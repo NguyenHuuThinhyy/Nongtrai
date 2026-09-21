@@ -291,9 +291,9 @@ namespace NongTrai.Editor
             Button(hud.pausePanel.transform,"Hướng dẫn",new Vector2(35,-215),hud.ToggleInstructions);
             Button(hud.pausePanel.transform,"Lưu game",new Vector2(35,-315),hud.SaveNow);
             Button(hud.pausePanel.transform,"Thoát game",new Vector2(35,-415),hud.Quit);
-            hud.saveStatus=Label(hud.pausePanel.transform,"Tự lưu mỗi 45 giây và khi thoát.",new Vector2(35,-505),new Vector2(520,38),19,Color.white);
+            hud.saveStatus=Label(hud.pausePanel.transform,"Chỉ lưu khi nhấn Lưu game.",new Vector2(35,-505),new Vector2(520,38),19,Color.white);
             hud.instructions=Panel(hud.pausePanel.transform,"Instructions",new Vector2(595,-35),new Vector2(665,510),new Color(.15f,.25f,.19f,1));
-            Label(hud.instructions.transform,"HƯỚNG DẪN\n\nWASD đi • Shift chạy • Space nhảy\nChuột nhìn • V đổi góc nhìn\nE mở cửa chuồng / lấy sữa, lông, thịt, trứng\nChuột trái nhấc thú • chuột phải thả đúng chuồng\n1–3 chọn hạt • E cày, gieo, tưới, thu hoạch\nB mở shop • I mở túi đồ / bán sản phẩm\nMỗi chuồng gà tối đa 5 con; nhặt trứng ở ổ\nEsc tiếp tục / đóng shop hoặc túi đồ\n\nGame tự lưu; nhấn Lưu game để lưu ngay.",new Vector2(25,-25),new Vector2(615,470),22,Color.white);
+            Label(hud.instructions.transform,"HƯỚNG DẪN\n\nWASD đi • Shift chạy • Space nhảy\nChuột nhìn • V đổi góc nhìn\nE mở cửa chuồng / lấy sữa, lông, thịt, trứng\nChuột trái nhấc thú • chuột phải thả đúng chuồng\n1–3 chọn hạt • E cày, gieo, tưới, thu hoạch\nB mở shop • I mở túi đồ / bán sản phẩm\nMỗi chuồng gà tối đa 5 con; nhặt trứng ở ổ\nEsc tiếp tục / đóng shop hoặc túi đồ\n\nThoát không tự lưu. Nhấn Lưu game để lưu.",new Vector2(25,-25),new Vector2(615,470),22,Color.white);
             hud.instructions.SetActive(false);
             hud.pausePanel.SetActive(false);
             BuildShop(hud,interaction);

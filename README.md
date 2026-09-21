@@ -1,6 +1,6 @@
 # Nông Trại — First Harvest
 
-**Bản mới:** I mở túi đồ và bán từng sản phẩm; nhấp trái nhấc vật nuôi, nhấp phải thả vào chuồng đúng loài; bốn loài có chuồng riêng. Bò cho sữa, cừu cho lông, heo cho thịt, gà đẻ trứng ở ổ (tối đa 5 con/chuồng gà). Có tự lưu và nút Lưu game trong menu Esc. Xem `CHOI_GAME.md`.
+**Bản mới:** I mở túi đồ và bán từng sản phẩm; nhấp trái nhấc vật nuôi, nhấp phải thả vào chuồng đúng loài; bốn loài có chuồng riêng. Bò cho sữa, cừu cho lông, heo cho thịt, gà đẻ trứng ở ổ (tối đa 5 con/chuồng gà). Chỉ lưu khi nhấn Lưu game trong menu Esc; thoát không tự lưu. Xem `CHOI_GAME.md`.
 
 **Bản cửa chuồng & shop:** E mở/đóng cửa chuồng; B mở shop mua hạt, vật nuôi, chuồng và cây táo, bán nông sản. Esc mở menu Hướng dẫn / Tiếp tục / Lưu game / Thoát; hướng dẫn ẩn khi chơi. Xem `CHOI_GAME.md` để biết giá và quy trình.
 

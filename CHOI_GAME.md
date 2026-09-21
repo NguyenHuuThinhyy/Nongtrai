@@ -7,7 +7,7 @@
 - Đứng gần vật nuôi, ngắm vào nó và **nhấp chuột trái** để nhấc. Đi vào chuồng đúng loài, hướng về chỗ trống và **nhấp chuột phải** để thả. Không thể thả nhầm chuồng hoặc ngoài chuồng.
 - **Bò:** ngắm và nhấn E lấy 3 sữa, chờ 45 giây để lấy tiếp. **Cừu:** E lấy 2 lông, chờ 60 giây. **Heo:** E lấy 6 thịt; con heo rời chuồng sau khi lấy thịt, cần mua con mới nếu muốn tiếp tục nuôi.
 - **Gà:** cứ 30 giây trong game, mỗi con gà đang ở chuồng tạo 1 trứng; mỗi ổ chứa tối đa 25 trứng. Ngắm ổ rơm trong chuồng gà và nhấn **E** để gom trứng vào túi đồ. Gà đang được cầm không đẻ trứng.
-- Game tự lưu khoảng mỗi 45 giây và khi thoát. Trong menu **Esc** có nút **Lưu game** để lưu ngay. Mở lại game sẽ tự tải bản lưu. Tiền, túi đồ, hạt, ô đất, cây táo, vật nuôi, trứng và cửa chuồng được lưu tại `%USERPROFILE%\AppData\LocalLow\Nong Trai Studio\Nong Trai - First Harvest\farm-save.json` trên Windows.
+- Game **chỉ lưu khi bạn nhấn Lưu game** trong menu **Esc**. Thoát game không lưu thay đổi kể từ lần bấm lưu gần nhất. Mở lại game sẽ tải bản lưu thủ công gần nhất; nếu chưa từng bấm lưu, game bắt đầu mới. Tiền, túi đồ, hạt, ô đất, cây táo, vật nuôi, trứng và cửa chuồng được lưu tại `%USERPROFILE%\AppData\LocalLow\Nong Trai Studio\Nong Trai - First Harvest\farm-manual-save.json` trên Windows. Bản mới không đọc file `farm-save.json` của bản cũ.
 
 ## Cửa chuồng, shop và menu Esc (bản mới)
 
@@ -18,7 +18,7 @@
 - Giá vật nuôi: bò 220, heo 120, cừu 150, gà 60 xu. Bò, heo và cừu mỗi chuồng chứa tối đa 4 con. Chuồng gà đầu chứa tối đa 5 con; chuồng gà thứ hai giá 400 xu và có cửa riêng.
 - **Cây táo giá 150 xu**, tự trồng tại khu vườn phía tây (x = -28 hoặc -33); tối đa 6 cây. Lứa đầu chín sau 30 giây; ngắm thân cây và nhấn E thu 5 táo, sau 60 giây có lứa tiếp theo.
 - Trong shop, nút **Bán toàn bộ nông sản** bán cây trồng giá 10 xu/đơn vị, táo giá 15 xu/quả. Nông sản đã bán bị trừ khỏi túi, không thể bán lặp lại.
-- Tiến trình và tiền được lưu tự động theo mục mới ở trên.
+- Tiến trình và tiền chỉ được lưu khi nhấn nút Lưu game theo mục mới ở trên.
 
 ## Nhân vật và vật nuôi
 

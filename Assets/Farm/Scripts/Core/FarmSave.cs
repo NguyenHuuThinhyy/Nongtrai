@@ -13,7 +13,7 @@ namespace NongTrai
         [Serializable] sealed class PenRecord { public int id,eggs; public float progress; public bool open; }
         [Serializable] sealed class SaveData
         {
-            public int version=1,money,fruit,treeCount,selected;
+            public int version=2,money,fruit,treeCount,selected;
             public bool expanded;
             public int[] seeds,harvested,products;
             public PlotRecord[] plots;
@@ -27,23 +27,12 @@ namespace NongTrai
         public FarmPlayer player;
         public string pathOverride;
         public string SavePath => string.IsNullOrEmpty(pathOverride)
-            ? Path.Combine(Application.persistentDataPath,"farm-save.json") : pathOverride;
-        bool smoke, loaded;
-        float elapsed;
+            ? Path.Combine(Application.persistentDataPath,"farm-manual-save.json") : pathOverride;
         IEnumerator Start()
         {
-            smoke=Array.IndexOf(Environment.GetCommandLineArgs(),"-farmSmokeCheck")>=0;
             yield return null;
-            if(!smoke) Load();
-            loaded=true;
+            if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmSmokeCheck")<0) Load();
         }
-        void Update()
-        {
-            if(smoke || !loaded || player.Paused) return;
-            elapsed+=Time.deltaTime;
-            if(elapsed>=45) { elapsed=0; Save(); }
-        }
-        void OnApplicationQuit() { if(loaded && !smoke) Save(); }
 
         public bool Save()
         {
@@ -89,7 +78,7 @@ namespace NongTrai
             try
             {
                 var data=JsonUtility.FromJson<SaveData>(File.ReadAllText(SavePath));
-                if(data==null || data.version!=1 || data.seeds==null || data.seeds.Length!=3 ||
+                if(data==null || data.version!=2 || data.seeds==null || data.seeds.Length!=3 ||
                     data.harvested==null || data.harvested.Length!=3 || data.products==null || data.products.Length!=4)
                     throw new InvalidDataException("Phiên bản dữ liệu lưu không phù hợp.");
                 shop.RestoreState(data.money,data.fruit,data.expanded,data.treeCount);
