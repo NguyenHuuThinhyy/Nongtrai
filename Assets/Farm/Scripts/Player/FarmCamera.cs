@@ -1,0 +1,37 @@
+using UnityEngine;
+using Unity.Cinemachine;
+
+namespace NongTrai
+{
+    [DefaultExecutionOrder(-100)]
+    public sealed class FarmCamera : MonoBehaviour
+    {
+        public FarmPlayer player;
+        public CinemachineCamera virtualCamera;
+        public LayerMask obstacleMask = 1;
+        public bool FirstPerson { get; private set; }
+        public float Yaw { get; private set; }
+        float pitch = 14;
+        public void ReadLook(Vector2 delta)
+        {
+            Yaw += delta.x * player.settings.mouseSensitivity;
+            pitch = Mathf.Clamp(pitch - delta.y * player.settings.mouseSensitivity, -50, 75);
+        }
+        public void ToggleView()
+        {
+            FirstPerson = !FirstPerson;
+            player.visual.gameObject.SetActive(!FirstPerson);
+        }
+        void LateUpdate()
+        {
+            Quaternion rotation = Quaternion.Euler(pitch, Yaw, 0);
+            Vector3 pivot = player.transform.position + Vector3.up * 1.65f;
+            float distance = FirstPerson ? 0 : player.settings.cameraDistance;
+            // Chỉ kiểm tra môi trường; layer Player được loại khỏi obstacleMask.
+            if (distance > 0 && Physics.SphereCast(pivot, 0.2f, -(rotation * Vector3.forward),
+                out RaycastHit hit, distance, obstacleMask, QueryTriggerInteraction.Ignore))
+                distance = Mathf.Max(0, hit.distance - 0.1f);
+            virtualCamera.transform.SetPositionAndRotation(pivot - rotation * Vector3.forward * distance, rotation);
+        }
+    }
+}
