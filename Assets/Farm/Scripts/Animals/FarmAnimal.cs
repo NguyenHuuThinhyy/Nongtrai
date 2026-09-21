@@ -8,6 +8,11 @@ namespace NongTrai
         public float speed = 0.75f;
         public Transform[] legs;
         public Transform head;
+        public AnimalSpecies species;
+        public AnimalPen pen;
+        public bool IsCarried { get; private set; }
+        public float ProductCooldown { get; private set; }
+        public void RestoreCooldown(float seconds) => ProductCooldown = Mathf.Max(0,seconds);
         public float DistanceTravelled { get; private set; }
         static readonly List<FarmAnimal> herd = new List<FarmAnimal>();
         FarmPlayer player;
@@ -16,11 +21,56 @@ namespace NongTrai
         void OnEnable() => herd.Add(this);
         void OnDisable() => herd.Remove(this);
         void Start() { player=FindFirstObjectByType<FarmPlayer>(); ChooseGoal(); }
+        public void AssignPen(AnimalPen target)
+        {
+            pen = target;
+            minimum = target.minimum;
+            maximum = target.maximum;
+            ChooseGoal();
+        }
+        public void SetCarried(bool carried)
+        {
+            IsCarried = carried;
+            foreach (var collider in GetComponentsInChildren<Collider>()) collider.enabled = !carried;
+            var body = GetComponent<Rigidbody>();
+            if (body != null) body.detectCollisions = !carried;
+            if (!carried) ChooseGoal();
+        }
+        public bool TryCollect(FarmInventory inventory, out string message)
+        {
+            if (species == AnimalSpecies.Chicken) { message = "Đến ổ trứng trong chuồng gà để lấy trứng."; return false; }
+            if (species == AnimalSpecies.Pig)
+            {
+                inventory.AddProduct(FarmInventory.Meat, 6);
+                message = "Đã lấy 6 thịt từ heo. Heo rời chuồng; hãy mua con mới nếu muốn nuôi tiếp.";
+                Destroy(gameObject);
+                return true;
+            }
+            if (ProductCooldown > 0)
+            {
+                message = "Chưa đến lượt lấy sản phẩm. Chờ " + Mathf.CeilToInt(ProductCooldown) + " giây.";
+                return false;
+            }
+            if (species == AnimalSpecies.Cow)
+            {
+                inventory.AddProduct(FarmInventory.Milk, 3);
+                ProductCooldown = 45;
+                message = "+3 sữa trong túi đồ.";
+            }
+            else
+            {
+                inventory.AddProduct(FarmInventory.Wool, 2);
+                ProductCooldown = 60;
+                message = "+2 lông cừu trong túi đồ.";
+            }
+            return true;
+        }
         void ChooseGoal() { goal=new Vector3(Random.Range(minimum.x,maximum.x),transform.position.y,Random.Range(minimum.y,maximum.y)); }
         void FixedUpdate()
         {
-            if (player == null || player.Paused) return;
+            if (player == null || player.Paused || IsCarried) return;
             float step=Time.fixedDeltaTime;
+            ProductCooldown = Mathf.Max(0, ProductCooldown - step);
             if (resting>0)
             {
                 resting-=step;
@@ -35,7 +85,7 @@ namespace NongTrai
             // Tránh người chơi và các con khác trong chuồng, không cần NavMesh cho sân trống.
             foreach(var animal in herd)
             {
-                if(animal==this) continue;
+                if(animal==this || animal.IsCarried || animal.pen != pen) continue;
                 Vector3 away=transform.position-animal.transform.position; away.y=0;
                 if(away.sqrMagnitude<2.5f && away.sqrMagnitude>0.001f) move+=away.normalized*(1.6f-away.magnitude)*2;
             }

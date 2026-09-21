@@ -1,6 +1,10 @@
 # Nông Trại — First Harvest
 
-**Đã cập nhật vòng chơi canh tác:** xem [CHOI_GAME.md](CHOI_GAME.md) để cày, gieo, tưới và thu hoạch. Các mô tả Giai đoạn 1 bên dưới là tài liệu nền tảng; giới hạn “cây chỉ minh họa” đã được thay bằng 80 ô đất tương tác trong bản mới. Chưa có lưu game.
+**Bản mới:** I mở túi đồ và bán từng sản phẩm; nhấp trái nhấc vật nuôi, nhấp phải thả vào chuồng đúng loài; bốn loài có chuồng riêng. Bò cho sữa, cừu cho lông, heo cho thịt, gà đẻ trứng ở ổ (tối đa 5 con/chuồng gà). Có tự lưu và nút Lưu game trong menu Esc. Xem `CHOI_GAME.md`.
+
+**Bản cửa chuồng & shop:** E mở/đóng cửa chuồng; B mở shop mua hạt, vật nuôi, chuồng và cây táo, bán nông sản. Esc mở menu Hướng dẫn / Tiếp tục / Lưu game / Thoát; hướng dẫn ẩn khi chơi. Xem `CHOI_GAME.md` để biết giá và quy trình.
+
+**Đã cập nhật vòng chơi canh tác:** xem [CHOI_GAME.md](CHOI_GAME.md) để cày, gieo, tưới và thu hoạch. Các mô tả Giai đoạn 1 bên dưới là tài liệu nền tảng; giới hạn “cây chỉ minh họa” đã được thay bằng 80 ô đất tương tác trong bản mới.
 
 Giai đoạn 1 của lộ trình trong `prompt.MD`: dự án Unity PC với địa hình mẫu, nhân vật đi bộ và camera. Ảnh `ChatGPT Image Sep 20, 2026, 07_13_45 PM.png` là tham chiếu bố cục, màu sắc và phong cách nông trại; không phải bộ model 3D có thể nhập trực tiếp. Toàn bộ hình học hiện tại là primitive Unity, không cần mua asset.
 
@@ -77,6 +81,6 @@ Lệnh này dựng lại scene mặc định rồi build. Để build scene đã
 
 ## Phạm vi
 
-Đây là nền tảng chơi được của giai đoạn 1, chưa phải game mô phỏng hoàn chỉnh. Cây chỉ để minh họa, mặt ao chưa có vật lý nước, nhân vật chưa có animation; không hiển thị tiền/thời tiết giả. Các manager thời gian, thời tiết, đất, cây, kinh tế và lưu game sẽ bổ sung đúng từng giai đoạn trong prompt. Bước tiếp theo là **Giai đoạn 2: TimeManager + WeatherManager**.
+Đây là game nông trại mẫu có canh tác, kinh tế, vật nuôi và lưu tiến độ; chưa có thời tiết, mùa, máy kéo hoặc cho ăn/sinh sản. Mặt ao chỉ để minh họa; model vẫn là primitive. Hệ thống tiếp theo trong lộ trình là thời gian, thời tiết và mùa vụ.
 
 Thiết kế camera có tham khảo tài liệu chính thức: https://docs.unity.cn/Packages/com.unity.cinemachine@3.1/manual/setup-follow-camera.html

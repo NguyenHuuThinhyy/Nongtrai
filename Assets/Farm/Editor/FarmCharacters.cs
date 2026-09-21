@@ -45,19 +45,24 @@ namespace NongTrai.Editor
         }
         static void BuildAnimals()
         {
-            var pen=new GameObject("Animal paddock").transform;
-            for(int x=8;x<=28;x+=4) { Fence(pen,new Vector3(x,0,0),false); Fence(pen,new Vector3(x,0,10),false); }
-            for(int z=0;z<10;z+=4) { Fence(pen,new Vector3(8,0,z),true); Fence(pen,new Vector3(32,0,z),true); }
-            Sign(pen,new Vector3(8,0,-.8f),"Vật nuôi","Bò, heo, cừu và gà tự đi lại, nghỉ ngơi trong khu chăn nuôi.");
-            Box("Water trough",new Vector3(30,.3f,5),new Vector3(1.1f,.6f,3),wood,pen);
-            Box("Drinking water",new Vector3(30,.62f,5),new Vector3(.9f,.03f,2.8f),water,pen,false);
+            var pen=new GameObject("Four animal paddocks").transform;
+            pens=new[] {
+                BuildPen(pen,"bò",AnimalSpecies.Cow,8,19,0,10,4),
+                BuildPen(pen,"heo",AnimalSpecies.Pig,21,32,0,10,4),
+                BuildPen(pen,"cừu",AnimalSpecies.Sheep,8,19,11,20,4),
+                BuildPen(pen,"gà",AnimalSpecies.Chicken,21,32,11,20,5)
+            };
+            Box("Water trough",new Vector3(17,.3f,8),new Vector3(1.1f,.6f,1.2f),wood,pen);
+            Box("Drinking water",new Vector3(17,.62f,8),new Vector3(.9f,.03f,1),water,pen,false);
             string[] species={"Bò","Heo","Cừu","Gà","Gà","Heo"};
             for(int index=0;index<species.Length;index++)
             {
                 string kind=species[index]; bool chicken=kind=="Gà";
-                var root=Pivot(kind,pen,new Vector3(11+index*3,0,4+(index%2)*2));
+                int type=kind=="Bò"?0:kind=="Heo"?1:kind=="Cừu"?2:3;
+                var home=pens[type];
+                var root=Pivot(kind,home.transform,new Vector3((home.minimum.x+home.maximum.x)/2+(index%2)*.8f,0,(home.minimum.y+home.maximum.y)/2));
                 root.rotation=Quaternion.Euler(0,170+index*31,0);
-                var animal=root.gameObject.AddComponent<FarmAnimal>(); animal.speed=chicken?1.1f:.65f;
+                var animal=root.gameObject.AddComponent<FarmAnimal>(); animal.speed=chicken?1.1f:.65f; animal.species=(AnimalSpecies)type;
                 var white=Mat("Animal ivory","EEE4CB"); var black=Mat("Animal black","373433"); var pink=Mat("Pig pink","E9A097");
                 var bodyMaterial=kind=="Heo"?pink:white;
                 float size=chicken?.48f:kind=="Bò"?1.1f:.85f;
@@ -92,6 +97,8 @@ namespace NongTrai.Editor
                 }
                 var collider=root.gameObject.AddComponent<CapsuleCollider>(); collider.center=new Vector3(0,.65f*size,0); collider.radius=.45f*size; collider.height=1.3f*size;
                 var rb=root.gameObject.AddComponent<Rigidbody>(); rb.isKinematic=true; rb.useGravity=false;
+                if(index<4) UnityEditor.PrefabUtility.SaveAsPrefabAsset(root.gameObject,Root+"Prefabs/Animal"+index+".prefab");
+                animal.AssignPen(home);
             }
         }
     }

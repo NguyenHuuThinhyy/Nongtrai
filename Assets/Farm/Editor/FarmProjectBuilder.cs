@@ -129,7 +129,7 @@ namespace NongTrai.Editor
                         var tile = Box("Ô đất " + field + "-" + col + "-" + row,
                             new Vector3(x - 5.6f + col * 2.8f, 0.14f, z - 4.2f + row * 2.8f),
                             new Vector3(2.55f, 0.2f, 2.55f), earth, environment);
-                        tile.AddComponent<FarmPlot>();
+                        tile.AddComponent<FarmPlot>().id=field*20+col*4+row;
                     }
             }
             Barn(environment, new Vector3(-13, 0, 23), 1);
@@ -282,17 +282,21 @@ namespace NongTrai.Editor
             Label(canvas.transform, "NÔNG TRẠI  /  VỤ MÙA ĐẦU TIÊN", new Vector2(50, -88), new Vector2(360, 28), 18, Color.white);
             Panel(canvas.transform, "Crop inventory", new Vector2(1120, -26), new Vector2(450, 130), new Color(0.1f, 0.19f, 0.16f, 0.94f));
             hud.farmingStatus = Label(canvas.transform, "", new Vector2(1140, -42), new Vector2(415, 110), 21, Color.white);
-            Panel(canvas.transform, "Guide", new Vector2(28, -718), new Vector2(560, 155), new Color(0.1f, 0.19f, 0.16f, 0.92f));
-            Label(canvas.transform, "KHÁM PHÁ NÔNG TRẠI", new Vector2(48, -733), new Vector2(500, 30), 20, new Color(1, 0.86f, 0.52f));
-            Label(canvas.transform, "WASD  Di chuyển     SHIFT  Chạy     SPACE  Nhảy\nCHUỘT  Nhìn     V  Đổi góc nhìn     E  Tương tác\nESC  Tạm dừng / Thả chuột", new Vector2(48, -772), new Vector2(530, 90), 19, Color.white);
             Label(canvas.transform, "+", new Vector2(788, -433), new Vector2(24, 34), 24, Color.white);
             hud.prompt = Label(canvas.transform, "", new Vector2(440, -515), new Vector2(950, 70), 21, Color.white);
-            hud.toast = Label(canvas.transform, "Đến ruộng, nhìn xuống ô đất và nhấn E để cày, gieo, tưới. Phím 1–3 chọn hạt.", new Vector2(400, -170), new Vector2(800, 90), 22, Color.white);
-            hud.pausePanel = Panel(canvas.transform, "Pause", new Vector2(500, -270), new Vector2(600, 340), new Color(0.08f, 0.16f, 0.13f, 0.98f));
-            Label(hud.pausePanel.transform, "TẠM DỪNG", new Vector2(40, -30), new Vector2(520, 60), 36, Color.white);
-            Button(hud.pausePanel.transform, "Tiếp tục", new Vector2(40, -120), hud.Resume);
-            Button(hud.pausePanel.transform, "Thoát game", new Vector2(40, -220), hud.Quit);
+            hud.toast = Label(canvas.transform, "", new Vector2(400, -170), new Vector2(800, 90), 22, Color.white);
+            hud.pausePanel = Panel(canvas.transform, "Pause", new Vector2(150,-160), new Vector2(1300,580), new Color(.08f,.16f,.13f,.99f));
+            Label(hud.pausePanel.transform,"TẠM DỪNG",new Vector2(35,-25),new Vector2(500,55),32,Color.white);
+            Button(hud.pausePanel.transform,"Tiếp tục",new Vector2(35,-115),hud.Resume);
+            Button(hud.pausePanel.transform,"Hướng dẫn",new Vector2(35,-215),hud.ToggleInstructions);
+            Button(hud.pausePanel.transform,"Lưu game",new Vector2(35,-315),hud.SaveNow);
+            Button(hud.pausePanel.transform,"Thoát game",new Vector2(35,-415),hud.Quit);
+            hud.saveStatus=Label(hud.pausePanel.transform,"Tự lưu mỗi 45 giây và khi thoát.",new Vector2(35,-505),new Vector2(520,38),19,Color.white);
+            hud.instructions=Panel(hud.pausePanel.transform,"Instructions",new Vector2(595,-35),new Vector2(665,510),new Color(.15f,.25f,.19f,1));
+            Label(hud.instructions.transform,"HƯỚNG DẪN\n\nWASD đi • Shift chạy • Space nhảy\nChuột nhìn • V đổi góc nhìn\nE mở cửa chuồng / lấy sữa, lông, thịt, trứng\nChuột trái nhấc thú • chuột phải thả đúng chuồng\n1–3 chọn hạt • E cày, gieo, tưới, thu hoạch\nB mở shop • I mở túi đồ / bán sản phẩm\nMỗi chuồng gà tối đa 5 con; nhặt trứng ở ổ\nEsc tiếp tục / đóng shop hoặc túi đồ\n\nGame tự lưu; nhấn Lưu game để lưu ngay.",new Vector2(25,-25),new Vector2(615,470),22,Color.white);
+            hud.instructions.SetActive(false);
             hud.pausePanel.SetActive(false);
+            BuildShop(hud,interaction);
             new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
         }
         static RectTransform Rect(GameObject go, Transform parent, Vector2 position, Vector2 size)
@@ -336,5 +340,6 @@ namespace NongTrai.Editor
         }
     }
 }
+
 
 

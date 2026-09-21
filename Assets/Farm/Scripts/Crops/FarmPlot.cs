@@ -4,6 +4,7 @@ namespace NongTrai
     public enum PlotState { Untilled, Tilled, Growing, Ready }
     public sealed class FarmPlot : MonoBehaviour
     {
+        public int id;
         public PlotState State { get; private set; }
         public CropDefinition Crop { get; private set; }
         public float Moisture { get; private set; }
@@ -41,6 +42,13 @@ namespace NongTrai
             Growth = Mathf.Min(1, Growth + wateredSeconds / Crop.growthSeconds);
             if (Growth >= 1) State = PlotState.Ready;
             Refresh();
+        }
+        public void Restore(PlotState state,CropDefinition crop,float growth,float moisture)
+        {
+            State=state; Crop=crop; Growth=Mathf.Clamp01(growth); Moisture=Mathf.Clamp01(moisture);
+            if(fruit!=null) Destroy(fruit);
+            fruit=crop==null?null:Material(crop.fruitColor);
+            stage=-99;Refresh();
         }
         public void Highlight(bool value)
         {
