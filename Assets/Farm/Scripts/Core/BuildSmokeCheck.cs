@@ -109,6 +109,23 @@ namespace NongTrai
             if(!inventory.Panel.activeSelf || !player.Paused || shop.Panel.activeSelf) throw new InvalidOperationException("Inventory panel failed.");
             Capture(Path.Combine(folder,"inventory-preview.png"),hud,camera);
             hud.Resume();
+            FarmProcessing.Instance.Open();
+            Capture(Path.Combine(folder,"processing-preview.png"),hud,camera);
+            hud.Resume();
+            FarmExpansion.Instance.Open();
+            Capture(Path.Combine(folder,"land-preview.png"),hud,camera);
+            hud.Resume();
+            shop.barn.Open();
+            Capture(Path.Combine(folder,"barn-preview.png"),hud,camera);
+            hud.Resume();
+            hud.mainMenu.SetActive(true);player.SetPaused(true);hud.pausePanel.SetActive(false);
+            Capture(Path.Combine(folder,"main-menu-preview.png"),hud,camera);
+            hud.OpenSettings();
+            if(!hud.settingsPanel.activeSelf || hud.mainMenu.activeSelf)
+                throw new InvalidOperationException("Settings menu failed.");
+            Capture(Path.Combine(folder,"settings-preview.png"),hud,camera);
+            hud.CloseSettings();
+            hud.Resume();
             for(int i=0;i<5;i++) if(!shop.ConsumeSeed(0)) throw new InvalidOperationException("Seed use failed.");
             if(shop.ConsumeSeed(0)) throw new InvalidOperationException("Seed inventory went negative.");
             if(!shop.Purchase(0,out _) || shop.Seeds[0]!=5 || shop.Money!=990) throw new InvalidOperationException("Seed purchase failed.");
@@ -206,6 +223,104 @@ namespace NongTrai
             Capture(Path.Combine(folder,"animals-preview.png"),hud,camera);
             hud.gameObject.SetActive(true);
             Debug.Log("FARM_ANIMALS_SIGNS_OK: six animals moved, stayed in paddock, paused correctly; front/back sign and farmer screenshots captured.");
+            var progress=FarmExpansion.Instance;
+            var processing=FarmProcessing.Instance;
+            if(progress==null || processing==null || processing.Recipes.Length!=6)
+                throw new InvalidOperationException("Expansion systems or JSON recipes missing.");
+            milkCow=null;
+            foreach(var candidate in FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None))
+                if(candidate.species==AnimalSpecies.Cow) { milkCow=candidate;break; }
+            if(milkCow==null) throw new InvalidOperationException("Cow missing after load.");
+            milkCow.RestoreCare(0,0);milkCow.RestoreCooldown(0);
+            if(milkCow.TryCollect(inventory,out _)) throw new InvalidOperationException("Hungry cow produced milk.");
+            shop.AddFeed(2);milkCow.Feed(shop,out _);milkCow.Feed(shop,out _);
+            if(!milkCow.WellCared || !milkCow.TryCollect(inventory,out _))
+                throw new InvalidOperationException("Feeding did not restore cow production.");
+            shop.Credit(3000);
+            if(!shop.speciesPens[0].Upgrade(shop,out _) || shop.speciesPens[0].capacity!=6)
+                throw new InvalidOperationException("Pen upgrade failed.");
+            if(!shop.speciesPens[3].Upgrade(shop,out _) || shop.speciesPens[3].capacity!=5)
+                throw new InvalidOperationException("Chicken pen exceeded five animals.");
+            int flourBefore=inventory.Count(8);
+            inventory.Add(0,3);
+            if(!processing.Enqueue(0) || processing.QueueCount!=1)
+                throw new InvalidOperationException("Processing queue failed.");
+            var fastJob=processing.Snapshot();fastJob[0].remaining=0;
+            processing.Restore(fastJob);
+            player.SetPaused(false);yield return null;
+            if(inventory.Count(8)!=flourBefore+2 || processing.QueueCount!=0)
+                throw new InvalidOperationException("Flour processing failed.");
+            progress.GainExperience(500);
+            if(progress.Level<2 || !progress.BuyRegion(1) || !progress.UnlockedRegions[1])
+                throw new InvalidOperationException("Level gated land purchase failed.");
+            if(!progress.UpgradeTool(0) || progress.ToolRadius(0)!=3)
+                throw new InvalidOperationException("Tool upgrade failed.");
+            save.pathOverride=Path.Combine(Application.temporaryCachePath,"farm-expansion-smoke-save.json");
+            int savedLevel=progress.Level,savedFeed=shop.FeedStock;
+            if(!save.Save()) throw new InvalidOperationException("Expansion save failed.");
+            progress.Restore(1,0,1,0,null,null);shop.AddFeed(9);
+            if(!save.Load() || progress.Level!=savedLevel || !progress.UnlockedRegions[1] ||
+                progress.ToolRadius(0)!=3 || shop.FeedStock!=savedFeed)
+                throw new InvalidOperationException("Expansion save did not restore state.");
+            File.Delete(save.SavePath);
+            if(File.Exists(save.SavePath+".bak")) File.Delete(save.SavePath+".bak");
+            save.pathOverride=null;
+            Debug.Log("FARM_EXPANSION_OK: animal care, pens, JSON processing, region gates, tools and manual save.");
+            var clock=TimeManager.Instance;
+            var islands=IslandManager.Instance;
+            var disaster=FindFirstObjectByType<DisasterPuzzleManager>();
+            if(clock==null || islands==null || disaster==null || TimeManager.DayLengthSeconds!=600)
+                throw new InvalidOperationException("Time, island or disaster manager missing.");
+            clock.Restore(28,.80f,FarmWeather.Sunny);
+            if(clock.Season!=FarmSeason.Spring || clock.Year!=1)
+                throw new InvalidOperationException("Season calendar incorrect.");
+            clock.SleepUntilMorning();
+            if(disaster.Pending) disaster.Answer(0);
+            if(clock.Day!=29 || clock.Season!=FarmSeason.Summer || clock.Hour!=6)
+                throw new InvalidOperationException("Sleep or season transition failed.");
+            plots[0].Restore(PlotState.Growing,field.crops[0],0,0);
+            clock.SetWeather(FarmWeather.Rain);
+            if(plots[0].Moisture<.99f) throw new InvalidOperationException("Rain did not water crops.");
+            clock.SetWeather(FarmWeather.Storm,true);
+            if(!disaster.Pending || disaster.ProjectedDamage<30 || disaster.ProjectedDamage>80)
+                throw new InvalidOperationException("Storm puzzle did not start.");
+            disaster.Answer(0);
+            if(disaster.LastDamage!=0 || disaster.LastPrevented==0)
+                throw new InvalidOperationException("Correct storm answer did not protect farm.");
+            inventory.Add(0,10);int beforeStorm=inventory.Count(0);
+            disaster.BeginStorm();disaster.Answer(1);
+            if(inventory.Count(0)>=beforeStorm || disaster.LastDamage==0)
+                throw new InvalidOperationException("Wrong storm answer caused no damage.");
+            clock.SetWeather(FarmWeather.Sunny);
+            progress.GainExperience(2000);
+            if(progress.Level!=5 || progress.LevelCap!=5)
+                throw new InvalidOperationException("Mystery level cap failed.");
+            if(!islands.Travel(1) || Mathf.Abs(player.transform.position.x-200)>2 ||
+                !islands.Travel(2) || Mathf.Abs(player.transform.position.x-400)>2)
+                throw new InvalidOperationException("Island travel failed.");
+            inventory.Add(13,2);
+            if(processing.Enqueue(5)) throw new InvalidOperationException("Furnace worked without blueprint.");
+            islands.OpenMystery();
+            if(!islands.AnswerMystery(1) || progress.LevelCap!=10 || islands.Blueprints!=1)
+                throw new InvalidOperationException("Mystery challenge or blueprint failed.");
+            hud.Resume();
+            if(!processing.Enqueue(5)) throw new InvalidOperationException("Furnace did not unlock.");
+            islands.OpenNpc(0);islands.Talk();
+            clock.Restore(clock.Day+1,.25f,FarmWeather.Sunny);islands.Talk();islands.Befriend();
+            if(islands.FriendCount!=1) throw new InvalidOperationException("NPC friendship failed.");
+            hud.Resume();
+            var hotbar=FindFirstObjectByType<FarmHudV2>();hotbar.Select(8);
+            if(hotbar.SelectedSlot!=8) throw new InvalidOperationException("Nine slot hotbar failed.");
+            save.pathOverride=Path.Combine(Application.temporaryCachePath,"farm-islands-smoke-save.json");
+            if(!save.Save()) throw new InvalidOperationException("Island save failed.");
+            clock.Restore(1,.25f,FarmWeather.Sunny);player.Teleport(Vector3.zero);
+            if(!save.Load() || clock.Day<=1 || islands.Blueprints!=1 || islands.FriendCount!=1 ||
+                Mathf.Abs(player.transform.position.x-400)>2)
+                throw new InvalidOperationException("Time/island save did not restore.");
+            File.Delete(save.SavePath);
+            if(File.Exists(save.SavePath+".bak")) File.Delete(save.SavePath+".bak");
+            save.pathOverride=null;
+            Debug.Log("FARM_ISLANDS_TIME_OK: 10-minute day, seasons, rain, storm puzzle, sleep, portals, NPCs, level cap, furnace blueprint, hotbar and manual save.");
             yield return new WaitForSeconds(2);
             Debug.Log("FARM_CROPS_SMOKE_OK: grounded, cameras, pause, 80 plots, three crops, dry growth blocked, watering, harvest inventory, replant, screenshot.");
             Application.Quit(0);

@@ -1,10 +1,14 @@
 using UnityEngine;
 namespace NongTrai
 {
-    public sealed class PaddockGate : MonoBehaviour
+    public sealed class PaddockGate : MonoBehaviour, IInteractable
     {
         public Transform door;
         public bool IsOpen { get; private set; }
+        public string InteractionHint => IsOpen?"[E] Đóng cửa chuồng":"[E] Mở cửa chuồng";
+        public bool CanInteract(FarmPlayer source) => true;
+        public void Interact(PlayerInteraction actor) => actor.Say(Toggle());
+        public void SetHighlighted(bool selected) => InteractionOutline.Set(this,selected);
         FarmPlayer player;
         void Start() => player=FindFirstObjectByType<FarmPlayer>();
         public string Toggle()

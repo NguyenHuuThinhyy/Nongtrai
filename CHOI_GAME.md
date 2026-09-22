@@ -1,60 +1,55 @@
-# Bản cập nhật canh tác
+# Nông Trại – cách chơi bản mở rộng
 
-## Túi đồ, vật nuôi và lưu game
+Mở `D:\GAME_NongTrai\Builds\Windows\NongTrai.exe`, giữ nguyên toàn bộ thư mục `Windows` khi chép sang máy khác. Ở menu chính, chọn **Vào nông trại**. Mở Unity Editor nếu muốn sửa game; người chơi trên máy khác không cần cài Unity.
 
-- **I** mở túi đồ để xem lúa mì, cà chua, đậu nành, táo, trứng, sữa, lông cừu và thịt heo. Mỗi dòng có **Bán 1** và **Bán hết**; shop vẫn có nút bán tất cả sản phẩm.
-- Chuồng bò, heo, cừu, gà tách riêng. Chuồng gà ban đầu tối đa **5 con**. Trong shop có thể mua thêm chuồng gà thứ hai (thêm 5 chỗ).
-- Đứng gần vật nuôi, ngắm vào nó và **nhấp chuột trái** để nhấc. Đi vào chuồng đúng loài, hướng về chỗ trống và **nhấp chuột phải** để thả. Không thể thả nhầm chuồng hoặc ngoài chuồng.
-- **Bò:** ngắm và nhấn E lấy 3 sữa, chờ 45 giây để lấy tiếp. **Cừu:** E lấy 2 lông, chờ 60 giây. **Heo:** E lấy 6 thịt; con heo rời chuồng sau khi lấy thịt, cần mua con mới nếu muốn tiếp tục nuôi.
-- **Gà:** cứ 30 giây trong game, mỗi con gà đang ở chuồng tạo 1 trứng; mỗi ổ chứa tối đa 25 trứng. Ngắm ổ rơm trong chuồng gà và nhấn **E** để gom trứng vào túi đồ. Gà đang được cầm không đẻ trứng.
-- Game **chỉ lưu khi bạn nhấn Lưu game** trong menu **Esc**. Thoát game không lưu thay đổi kể từ lần bấm lưu gần nhất. Mở lại game sẽ tải bản lưu thủ công gần nhất; nếu chưa từng bấm lưu, game bắt đầu mới. Tiền, túi đồ, hạt, ô đất, cây táo, vật nuôi, trứng và cửa chuồng được lưu tại `%USERPROFILE%\AppData\LocalLow\Nong Trai Studio\Nong Trai - First Harvest\farm-manual-save.json` trên Windows. Bản mới không đọc file `farm-save.json` của bản cũ.
+| Phím | Tác dụng |
+|---|---|
+| WASD, Shift, Space | Di chuyển, chạy, nhảy |
+| Chuột, V | Nhìn, đổi góc nhìn |
+| E | Cày, gieo, tưới, thu hoạch; dùng quầy/máy; lấy sản phẩm; mở cửa chuồng |
+| 1, 2, 3 | Chọn lúa mì, cà chua, đậu nành |
+| B | Shop mua hạt, vật nuôi, cây táo, chuồng gà |
+| I | Túi đồ, bán từng loại hoặc bán hết |
+| M | Máy chế biến và hàng đợi |
+| N | Cấp độ, mua vùng đất và nâng cấp dụng cụ |
+| P | Quản lý chuồng, mua thức ăn và chuồng mới |
+| Tab | Mở bản đồ bốn đảo và dịch chuyển |
+| F | Cho vật nuôi đang ngắm ăn |
+| Chuột trái/phải | Nhấc vật nuôi / thả vào đúng chuồng |
+| 1–9, cuộn chuột | Chọn ô hotbar |
+| Esc | Tạm dừng; mở hướng dẫn, chỉnh âm lượng, lưu, tiếp tục hoặc thoát |
 
-## Cửa chuồng, shop và menu Esc (bản mới)
+## Vòng chơi
 
-- **Esc** mở menu tạm dừng. Chọn **Hướng dẫn**, **Tiếp tục** hoặc **Thoát game**. Hướng dẫn không hiện trên màn hình chơi.
-- Đến cửa màu vàng ở cạnh trái chuồng, ngắm vào cửa và nhấn **E** để mở/đóng. Không đóng được khi đứng ngay trong lối cửa. Vật nuôi tiếp tục ở trong phạm vi khu chăn nuôi.
-- **B** mở shop ở bất kỳ đâu; hoặc đến quầy mái đỏ gần nhà kho, ngắm quầy và nhấn **E**.
-- Bắt đầu với **1.000 xu**, mỗi loại hạt **5 hạt**. Mỗi lần gieo trừ 1 hạt; mua 5 hạt giá 10 xu.
-- Giá vật nuôi: bò 220, heo 120, cừu 150, gà 60 xu. Bò, heo và cừu mỗi chuồng chứa tối đa 4 con. Chuồng gà đầu chứa tối đa 5 con; chuồng gà thứ hai giá 400 xu và có cửa riêng.
-- **Cây táo giá 150 xu**, tự trồng tại khu vườn phía tây (x = -28 hoặc -33); tối đa 6 cây. Lứa đầu chín sau 30 giây; ngắm thân cây và nhấn E thu 5 táo, sau 60 giây có lứa tiếp theo.
-- Trong shop, nút **Bán toàn bộ nông sản** bán cây trồng giá 10 xu/đơn vị, táo giá 15 xu/quả. Nông sản đã bán bị trừ khỏi túi, không thể bán lặp lại.
-- Tiến trình và tiền chỉ được lưu khi nhấn nút Lưu game theo mục mới ở trên.
+Ngắm ô đất gần người và nhấn E lần lượt để cày, gieo, tưới, thu hoạch. Cây có bốn giai đoạn chuyển động khi lớn. Cây chỉ lớn khi đủ nước. Bán sản phẩm trong túi để kiếm xu; thu hoạch, chăm vật nuôi, chế biến và bán hàng cho XP. Nâng cấp **cuốc, bình tưới, liềm** từ đồng lên bạc rồi vàng bằng bảng N: số ô tác động cùng lúc là 1, 3, 5. Bốn vùng ruộng, mỗi vùng 20 ô, mở lần lượt bằng xu khi đạt cấp 1, 2, 4, 6; vùng đầu mở sẵn. Giá mở vùng sau tăng dần: 500, 1.200, 2.400 xu.
 
-## Nhân vật và vật nuôi
+Gà, bò, cừu và heo có độ no, độ vui. Một ngày trong game dài **10 phút**; độ no và vui giảm theo thời gian. Ngắm con vật và nhấn F để dùng một thức ăn. Vật nuôi cần đủ no và vui mới tạo sản phẩm. Gà đẻ trứng theo chu kỳ tại ổ, mỗi chuồng gà tối đa 5 con. Bò cho sữa mỗi 45 giây, cừu cho len mỗi 60 giây. Heo cho thịt một lần. Bảng P bán 10 thức ăn giá 50 xu, xây thêm chuồng bò/cừu và nâng cấp chuồng. Nâng cấp chuồng bò, cừu, heo tăng sức chứa; nâng chuồng gà rút ngắn chu kỳ đẻ, vẫn giữ tối đa 5 con. Shop B bán chuồng gà thứ hai.
 
-- Nhân vật mới có khuôn mặt, tóc, mũ có đai, áo yếm và túi áo; tay chân chuyển động khi đi/chạy. Xoay camera bằng chuột để nhìn mặt nhân vật.
-- Khu vật nuôi ở bên phải đường chính, trước nhà kho nhỏ: hai heo, hai gà, một bò và một cừu. Chúng tự di chuyển, nghỉ, tránh nhau và ở trong phạm vi chuồng. Esc cũng dừng vật nuôi.
-- Vật nuôi hiện chưa có cho ăn hoặc sinh sản; sản phẩm được lấy theo hướng dẫn ở đầu tài liệu.
-- Chữ bảng dùng shader có kiểm tra độ sâu để mặt chữ phía sau bị tấm bảng che; không còn dùng shader chữ mặc định hiển thị xuyên vật thể.
+Nhấn M để mở xưởng, hoặc đến bốn máy gần quầy shop và nhấn E. Công thức nằm trong `Assets/StreamingAssets/recipes.json`; mỗi máy có hàng đợi tối đa 5 lượt, nguyên liệu được trừ khi xếp việc và thành phẩm vào túi khi hết thời gian. Giá bán mỗi thành phẩm cao hơn tổng giá nguyên liệu:
 
-Mở `D:\GAME_NongTrai\Builds\Windows\NongTrai.exe`. Giữ nguyên toàn bộ thư mục Windows. Nếu đang chạy bản cũ, thoát rồi mở lại file này.
+| Máy | Công thức | Chờ | Giá bán |
+|---|---|---:|---:|
+| Cối xay | 3 lúa mì → 2 bột mì | 25 giây | 44 xu |
+| Lò bánh | 2 bột mì → 1 bánh mì | 35 giây | 65 xu |
+| Thùng ủ | 2 sữa → 1 phô mai | 40 giây | 65 xu |
+| Máy ép | 3 táo → 2 nước táo | 30 giây | 70 xu |
+| Xưởng cưa | 2 gỗ → 1 ván | 45 giây | 34 xu |
+| Lò nung | 2 quặng → 1 kim loại | 55 giây | 50 xu |
 
-## Trồng và thu hoạch
+## Ngày, mùa, bão và các đảo
 
-1. Đi vào khu ruộng ở bên trái hoặc bên phải đường chính bằng WASD.
-2. Di chuột nhìn xuống ô đất trong phạm vi khoảng 3 m. Ô đang ngắm sẽ đổi màu và hiện thao tác.
-3. Nhấn **E** để cày đất.
-4. Chọn hạt bằng **1: lúa mì**, **2: cà chua**, **3: đậu nành**. Nhấn **E** để gieo.
-5. Nhấn **E** lần nữa để tưới. Đất ướt chuyển màu sẫm; HUD hiển thị phần trăm lớn và độ ẩm.
-6. Chờ 35 / 45 / 55 giây tương ứng từng cây. Cây chỉ lớn khi còn nước; E tưới bổ sung. Menu tạm dừng cũng dừng sinh trưởng.
-7. Khi hiện **Thu hoạch**, nhấn **E**. Mỗi ô cho 3 nông sản; bộ đếm góc phải tăng đúng loại.
-8. Ô đất sau thu hoạch có thể gieo lại ngay.
+Đồng hồ trên HUD hiển thị năm, ngày, giờ, mùa và thời tiết. Mỗi mùa dài 28 ngày; lá và cỏ đổi màu theo mùa. Trời mưa hoặc bão tự tưới ruộng. Khi có bão, trả lời câu hỏi gia cố trong 25 giây: đúng thì không thiệt hại, sai hoặc hết giờ sẽ mất 30–80% nông sản và máy bị chậm. Từ 18:00 đến trước 06:00, vào nhà và nhấn E ở giường để ngủ đến sáng.
 
-Nước hiện miễn phí; hạt dùng túi đồ và shop theo mục cập nhật ở trên. Chưa có thời tiết. Model vẫn là mô hình đơn giản, chưa phải đồ họa hoàn thiện.
+Nhấn Tab hoặc dùng cổng để đi giữa **Đảo Nông Trại**, **Đảo Trung Tâm**, **Đảo Thần Bí** và **Đảo Công Nghiệp**. Đảo Trung Tâm có NPC để trò chuyện hai ngày rồi kết bạn, chợ đấu giá nông sản với người mua NPC và trò chơi ba rương. Đảo Thần Bí mở ở LV3, có mê cung, bẫy và di tích; đạt LV5 rồi giải câu đố tại di tích để mở giới hạn LV10 và lấy bản vẽ hiếm. Đảo Công Nghiệp mở ở LV4, có gỗ, quặng, xưởng cưa và lò nung; luyện kim cần bản vẽ từ di tích. Các hoạt động xã hội và đấu giá hiện hoạt động **chơi đơn với NPC**.
 
-**Điều khiển khác:** Shift chạy, Space nhảy, V đổi ngôi thứ nhất/thứ ba, Esc tạm dừng/thả chuột.
+Trong menu Esc, chỉ nút **Lưu game** ghi bản lưu. Thoát game không tự lưu. Mở lại game tải bản lưu thủ công gần nhất. Bản lưu cũ phiên bản 2 vẫn được đọc; bản mới lưu thêm cấp độ, vùng đất, dụng cụ, thức ăn, độ no/vui, chuồng nâng cấp, hàng đợi chế biến, âm lượng, ngày/giờ/thời tiết và tiến độ đảo. Đường dẫn lưu trên Windows: `%USERPROFILE%\AppData\LocalLow\Nong Trai Studio\Nong Trai - First Harvest\farm-manual-save.json`.
 
-## Thay đổi
+## Build lại
 
-- Sửa hướng chữ trên bảng, thêm chữ mặt sau, thu nhỏ để vừa bảng.
-- Thay cây trang trí bằng 80 ô đất có thể cày/gieo/tưới/thu hoạch.
-- Ba CropDefinition ScriptableObject trong `Assets/Farm/Data/Crop0.asset` đến `Crop2.asset` cho phép chỉnh thời gian lớn, sản lượng và màu nông sản.
-- FarmPlot lưu trạng thái ô, độ ẩm và tiến độ; FieldManager cập nhật mỗi giây và dừng khi pause.
-- Cây có thân, lá và phần nông sản hiện dần qua bốn giai đoạn.
-- HUD cho biết hạt đang chọn, số lượng đã thu hoạch và thao tác tại ô đất.
+Đóng Unity Editor đang mở cùng dự án, rồi chạy:
 
-## Kiểm tra trong Editor
+```powershell
+& 'D:\Unity\Editors\6000.3.22f1\Editor\Unity.exe' -batchmode -nographics -quit -projectPath 'D:\GAME_NongTrai' -executeMethod NongTrai.Editor.FarmProjectBuilder.BuildWindows -logFile 'D:\GAME_NongTrai\Logs\build.log'
+```
 
-Mở `Assets/Farm/Scenes/Farm.unity` và Play. Thử đủ ba loại cây theo quy trình trên; không tưới thì tiến độ phải giữ ở 0%. Sau thu hoạch, kiểm tra bộ đếm tăng 3 và gieo lại không cộng thêm nông sản. Kiểm tra bảng từ cả hai phía và đổi camera bằng V.
-
-`Logs/build.log` ghi kết quả build; `Logs/smoke.log` ghi kiểm tra tự động. Bộ kiểm tra dùng tick tăng tốc để kiểm tra trạng thái, không thay đổi tốc độ phát triển của game thông thường.
+Lệnh này dựng lại scene và bản Windows. Nếu đã sửa scene trong Editor, hãy giữ bản sao trước khi chạy.

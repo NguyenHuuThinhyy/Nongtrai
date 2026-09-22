@@ -33,10 +33,13 @@ namespace NongTrai
         }
         void OnApplicationFocus(bool focus) { if (!focus) SetPaused(true); }
         void OnDisable() { Cursor.lockState = CursorLockMode.None; Cursor.visible = true; }
+        public void Teleport(Vector3 position)
+        { controller.enabled=false;transform.position=position;verticalSpeed=0;controller.enabled=true; }
 
         void Update()
         {
-            if (Input.Pause.WasPressedThisFrame()) SetPaused(!Paused);
+            if (Input.Pause.WasPressedThisFrame())
+            { var hud=FindFirstObjectByType<FarmHud>();if(hud==null || !hud.HandleEscape()) SetPaused(!Paused); }
             if (Paused) return;
             cameraRig.ReadLook(Input.Look.ReadValue<Vector2>());
             if (Input.View.WasPressedThisFrame()) cameraRig.ToggleView();

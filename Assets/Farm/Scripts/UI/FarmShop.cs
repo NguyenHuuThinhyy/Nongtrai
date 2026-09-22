@@ -10,9 +10,14 @@ namespace NongTrai
         public AnimalPen[] speciesPens;
         public AnimalPen extraChickenPen;
         public FarmInventory inventory;
+        public FarmBarnMenu barn;
         public int Money { get; private set; }=1000;
         public int Fruit { get; private set; }
         public int[] Seeds { get; private set; }=new int[]{5,5,5};
+        public int FeedStock { get; private set; }=15;
+        public void AddFeed(int count) => FeedStock=Mathf.Max(0,FeedStock+count);
+        public bool ConsumeFeed() { if(FeedStock<=0) return false;FeedStock--;return true; }
+        public bool TrySpend(int cost) { if(cost<0 || Money<cost) return false;Money-=cost;return true; }
         public bool Expanded { get; private set; }
         public int BoughtTrees { get; private set; }
         public int AnimalCount => FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None).Length;
@@ -29,8 +34,9 @@ namespace NongTrai
             for(int i=0;i<names.Length;i++) { int item=i; Button(names[i]+" — "+prices[i]+" xu",new Vector2(35+(i%2)*475,-110-(i/2)*95),()=>Buy(item)); }
             Button("Bán toàn bộ nông sản",new Vector2(510,-490),Sell);
             Button("Xem túi đồ",new Vector2(510,-675),inventory.Open);
+            Button("Quản lý chuồng",new Vector2(35,-580),barn.Open);
             Button("Trở lại game",new Vector2(35,-675),hud.Resume);
-            feedback=Label("Hạt đã mua được thêm vào túi. Cây táo được trồng tại vườn phía tây.",new Vector2(35,-590),new Vector2(920,75),21);
+            feedback=Label("Hạt đã mua được thêm vào túi. Cây táo được trồng tại vườn phía tây.",new Vector2(510,-580),new Vector2(455,75),19);
             Panel.SetActive(false); hud.player.PauseChanged+=OnPause;
         }
         void OnDestroy() { if(hud!=null && hud.player!=null) hud.player.PauseChanged-=OnPause; }
@@ -40,8 +46,8 @@ namespace NongTrai
         public void AddFruit(int amount) => Fruit+=amount;
         public void TakeFruit(int amount) => Fruit=Mathf.Max(0,Fruit-amount);
         public void Credit(int amount) => Money+=Mathf.Max(0,amount);
-        public void RestoreState(int money,int fruit,bool expanded,int trees)
-        { Money=Mathf.Max(0,money); Fruit=Mathf.Max(0,fruit); Expanded=expanded; BoughtTrees=Mathf.Clamp(trees,0,6); extraPen.SetActive(expanded); }
+        public void RestoreState(int money,int fruit,bool expanded,int trees,int feed=15)
+        { Money=Mathf.Max(0,money); Fruit=Mathf.Max(0,fruit); Expanded=expanded; BoughtTrees=Mathf.Clamp(trees,0,6); FeedStock=Mathf.Max(0,feed);extraPen.SetActive(expanded); }
         public bool Purchase(int item,out string result)
         {
             result="";
@@ -52,6 +58,11 @@ namespace NongTrai
             {
                 destination=speciesPens[item-3];
                 if(item==6 && !destination.HasSpace && Expanded) destination=extraChickenPen;
+                if((item==3 || item==5) && !destination.HasSpace)
+                {
+                    var extra=item==3?barn.extraCow:barn.extraSheep;
+                    if(extra.gameObject.activeSelf) destination=extra;
+                }
                 if(destination==null || !destination.HasSpace)
                 { result="Chuồng "+(item==6?"gà":"loại này")+" đã đầy."; return false; }
             }
@@ -66,7 +77,8 @@ namespace NongTrai
             }
             else if(item==7) { extraPen.SetActive(true); Expanded=true; }
             else { Instantiate(treePrefab,new Vector3(-28-(BoughtTrees%2)*5,0,-5-(BoughtTrees/2)*6),Quaternion.identity); BoughtTrees++; }
-            Money-=prices[item]; result="Đã mua "+names[item]+"."; return true;
+            Money-=prices[item]; result="Đã mua "+names[item]+".";
+            FarmAudio.Instance?.Play(FarmAudio.Cue.Buy);return true;
         }
         void Buy(int item) { Purchase(item,out string message); feedback.text=message; Refresh(); }
         public int SellHarvest() => inventory.SellAll();

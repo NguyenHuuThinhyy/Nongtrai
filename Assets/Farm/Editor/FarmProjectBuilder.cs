@@ -10,6 +10,7 @@ using UnityEngine.InputSystem.UI;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
+using TMPro;
 
 namespace NongTrai.Editor
 {
@@ -26,6 +27,7 @@ namespace NongTrai.Editor
             foreach (string folder in new[] { "Scenes", "Settings", "Materials", "Prefabs", "Art", "Data" })
                 Directory.CreateDirectory(Root + folder);
             AssetDatabase.Refresh();
+            ConfigureTextMeshPro();
             Configure();
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             grass = Mat("Grass", "759B47"); earth = Mat("Soil", "70503A"); wood = Mat("Timber", "A77444");
@@ -75,6 +77,26 @@ namespace NongTrai.Editor
             var tags = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
             tags.FindProperty("layers").GetArrayElementAtIndex(8).stringValue = "Player";
             tags.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        static void ConfigureTextMeshPro()
+        {
+            const string settings="Assets/TextMesh Pro/Resources/TMP Settings.asset";
+            if(AssetDatabase.LoadAssetAtPath<TMP_Settings>(settings)==null)
+                throw new System.Exception("TMP Settings resource is missing from Assets/TextMesh Pro/Resources.");
+            Directory.CreateDirectory(Root+"Resources");
+            const string fontPath=Root+"Resources/FarmFont.asset";
+            if(AssetDatabase.LoadAllAssetsAtPath(fontPath).Length<3)
+            {
+                var source=AssetDatabase.LoadAssetAtPath<Font>("Assets/TextMesh Pro/Fonts/LiberationSans.ttf");
+                if(source==null) throw new System.Exception("TMP font missing after Essentials import.");
+                if(AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(fontPath)!=null) AssetDatabase.DeleteAsset(fontPath);
+                var asset=TMP_FontAsset.CreateFontAsset(source);
+                AssetDatabase.CreateAsset(asset,fontPath);
+                AssetDatabase.AddObjectToAsset(asset.atlasTexture,asset);
+                AssetDatabase.AddObjectToAsset(asset.material,asset);
+                EditorUtility.SetDirty(asset);AssetDatabase.SaveAssets();
+            }
         }
 
         static Material Mat(string name, string hex)
@@ -134,13 +156,18 @@ namespace NongTrai.Editor
             }
             Barn(environment, new Vector3(-13, 0, 23), 1);
             Barn(environment, new Vector3(16, 0, 25), 0.72f);
+            BuildHome(environment);
+            BuildIslands(environment);
             Shape("Silo", PrimitiveType.Cylinder, new Vector3(-23, 4, 24), new Vector3(4.6f, 4, 4.6f), metal, environment);
             Shape("Silo dome", PrimitiveType.Sphere, new Vector3(-23, 8, 24), new Vector3(4.8f, 2, 4.8f), metal, environment, false);
             for (int i = 0; i < 4; i++)
                 Shape("Hay bale", PrimitiveType.Cylinder, new Vector3(-23 + i * 2.2f, 0.85f, 14), new Vector3(1.6f, 0.85f, 1.6f), gold, environment);
             Box("Pond surface - decorative", new Vector3(32, 0.07f, -15), new Vector3(13, 0.1f, 20), water, environment, false);
             for (int i = 0; i < 11; i++)
-                Box("Pond boardwalk", new Vector3(27.5f + i * 0.7f, 0.3f, -11), new Vector3(0.62f, 0.35f, 3), wood, environment);
+            {
+                var board=Box("Pond boardwalk", new Vector3(27.5f + i * 0.7f, 0.3f, -11), new Vector3(0.62f, 0.35f, 3), wood, environment);
+                if(i==5) board.AddComponent<FishingPier>();
+            }
             var random = new System.Random(42);
             for (int i = 0; i < 36; i++)
             {
@@ -173,6 +200,23 @@ namespace NongTrai.Editor
             RenderSettings.ambientGroundColor = new Color(0.27f, 0.30f, 0.24f);
             RenderSettings.fog = true; RenderSettings.fogColor = new Color(0.68f, 0.82f, 0.85f);
             RenderSettings.fogMode = FogMode.Linear; RenderSettings.fogStartDistance = 65; RenderSettings.fogEndDistance = 140;
+        }
+
+        static void BuildHome(Transform parent)
+        {
+            var home=new GameObject("Nhà ở - vào cửa trước để ngủ").transform;
+            home.SetParent(parent,false);home.localPosition=new Vector3(0,0,34);
+            Box("Sàn nhà",new Vector3(0,.1f,0),new Vector3(8,.2f,8),wood,home);
+            Box("Tường trái",new Vector3(-4,2,0),new Vector3(.25f,4,8),cream,home);
+            Box("Tường phải",new Vector3(4,2,0),new Vector3(.25f,4,8),cream,home);
+            Box("Tường sau",new Vector3(0,2,4),new Vector3(8,4,.25f),cream,home);
+            Box("Tường trước trái",new Vector3(-2.55f,2,-4),new Vector3(2.9f,4,.25f),cream,home);
+            Box("Tường trước phải",new Vector3(2.55f,2,-4),new Vector3(2.9f,4,.25f),cream,home);
+            Box("Mái nhà",new Vector3(0,4.4f,0),new Vector3(9,.3f,9),roof,home,false);
+            var bed=Box("Giường ngủ - E",new Vector3(-1.5f,.52f,1.4f),new Vector3(2.5f,.65f,1.6f),wood,home);
+            bed.AddComponent<FarmBed>();
+            Box("Chăn",new Vector3(-1.5f,.90f,1.4f),new Vector3(2.3f,.12f,1.2f),red,home,false);
+            Sign(home,new Vector3(0,0,29),"Nhà ở","Vào nhà, ngắm giường và nhấn E để ngủ qua đêm.");
         }
 
         static void Barn(Transform parent, Vector3 position, float scale)
@@ -275,16 +319,14 @@ namespace NongTrai.Editor
             var canvas = new GameObject("Farm HUD", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             canvas.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
             var scaler = canvas.GetComponent<CanvasScaler>(); scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1600, 900); scaler.matchWidthOrHeight = 0.5f;
+            scaler.referenceResolution = new Vector2(1920, 1080); scaler.matchWidthOrHeight = 0.5f;
             var hud = canvas.AddComponent<FarmHud>(); hud.player = player; hud.interaction = interaction;
-            Panel(canvas.transform, "Title card", new Vector2(28, -26), new Vector2(395, 110), new Color(0.1f, 0.19f, 0.16f, 0.94f));
-            Label(canvas.transform, "FIRST HARVEST", new Vector2(48, -40), new Vector2(355, 40), 30, new Color(1, 0.86f, 0.52f));
-            Label(canvas.transform, "NÔNG TRẠI  /  VỤ MÙA ĐẦU TIÊN", new Vector2(50, -88), new Vector2(360, 28), 18, Color.white);
-            Panel(canvas.transform, "Crop inventory", new Vector2(1120, -26), new Vector2(450, 130), new Color(0.1f, 0.19f, 0.16f, 0.94f));
-            hud.farmingStatus = Label(canvas.transform, "", new Vector2(1140, -42), new Vector2(415, 110), 21, Color.white);
-            Label(canvas.transform, "+", new Vector2(788, -433), new Vector2(24, 34), 24, Color.white);
-            hud.prompt = Label(canvas.transform, "", new Vector2(440, -515), new Vector2(950, 70), 21, Color.white);
-            hud.toast = Label(canvas.transform, "", new Vector2(400, -170), new Vector2(800, 90), 22, Color.white);
+            var chrome=new GameObject("Gameplay HUD",typeof(RectTransform));
+            var chromeRect=chrome.GetComponent<RectTransform>();chromeRect.SetParent(canvas.transform,false);
+            chromeRect.anchorMin=Vector2.zero;chromeRect.anchorMax=Vector2.one;chromeRect.offsetMin=chromeRect.offsetMax=Vector2.zero;
+            hud.gameplayChrome=chrome;
+            hud.prompt = Label(chrome.transform, "", new Vector2(610, -730), new Vector2(700, 65), 22, Color.white);
+            hud.toast = Label(chrome.transform, "", new Vector2(520, -200), new Vector2(880, 90), 24, Color.white);
             hud.pausePanel = Panel(canvas.transform, "Pause", new Vector2(150,-160), new Vector2(1300,580), new Color(.08f,.16f,.13f,.99f));
             Label(hud.pausePanel.transform,"TẠM DỪNG",new Vector2(35,-25),new Vector2(500,55),32,Color.white);
             Button(hud.pausePanel.transform,"Tiếp tục",new Vector2(35,-115),hud.Resume);
@@ -293,7 +335,8 @@ namespace NongTrai.Editor
             Button(hud.pausePanel.transform,"Thoát game",new Vector2(35,-415),hud.Quit);
             hud.saveStatus=Label(hud.pausePanel.transform,"Chỉ lưu khi nhấn Lưu game.",new Vector2(35,-505),new Vector2(520,38),19,Color.white);
             hud.instructions=Panel(hud.pausePanel.transform,"Instructions",new Vector2(595,-35),new Vector2(665,510),new Color(.15f,.25f,.19f,1));
-            Label(hud.instructions.transform,"HƯỚNG DẪN\n\nWASD đi • Shift chạy • Space nhảy\nChuột nhìn • V đổi góc nhìn\nE mở cửa chuồng / lấy sữa, lông, thịt, trứng\nChuột trái nhấc thú • chuột phải thả đúng chuồng\n1–3 chọn hạt • E cày, gieo, tưới, thu hoạch\nB mở shop • I mở túi đồ / bán sản phẩm\nMỗi chuồng gà tối đa 5 con; nhặt trứng ở ổ\nEsc tiếp tục / đóng shop hoặc túi đồ\n\nThoát không tự lưu. Nhấn Lưu game để lưu.",new Vector2(25,-25),new Vector2(615,470),22,Color.white);
+            Label(hud.instructions.transform,"HƯỚNG DẪN\n\nWASD đi • Shift chạy • Space nhảy\nChuột nhìn • V đổi góc nhìn\nE làm ruộng / thu sản phẩm / mở cửa\nF cho thú ăn • Chuột trái nhấc, phải thả\n1–3 chọn hạt giống\nB Shop • I Túi đồ • M Chế biến\nN Mở đất & dụng cụ • P Quản lý chuồng\nChăm gà, bò, cừu mỗi ngày để có sản phẩm\nEsc tạm dừng; cài đặt âm lượng tại đây\n\nThoát không tự lưu. Nhấn Lưu game để lưu.",new Vector2(25,-25),new Vector2(615,470),21,Color.white);
+            Button(hud.pausePanel.transform,"Cài đặt âm lượng",new Vector2(560,-415),hud.OpenSettings);
             hud.instructions.SetActive(false);
             hud.pausePanel.SetActive(false);
             BuildShop(hud,interaction);

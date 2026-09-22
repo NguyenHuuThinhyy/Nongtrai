@@ -2,7 +2,7 @@ using UnityEngine;
 namespace NongTrai
 {
     public enum PlotState { Untilled, Tilled, Growing, Ready }
-    public sealed class FarmPlot : MonoBehaviour
+    public sealed class FarmPlot : MonoBehaviour, IInteractable
     {
         public int id;
         public PlotState State { get; private set; }
@@ -13,10 +13,17 @@ namespace NongTrai
         int stage = -1;
         static Material green, stem;
         Material fruit;
-        public string Description => State == PlotState.Untilled ? "Đất trống • [E] Cày đất" :
+        void Start() => Highlight(false);
+        public string Description => FarmExpansion.Instance!=null && !FarmExpansion.Instance.IsUnlocked(this)
+            ? "Vùng đất chưa mở • [N] Mua đất khi đủ cấp" : State == PlotState.Untilled ? "Đất trống • [E] Cày đất" :
             State == PlotState.Tilled ? "Đất đã cày • [E] Gieo hạt" :
             State == PlotState.Ready ? Crop.displayName + " chín • [E] Thu hoạch" :
             Crop.displayName + " • " + Mathf.FloorToInt(Growth * 100) + "% • Nước " + Mathf.CeilToInt(Moisture * 100) + "% • [E] Tưới";
+        public string InteractionHint => Description;
+        public bool CanInteract(FarmPlayer player) => true;
+        public void Interact(PlayerInteraction actor)
+        { actor.Say(FarmExpansion.Instance==null?Work(actor.field.Current,out _):FarmExpansion.Instance.Work(this)); }
+        public void SetHighlighted(bool selected) { Highlight(selected);InteractionOutline.Set(this,selected); }
         public string Work(CropDefinition selected, out int harvested)
         {
             harvested = 0;
@@ -43,6 +50,12 @@ namespace NongTrai
             if (Growth >= 1) State = PlotState.Ready;
             Refresh();
         }
+        public void AddMoisture(float amount)
+        {
+            if(State!=PlotState.Growing || amount<=0) return;
+            Moisture=Mathf.Clamp01(Moisture+amount);
+            Highlight(false);
+        }
         public void Restore(PlotState state,CropDefinition crop,float growth,float moisture)
         {
             State=state; Crop=crop; Growth=Mathf.Clamp01(growth); Moisture=Mathf.Clamp01(moisture);
@@ -54,7 +67,8 @@ namespace NongTrai
         {
             var block = new MaterialPropertyBlock();
             GetComponent<Renderer>().GetPropertyBlock(block);
-            block.SetColor("_BaseColor", value ? new Color(0.65f, 0.49f, 0.22f) :
+            bool locked=FarmExpansion.Instance!=null && !FarmExpansion.Instance.IsUnlocked(this);
+            block.SetColor("_BaseColor", locked ? new Color(.27f,.28f,.29f) : value ? new Color(0.65f, 0.49f, 0.22f) :
                 State == PlotState.Untilled ? new Color(0.40f, 0.30f, 0.18f) : Moisture > 0 ? new Color(0.23f, 0.14f, 0.08f) : new Color(0.38f, 0.23f, 0.12f));
             GetComponent<Renderer>().SetPropertyBlock(block);
         }
@@ -71,6 +85,7 @@ namespace NongTrai
             plants.SetParent(transform, false);
             // Giữ kích thước cây theo mét, độc lập với tỷ lệ của ô đất.
             plants.localScale = new Vector3(1 / transform.localScale.x, 1 / transform.localScale.y, 1 / transform.localScale.z);
+            plants.gameObject.AddComponent<CropStageAnimation>();
             float height = 0.18f + stage * 0.23f;
             for (int x = -1; x <= 1; x += 2)
                 for (int z = -1; z <= 1; z += 2)

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace NongTrai
 {
-    public sealed class FarmAnimal : MonoBehaviour
+    public sealed class FarmAnimal : MonoBehaviour, IInteractable
     {
         public Vector2 minimum = new Vector2(10,2), maximum = new Vector2(28,8);
         public float speed = 0.75f;
@@ -12,8 +12,34 @@ namespace NongTrai
         public AnimalPen pen;
         public bool IsCarried { get; private set; }
         public float ProductCooldown { get; private set; }
+        public float Hunger { get; private set; } = 80;
+        public float Happiness { get; private set; } = 75;
+        public bool WellCared => Hunger >= 35 && Happiness >= 35;
+        public void RestoreCare(float hunger,float happiness)
+        { Hunger=Mathf.Clamp(hunger,0,100); Happiness=Mathf.Clamp(happiness,0,100); }
+        public bool Feed(FarmShop shop,out string message)
+        {
+            if(shop.FeedStock<=0) { message="Hết thức ăn. Mua thêm ở shop."; return false; }
+            if(Hunger>=95 && Happiness>=95) { message="Vật nuôi đã no và vui."; return false; }
+            shop.ConsumeFeed(); Hunger=Mathf.Min(100,Hunger+55); Happiness=Mathf.Min(100,Happiness+20);
+            message="Đã cho "+name+" ăn. Đói "+Mathf.RoundToInt(Hunger)+"%, vui "+Mathf.RoundToInt(Happiness)+"%.";
+            return true;
+        }
+        public void AdvanceCare(float dayFraction)
+        {
+            Hunger=Mathf.Max(0,Hunger-65*dayFraction);
+            Happiness=Mathf.Max(0,Happiness-(Hunger<35?55:20)*dayFraction);
+        }
         public void RestoreCooldown(float seconds) => ProductCooldown = Mathf.Max(0,seconds);
+        public void AdvanceCooldown(float seconds) => ProductCooldown=Mathf.Max(0,ProductCooldown-seconds);
         public float DistanceTravelled { get; private set; }
+        public string InteractionHint => "[E] "+(species==AnimalSpecies.Cow?"Lấy sữa":species==AnimalSpecies.Sheep?"Lấy len":species==AnimalSpecies.Pig?"Lấy thịt":"Xem ổ trứng")
+            +"  [F] Cho ăn • No "+Mathf.RoundToInt(Hunger)+"% Vui "+Mathf.RoundToInt(Happiness)+"%";
+        public bool CanInteract(FarmPlayer source) => !IsCarried;
+        public void Interact(PlayerInteraction actor)
+        { bool collected=TryCollect(actor.inventory,out string result);actor.Say(result);
+          if(collected) { FarmExpansion.Instance?.GainExperience(12);FarmAudio.Instance?.Play(FarmAudio.Cue.Harvest); } }
+        public void SetHighlighted(bool selected) => InteractionOutline.Set(this,selected);
         static readonly List<FarmAnimal> herd = new List<FarmAnimal>();
         FarmPlayer player;
         Vector3 goal;
@@ -39,6 +65,7 @@ namespace NongTrai
         public bool TryCollect(FarmInventory inventory, out string message)
         {
             if (species == AnimalSpecies.Chicken) { message = "Đến ổ trứng trong chuồng gà để lấy trứng."; return false; }
+            if (!WellCared) { message="Vật nuôi đang đói hoặc buồn. Nhấn F để cho ăn trước."; return false; }
             if (species == AnimalSpecies.Pig)
             {
                 inventory.AddProduct(FarmInventory.Meat, 6);
@@ -63,6 +90,7 @@ namespace NongTrai
                 ProductCooldown = 60;
                 message = "+2 lông cừu trong túi đồ.";
             }
+            Happiness=Mathf.Min(100,Happiness+5);
             return true;
         }
         void ChooseGoal() { goal=new Vector3(Random.Range(minimum.x,maximum.x),transform.position.y,Random.Range(minimum.y,maximum.y)); }
@@ -70,7 +98,7 @@ namespace NongTrai
         {
             if (player == null || player.Paused || IsCarried) return;
             float step=Time.fixedDeltaTime;
-            ProductCooldown = Mathf.Max(0, ProductCooldown - step);
+            AdvanceCooldown(step);
             if (resting>0)
             {
                 resting-=step;
