@@ -14,11 +14,13 @@ namespace NongTrai
         static Material green, stem;
         Material fruit;
         void Start() => Highlight(false);
+        string RequiredAction => State==PlotState.Untilled?"chọn [5] Cuốc":State==PlotState.Tilled?"chọn [1–3] Hạt giống":
+            State==PlotState.Ready?"chọn [7] Liềm":"chọn [6] Bình tưới";
         public string Description => FarmExpansion.Instance!=null && !FarmExpansion.Instance.IsUnlocked(this)
-            ? "Vùng đất chưa mở • [N] Mua đất khi đủ cấp" : State == PlotState.Untilled ? "Đất trống • [E] Cày đất" :
-            State == PlotState.Tilled ? "Đất đã cày • [E] Gieo hạt" :
-            State == PlotState.Ready ? Crop.displayName + " chín • [E] Thu hoạch" :
-            Crop.displayName + " • " + Mathf.FloorToInt(Growth * 100) + "% • Nước " + Mathf.CeilToInt(Moisture * 100) + "% • [E] Tưới";
+            ? "Vùng đất chưa mở • [N] Mua đất khi đủ cấp" : State == PlotState.Untilled ? "Đất trống • chọn [5] Cuốc rồi [E]" :
+            State == PlotState.Tilled ? "Đất đã cày • chọn [1–3] Hạt giống rồi [E]" :
+            State == PlotState.Ready ? Crop.displayName + " chín • chọn [7] Liềm rồi [E]" :
+            Crop.displayName + " • " + Mathf.FloorToInt(Growth * 100) + "% • Nước " + Mathf.CeilToInt(Moisture * 100) + "% • "+RequiredAction+" rồi [E]";
         public string InteractionHint => Description;
         public bool CanInteract(FarmPlayer player) => true;
         public void Interact(PlayerInteraction actor)
@@ -32,7 +34,7 @@ namespace NongTrai
             {
                 Crop = selected; State = PlotState.Growing; Growth = 0; Moisture = 0;
                 fruit = Material(Crop.fruitColor); Refresh();
-                return "Đã gieo " + Crop.displayName + ". Nhấn E để tưới; cây chỉ lớn khi đủ nước.";
+                return "Đã gieo " + Crop.displayName + ". Chọn [6] Bình tưới rồi nhấn E; tưới giúp cây lớn nhanh.";
             }
             if (State == PlotState.Growing) { Moisture = 1; Refresh(); return "Đã tưới đầy nước cho " + Crop.displayName; }
             harvested = Crop.yield; string result = "Thu hoạch +" + harvested + " " + Crop.displayName;
@@ -43,10 +45,11 @@ namespace NongTrai
         // Cập nhật theo tick từ FieldManager, không chạy Update cho từng ô.
         public void Tick(float seconds)
         {
-            if (State != PlotState.Growing || Moisture <= 0) return;
-            float wateredSeconds = Mathf.Min(seconds, Moisture * 75);
-            Moisture = Mathf.Max(0, Moisture - seconds / 75);
-            Growth = Mathf.Min(1, Growth + wateredSeconds / Crop.growthSeconds);
+            if (State != PlotState.Growing) return;
+            float wateredSeconds = Mathf.Min(seconds, Moisture * 120);
+            float drySeconds = seconds-wateredSeconds;
+            Moisture = Mathf.Max(0, Moisture - seconds / 120);
+            Growth = Mathf.Min(1, Growth + (wateredSeconds+drySeconds*.2f) / Crop.growthSeconds);
             if (Growth >= 1) State = PlotState.Ready;
             Refresh();
         }

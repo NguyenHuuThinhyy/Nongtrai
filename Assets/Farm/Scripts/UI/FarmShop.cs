@@ -23,7 +23,7 @@ namespace NongTrai
         public int AnimalCount => FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None).Length;
         public GameObject Panel { get; private set; }
         Text balance, feedback;
-        readonly int[] prices={10,10,10,220,120,150,60,400,150};
+        readonly int[] prices={20,40,75,220,120,150,60,400,150};
         readonly string[] names={"5 hạt lúa mì","5 hạt cà chua","5 hạt đậu nành","Bò","Heo","Cừu","Gà","Chuồng gà thứ hai (5 chỗ)","Cây táo"};
         void Start()
         {

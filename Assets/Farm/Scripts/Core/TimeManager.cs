@@ -95,6 +95,7 @@ namespace NongTrai
         void NewDay()
         {
             Day++;ApplySeason();
+            FarmCraftOrders.Instance?.OnNewDay(Day);
             var random=new System.Random(Day*7919+Year*373);
             int roll=random.Next(100);
             SetWeather(roll<54?FarmWeather.Sunny:roll<79?FarmWeather.Rain:roll<91?FarmWeather.Fog:FarmWeather.Storm,true);

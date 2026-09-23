@@ -105,6 +105,14 @@ namespace NongTrai.Editor
             var islands=hud.gameObject.AddComponent<IslandManager>();
             islands.hud=hud;islands.shop=shop;islands.inventory=inventory;
             islands.progress=expansion;islands.player=hud.player;save.islands=islands;
+            var water=hud.gameObject.AddComponent<FarmWaterSystem>();
+            water.hud=hud;water.shop=shop;water.expansion=expansion;water.field=interaction.field;
+            save.water=water;
+            var orders=hud.gameObject.AddComponent<FarmCraftOrders>();
+            orders.hud=hud;orders.inventory=inventory;orders.shop=shop;orders.expansion=expansion;
+            save.orders=orders;
+            var creative=hud.gameObject.AddComponent<CreativeModeManager>();
+            creative.hud=hud;creative.player=hud.player;creative.save=save;
             var sound=new GameObject("Farm audio").AddComponent<FarmAudio>();
             shop.animalPrefabs = new GameObject[4];
             for (int i = 0; i < 4; i++)

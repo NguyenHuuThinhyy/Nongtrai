@@ -11,10 +11,10 @@ namespace NongTrai
         public FarmHud hud;
         public FieldManager field;
         public FarmShop shop;
-        public int[] AnimalProducts { get; private set; } = new int[12];
+        public int[] AnimalProducts { get; private set; } = new int[16];
         public GameObject Panel { get; private set; }
-        readonly string[] itemNames = { "Lúa mì", "Cà chua", "Đậu nành", "Táo", "Trứng", "Sữa", "Lông cừu", "Thịt heo", "Bột mì", "Bánh mì", "Phô mai", "Nước táo", "Gỗ", "Quặng", "Ván", "Kim loại" };
-        readonly int[] unitPrices = { 10, 10, 10, 15, 8, 20, 25, 30, 22, 65, 65, 35, 12, 18, 34, 50 };
+        readonly string[] itemNames = { "Lúa mì", "Cà chua", "Đậu nành", "Táo", "Trứng", "Sữa", "Lông cừu", "Thịt heo", "Bột mì", "Bánh mì", "Phô mai", "Nước táo", "Gỗ", "Quặng", "Ván", "Kim loại", "Bó nông sản", "Gói đậu", "Giỏ táo", "Đèn thủ công" };
+        readonly int[] unitPrices = { 8, 18, 32, 15, 8, 20, 25, 30, 22, 65, 65, 35, 12, 18, 34, 50, 45, 55, 95, 165 };
         public int Price(int item) => item>=0 && item<unitPrices.Length?unitPrices[item]:0;
         public string Name(int item) => item>=0 && item<itemNames.Length?itemNames[item]:"?";
         TMP_Text[] amounts;
@@ -24,20 +24,31 @@ namespace NongTrai
         {
             Panel=FarmUi.Panel(hud.transform,"Inventory Grid",new Vector2(1380,960));
             FarmUi.TmpLabel(Panel.transform,"TÚI ĐỒ • KHO NÔNG SẢN",new Vector2(30,-16),new Vector2(1300,54),32);
+            var viewport=new GameObject("Inventory viewport",typeof(RectTransform),typeof(Image),typeof(RectMask2D));
+            var vr=viewport.GetComponent<RectTransform>();vr.SetParent(Panel.transform,false);vr.anchorMin=vr.anchorMax=vr.pivot=new Vector2(0,1);
+            vr.anchoredPosition=new Vector2(30,-85);vr.sizeDelta=new Vector2(1320,680);
+            viewport.GetComponent<Image>().color=new Color(0,0,0,.08f);
+            var content=new GameObject("Inventory content",typeof(RectTransform));
+            var contentRect=content.GetComponent<RectTransform>();contentRect.SetParent(viewport.transform,false);
+            contentRect.anchorMin=new Vector2(0,1);contentRect.anchorMax=new Vector2(1,1);contentRect.pivot=new Vector2(0,1);
+            contentRect.anchoredPosition=Vector2.zero;contentRect.sizeDelta=new Vector2(0,920);
+            var scroll=viewport.AddComponent<ScrollRect>();scroll.viewport=vr;scroll.content=contentRect;scroll.horizontal=false;scroll.vertical=true;
+            scroll.movementType=ScrollRect.MovementType.Clamped;scroll.scrollSensitivity=38;
             status=FarmUi.TmpLabel(Panel.transform,"Di chuột lên vật phẩm để xem mô tả; bán từng loại ở dưới.",
-                new Vector2(30,-827),new Vector2(1300,48),21);
+                new Vector2(30,-785),new Vector2(1300,48),21);
             amounts=new TMP_Text[itemNames.Length];
-            string[] glyphs={"L","C","Đ","T","T","S","L","T","B","B","P","N","G","Q","V","K"};
+            string[] glyphs={"L","C","Đ","T","T","S","L","T","B","B","P","N","G","Q","V","K","B","G","G","Đ"};
             Color[] palette={new Color(.89f,.72f,.30f),new Color(.89f,.32f,.25f),new Color(.54f,.74f,.27f),
                 new Color(.85f,.27f,.23f),new Color(.95f,.86f,.63f),new Color(.92f,.94f,.96f),
                 new Color(.84f,.83f,.73f),new Color(.70f,.42f,.34f),new Color(.94f,.87f,.70f),
                 new Color(.79f,.57f,.29f),new Color(.95f,.79f,.38f),new Color(.92f,.59f,.20f),
-                new Color(.57f,.37f,.20f),new Color(.54f,.58f,.62f),new Color(.72f,.48f,.25f),new Color(.70f,.73f,.77f)};
+                new Color(.57f,.37f,.20f),new Color(.54f,.58f,.62f),new Color(.72f,.48f,.25f),new Color(.70f,.73f,.77f),
+                new Color(.76f,.62f,.27f),new Color(.45f,.68f,.29f),new Color(.85f,.39f,.23f),new Color(.96f,.75f,.28f)};
             for (int i=0;i<itemNames.Length;i++)
             {
                 int item = i;
-                float x=30+(i%4)*330, y=-85-(i/4)*182;
-                var cell=FarmUi.Panel(Panel.transform,"Item "+itemNames[i],new Vector2(310,174));
+                float x=(i%4)*330, y=-(i/4)*182;
+                var cell=FarmUi.Panel(content.transform,"Item "+itemNames[i],new Vector2(310,174));
                 var cr=cell.GetComponent<RectTransform>();cr.anchorMin=cr.anchorMax=cr.pivot=new Vector2(0,1);
                 cr.anchoredPosition=new Vector2(x,y);cell.GetComponent<Image>().color=new Color(.16f,.27f,.22f,.95f);
                 var icon=FarmUi.Panel(cell.transform,"Icon",new Vector2(67,67));
@@ -51,7 +62,7 @@ namespace NongTrai
                 FarmUi.Button(cell.transform,"Bán hết",new Vector2(158,-118),new Vector2(142,47),()=>Sell(item,int.MaxValue));
                 cell.AddComponent<FarmInventoryTooltip>().Initialize(this,item);
             }
-            FarmUi.Button(Panel.transform,"Trở lại game",new Vector2(30,-890),new Vector2(520,54),hud.Resume);
+            FarmUi.Button(Panel.transform,"Trở lại game",new Vector2(30,-870),new Vector2(520,54),hud.Resume);
             Panel.SetActive(false);
             hud.player.PauseChanged += OnPause;
         }

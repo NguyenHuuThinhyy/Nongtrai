@@ -119,8 +119,13 @@ namespace NongTrai
         {
             if(!IsUnlocked(center)) return "Vùng đất chưa mở. Cần LV "+regionLevels[RegionFor(center)]+" và "
                 +regionPrices[RegionFor(center)]+" xu. Nhấn N để mua.";
-            int tool=center.State==PlotState.Untilled?0:center.State==PlotState.Growing?1:2;
-            int range=ToolRadius(tool);
+            int slot=FarmHudV2.Instance==null?0:FarmHudV2.Instance.SelectedSlot;
+            if(center.State==PlotState.Untilled && slot!=4) return "Hãy nhấn [5] chọn Cuốc trước khi cày.";
+            if(center.State==PlotState.Tilled && (slot<0 || slot>2)) return "Hãy nhấn [1], [2] hoặc [3] chọn hạt giống trước khi gieo.";
+            if(center.State==PlotState.Growing && slot!=5) return "Hãy nhấn [6] chọn Bình tưới trước khi tưới.";
+            if(center.State==PlotState.Ready && slot!=6) return "Hãy nhấn [7] chọn Liềm trước khi thu hoạch.";
+            int tool=center.State==PlotState.Untilled?0:center.State==PlotState.Growing?1:center.State==PlotState.Ready?2:-1;
+            int range=tool<0?1:ToolRadius(tool);
             var plots=FindObjectsByType<FarmPlot>(FindObjectsSortMode.None);
             Array.Sort(plots,(a,b)=>Vector3.SqrMagnitude(a.transform.position-center.transform.position)
                 .CompareTo(Vector3.SqrMagnitude(b.transform.position-center.transform.position)));
@@ -131,13 +136,15 @@ namespace NongTrai
                 if(!IsUnlocked(plot) || plot.State!=center.State ||
                     Vector3.Distance(plot.transform.position,center.transform.position)>4.5f) continue;
                 if(plot.State==PlotState.Tilled && !shop.ConsumeSeed(field.Selected)) break;
+                if(plot.State==PlotState.Growing && (FarmWaterSystem.Instance==null || !FarmWaterSystem.Instance.Consume(1))) break;
                 CropDefinition crop=plot.Crop;
                 plot.Work(field.Current,out int harvest);
                 if(harvest>0) { field.Record(crop,harvest); harvestedTotal+=harvest; GainExperience(8); }
                 worked++;
             }
-            if(worked==0) return center.State==PlotState.Tilled?"Hết hạt giống. Nhấn B để mở shop.":"Chưa thể thao tác.";
-            var cue=tool==0?FarmAudio.Cue.Hoe:tool==1?FarmAudio.Cue.Water:FarmAudio.Cue.Harvest;
+            if(worked==0) return center.State==PlotState.Tilled?"Hết hạt giống. Nhấn B để mở shop.":
+                center.State==PlotState.Growing?"Bình đã hết nước. Đến hồ và nhấn E để lấy nước.":"Chưa thể thao tác.";
+            var cue=tool==0?FarmAudio.Cue.Hoe:tool==1?FarmAudio.Cue.Water:tool==2?FarmAudio.Cue.Harvest:FarmAudio.Cue.Buy;
             FarmAudio.Instance?.Play(cue);
             if(harvestedTotal>0) FarmEffects.Burst(center.transform.position+Vector3.up*.4f,"+"+harvestedTotal+" nông sản",new Color(1,.87f,.28f));
             return (tool==0?"Đã cày ":tool==1?"Đã tưới ":harvestedTotal>0?"Thu hoạch +"+harvestedTotal+" từ ":"Đã gieo ")+worked+" ô.";

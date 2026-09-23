@@ -14,7 +14,7 @@ namespace NongTrai
         [Serializable] sealed class ResourceRecord { public int id; public float remaining; }
         [Serializable] sealed class SaveData
         {
-            public int version=4,money,fruit,treeCount,selected,feed,level,xp,day,weather,levelCap;
+            public int version=5,money,fruit,treeCount,selected,feed,level,xp,day,weather,levelCap;
             public float dayTime,musicVolume,effectsVolume;
             public bool expanded;
             public int[] seeds,harvested,products;
@@ -23,6 +23,8 @@ namespace NongTrai
             public ProcessingRecord[] processing;
             public IslandState island;
             public ResourceRecord[] resources;
+            public WaterState water;
+            public OrderSystemState orders;
             public Vector3 playerPosition;
             public PlotRecord[] plots;
             public AnimalRecord[] animals;
@@ -37,6 +39,8 @@ namespace NongTrai
         public FarmProcessing processing;
         public TimeManager clock;
         public IslandManager islands;
+        public FarmWaterSystem water;
+        public FarmCraftOrders orders;
         public string pathOverride;
         public string SavePath => string.IsNullOrEmpty(pathOverride)
             ? Path.Combine(Application.persistentDataPath,"farm-manual-save.json") : pathOverride;
@@ -48,6 +52,7 @@ namespace NongTrai
 
         public bool Save()
         {
+            if(CreativeModeManager.IsCreative) return false;
             try
             {
                 var data=new SaveData { money=shop.Money,fruit=shop.Fruit,expanded=shop.Expanded,
@@ -59,7 +64,8 @@ namespace NongTrai
                     toolTiers=(int[])expansion.ToolTiers.Clone(),regions=(bool[])expansion.UnlockedRegions.Clone(),
                     processing=processing.Snapshot(),island=islands.Snapshot(),playerPosition=player.transform.position,
                     weather=(int)clock.Weather,musicVolume=FarmAudio.Instance.MusicVolume,
-                    effectsVolume=FarmAudio.Instance.EffectsVolume };
+                    effectsVolume=FarmAudio.Instance.EffectsVolume,
+                    water=water==null?null:water.Snapshot(),orders=orders==null?null:orders.Snapshot() };
                 var plots=FindObjectsByType<FarmPlot>(FindObjectsSortMode.None);
                 data.plots=new PlotRecord[plots.Length];
                 for(int i=0;i<plots.Length;i++)
@@ -101,7 +107,7 @@ namespace NongTrai
             try
             {
                 var data=JsonUtility.FromJson<SaveData>(File.ReadAllText(SavePath));
-                if(data==null || (data.version!=2 && data.version!=3 && data.version!=4) || data.seeds==null || data.seeds.Length!=3 ||
+                if(data==null || data.version<2 || data.version>5 || data.seeds==null || data.seeds.Length!=3 ||
                     data.harvested==null || data.harvested.Length!=3 || data.products==null || data.products.Length<4)
                     throw new InvalidDataException("Phiên bản dữ liệu lưu không phù hợp.");
                 shop.RestoreState(data.money,data.fruit,data.expanded,data.treeCount,data.version>=3?data.feed:15);
@@ -150,6 +156,8 @@ namespace NongTrai
                             if(resource.id==item.id) resource.remaining=Mathf.Max(0,item.remaining);
                     player.Teleport(data.playerPosition);
                 }
+                if(water!=null) water.Restore(data.version>=5?data.water:null);
+                if(orders!=null) orders.Restore(data.version>=5?data.orders:null,data.version<5);
                 return true;
             }
             catch(Exception error) { Debug.LogError("Tải nông trại thất bại: "+error); return false; }

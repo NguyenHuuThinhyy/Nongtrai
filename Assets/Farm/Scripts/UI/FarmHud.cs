@@ -17,6 +17,7 @@ namespace NongTrai
         public GameObject instructions;
         public FarmSave save;
         public Text saveStatus;
+        public Button saveButton;
         public GameObject mainMenu,settingsPanel;
         bool settingsFromMain;
         float remaining;
@@ -25,10 +26,11 @@ namespace NongTrai
             mainMenu=FarmUi.Panel(transform,"Menu chính",new Vector2(850,650));
             FarmUi.Label(mainMenu.transform,"NÔNG TRẠI • FIRST HARVEST",new Vector2(35,-40),new Vector2(780,65),34);
             FarmUi.Label(mainMenu.transform,"Trồng trọt • chăn nuôi • chế biến • mở rộng",new Vector2(35,-120),new Vector2(780,45),22);
-            FarmUi.Button(mainMenu.transform,"Vào nông trại",new Vector2(35,-215),new Vector2(780,70),Resume);
-            FarmUi.Button(mainMenu.transform,"Cài đặt âm lượng",new Vector2(35,-305),new Vector2(780,70),OpenSettings);
-            FarmUi.Button(mainMenu.transform,"Thoát game",new Vector2(35,-395),new Vector2(780,70),Quit);
-            FarmUi.Label(mainMenu.transform,"Bản lưu chỉ cập nhật khi bạn nhấn Lưu game trong menu ESC.",new Vector2(35,-520),new Vector2(780,55),18);
+            FarmUi.Button(mainMenu.transform,"Vào nông trại",new Vector2(35,-190),new Vector2(780,65),StartNormal);
+            FarmUi.Button(mainMenu.transform,"Chế độ sáng tạo",new Vector2(35,-270),new Vector2(780,65),StartCreative);
+            FarmUi.Button(mainMenu.transform,"Cài đặt âm lượng",new Vector2(35,-350),new Vector2(780,65),OpenSettings);
+            FarmUi.Button(mainMenu.transform,"Thoát game",new Vector2(35,-430),new Vector2(780,65),Quit);
+            FarmUi.Label(mainMenu.transform,"Sáng tạo dùng bản sao tiến độ và bỏ thay đổi khi thoát. Chơi thường chỉ lưu khi nhấn Lưu game.",new Vector2(35,-525),new Vector2(780,70),18);
             settingsPanel=FarmUi.Panel(transform,"Cài đặt âm lượng",new Vector2(780,560));
             FarmUi.Label(settingsPanel.transform,"CÀI ĐẶT ÂM LƯỢNG",new Vector2(30,-30),new Vector2(720,55),30);
             VolumeSlider("Nhạc nền",new Vector2(30,-130),true);
@@ -76,6 +78,7 @@ namespace NongTrai
         public void Notify(string text) => ShowMessage(text);
         void Update()
         {
+            if(saveButton!=null) saveButton.interactable=!CreativeModeManager.IsCreative;
             prompt.text = player.Paused?"":interaction.Hint;
             if (farmingStatus != null && interaction.field != null)
             {
@@ -88,8 +91,15 @@ namespace NongTrai
             }
             if (remaining > 0) { remaining -= Time.deltaTime; if (remaining <= 0) toast.text = ""; }
         }
+        public void StartNormal() => CreativeModeManager.Instance?.StartNormal();
+        public void StartCreative() => CreativeModeManager.Instance?.StartCreative();
         public void Resume() { if(mainMenu!=null) mainMenu.SetActive(false);if(settingsPanel!=null) settingsPanel.SetActive(false);player.SetPaused(false); }
-        public void SaveNow() { if(save!=null) saveStatus.text=save.Save()?"Đã lưu tiến độ.":"Lưu thất bại. Xem Console."; }
+        public void SaveNow()
+        {
+            if(CreativeModeManager.IsCreative) { saveStatus.text="Chế độ sáng tạo không ghi vào bản lưu.";return; }
+            if(save!=null) saveStatus.text=save.Save()?"Đã lưu tiến độ.":"Lưu thất bại. Xem Console.";
+        }
+        public void ReturnToMain() => CreativeModeManager.Instance?.ReturnToMainMenu();
         public void Quit() => Application.Quit();
     }
 }

@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Crop1
   m_EditorClassIdentifier: Assembly-CSharp::NongTrai.CropDefinition
   displayName: "C\xE0 chua"
-  growthSeconds: 45
+  growthSeconds: 180
   yield: 3
   fruitColor: {r: 0.9, g: 0.16, b: 0.08, a: 1}

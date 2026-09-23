@@ -77,6 +77,8 @@ namespace NongTrai
         public bool Enqueue(int index)
         {
             if(index<0 || index>=Recipes.Length) return false;
+            if(FarmCraftOrders.Instance!=null && !FarmCraftOrders.Instance.ProcessingUnlocked(Recipes[index].id))
+            { Say("Công thức này chưa mở. Hoàn thành thêm đơn ở hộp thư.");return false; }
             if(Recipes[index].id=="metal" && (IslandManager.Instance==null || IslandManager.Instance.Blueprints<=0))
             { Say("Cần bản vẽ hiếm từ di tích Đảo Thần Bí để dùng lò nung.");return false; }
             var recipe=Recipes[index];
@@ -122,6 +124,13 @@ namespace NongTrai
             string value="Hàng đợi: "+queue.Count+" công việc";
             foreach(var job in queue) value+=" • "+job.recipe+" "+Mathf.CeilToInt(job.remaining)+"s";
             status.text=value;
+        }
+        public void RefreshLocks()
+        {
+            if(feedback==null) return;
+            int completed=FarmCraftOrders.Instance==null?6:FarmCraftOrders.Instance.CompletedOrders;
+            feedback.text="Mở khóa bằng đơn: bánh mì 2 • phô mai 4 • nước táo 6. Đã giao "+completed+" đơn.";
+            Refresh();
         }
         public ProcessingRecord[] Snapshot() => queue.ToArray();
         public void ApplyStormDamage(int percent)

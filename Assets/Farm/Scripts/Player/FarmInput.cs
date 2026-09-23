@@ -12,6 +12,8 @@ namespace NongTrai
         public InputAction View { get; private set; }
         public InputAction Interact { get; private set; }
         public InputAction Pause { get; private set; }
+        public InputAction FlyToggle { get; private set; }
+        public InputAction Descend { get; private set; }
         InputActionMap map;
 
         void Awake()
@@ -26,6 +28,8 @@ namespace NongTrai
             View = map.AddAction("View", InputActionType.Button, "<Keyboard>/v");
             Interact = map.AddAction("Interact", InputActionType.Button, "<Keyboard>/e");
             Pause = map.AddAction("Pause", InputActionType.Button, "<Keyboard>/escape");
+            FlyToggle = map.AddAction("Creative fly", InputActionType.Button, "<Keyboard>/f8");
+            Descend = map.AddAction("Fly down", InputActionType.Button, "<Keyboard>/leftCtrl");
         }
         void OnEnable() => map.Enable();
         void OnDisable() => map.Disable();

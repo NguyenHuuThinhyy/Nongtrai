@@ -1,0 +1,8 @@
+{
+  "recipes": [
+    { "id": "produce_bundle", "name": "Bó nông sản", "output": 16, "inputs": [{"item":0,"count":2},{"item":1,"count":1}] },
+    { "id": "soy_pack", "name": "Gói đậu", "output": 17, "inputs": [{"item":2,"count":2},{"item":0,"count":1}] },
+    { "id": "apple_basket", "name": "Giỏ táo", "output": 18, "inputs": [{"item":3,"count":3},{"item":14,"count":1}] },
+    { "id": "handmade_lamp", "name": "Đèn thủ công", "output": 19, "inputs": [{"item":14,"count":2},{"item":15,"count":1}] }
+  ]
+}

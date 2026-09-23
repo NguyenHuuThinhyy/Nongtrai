@@ -305,7 +305,7 @@ namespace NongTrai.Editor
                 string path = Root + "Data/Crop" + i + ".asset";
                 var crop = AssetDatabase.LoadAssetAtPath<CropDefinition>(path);
                 if (crop == null) { crop = ScriptableObject.CreateInstance<CropDefinition>(); AssetDatabase.CreateAsset(crop, path); }
-                crop.displayName = cropNames[i]; crop.growthSeconds = 35 + i * 10; crop.fruitColor = colors[i];
+                crop.displayName = cropNames[i]; crop.growthSeconds = new[]{120f,180f,300f}[i]; crop.fruitColor = colors[i];
                 EditorUtility.SetDirty(crop); field.crops[i] = crop;
             }
             interaction.field = field;
@@ -331,12 +331,13 @@ namespace NongTrai.Editor
             Label(hud.pausePanel.transform,"TẠM DỪNG",new Vector2(35,-25),new Vector2(500,55),32,Color.white);
             Button(hud.pausePanel.transform,"Tiếp tục",new Vector2(35,-115),hud.Resume);
             Button(hud.pausePanel.transform,"Hướng dẫn",new Vector2(35,-215),hud.ToggleInstructions);
-            Button(hud.pausePanel.transform,"Lưu game",new Vector2(35,-315),hud.SaveNow);
+            hud.saveButton=Button(hud.pausePanel.transform,"Lưu game",new Vector2(35,-315),hud.SaveNow);
             Button(hud.pausePanel.transform,"Thoát game",new Vector2(35,-415),hud.Quit);
             hud.saveStatus=Label(hud.pausePanel.transform,"Chỉ lưu khi nhấn Lưu game.",new Vector2(35,-505),new Vector2(520,38),19,Color.white);
             hud.instructions=Panel(hud.pausePanel.transform,"Instructions",new Vector2(595,-35),new Vector2(665,510),new Color(.15f,.25f,.19f,1));
-            Label(hud.instructions.transform,"HƯỚNG DẪN\n\nWASD đi • Shift chạy • Space nhảy\nChuột nhìn • V đổi góc nhìn\nE làm ruộng / thu sản phẩm / mở cửa\nF cho thú ăn • Chuột trái nhấc, phải thả\n1–3 chọn hạt giống\nB Shop • I Túi đồ • M Chế biến\nN Mở đất & dụng cụ • P Quản lý chuồng\nChăm gà, bò, cừu mỗi ngày để có sản phẩm\nEsc tạm dừng; cài đặt âm lượng tại đây\n\nThoát không tự lưu. Nhấn Lưu game để lưu.",new Vector2(25,-25),new Vector2(615,470),21,Color.white);
+            Label(hud.instructions.transform,"HƯỚNG DẪN\n\nWASD đi • Shift chạy • Space nhảy\nChuột nhìn • V đổi góc nhìn • E tương tác\n1–3 Hạt • 5 Cuốc • 6 Tưới • 7 Liềm\nLấy nước ở hồ; xây trạm tưới từ bảng cạnh hồ\nF cho thú ăn • Chuột trái nhấc, phải thả\nB Shop • I Túi • M Chế biến • Tab Bản đồ\nN Mở đất & dụng cụ • P Quản lý chuồng\nBàn chế tạo và hộp thư ở trước nhà\nSáng tạo: F8 bay • Space lên • Ctrl xuống\n\nThoát không tự lưu. Nhấn Lưu game để lưu.",new Vector2(25,-25),new Vector2(615,470),20,Color.white);
             Button(hud.pausePanel.transform,"Cài đặt âm lượng",new Vector2(560,-415),hud.OpenSettings);
+            Button(hud.pausePanel.transform,"Về menu chính",new Vector2(560,-315),hud.ReturnToMain);
             hud.instructions.SetActive(false);
             hud.pausePanel.SetActive(false);
             BuildShop(hud,interaction);
@@ -359,11 +360,13 @@ namespace NongTrai.Editor
             var label = go.GetComponent<Text>(); label.font = font; label.text = text; label.fontSize = fontSize;
             label.color = color; label.raycastTarget = false; return label;
         }
-        static void Button(Transform parent, string text, Vector2 p, UnityEngine.Events.UnityAction action)
+        static UnityEngine.UI.Button Button(Transform parent, string text, Vector2 p, UnityEngine.Events.UnityAction action)
         {
             var go = Panel(parent, text, p, new Vector2(520, 65), new Color(0.3f, 0.43f, 0.24f));
-            UnityEditor.Events.UnityEventTools.AddPersistentListener(go.AddComponent<UnityEngine.UI.Button>().onClick, action);
+            var button=go.AddComponent<UnityEngine.UI.Button>();
+            UnityEditor.Events.UnityEventTools.AddPersistentListener(button.onClick, action);
             Label(go.transform, text, new Vector2(22, -14), new Vector2(470, 40), 25, Color.white);
+            return button;
         }
 
         public static void BuildWindows()

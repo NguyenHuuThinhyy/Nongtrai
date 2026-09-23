@@ -67,11 +67,13 @@ namespace NongTrai
                 if(other!=null) other.SetActive(false);
             panel.SetActive(true);
         }
-        public void OpenMap() { Open(MapPanel);mapStatus.text="Chọn đảo để dịch chuyển. Đảo Thần Bí mở ở LV3, Công Nghiệp ở LV4."; }
+        public void OpenMap() { Open(MapPanel);mapStatus.text=CreativeModeManager.IsCreative?
+            "SÁNG TẠO: có thể dịch chuyển đến mọi đảo không cần cấp.":
+            "Chọn đảo để dịch chuyển. Đảo Thần Bí mở ở LV3, Công Nghiệp ở LV4."; }
         public bool Travel(int index)
         {
             if(index<0 || index>=arrivals.Length) return false;
-            if(progress.Level<requiredLevels[index])
+            if(progress.Level<requiredLevels[index] && !(CreativeModeManager.Instance!=null && CreativeModeManager.Instance.CanTravelWithoutLevel))
             { hud.Notify("Cần đạt LV "+requiredLevels[index]+" để đến "+islandNames[index]+".");return false; }
             hud.Resume();player.Teleport(arrivals[index]);
             hud.Notify("Đã đến "+islandNames[index]+".");return true;

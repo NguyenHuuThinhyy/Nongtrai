@@ -8,6 +8,7 @@ namespace NongTrai
 {
     public sealed class FarmHudV2 : MonoBehaviour
     {
+        public static FarmHudV2 Instance { get; private set; }
         public FarmHud hud;
         public FarmShop shop;
         public FarmInventory inventory;
@@ -29,6 +30,7 @@ namespace NongTrai
             new Color(.72f,.78f,.80f),new Color(.91f,.24f,.18f),new Color(.96f,.93f,.76f)};
         void Start()
         {
+            Instance=this;
             var root=new GameObject("HUD 1920x1080",typeof(RectTransform));
             var full=root.GetComponent<RectTransform>();full.SetParent(hud.gameplayChrome.transform,false);
             full.anchorMin=Vector2.zero;full.anchorMax=Vector2.one;full.offsetMin=full.offsetMax=Vector2.zero;
@@ -64,6 +66,7 @@ namespace NongTrai
             }
             displayedMoney=shop.Money;Select(0);
         }
+        void OnDestroy() { if(Instance==this) Instance=null; }
         static GameObject CreatePanel(Transform parent,string name,Vector2 position,Vector2 size,Vector2 anchor)
         {
             var go=new GameObject(name,typeof(RectTransform),typeof(Image));
@@ -103,9 +106,11 @@ namespace NongTrai
             xpFill.rectTransform.sizeDelta=new Vector2(420f*progress.Experience/progress.ExperienceNeeded,28);
             var clock=TimeManager.Instance;
             if(clock!=null) environmentText.text=clock.ClockText;
+            if(CreativeModeManager.IsCreative) environmentText.text+=" • SÁNG TẠO"+(CreativeModeManager.IsFlying?" • ĐANG BAY":"");
             counts[0].text=shop.Seeds[0].ToString();counts[1].text=shop.Seeds[1].ToString();counts[2].text=shop.Seeds[2].ToString();
             counts[3].text=shop.FeedStock.ToString();
             for(int i=0;i<3;i++) counts[4+i].text=(progress.ToolTiers[i]+1).ToString();
+            if(FarmWaterSystem.Instance!=null) counts[5].text=FarmWaterSystem.Instance.CanWater+"/"+FarmWaterSystem.Instance.CanCapacity;
             counts[7].text=shop.Fruit.ToString();counts[8].text=inventory.Count(5).ToString();
         }
     }

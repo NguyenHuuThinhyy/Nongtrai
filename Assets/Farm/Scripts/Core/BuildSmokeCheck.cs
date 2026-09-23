@@ -54,8 +54,9 @@ namespace NongTrai
                 plot.Work(crop, out _);
                 if (plot.State != PlotState.Tilled) throw new InvalidOperationException("Tilling failed.");
                 plot.Work(crop, out _); plot.Tick(100);
-                if (plot.Growth != 0) throw new InvalidOperationException("Dry crops must stop growing.");
-                plot.Work(crop, out _); plot.Tick(crop.growthSeconds + 1);
+                if (plot.Growth <= 0 || plot.Growth >= 1) throw new InvalidOperationException("Dry crops must grow at reduced speed.");
+                for(int watering=0;watering<6 && plot.State==PlotState.Growing;watering++)
+                { plot.Work(crop,out _);plot.Tick(60); }
                 if (plot.State != PlotState.Ready) throw new InvalidOperationException("Watered crop did not ripen.");
                 plot.Work(crop, out int harvested); field.Record(crop, harvested);
                 if (harvested != crop.yield || field.Harvested[i] != crop.yield || plot.State != PlotState.Tilled)
@@ -128,7 +129,7 @@ namespace NongTrai
             hud.Resume();
             for(int i=0;i<5;i++) if(!shop.ConsumeSeed(0)) throw new InvalidOperationException("Seed use failed.");
             if(shop.ConsumeSeed(0)) throw new InvalidOperationException("Seed inventory went negative.");
-            if(!shop.Purchase(0,out _) || shop.Seeds[0]!=5 || shop.Money!=990) throw new InvalidOperationException("Seed purchase failed.");
+            if(!shop.Purchase(0,out _) || shop.Seeds[0]!=5 || shop.Money!=980) throw new InvalidOperationException("Seed purchase failed.");
             if(!shop.Purchase(3,out _) || !shop.Purchase(4,out _) || !shop.Purchase(4,out _)) throw new InvalidOperationException("Animal purchase failed.");
             if(shop.speciesPens[0].AnimalCount()!=2 || shop.speciesPens[1].AnimalCount()!=4) throw new InvalidOperationException("Species pens mismatched.");
             int money=shop.Money;
@@ -137,7 +138,7 @@ namespace NongTrai
             money=shop.Money;
             if(shop.Purchase(7,out _) || shop.Money!=money) throw new InvalidOperationException("Duplicate pen charged money.");
             if(shop.Purchase(8,out _) || shop.Money!=money) throw new InvalidOperationException("Insufficient funds failed.");
-            if(shop.SellHarvest()!=90 || shop.SellHarvest()!=0) throw new InvalidOperationException("Selling crops failed.");
+            if(shop.SellHarvest()!=174 || shop.SellHarvest()!=0) throw new InvalidOperationException("Selling crops failed.");
             if(!shop.Purchase(8,out _) || shop.BoughtTrees!=1) throw new InvalidOperationException("Fruit tree purchase failed.");
             yield return null;
             var apple=FindFirstObjectByType<FruitTree>();
@@ -225,7 +226,10 @@ namespace NongTrai
             Debug.Log("FARM_ANIMALS_SIGNS_OK: six animals moved, stayed in paddock, paused correctly; front/back sign and farmer screenshots captured.");
             var progress=FarmExpansion.Instance;
             var processing=FarmProcessing.Instance;
-            if(progress==null || processing==null || processing.Recipes.Length!=6)
+            var water=FarmWaterSystem.Instance;
+            var orders=FarmCraftOrders.Instance;
+            var creative=CreativeModeManager.Instance;
+            if(progress==null || processing==null || processing.Recipes.Length!=6 || water==null || orders==null || creative==null)
                 throw new InvalidOperationException("Expansion systems or JSON recipes missing.");
             milkCow=null;
             foreach(var candidate in FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None))
@@ -255,12 +259,29 @@ namespace NongTrai
                 throw new InvalidOperationException("Level gated land purchase failed.");
             if(!progress.UpgradeTool(0) || progress.ToolRadius(0)!=3)
                 throw new InvalidOperationException("Tool upgrade failed.");
+            if(water.RefillCan()!=water.CanCapacity || !water.Consume(1) || water.CanWater!=water.CanCapacity-1)
+                throw new InvalidOperationException("Finite watering can failed.");
+            if(!water.BuyStation(0)) throw new InvalidOperationException("Irrigation station purchase failed.");
+            water.RefillCan();
+            if(water.TransferToStation(0)<=0 || water.StationWater[0]<=0)
+                throw new InvalidOperationException("Irrigation station transfer failed.");
+            int bundles=inventory.Count(16);inventory.Add(0,2);inventory.Add(1,1);
+            if(!orders.Craft(0) || inventory.Count(16)!=bundles+1)
+                throw new InvalidOperationException("JSON crafting recipe failed.");
+            if(!orders.Reroll(0) || orders.RerollRemaining<=0)
+                throw new InvalidOperationException("Order reroll cooldown failed.");
+            for(int i=0;i<orders.Orders.Length;i++)
+            { inventory.Add(orders.Orders[i].item,orders.Orders[i].count);if(!orders.Deliver(i)) throw new InvalidOperationException("Order delivery failed."); }
+            if(orders.CompletedOrders<2 || !orders.ProcessingUnlocked("bread"))
+                throw new InvalidOperationException("Order recipe unlock failed.");
             save.pathOverride=Path.Combine(Application.temporaryCachePath,"farm-expansion-smoke-save.json");
-            int savedLevel=progress.Level,savedFeed=shop.FeedStock;
+            int savedLevel=progress.Level,savedFeed=shop.FeedStock,savedStation=water.StationWater[0],savedOrders=orders.CompletedOrders;
             if(!save.Save()) throw new InvalidOperationException("Expansion save failed.");
             progress.Restore(1,0,1,0,null,null);shop.AddFeed(9);
+            water.Restore(null);orders.Restore(null,false);
             if(!save.Load() || progress.Level!=savedLevel || !progress.UnlockedRegions[1] ||
-                progress.ToolRadius(0)!=3 || shop.FeedStock!=savedFeed)
+                progress.ToolRadius(0)!=3 || shop.FeedStock!=savedFeed || water.StationWater[0]!=savedStation ||
+                orders.CompletedOrders!=savedOrders)
                 throw new InvalidOperationException("Expansion save did not restore state.");
             File.Delete(save.SavePath);
             if(File.Exists(save.SavePath+".bak")) File.Delete(save.SavePath+".bak");
@@ -321,6 +342,15 @@ namespace NongTrai
             if(File.Exists(save.SavePath+".bak")) File.Delete(save.SavePath+".bak");
             save.pathOverride=null;
             Debug.Log("FARM_ISLANDS_TIME_OK: 10-minute day, seasons, rain, storm puzzle, sleep, portals, NPCs, level cap, furnace blueprint, hotbar and manual save.");
+            save.pathOverride=Path.Combine(Application.temporaryCachePath,"farm-creative-do-not-save.json");
+            if(File.Exists(save.SavePath)) File.Delete(save.SavePath);
+            creative.StartCreative();progress.Restore(1,0,1,.25f,null,null);
+            if(!CreativeModeManager.IsCreative || !islands.Travel(3) || Mathf.Abs(player.transform.position.x-600)>2)
+                throw new InvalidOperationException("Creative LV1 island travel failed.");
+            creative.ToggleFlight();if(!CreativeModeManager.IsFlying) throw new InvalidOperationException("Creative flight toggle failed.");
+            if(save.Save() || File.Exists(save.SavePath)) throw new InvalidOperationException("Creative mode wrote a save file.");
+            creative.StartNormal();save.pathOverride=null;
+            Debug.Log("FARM_WATER_ORDERS_CREATIVE_OK: finite water, irrigation, JSON craft, daily orders, v5 save and discard-only creative mode.");
             yield return new WaitForSeconds(2);
             Debug.Log("FARM_CROPS_SMOKE_OK: grounded, cameras, pause, 80 plots, three crops, dry growth blocked, watering, harvest inventory, replant, screenshot.");
             Application.Quit(0);
