@@ -1,4 +1,4 @@
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -46,6 +46,10 @@ namespace NongTrai
             bir.SetParent(bag.transform,false);bir.anchorMin=bir.anchorMax=bir.pivot=new Vector2(0,.5f);bir.anchoredPosition=new Vector2(12,0);bir.sizeDelta=new Vector2(52,52);
             bagIcon.GetComponent<Image>().sprite=FarmItemIconLibrary.Get(20);bagIcon.GetComponent<Image>().preserveAspect=true;
             FarmUi.TmpLabel(bag.transform,"[B]  TÚI ĐỒ",new Vector2(72,-14),new Vector2(145,42),22);
+            var map=CreatePanel(root.transform,"Tab • Đổi bản đồ",new Vector2(24,-260),new Vector2(280,58),new Vector2(0,1));
+            map.AddComponent<Button>().onClick.AddListener(()=>IslandManager.Instance.OpenMap());
+            FarmUi.TmpLabel(map.transform,"[TAB]  ĐỔI BẢN ĐỒ",new Vector2(14,-12),new Vector2(255,36),22);
+            FarmUi.TmpLabel(root.transform,"SPACE: NHẢY QUA KHỐI",new Vector2(24,-324),new Vector2(330,35),20);
             var right=CreatePanel(root.transform,"Thông tin nông trại",new Vector2(-24,-24),new Vector2(650,146),new Vector2(1,1));
             coinText=FarmUi.TmpLabel(right.transform,"",new Vector2(20,-12),new Vector2(610,52),30);
             environmentText=FarmUi.TmpLabel(right.transform,"",new Vector2(20,-72),new Vector2(610,65),21);

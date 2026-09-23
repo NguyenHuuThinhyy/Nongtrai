@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using NongTrai;
 using Unity.Cinemachine;
 using UnityEditor;
@@ -326,7 +326,7 @@ namespace NongTrai.Editor
             chromeRect.anchorMin=Vector2.zero;chromeRect.anchorMax=Vector2.one;chromeRect.offsetMin=chromeRect.offsetMax=Vector2.zero;
             hud.gameplayChrome=chrome;
             hud.prompt = Label(chrome.transform, "", new Vector2(610, -730), new Vector2(700, 65), 22, Color.white);
-            hud.toast = Label(chrome.transform, "", new Vector2(520, -200), new Vector2(880, 90), 24, Color.white);
+            hud.toast = Label(chrome.transform, "", new Vector2(520, -430), new Vector2(880, 72), 24, Color.white);
             hud.pausePanel = Panel(canvas.transform, "Pause", new Vector2(150,-160), new Vector2(1300,580), new Color(.08f,.16f,.13f,.99f));
             Label(hud.pausePanel.transform,"TẠM DỪNG",new Vector2(35,-25),new Vector2(500,55),32,Color.white);
             Button(hud.pausePanel.transform,"Tiếp tục",new Vector2(35,-115),hud.Resume);

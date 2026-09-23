@@ -4,7 +4,7 @@ Mở `D:\GAME_NongTrai\Builds\Windows\NongTrai.exe`, giữ nguyên toàn bộ th
 
 | Phím | Tác dụng |
 |---|---|
-| WASD, Shift, Space | Di chuyển, chạy, nhảy |
+| WASD, Shift, Space | Di chuyển, chạy, nhảy cao 1,6 m để qua khối 1 m |
 | Chuột, V | Nhìn, đổi góc nhìn |
 | E | Tương tác với ô đất, hồ, trạm tưới, bàn chế tạo, hộp thư, quầy/máy, vật thể và cửa chuồng |
 | 1, 2, 3 | Chọn lúa mì, cà chua, đậu nành |
@@ -53,7 +53,7 @@ Nhấn Tab hoặc dùng cổng để đi giữa **Nông trại** và **Khám ph�
 
 Map Khám phá sinh thêm địa hình theo **seed** khi bạn đi xa, theo cả bốn hướng; không còn dừng ở ô 48 × 48 m. Có đồng cỏ, đồi cát, núi tuyết, đá và quặng/hốc ngầm. Khu xuất phát 48 × 48 m được giữ để tương thích bản cũ; phần đất mới bên ngoài thay đổi theo seed. Mỗi thế giới chưa có bản lưu nhận seed ngẫu nhiên. Khi bấm Lưu game, seed được giữ cố định: quay lại vẫn gặp cùng địa hình, các khối đã đào không tự mọc lại.
 
-Nhấn V để dùng góc nhìn thứ nhất, hướng dấu chấm vào đất/đá trong tầm 8 m, giữ chuột trái để đào. Đất/cát/tuyết trả khối cỏ, đá trả khối đá, quặng trả nguyên liệu luyện kim. Đào 30 khối mở bản vẽ lò nung và đèn thủ công. Khu cổng và tầng đáy không đào được. Dùng G để xây bằng vật liệu trong túi, Tab để trở về. Khu vào map có sáu cây táo ban đầu để hái trái hoặc chặt lấy gỗ. Gỗ lấy từ cây táo bằng rìu hoặc mua shop; không có quặng gỗ.
+Nhấn V để dùng góc nhìn thứ nhất, hướng dấu chấm vào đất/đá trong tầm 6 m tính từ nhân vật, giữ chuột trái khoảng 0,55 giây để đào. Đất/cát/tuyết trả khối cỏ, đá trả khối đá, quặng trả nguyên liệu luyện kim. Đào 30 khối mở bản vẽ lò nung và đèn thủ công. HUD hiện phần trăm đào và thông báo khi khối quá xa hoặc thuộc khu bảo vệ. Khu cổng và tầng đáy không đào được. Dùng G để xây bằng vật liệu trong túi, Tab để trở về. Khu vào map có sáu cây táo ban đầu để hái trái hoặc chặt lấy gỗ. Gỗ lấy từ cây táo bằng rìu hoặc mua shop; không có quặng gỗ.
 
 HUD phiêu lưu hiển thị seed, tên địa hình và tọa độ. Game tải từng vùng 16 × 16 m quanh nhân vật, gỡ vùng xa rồi tái tạo khi quay lại; các thay đổi đào và công trình vẫn giữ. Sương xa che ranh giới tải. Đây là thế giới mở rộng theo vùng trên máy chơi đơn, chưa có quái, sinh tồn hay multiplayer; đi quá xa vẫn chịu giới hạn độ chính xác tọa độ của Unity.
 
@@ -74,3 +74,5 @@ Trong menu Esc, chỉ nút **Lưu game** ghi bản lưu khi chơi thường. Tho
 ```
 
 Lệnh này dựng lại scene và bản Windows. Nếu đã sửa scene trong Editor, hãy giữ bản sao trước khi chạy.
+
+HUD luôn có nhãn **[TAB] ĐỔI BẢN ĐỒ** bên trái, dưới nút túi đồ. Giữ W và nhấn Space để nhảy lên/qua khối.

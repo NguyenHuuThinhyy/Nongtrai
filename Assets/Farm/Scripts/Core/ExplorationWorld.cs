@@ -21,6 +21,7 @@ namespace NongTrai
         public static readonly Vector3 Origin=new Vector3(175.5f,996,-24.5f);
         readonly HashSet<Vector3Int> removed=new HashSet<Vector3Int>();
         readonly Dictionary<Vector2Int,Chunk> chunks=new Dictionary<Vector2Int,Chunk>();
+        TMPro.TMP_Text miningText,reticle;string miningHint="";
         Material[] materials;float hold;Vector3Int target;bool hasTarget;
         public int MinedCount {get;private set;}
         public int Seed {get;private set;}
@@ -47,7 +48,16 @@ namespace NongTrai
             for(int i=0;i<colors.Length;i++){materials[i]=new Material(Shader.Find("Universal Render Pipeline/Lit"));materials[i].color=colors[i];}
             Restore(null);
         }
-        void Start()=>CreateStarterOrchard();
+        void Start()
+        {
+            CreateStarterOrchard();
+            miningText=FarmUi.TmpLabel(hud.gameplayChrome.transform,"",Vector2.zero,new Vector2(1000,88),22);
+            var r=miningText.rectTransform;r.anchorMin=r.anchorMax=r.pivot=new Vector2(.5f,0);r.anchoredPosition=new Vector2(0,195);
+            miningText.alignment=TMPro.TextAlignmentOptions.Center;miningText.raycastTarget=false;
+            reticle=FarmUi.TmpLabel(hud.gameplayChrome.transform,"+",Vector2.zero,new Vector2(40,40),28);
+            var aim=reticle.rectTransform;aim.anchorMin=aim.anchorMax=aim.pivot=new Vector2(.5f,.5f);aim.anchoredPosition=Vector2.zero;
+            reticle.alignment=TMPro.TextAlignmentOptions.Center;reticle.raycastTarget=false;
+        }
         public void CreateStarterOrchard()
         {
             var shop=FindFirstObjectByType<FarmShop>();if(shop==null||shop.treePrefab==null)return;
@@ -146,21 +156,39 @@ namespace NongTrai
             if(IsExploring)Stream(hud.player.transform.position);
             if(hud.player.Paused||!IsExploring||FarmBuildingSystem.Instance.IsBuilding){hold=0;return;}
             var cam=Camera.main;if(cam==null||Mouse.current==null)return;
-            if(Physics.Raycast(cam.transform.position,cam.transform.forward,out var hit,8)&&IsTerrain(hit.collider))
+            UpdateMiningRay(new Ray(cam.transform.position,cam.transform.forward),Mouse.current.leftButton.isPressed,Time.deltaTime);
+        }
+        public bool UpdateMiningRay(Ray ray,bool pressed,float elapsed)
+        {
+            if(hud.player.Paused||!IsExploring||FarmBuildingSystem.Instance.IsBuilding)return false;
+            miningHint="Nhìn vào khối đất/đá • Giữ CHUỘT TRÁI để đào • V đổi góc nhìn";
+            // The third-person ray must pass through the player's own layer and reach past the camera offset.
+            if(Physics.Raycast(ray,out var hit,24,~(1<<8),QueryTriggerInteraction.Ignore)&&IsTerrain(hit.collider))
             {
                 var c=CellAt(hit.point-hit.normal*.02f);
+                if(Vector3.Distance(hit.point,hud.player.transform.position+Vector3.up)>6)
+                {miningHint="Tiến gần khối hơn (tầm đào 6 m tính từ nhân vật)";hold=0;hasTarget=false;return false;}
                 if(!hasTarget||target!=c){target=c;hold=0;hasTarget=true;}
-                if(Mouse.current.leftButton.isPressed){hold+=Time.deltaTime;if(hold>=.55f){MineCell(c);hold=0;}}
-                else hold=0;
-            }else{hasTarget=false;hold=0;}
+                if(c.y<=0||Protected(c.x,c.z))
+                {miningHint=c.y<=0?"Tầng đáy không thể đào":"Khu cổng được bảo vệ • Đi ra ngoài để đào";hold=0;return false;}
+                string name=BlockAt(c)==4?"Quặng":BlockAt(c)==3?"Đá":"Đất";
+                if(pressed)hold+=Mathf.Max(0,elapsed);else hold=0;
+                miningHint=name+" • Giữ CHUỘT TRÁI: "+Mathf.Min(100,Mathf.FloorToInt(hold/.55f*100))+"%";
+                if(hold>=.55f){hold=0;return MineCell(c);}
+            }
+            else{hasTarget=false;hold=0;}
+            return false;
         }
         bool IsTerrain(Collider collider){foreach(var c in chunks.Values)if(c.collider==collider)return true;return false;}
-        void OnGUI()
+        void LateUpdate()
         {
-            if(hud==null||hud.player.Paused||!IsExploring||FarmBuildingSystem.Instance.IsBuilding)return;
+            if(miningText==null)return;
+            bool visible=IsExploring&&!hud.player.Paused&&!FarmBuildingSystem.Instance.IsBuilding;
+            miningText.gameObject.SetActive(visible);reticle.gameObject.SetActive(visible);
+            if(!visible)return;
             var cell=CellAt(hud.player.transform.position);
-            GUI.Label(new Rect(Screen.width/2-5,Screen.height/2-12,24,24),"•");
-            GUI.Box(new Rect(Screen.width/2-280,Screen.height-205,560,55),BiomeAt(cell.x,cell.z)+" • Seed "+Seed+" • "+cell.x+", "+cell.z+"\nGiữ chuột trái đào • G xây • Tab về nhà • Đã đào: "+MinedCount);
+            miningText.text=miningHint+"\n"+BiomeAt(cell.x,cell.z)+" • Seed "+Seed+" • "+cell.x+", "+cell.z;
+            reticle.color=hasTarget?new Color(1,.8f,.2f):Color.white;
         }
         void Rebuild(Vector2Int key,Chunk chunk)
         {

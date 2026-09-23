@@ -1,4 +1,13 @@
-﻿# CẬP NHẬT ƯU TIÊN — MAP SINH LIÊN TỤC (v8)
+﻿# CẬP NHẬT ƯU TIÊN — SỬA ĐÀO / NHẢY / HƯỚNG DẪN TAB
+
+- ExplorationWorld.UpdateMiningRay dùng mask bỏ layer8 Player và IgnoreTriggers, ray24m từ camera nhưng kiểm tra tầm6m từ player. Sửa ray TPS tự trúng nhân vật và tầm8m tính từ camera cũ quá ngắn. Runtime và smoke dùng chung đường ray/hold .55s; không chỉ test MineCell trực tiếp.
+- Bỏ OnGUI của mining, dùng TMP Canvas: tâm ngắm khi khám phá, tiến độ %, hướng dẫn khối quá xa/khu cổng/tầng đáy. FarmHudV2 thêm nhãn/nút Tab đổi map và nhắc Space.
+- PlayerSettings jumpHeight tăng .8 ->1.6 trong class lẫn asset. Smoke giả lập Keyboard W+Space qua collider cao1m, kiểm tra vị trí vượt qua và đỉnh nhảy.
+- Schema save vẫn v8, không đổi inventory/seed/chunk persistence.
+
+---
+
+# CẬP NHẬT ƯU TIÊN — MAP SINH LIÊN TỤC (v8)
 
 - ExplorationWorld thay mesh cố định bằng Dictionary<Vector2Int,Chunk>, chunk16x16, cao32; radius2 và vùng giữ thêm1. Một chunk bổ sung/frame, đồng bộ3x3 collider khi dịch chuyển. Gỡ mesh/GameObject xa; chỉ giữ seed và HashSet<Vector3Int> các ô đào. Không sinh thế giới mới khi quay lại.
 - GeneratorVersion1, seed ngẫu nhiên nếu chưa có; giữ core48x48 phiên bản trước, bên ngoài sinh đồng cỏ/cát/tuyết và hang/quặng bằng seed. Tọa độ âm dùng floor division.

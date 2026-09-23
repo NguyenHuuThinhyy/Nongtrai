@@ -36,6 +36,20 @@ namespace NongTrai
             if (!player.GetComponent<CharacterController>().isGrounded)
                 throw new InvalidOperationException("Player did not settle on the ground. Position=" + player.transform.position
                     + " paused=" + player.Paused + " frames=" + frames);
+            var originalPosition=player.transform.position;
+            var jumpBlock=GameObject.CreatePrimitive(PrimitiveType.Cube);
+            jumpBlock.transform.position=new Vector3(0,.5f,-32.8f);jumpBlock.transform.localScale=new Vector3(3,1,1);
+            player.Teleport(new Vector3(0,.05f,-35));Physics.SyncTransforms();
+            for(int n=0;n<10;n++)yield return null;
+            var keyboard=UnityEngine.InputSystem.Keyboard.current;
+            UnityEngine.InputSystem.InputSystem.QueueStateEvent(keyboard,new UnityEngine.InputSystem.LowLevel.KeyboardState(UnityEngine.InputSystem.Key.W,UnityEngine.InputSystem.Key.Space));
+            float jumpEnd=Time.time+1.3f,maxJumpY=0;
+            while(Time.time<jumpEnd){player.SetPaused(false);maxJumpY=Mathf.Max(maxJumpY,player.transform.position.y);yield return null;}
+            UnityEngine.InputSystem.InputSystem.QueueStateEvent(keyboard,new UnityEngine.InputSystem.LowLevel.KeyboardState());
+            yield return null;
+            if(maxJumpY<1.2f||player.transform.position.z<-32)throw new InvalidOperationException("SPACE + forward failed to cross a one metre block: "+player.transform.position+" peak="+maxJumpY);
+            jumpBlock.SetActive(false);Destroy(jumpBlock);player.Teleport(originalPosition);
+            Debug.Log("FARM_JUMP_BLOCK_OK: keyboard SPACE/W crossed a one metre collider.");
             player.cameraRig.ToggleView();
             if (!player.cameraRig.FirstPerson || player.visual.gameObject.activeSelf)
                 throw new InvalidOperationException("First-person visibility failed.");
@@ -369,6 +383,19 @@ namespace NongTrai
             inventory.Add(13,2);
             if(processing.Enqueue(5)) throw new InvalidOperationException("Furnace worked without blueprint.");
             var exploration=ExplorationWorld.Instance;
+            var beforeRay=exploration.Snapshot();
+            player.Teleport(new Vector3(186,1000.05f,-20));Physics.SyncTransforms();
+            var aimed=new Vector3(186,999.98f,-18);
+            var rayStart=new Vector3(186,1003,-24);
+            var thirdPersonRay=new Ray(rayStart,(aimed-rayStart).normalized);
+            if(exploration.UpdateMiningRay(thirdPersonRay,true,.3f)||!exploration.UpdateMiningRay(thirdPersonRay,true,.3f))
+                throw new InvalidOperationException("Third person hold-to-mine ray failed.");
+            if(exploration.BlockAt(new Vector3Int(10,3,6))!=0)throw new InvalidOperationException("Aimed surface block was not excavated.");
+            exploration.Restore(beforeRay);Physics.SyncTransforms();
+            var eye=player.transform.position+Vector3.up*1.65f;
+            if(!exploration.UpdateMiningRay(new Ray(eye,(aimed-eye).normalized),true,.6f))throw new InvalidOperationException("First person hold-to-mine ray failed.");
+            exploration.Restore(beforeRay);islands.Travel(1);
+            Debug.Log("FARM_MINING_RAY_OK: first/third person rays, hold duration and terrain mutation.");
             int mined=0;
             for(int x=0;x<10 && mined<30;x++)for(int z=12;z<30 && mined<30;z++)
                 if(exploration.MineCell(new Vector3Int(x,2,z)))mined++;
