@@ -22,12 +22,12 @@ namespace NongTrai
         int selectedSlot;
         public int SelectedSlot => selectedSlot;
         readonly string[] names={"Lúa mì","Cà chua","Đậu nành","Thức ăn","Cuốc","Bình tưới","Liềm","Táo","Sữa"};
-        readonly string[] glyphs={"L","C","Đ","Ă","C","T","L","T","S"};
+        readonly int[] iconIds={0,1,2,20,21,22,23,3,5};
+        readonly string[] actions={"Gieo hạt vào đất đã cày","Gieo hạt vào đất đã cày","Gieo hạt vào đất đã cày",
+            "Cho vật nuôi ăn bằng F","Cày đất bằng E","Tưới cây bằng E","Thu hoạch bằng E",
+            "Vật phẩm trong túi","Vật phẩm trong túi"};
         static readonly Key[] digitKeys={Key.Digit1,Key.Digit2,Key.Digit3,Key.Digit4,Key.Digit5,
             Key.Digit6,Key.Digit7,Key.Digit8,Key.Digit9};
-        readonly Color[] colors={new Color(.94f,.75f,.28f),new Color(.90f,.29f,.21f),new Color(.55f,.80f,.28f),
-            new Color(.64f,.43f,.24f),new Color(.70f,.69f,.55f),new Color(.36f,.68f,.87f),
-            new Color(.72f,.78f,.80f),new Color(.91f,.24f,.18f),new Color(.96f,.93f,.76f)};
         void Start()
         {
             Instance=this;
@@ -55,10 +55,9 @@ namespace NongTrai
                 tile.GetComponent<RectTransform>().pivot=new Vector2(.5f,0);
                 slots[i]=tile.GetComponent<Image>();
                 var button=tile.AddComponent<Button>();button.onClick.AddListener(()=>Select(index));
-                var icon=CreatePanel(tile.transform,"Icon",new Vector2(12,-12),new Vector2(40,44),new Vector2(0,1));
-                icon.GetComponent<Image>().color=colors[i];
-                var glyph=FarmUi.TmpLabel(icon.transform,glyphs[i],new Vector2(4,-2),new Vector2(36,40),25);
-                glyph.color=Color.black;glyph.alignment=TextAlignmentOptions.Center;
+                var icon=CreatePanel(tile.transform,"Hình "+names[i],new Vector2(8,-8),new Vector2(52,52),new Vector2(0,1));
+                var iconImage=icon.GetComponent<Image>();iconImage.sprite=FarmItemIconLibrary.Get(iconIds[i]);
+                iconImage.color=Color.white;iconImage.preserveAspect=true;
                 FarmUi.TmpLabel(tile.transform,(i+1).ToString(),new Vector2(66,-4),new Vector2(18,24),17);
                 counts[i]=FarmUi.TmpLabel(tile.transform,"",new Vector2(9,-59),new Vector2(69,25),18);
                 counts[i].alignment=TextAlignmentOptions.Right;
@@ -81,9 +80,11 @@ namespace NongTrai
             if(selectedSlot<3) field.Select(selectedSlot);
             if(slots!=null) for(int i=0;i<slots.Length;i++)
                 slots[i].color=i==selectedSlot?new Color(.93f,.73f,.26f,.96f):new Color(.07f,.14f,.12f,.90f);
-            ShowTooltip(names[selectedSlot]);
+            ShowSelected();
         }
-        public void ShowTooltip(string value) { if(tooltip!=null) tooltip.text=value; }
+        void ShowSelected()
+        { if(tooltip!=null) tooltip.text="ĐANG CHỌN ["+(selectedSlot+1)+"]  "+names[selectedSlot].ToUpper()+"  •  "+actions[selectedSlot]+"  •  Lăn chuột để đổi"; }
+        public void ShowTooltip(string value) { if(string.IsNullOrEmpty(value)) ShowSelected();else if(tooltip!=null) tooltip.text=value; }
         void Update()
         {
             if(hud.player.Paused) return;

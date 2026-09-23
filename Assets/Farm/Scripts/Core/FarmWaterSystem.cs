@@ -34,8 +34,10 @@ namespace NongTrai
             CreatePanel();
             CreateStations();
             CreateWaterSource();
+            hud.player.PauseChanged+=OnPause;
         }
-        void OnDestroy() { if(Instance==this) Instance=null; }
+        void OnDestroy() { if(Instance==this) Instance=null;if(hud!=null && hud.player!=null) hud.player.PauseChanged-=OnPause; }
+        void OnPause(bool paused) { if(!paused && Panel!=null) Panel.SetActive(false); }
         void CreatePanel()
         {
             Panel=FarmUi.Panel(hud.transform,"Quản lý nước",new Vector2(930,720));
@@ -50,6 +52,7 @@ namespace NongTrai
             feedback=FarmUi.Label(Panel.transform,"Nạp bình tại hồ, sau đó E ở trạm để chuyển nước vào bồn.",
                 new Vector2(30,-545),new Vector2(870,55),19);
             FarmUi.Button(Panel.transform,"Trở lại game",new Vector2(30,-630),new Vector2(870,55),hud.Resume);
+            FarmUi.Label(Panel.transform,"Có thể nhấn ESC để đóng bảng",new Vector2(625,-22),new Vector2(270,36),17);
             Panel.SetActive(false);
         }
         void CreateStations()

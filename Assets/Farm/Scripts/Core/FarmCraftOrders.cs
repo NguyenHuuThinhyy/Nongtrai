@@ -42,8 +42,11 @@ namespace NongTrai
         {
             LoadRecipes();CreatePanels();CreateWorldObjects();
             if(Orders.Length==0) GenerateOrders(TimeManager.Instance==null?1:TimeManager.Instance.Day);
+            hud.player.PauseChanged+=OnPause;
         }
-        void OnDestroy() { if(Instance==this) Instance=null; }
+        void OnDestroy() { if(Instance==this) Instance=null;if(hud!=null && hud.player!=null) hud.player.PauseChanged-=OnPause; }
+        void OnPause(bool paused)
+        { if(!paused) { if(CraftPanel!=null) CraftPanel.SetActive(false);if(MailPanel!=null) MailPanel.SetActive(false); } }
         void Update()
         {
             if(hud==null || hud.player.Paused || RerollRemaining<=0) return;
@@ -70,6 +73,7 @@ namespace NongTrai
                 FarmUi.Button(CraftPanel.transform,RecipeLabel(i),new Vector2(30,-185-i*84),new Vector2(960,66),()=>Craft(recipe));
             }
             FarmUi.Button(CraftPanel.transform,"Trở lại game",new Vector2(30,-640),new Vector2(960,55),hud.Resume);
+            FarmUi.Label(CraftPanel.transform,"ESC để đóng",new Vector2(815,-22),new Vector2(160,35),17);
             CraftPanel.SetActive(false);
 
             MailPanel=FarmUi.Panel(hud.transform,"Hộp thư giao hàng",new Vector2(1040,760));
@@ -82,6 +86,7 @@ namespace NongTrai
             FarmUi.Label(MailPanel.transform,"Đơn chưa giao sẽ hết hạn vào ngày kế tiếp. Đổi đơn dùng chung thời gian chờ 5 phút chơi.",
                 new Vector2(30,-465),new Vector2(980,75),19);
             FarmUi.Button(MailPanel.transform,"Trở lại game",new Vector2(30,-650),new Vector2(980,55),hud.Resume);
+            FarmUi.Label(MailPanel.transform,"ESC để đóng",new Vector2(835,-22),new Vector2(160,35),17);
             MailPanel.SetActive(false);
         }
         string RecipeLabel(int index)

@@ -231,6 +231,10 @@ namespace NongTrai
             var creative=CreativeModeManager.Instance;
             if(progress==null || processing==null || processing.Recipes.Length!=6 || water==null || orders==null || creative==null)
                 throw new InvalidOperationException("Expansion systems or JSON recipes missing.");
+            water.Open();if(!player.Paused || !water.Panel.activeSelf) throw new InvalidOperationException("Water modal failed to open.");
+            hud.Resume();if(water.Panel.activeSelf) throw new InvalidOperationException("Water modal did not close with resume/ESC flow.");
+            orders.OpenCraft();if(!player.Paused || !orders.CraftPanel.activeSelf) throw new InvalidOperationException("Craft modal failed to open.");
+            hud.Resume();if(orders.CraftPanel.activeSelf) throw new InvalidOperationException("Craft modal did not close with resume/ESC flow.");
             milkCow=null;
             foreach(var candidate in FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None))
                 if(candidate.species==AnimalSpecies.Cow) { milkCow=candidate;break; }
@@ -344,12 +348,15 @@ namespace NongTrai
             Debug.Log("FARM_ISLANDS_TIME_OK: 10-minute day, seasons, rain, storm puzzle, sleep, portals, NPCs, level cap, furnace blueprint, hotbar and manual save.");
             save.pathOverride=Path.Combine(Application.temporaryCachePath,"farm-creative-do-not-save.json");
             if(File.Exists(save.SavePath)) File.Delete(save.SavePath);
-            creative.StartCreative();progress.Restore(1,0,1,.25f,null,null);
+            creative.StartCreative();
+            if(progress.Level!=99 || progress.LevelCap!=99 || !CreativeModeManager.IsFlying)
+                throw new InvalidOperationException("Creative mode did not enable LV99 and flight.");
+            progress.Restore(1,0,1,.25f,null,null);
             if(!CreativeModeManager.IsCreative || !islands.Travel(3) || Mathf.Abs(player.transform.position.x-600)>2)
                 throw new InvalidOperationException("Creative LV1 island travel failed.");
-            creative.ToggleFlight();if(!CreativeModeManager.IsFlying) throw new InvalidOperationException("Creative flight toggle failed.");
+            creative.ToggleFlight();if(CreativeModeManager.IsFlying) throw new InvalidOperationException("Creative flight toggle failed.");
             if(save.Save() || File.Exists(save.SavePath)) throw new InvalidOperationException("Creative mode wrote a save file.");
-            creative.StartNormal();save.pathOverride=null;
+            save.pathOverride=null;
             Debug.Log("FARM_WATER_ORDERS_CREATIVE_OK: finite water, irrigation, JSON craft, daily orders, v5 save and discard-only creative mode.");
             yield return new WaitForSeconds(2);
             Debug.Log("FARM_CROPS_SMOKE_OK: grounded, cameras, pause, 80 plots, three crops, dry growth blocked, watering, harvest inventory, replant, screenshot.");

@@ -51,7 +51,14 @@ namespace NongTrai
         {
             if (Input.Pause.WasPressedThisFrame())
             { var hud=FindFirstObjectByType<FarmHud>();if(hud==null || !hud.HandleEscape()) SetPaused(!Paused); }
-            if (Paused) return;
+            if (Paused)
+            {
+                // Một số driver/đổi focus có thể khóa lại con trỏ sau khi mở popup.
+                // Giữ trạng thái này mỗi frame để mọi nút UI luôn bấm được.
+                if(Cursor.lockState!=CursorLockMode.None) Cursor.lockState=CursorLockMode.None;
+                if(!Cursor.visible) Cursor.visible=true;
+                return;
+            }
             cameraRig.ReadLook(Input.Look.ReadValue<Vector2>());
             if (Input.View.WasPressedThisFrame()) cameraRig.ToggleView();
             if (Input.FlyToggle.WasPressedThisFrame()) CreativeModeManager.Instance?.ToggleFlight();

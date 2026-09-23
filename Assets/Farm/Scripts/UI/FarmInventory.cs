@@ -37,13 +37,6 @@ namespace NongTrai
             status=FarmUi.TmpLabel(Panel.transform,"Di chuột lên vật phẩm để xem mô tả; bán từng loại ở dưới.",
                 new Vector2(30,-785),new Vector2(1300,48),21);
             amounts=new TMP_Text[itemNames.Length];
-            string[] glyphs={"L","C","Đ","T","T","S","L","T","B","B","P","N","G","Q","V","K","B","G","G","Đ"};
-            Color[] palette={new Color(.89f,.72f,.30f),new Color(.89f,.32f,.25f),new Color(.54f,.74f,.27f),
-                new Color(.85f,.27f,.23f),new Color(.95f,.86f,.63f),new Color(.92f,.94f,.96f),
-                new Color(.84f,.83f,.73f),new Color(.70f,.42f,.34f),new Color(.94f,.87f,.70f),
-                new Color(.79f,.57f,.29f),new Color(.95f,.79f,.38f),new Color(.92f,.59f,.20f),
-                new Color(.57f,.37f,.20f),new Color(.54f,.58f,.62f),new Color(.72f,.48f,.25f),new Color(.70f,.73f,.77f),
-                new Color(.76f,.62f,.27f),new Color(.45f,.68f,.29f),new Color(.85f,.39f,.23f),new Color(.96f,.75f,.28f)};
             for (int i=0;i<itemNames.Length;i++)
             {
                 int item = i;
@@ -53,9 +46,11 @@ namespace NongTrai
                 cr.anchoredPosition=new Vector2(x,y);cell.GetComponent<Image>().color=new Color(.16f,.27f,.22f,.95f);
                 var icon=FarmUi.Panel(cell.transform,"Icon",new Vector2(67,67));
                 var ir=icon.GetComponent<RectTransform>();ir.anchorMin=ir.anchorMax=ir.pivot=new Vector2(0,1);
-                ir.anchoredPosition=new Vector2(12,-14);icon.GetComponent<Image>().color=palette[i];
-                var glyph=FarmUi.TmpLabel(icon.transform,glyphs[i],new Vector2(12,-8),new Vector2(46,50),31);
-                glyph.color=Color.black;
+                ir.anchoredPosition=new Vector2(12,-14);icon.GetComponent<Image>().color=new Color(.08f,.14f,.12f,1);
+                var picture=new GameObject("Minh họa "+itemNames[i],typeof(RectTransform),typeof(Image));
+                var pr=picture.GetComponent<RectTransform>();pr.SetParent(icon.transform,false);pr.anchorMin=pr.anchorMax=new Vector2(.5f,.5f);
+                pr.pivot=new Vector2(.5f,.5f);pr.anchoredPosition=Vector2.zero;pr.sizeDelta=new Vector2(58,58);
+                var pi=picture.GetComponent<Image>();pi.sprite=FarmItemIconLibrary.Get(i);pi.color=Color.white;pi.preserveAspect=true;pi.raycastTarget=false;
                 FarmUi.TmpLabel(cell.transform,itemNames[i],new Vector2(88,-12),new Vector2(208,48),23);
                 amounts[i]=FarmUi.TmpLabel(cell.transform,"",new Vector2(88,-62),new Vector2(208,46),19);
                 FarmUi.Button(cell.transform,"Bán 1",new Vector2(10,-118),new Vector2(137,47),()=>Sell(item,1));

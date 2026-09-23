@@ -17,8 +17,8 @@ Mở `D:\GAME_NongTrai\Builds\Windows\NongTrai.exe`, giữ nguyên toàn bộ th
 | Tab | Mở bản đồ bốn đảo và dịch chuyển |
 | F | Cho vật nuôi đang ngắm ăn |
 | Chuột trái/phải | Nhấc vật nuôi / thả vào đúng chuồng |
-| 1–9, cuộn chuột | Chọn ô hotbar |
-| Esc | Tạm dừng; mở hướng dẫn, chỉnh âm lượng, lưu, tiếp tục hoặc thoát |
+| 1–9, cuộn chuột | Chọn nhanh ô hotbar; tên và công dụng hiện ngay phía trên thanh |
+| Esc | Đóng bảng đang mở hoặc tạm dừng; mở hướng dẫn, chỉnh âm lượng, lưu, tiếp tục hoặc thoát |
 | F8 | Bật/tắt bay trong chế độ sáng tạo; Space lên, Ctrl xuống, Shift bay nhanh |
 
 ## Vòng chơi
@@ -48,7 +48,7 @@ Bàn chế tạo và hộp thư nằm trước nhà. Bàn ghép tức thì Bó n
 
 Nhấn Tab hoặc dùng cổng để đi giữa **Đảo Nông Trại**, **Đảo Trung Tâm**, **Đảo Thần Bí** và **Đảo Công Nghiệp**. Đảo Trung Tâm có NPC để trò chuyện hai ngày rồi kết bạn, chợ đấu giá nông sản với người mua NPC và trò chơi ba rương. Đảo Thần Bí mở ở LV3, có mê cung, bẫy và di tích; đạt LV5 rồi giải câu đố tại di tích để mở giới hạn LV10 và lấy bản vẽ hiếm. Đảo Công Nghiệp mở ở LV4, có gỗ, quặng, xưởng cưa và lò nung; luyện kim cần bản vẽ từ di tích. Các hoạt động xã hội và đấu giá hiện hoạt động **chơi đơn với NPC**.
 
-Trong menu chính, **Chế độ sáng tạo** đọc một bản sao của bản lưu thủ công và cho đi mọi đảo từ LV1. F8 bật bay; WASD di chuyển, Space lên, Ctrl xuống và Shift bay nhanh. Chế độ này vẫn giữ va chạm, không cấp tiền/vật phẩm vô hạn, khóa nút Lưu game và bỏ thay đổi khi về menu hoặc thoát.
+Trong menu chính, **Chế độ sáng tạo** đọc một bản sao của bản lưu thủ công, tạm nâng nhân vật lên **LV99**, bật bay ngay và cho đi mọi đảo. F8 bật/tắt bay; WASD di chuyển, Space lên, Ctrl xuống và Shift bay nhanh. Chế độ này vẫn giữ va chạm, không cấp tiền/vật phẩm vô hạn, khóa nút Lưu game và bỏ thay đổi khi về menu hoặc thoát. Khi vào lại chế độ thường, cấp độ cũ trong bản lưu được khôi phục.
 
 Trong menu Esc, chỉ nút **Lưu game** ghi bản lưu khi chơi thường. Thoát game không tự lưu. Mở lại game tải bản lưu thủ công gần nhất. Loader vẫn đọc bản lưu v2–v4; bản v5 lưu thêm nước, trạm tưới, vật phẩm chế tạo, đơn hàng, thời gian đổi đơn và công thức đã mở. Đường dẫn lưu trên Windows: `%USERPROFILE%\AppData\LocalLow\Nong Trai Studio\Nong Trai - First Harvest\farm-manual-save.json`.
 
