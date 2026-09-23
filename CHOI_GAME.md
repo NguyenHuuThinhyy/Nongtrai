@@ -1,4 +1,4 @@
-# Nông Trại – cách chơi bản mở rộng
+﻿# Nông Trại – cách chơi bản mở rộng
 
 Mở `D:\GAME_NongTrai\Builds\Windows\NongTrai.exe`, giữ nguyên toàn bộ thư mục `Windows` khi chép sang máy khác. Ở menu chính, chọn **Vào nông trại**. Mở Unity Editor nếu muốn sửa game; người chơi trên máy khác không cần cài Unity.
 
@@ -13,7 +13,7 @@ Mở `D:\GAME_NongTrai\Builds\Windows\NongTrai.exe`, giữ nguyên toàn bộ th
 | M | Máy chế biến và hàng đợi |
 | N | Cấp độ, mua vùng đất và nâng cấp dụng cụ |
 | P | Quản lý chuồng, mua thức ăn và chuồng mới |
-| Tab | Mở bản đồ bốn đảo và dịch chuyển |
+| Tab | Mở hai bản đồ Nông trại / Khám phá và dịch chuyển |
 | F | Cho vật nuôi đang ngắm ăn |
 | Chuột trái/phải | Nhấc vật nuôi / thả vào đúng chuồng |
 | 8, 9 | Chọn rìu để hạ cây táo lấy khối gỗ / giỏ để hái táo mà vẫn giữ cây |
@@ -30,7 +30,7 @@ Gói 5 hạt lúa mì/cà chua/đậu nành có giá 20/40/75 xu; sản phẩm b
 
 Gà, bò, cừu và heo có độ no, độ vui. Một ngày trong game dài **10 phút**; độ no và vui giảm theo thời gian. Ngắm con vật và nhấn F để dùng một thức ăn. Vật nuôi cần đủ no và vui mới tạo sản phẩm. Gà đẻ trứng theo chu kỳ tại ổ, mỗi chuồng gà tối đa 5 con. Bò cho sữa mỗi 45 giây, cừu cho len mỗi 60 giây. Heo cho thịt một lần. Bảng P bán 10 thức ăn giá 50 xu, xây thêm chuồng bò/cừu và nâng cấp chuồng. Nâng cấp chuồng bò, cừu, heo tăng sức chứa; nâng chuồng gà rút ngắn chu kỳ đẻ, vẫn giữ tối đa 5 con. Mở shop từ nút trong túi đồ để mua chuồng gà thứ hai.
 
-Nhấn M để mở xưởng, hoặc đến máy và nhấn E để chỉ xem công thức của máy đó. Bốn máy ở nông trại, xưởng cưa và lò nung ở Đảo Công Nghiệp. Máy quay khi đang chế biến. Công thức nằm trong `Assets/StreamingAssets/recipes.json`; mỗi máy có hàng đợi tối đa 5 lượt, nguyên liệu được trừ khi xếp việc và thành phẩm vào túi khi hết thời gian. Giá bán mỗi thành phẩm cao hơn tổng giá nguyên liệu:
+Nhấn M để mở xưởng, hoặc đến máy và nhấn E để chỉ xem công thức của máy đó. Cả sáu máy ở nông trại; xưởng cưa và lò nung nằm phía tây. Máy quay khi đang chế biến. Công thức nằm trong `Assets/StreamingAssets/recipes.json`; mỗi máy có hàng đợi tối đa 5 lượt, nguyên liệu được trừ khi xếp việc và thành phẩm vào túi khi hết thời gian. Giá bán mỗi thành phẩm cao hơn tổng giá nguyên liệu:
 
 | Máy | Công thức | Chờ | Giá bán |
 |---|---|---:|---:|
@@ -49,7 +49,13 @@ Bàn chế tạo cố định và hộp thư nằm trước nhà. Bàn ghép t�
 
 Đồng hồ trên HUD hiển thị năm, ngày, giờ, mùa và thời tiết. Mỗi mùa dài 28 ngày; lá và cỏ đổi màu theo mùa. Trời mưa hoặc bão tự tưới ruộng. Khi có bão, trả lời câu hỏi gia cố trong 25 giây: đúng thì không thiệt hại, sai hoặc hết giờ sẽ mất 30–80% nông sản và máy bị chậm. Từ 18:00 đến trước 06:00, vào nhà và nhấn E ở giường để ngủ đến sáng.
 
-Nhấn Tab hoặc dùng cổng để đi giữa **Đảo Nông Trại**, **Đảo Trung Tâm**, **Đảo Thần Bí** và **Đảo Công Nghiệp**. Đảo Trung Tâm có NPC để trò chuyện hai ngày rồi kết bạn, chợ đấu giá nông sản với người mua NPC và trò chơi ba rương. Đảo Thần Bí mở ở LV3, có mê cung, bẫy và di tích; đạt LV5 rồi giải câu đố tại di tích để mở giới hạn LV10 và lấy bản vẽ hiếm. Đảo Công Nghiệp mở ở LV4, có mỏ đá, quặng, xưởng cưa và lò nung; luyện kim cần bản vẽ từ di tích. Các hoạt động xã hội và đấu giá hiện hoạt động **chơi đơn với NPC**.
+Nhấn Tab hoặc dùng cổng để đi giữa **Nông trại** và **Khám phá**, cả hai mở từ đầu. Đã bỏ ba khu chức năng cũ (Trung tâm, Thần bí, Công nghiệp), đấu giá NPC, minigame và cổng giới hạn cấp. Cấp tối đa thường là 99.
+
+Map Khám phá là địa hình khối hữu hạn 48 × 48 m, có đồi đất, lớp đá và quặng ở sâu. Nhấn V để dùng góc nhìn thứ nhất, hướng dấu chấm vào đất/đá trong tầm 8 m, giữ chuột trái để đào. Đất trả khối cỏ, đá trả khối đá, quặng trả nguyên liệu luyện kim. Đào 30 khối mở bản vẽ lò nung và đèn thủ công. Khu cổng và tầng đáy không đào được. Dùng G để xây bằng vật liệu trong túi, Tab để trở về. Khu vào map có sáu cây táo ban đầu để hái trái hoặc chặt lấy gỗ. Gỗ vẫn lấy từ cây táo bằng rìu hoặc mua shop; không có quặng gỗ.
+
+Chế tạo bàn từ 5 khối gỗ, bật G và đặt bàn trước để xây các khối khác. Chế độ xây: 1–7/cuộn chuột chọn khối, chuột trái đặt, chuột phải tháo, R xoay, G thoát. Có thể xây ở cả hai map. Các khối đào và công trình chỉ được lưu khi bấm Lưu game.
+
+Bản lưu v7 đọc được bản cũ: giữ công trình nông trại, hoàn vật liệu của công trình ở đảo cũ vào túi, chuyển nhân vật ở đảo cũ về cổng khám phá. Quyền dùng bản vẽ cũ vẫn giữ.
 
 Trong menu chính, **Chế độ sáng tạo** đọc một bản sao của bản lưu thủ công, tạm nâng nhân vật lên **LV99**, bật bay ngay và cho đi mọi đảo. F8 bật/tắt bay; WASD di chuyển, Space lên, X hoặc Ctrl xuống và Shift bay nhanh. HUD luôn hiện các phím bay khi đang bay. Chế độ này vẫn giữ va chạm, không cấp tiền/vật phẩm vô hạn, khóa nút Lưu game và bỏ thay đổi khi về menu hoặc thoát. Khi vào lại chế độ thường, cấp độ cũ trong bản lưu được khôi phục.
 

@@ -41,10 +41,7 @@ namespace NongTrai
 
         static Vector3 IslandSafePoint(Vector3 position)
         {
-            if(position.x>500) return new Vector3(600,.4f,-20);
-            if(position.x>300) return new Vector3(400,.4f,-20);
-            if(position.x>100) return new Vector3(200,.4f,-20);
-            return new Vector3(0,.4f,0);
+            return position.x>100?IslandManager.ExploreArrival:IslandManager.FarmArrival;
         }
 
         void Update()

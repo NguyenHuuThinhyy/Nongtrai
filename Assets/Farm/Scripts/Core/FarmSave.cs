@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.IO;
 using UnityEngine;
@@ -14,7 +14,7 @@ namespace NongTrai
         [Serializable] sealed class ResourceRecord { public int id; public float remaining; }
         [Serializable] sealed class SaveData
         {
-            public int version=6,money,fruit,treeCount,selected,feed,level,xp,day,weather,levelCap;
+            public int version=7,money,fruit,treeCount,selected,feed,level,xp,day,weather,levelCap;
             public float dayTime,musicVolume,effectsVolume;
             public bool expanded;
             public int[] seeds,harvested,products;
@@ -26,6 +26,7 @@ namespace NongTrai
             public WaterState water;
             public OrderSystemState orders;
             public BuildingState building;
+            public ExplorationState exploration;
             public Vector3 playerPosition;
             public PlotRecord[] plots;
             public AnimalRecord[] animals;
@@ -68,7 +69,7 @@ namespace NongTrai
                     weather=(int)clock.Weather,musicVolume=FarmAudio.Instance.MusicVolume,
                     effectsVolume=FarmAudio.Instance.EffectsVolume,
                     water=water==null?null:water.Snapshot(),orders=orders==null?null:orders.Snapshot(),
-                    building=building==null?null:building.Snapshot() };
+                    exploration=ExplorationWorld.Instance?.Snapshot(),building=building==null?null:building.Snapshot() };
                 var plots=FindObjectsByType<FarmPlot>(FindObjectsSortMode.None);
                 data.plots=new PlotRecord[plots.Length];
                 for(int i=0;i<plots.Length;i++)
@@ -110,7 +111,7 @@ namespace NongTrai
             try
             {
                 var data=JsonUtility.FromJson<SaveData>(File.ReadAllText(SavePath));
-                if(data==null || data.version<2 || data.version>6 || data.seeds==null || data.seeds.Length!=3 ||
+                if(data==null || data.version<2 || data.version>7 || data.seeds==null || data.seeds.Length!=3 ||
                     data.harvested==null || data.harvested.Length!=3 || data.products==null || data.products.Length<4)
                     throw new InvalidDataException("Phiên bản dữ liệu lưu không phù hợp.");
                 shop.RestoreState(data.money,data.fruit,data.expanded,data.treeCount,data.version>=3?data.feed:15);
@@ -158,15 +159,24 @@ namespace NongTrai
                 foreach(var tree in FindObjectsByType<FruitTree>(FindObjectsSortMode.None)) Destroy(tree.gameObject);
                 if(data.trees!=null) foreach(var item in data.trees)
                     Instantiate(shop.treePrefab,item.position,Quaternion.identity).GetComponent<FruitTree>().remaining=item.remaining;
+                if(data.version<7) ExplorationWorld.Instance?.CreateStarterOrchard();
                 if(data.version>=4)
                 {
                     if(data.resources!=null) foreach(var item in data.resources)
                         foreach(var resource in FindObjectsByType<ResourceNode>(FindObjectsSortMode.None))
                             if(resource.id==item.id) resource.remaining=Mathf.Max(0,item.remaining);
-                    player.Teleport(data.playerPosition);
+                    ExplorationWorld.Instance?.Restore(data.exploration);
+                    player.Teleport(data.version<7 && data.playerPosition.x>100?IslandManager.ExploreArrival:data.playerPosition);
                 }
                 if(water!=null) water.Restore(data.version>=5?data.water:null);
                 if(orders!=null) orders.Restore(data.version>=5?data.orders:null,data.version<5);
+                if(data.version<7 && data.building?.blocks!=null)
+                {
+                    var keep=new System.Collections.Generic.List<PlacedBlockRecord>();
+                    foreach(var block in data.building.blocks)
+                        if(block.position.x>100) inventory.Add(20+Mathf.Clamp(block.type,0,6),1); else keep.Add(block);
+                    data.building.blocks=keep.ToArray();
+                }
                 if(building!=null) building.Restore(data.version>=6?data.building:null);
                 return true;
             }

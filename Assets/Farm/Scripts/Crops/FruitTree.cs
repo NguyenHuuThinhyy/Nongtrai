@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 namespace NongTrai
 {
     public sealed class FruitTree : MonoBehaviour, IInteractable
@@ -18,7 +18,7 @@ namespace NongTrai
         {
             if(Slot==7)
             {
-                actor.inventory.Add(20,6);actor.shop.TreeCut();FarmExpansion.Instance?.GainExperience(12);
+                actor.inventory.Add(20,6);if(transform.position.x<100)actor.shop.TreeCut();FarmExpansion.Instance?.GainExperience(12);
                 actor.Say("Đã hạ cây: +6 khối gỗ. Trồng cây mới nếu muốn tiếp tục lấy táo.");
                 FarmEffects.Burst(transform.position+Vector3.up*1.5f,"+6 khối gỗ",new Color(.72f,.45f,.2f));Destroy(gameObject);return;
             }

@@ -60,7 +60,7 @@ namespace NongTrai
             {
                 var go=new GameObject(names[i]+" - nhấn E");
                 go.name=names[i]+" - nhấn E";
-                go.transform.position=i<4?new Vector3(-16+i*2.5f,.85f,12):new Vector3(597+(i-4)*4,.85f,4);
+                go.transform.position=i<4?new Vector3(-16+i*2.5f,.85f,12):new Vector3(-16+(i-4)*4,.85f,7);
                 var collider=go.AddComponent<BoxCollider>();collider.size=new Vector3(1.8f,1.8f,1.7f);
                 var machine=go.AddComponent<ProcessingMachine>();machine.processing=this;machine.recipeIndex=i;
                 MachinePart(go.transform,"Thân "+names[i],PrimitiveType.Cube,Vector3.zero,new Vector3(1.65f,1.5f,1.45f),colors[i]);
@@ -128,7 +128,7 @@ namespace NongTrai
             if(FarmCraftOrders.Instance!=null && !FarmCraftOrders.Instance.ProcessingUnlocked(Recipes[index].id))
             { Say("Công thức này chưa mở. Hoàn thành thêm đơn ở hộp thư.");return false; }
             if(Recipes[index].id=="metal" && (IslandManager.Instance==null || IslandManager.Instance.Blueprints<=0))
-            { Say("Cần bản vẽ hiếm từ di tích Đảo Thần Bí để dùng lò nung.");return false; }
+            { Say("Đào 30 khối ở map Khám phá để mở bản vẽ lò nung.");return false; }
             var recipe=Recipes[index];
             int same=0;foreach(var job in queue) if(job.recipe==recipe.id) same++;
             if(same>=5) { Say("Hàng đợi "+recipe.machine+" đã đầy (5 lượt)."); return false; }

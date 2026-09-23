@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.IO;
 using UnityEngine;
@@ -359,46 +359,50 @@ namespace NongTrai
                 throw new InvalidOperationException("Wrong storm answer caused no damage.");
             clock.SetWeather(FarmWeather.Sunny);
             progress.GainExperience(2000);
-            if(progress.Level!=5 || progress.LevelCap!=5)
-                throw new InvalidOperationException("Mystery level cap failed.");
-            if(!islands.Travel(1) || Mathf.Abs(player.transform.position.x-200)>2 ||
-                !islands.Travel(2) || Mathf.Abs(player.transform.position.x-400)>2)
-                throw new InvalidOperationException("Island travel failed.");
+            if(progress.LevelCap!=99) throw new InvalidOperationException("Normal level cap failed.");
+            if(!islands.Travel(1) || Mathf.Abs(player.transform.position.x-200)>2 || islands.Travel(2) || islands.Travel(3))
+                throw new InvalidOperationException("Two map travel failed.");
+            clock.Restore(clock.Day,.5f,FarmWeather.Sunny);
+            camera.transform.position=new Vector3(232,28,-36);
+            camera.transform.LookAt(new Vector3(199,1,0));
+            Capture(Path.Combine(folder,"exploration-preview.png"),hud,camera);
             inventory.Add(13,2);
             if(processing.Enqueue(5)) throw new InvalidOperationException("Furnace worked without blueprint.");
-            islands.OpenMystery();
-            if(!islands.AnswerMystery(1) || progress.LevelCap!=10 || islands.Blueprints!=1)
-                throw new InvalidOperationException("Mystery challenge or blueprint failed.");
+            var exploration=ExplorationWorld.Instance;
+            int mined=0;
+            for(int x=0;x<10 && mined<30;x++)for(int z=12;z<30 && mined<30;z++)
+                if(exploration.MineCell(new Vector3Int(x,2,z)))mined++;
+            if(mined!=30 || exploration.MinedCount!=30 || islands.Blueprints!=1)
+                throw new InvalidOperationException("Voxel mining blueprint failed.");
+            if(exploration.MineCell(new Vector3Int(24,2,4)))throw new InvalidOperationException("Spawn was mineable.");
             hud.Resume();
             if(!processing.Enqueue(5)) throw new InvalidOperationException("Furnace did not unlock.");
-            islands.OpenNpc(0);islands.Talk();
-            clock.Restore(clock.Day+1,.25f,FarmWeather.Sunny);islands.Talk();islands.Befriend();
-            if(islands.FriendCount!=1) throw new InvalidOperationException("NPC friendship failed.");
-            hud.Resume();
+            clock.Restore(clock.Day+1,.25f,FarmWeather.Sunny);
             var hotbar=FindFirstObjectByType<FarmHudV2>();hotbar.Select(8);
             if(hotbar.SelectedSlot!=8) throw new InvalidOperationException("Nine slot hotbar failed.");
             save.pathOverride=Path.Combine(Application.temporaryCachePath,"farm-islands-smoke-save.json");
             if(!save.Save()) throw new InvalidOperationException("Island save failed.");
             clock.Restore(1,.25f,FarmWeather.Sunny);player.Teleport(Vector3.zero);
-            if(!save.Load() || clock.Day<=1 || islands.Blueprints!=1 || islands.FriendCount!=1 ||
-                Mathf.Abs(player.transform.position.x-400)>2)
+            exploration.Restore(null);
+            if(!save.Load() || exploration.MinedCount!=30 || exploration.MineCell(new Vector3Int(0,2,12)) || clock.Day<=1 || islands.Blueprints!=1 ||
+                Mathf.Abs(player.transform.position.x-200)>2)
                 throw new InvalidOperationException("Time/island save did not restore.");
             File.Delete(save.SavePath);
             if(File.Exists(save.SavePath+".bak")) File.Delete(save.SavePath+".bak");
             save.pathOverride=null;
-            Debug.Log("FARM_ISLANDS_TIME_OK: 10-minute day, seasons, rain, storm puzzle, sleep, portals, NPCs, level cap, furnace blueprint, hotbar and manual save.");
+            Debug.Log("FARM_ISLANDS_TIME_OK: 10-minute day, seasons, rain, storm puzzle, sleep, two portals, voxel mining, level cap, furnace blueprint, hotbar and manual save.");
             save.pathOverride=Path.Combine(Application.temporaryCachePath,"farm-creative-do-not-save.json");
             if(File.Exists(save.SavePath)) File.Delete(save.SavePath);
             creative.StartCreative();
             if(progress.Level!=99 || progress.LevelCap!=99 || !CreativeModeManager.IsFlying)
                 throw new InvalidOperationException("Creative mode did not enable LV99 and flight.");
             progress.Restore(1,0,1,.25f,null,null);
-            if(!CreativeModeManager.IsCreative || !islands.Travel(3) || Mathf.Abs(player.transform.position.x-600)>2)
+            if(!CreativeModeManager.IsCreative || !islands.Travel(1) || Mathf.Abs(player.transform.position.x-200)>2)
                 throw new InvalidOperationException("Creative LV1 island travel failed.");
             creative.ToggleFlight();if(CreativeModeManager.IsFlying) throw new InvalidOperationException("Creative flight toggle failed.");
             if(save.Save() || File.Exists(save.SavePath)) throw new InvalidOperationException("Creative mode wrote a save file.");
             save.pathOverride=null;
-            Debug.Log("FARM_WATER_ORDERS_CREATIVE_OK: finite water, irrigation, JSON craft, daily orders, v6 building save and discard-only creative mode.");
+            Debug.Log("FARM_WATER_ORDERS_CREATIVE_OK: finite water, irrigation, JSON craft, daily orders, v7 terrain/building save and discard-only creative mode.");
             yield return new WaitForSeconds(2);
             Debug.Log("FARM_CROPS_SMOKE_OK: grounded, cameras, pause, 80 plots, three crops, dry growth blocked, watering, harvest inventory, replant, screenshot.");
             Application.Quit(0);

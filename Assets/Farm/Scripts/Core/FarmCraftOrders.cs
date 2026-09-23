@@ -124,7 +124,7 @@ namespace NongTrai
         public bool Craft(int index)
         {
             if(index<0 || index>=Recipes.Length) return false;
-            if(!CraftUnlocked(index)) { SayCraft(index==2?"Giỏ táo mở khi tiếp cận ván ở Đảo Công Nghiệp.":"Đèn cần bản vẽ từ Đảo Thần Bí.");return false; }
+            if(!CraftUnlocked(index)) { SayCraft(index==2?"Giỏ táo mở khi có ván từ xưởng cưa.":"Đào 30 khối ở map Khám phá để mở bản vẽ đèn.");return false; }
             var recipe=Recipes[index];
             foreach(var input in recipe.inputs) if(inventory.Count(input.item)<input.count)
             { SayCraft("Thiếu "+input.count+" "+inventory.Name(input.item)+".");return false; }

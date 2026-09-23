@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,7 +14,7 @@ namespace NongTrai
         public FarmInventory inventory;
         public TimeManager clock;
         public int Level { get; private set; } = 1;
-        public int LevelCap { get; private set; } = 5;
+        public int LevelCap { get; private set; } = 99;
         public int Experience { get; private set; }
         public int Day => clock!=null?clock.Day:1;
         public float DayTime => clock!=null?clock.NormalizedTime:.25f;
@@ -66,8 +66,6 @@ namespace NongTrai
             }
             if(Level>=LevelCap) Experience=Mathf.Min(Experience,ExperienceNeeded-1);
         }
-        public void UnlockLevelCap()
-        { LevelCap=10;hud.Notify("Đã vượt thử thách! Giới hạn cấp tăng lên 10."); }
         public void Open()
         {
             hud.player.SetPaused(true); hud.pausePanel.SetActive(false);
@@ -108,7 +106,7 @@ namespace NongTrai
         public void Restore(int level,int xp,int day,float time,int[] tiers,bool[] regions,int levelCap=5)
         {
             Level=Mathf.Max(1,level); Experience=Mathf.Max(0,xp);
-            LevelCap=Mathf.Max(5,levelCap);
+            LevelCap=99;
             if(clock!=null) clock.Restore(day,time,clock.Weather);
             for(int i=0;i<3;i++) ToolTiers[i]=tiers!=null && i<tiers.Length?Mathf.Clamp(tiers[i],0,2):0;
             for(int i=0;i<4;i++) UnlockedRegions[i]=i==0 || (regions!=null && i<regions.Length && regions[i]);

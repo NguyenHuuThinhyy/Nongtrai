@@ -1,3 +1,20 @@
+﻿# CẬP NHẬT ƯU TIÊN — 23/09/2026: CHỈ HAI MAP
+
+Thông tin dưới mục này về bốn đảo, NPC, đấu giá và minigame đã lỗi thời. Ưu tiên code hiện tại và README/CHOI_GAME.
+
+- Yêu cầu mới: nông trại theo hướng Avatar/Stardew/Hay Day và một map khám phá đào/xây khối; bỏ phần đảo dư.
+- IslandManager chỉ chấp nhận map 0 (nông trại) và 1 (khám phá), đều mở từ đầu; Tab/cổng. Điểm đến (0,.4,14) và (200,.4,-20).
+- FarmIslandsBuilder dựng hai cổng, không dựng Trung tâm/Thần bí/Công nghiệp. Đã xóa MysteryAltar, IslandTrap, IslandNpc, IslandGameKiosk, IslandAuctionKiosk và meta.
+- ExplorationWorld tạo mesh/collider voxel hữu hạn 48x48x18, đồi, đá, quặng, hốc ngầm. Giữ chuột trái đào trong tầm 8m khi ngoài chế độ xây; G dùng FarmBuildingSystem hiện có. Bảo vệ tầng đáy và cổng. Đào 30 khối mở bản vẽ lò nung/đèn. Đất -> item25, đá ->21, quặng ->13. Gỗ vẫn cây táo/shop.
+- Cả sáu máy trên nông trại; cấp thường tối đa99, bỏ thử thách mở giới hạn cấp.
+- FarmSave v7 lưu ExplorationState (removed cell IDs/minedCount); đọc v2..7. Bản cũ hoàn vật liệu công trình x>100, giữ công trình farm; đưa người ở đảo cũ về cổng khám phá. Giữ bản vẽ cũ. IslandState giữ trường cũ chỉ để đọc tương thích/hoàn hàng đấu giá.
+- BuildSmokeCheck đã chuyển test đảo cũ sang hai map, đào30, bảo vệ spawn, lưu/tải terrain. Giữ test cây/thú/nước/đơn/creative.
+- Chỉ lưu thủ công. Creative LV99 không được ghi file lưu. Không cấp tiền vô hạn.
+- Root D:/GAME_NongTrai là dự án Unity, clone Git là thư mục Nongtrai; đồng bộ sau build. Unity6000.3.22f1, lệnh build trong README.
+- Giới hạn hiện tại: map hữu hạn, chưa có quái/sinh tồn/multiplayer/thế giới vô hạn. Mesh được dựng lại khi đào (cần chia chunk nếu tăng kích thước). Đánh giá cảm giác chơi dài hạn và các máy yếu cần chơi thử thực tế.
+
+---
+
 # CODEX HANDOFF — Nông Trại / First Harvest
 
 > **CẬP NHẬT 2026-09-23:** Kế hoạch từng được ghi là “chưa triển khai” trong tài liệu này đã được triển khai sau khi handoff được tạo. Trạng thái đúng hiện nằm trong code: `FarmWaterSystem.cs`, `FarmCraftOrders.cs`, `CreativeModeManager.cs`, bản lưu v5, hotbar bắt buộc, cây 2/3/5 phút, túi 20 món và scene/build mới. README/CHOI_GAME cùng lịch sử Git mới hơn là nguồn chính xác hơn các đoạn trạng thái cũ bên dưới.
