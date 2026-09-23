@@ -22,21 +22,27 @@ namespace NongTrai
         public int BoughtTrees { get; private set; }
         public int AnimalCount => FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None).Length;
         public GameObject Panel { get; private set; }
-        Text balance, feedback;
-        readonly int[] prices={20,40,75,220,120,150,60,400,150,60,100,120,180};
-        readonly string[] names={"5 hạt lúa mì","5 hạt cà chua","5 hạt đậu nành","Bò","Heo","Cừu","Gà","Chuồng gà thứ hai (5 chỗ)","Cây táo","5 khối đá","5 khối gạch","3 khối kính","3 khối kim loại"};
+        Text balance, feedback, pageLabel;GameObject[] offers;
+        readonly int[] prices={20,40,75,220,120,150,60,400,150,60,100,120,180,110,55,50};
+        readonly string[] names={"5 hạt lúa mì","5 hạt cà chua","5 hạt đậu nành","Bò","Heo","Cừu","Gà","Chuồng gà thứ hai (5 chỗ)","Cây táo","5 khối đá","5 khối gạch","3 khối kính","3 khối kim loại","5 khối gỗ","5 khối cỏ","10 thức ăn"};
         void Start()
         {
             Panel=new GameObject("Shop",typeof(RectTransform),typeof(Image));
             var rect=Panel.GetComponent<RectTransform>(); rect.SetParent(hud.transform,false); rect.anchorMin=rect.anchorMax=rect.pivot=new Vector2(.5f,.5f); rect.sizeDelta=new Vector2(1000,1000);
             Panel.GetComponent<Image>().color=new Color(.07f,.14f,.11f,.99f);
             balance=Label("",new Vector2(35,-25),new Vector2(920,70),26);
-            for(int i=0;i<names.Length;i++) { int item=i; Button(names[i]+" — "+prices[i]+" xu",new Vector2(35+(i%2)*475,-105-(i/2)*82),()=>Buy(item)); }
+            offers=new GameObject[names.Length];
+            for(int i=0;i<names.Length;i++) { int item=i,slot=i%8;
+                offers[i]=Button(names[i]+" — "+prices[i]+" xu",new Vector2(35+(slot%2)*475,-105-(slot/2)*82),()=>Buy(item)); }
+            pageLabel=Label("",new Vector2(35,-480),new Vector2(920,42),22);
+            Button("◀ Trang trước",new Vector2(35,-545),()=>ShowPage(0));
+            Button("Trang sau ▶",new Vector2(510,-545),()=>ShowPage(1));
             Button("Bán toàn bộ nông sản",new Vector2(510,-755),Sell);
             Button("Xem túi đồ",new Vector2(510,-845),inventory.Open);
             Button("Quản lý chuồng",new Vector2(35,-755),barn.Open);
             Button("Trở lại game",new Vector2(35,-845),hud.Resume);
-            feedback=Label("Có thể mua vật nuôi, cây và khối xây. Khối gỗ lấy bằng rìu từ cây táo.",new Vector2(35,-690),new Vector2(920,48),19);
+            feedback=Label("Trang 2 có đủ sáu loại khối xây; khối gỗ cũng lấy từ cây táo bằng rìu.",new Vector2(35,-640),new Vector2(920,48),19);
+            ShowPage(0);
             Panel.SetActive(false); hud.player.PauseChanged+=OnPause;
         }
         void OnDestroy() { if(hud!=null && hud.player!=null) hud.player.PauseChanged-=OnPause; }
@@ -77,15 +83,19 @@ namespace NongTrai
             }
             else if(item==7) { extraPen.SetActive(true); Expanded=true; }
             else if(item==8) { Instantiate(treePrefab,new Vector3(-28-(BoughtTrees%2)*5,0,-5-(BoughtTrees/2)*6),Quaternion.identity); BoughtTrees++; }
-            else
+            else if(item<=14)
             {
-                int pack=item-9;int[] blockItems={21,22,23,24};int[] amounts={5,5,3,3};
+                int pack=item-9;int[] blockItems={21,22,23,24,20,25};int[] amounts={5,5,3,3,5,5};
                 inventory.Add(blockItems[pack],amounts[pack]);
             }
+            else AddFeed(10);
             Money-=prices[item]; result="Đã mua "+names[item]+".";
             FarmAudio.Instance?.Play(FarmAudio.Cue.Buy);return true;
         }
         void Buy(int item) { Purchase(item,out string message); feedback.text=message; Refresh(); }
+        public void ShowPage(int page)
+        { pageLabel.text=page==0?"TRANG 1/2 • HẠT GIỐNG VÀ VẬT NUÔI":"TRANG 2/2 • CÂY, KHỐI XÂY VÀ THỨC ĂN";
+          for(int i=0;i<offers.Length;i++) offers[i].SetActive(i/8==page); }
         public void TreeCut() => BoughtTrees=Mathf.Max(0,BoughtTrees-1);
         public int SellHarvest() => inventory.SellAll();
         void Sell() { feedback.text="Đã bán nông sản: +"+SellHarvest()+" xu."; Refresh(); }
@@ -96,10 +106,13 @@ namespace NongTrai
             var t=go.GetComponent<Text>(); t.font=Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"); t.text=text;t.fontSize=fontSize;t.color=Color.white;t.raycastTarget=false;return t;
         }
         void Place(GameObject go,Vector2 p,Vector2 size) { var r=go.GetComponent<RectTransform>();r.SetParent(Panel.transform,false);r.anchorMin=r.anchorMax=r.pivot=new Vector2(0,1);r.anchoredPosition=p;r.sizeDelta=size; }
-        void Button(string text,Vector2 p,UnityEngine.Events.UnityAction action)
+        GameObject Button(string text,Vector2 p,UnityEngine.Events.UnityAction action)
         {
             var go=new GameObject(text,typeof(RectTransform),typeof(Image),typeof(Button));Place(go,p,new Vector2(445,75));go.GetComponent<Image>().color=new Color(.26f,.39f,.22f);go.GetComponent<Button>().onClick.AddListener(action);
-            Label(text,p+new Vector2(15,-20),new Vector2(420,45),22);
+            var child=new GameObject("Text",typeof(RectTransform),typeof(Text));var rect=child.GetComponent<RectTransform>();rect.SetParent(go.transform,false);
+            rect.anchorMin=rect.anchorMax=rect.pivot=new Vector2(0,1);rect.anchoredPosition=new Vector2(15,-20);rect.sizeDelta=new Vector2(420,45);
+            var label=child.GetComponent<Text>();label.font=Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");label.text=text;label.fontSize=22;
+            label.color=Color.white;label.raycastTarget=false;return go;
         }
     }
 }

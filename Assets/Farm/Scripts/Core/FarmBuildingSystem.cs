@@ -53,12 +53,12 @@ namespace NongTrai
         public void Toggle()
         {
             if(!IsBuilding && !HasPlacedTable && inventory.Count(26)<=0)
-            { hud.Notify("Cần chế tạo Bàn chế tạo từ 5 khối gỗ trước.");return; }
+            { FarmCraftOrders.Instance?.OpenCraft();hud.Notify("Cần 5 khối gỗ để chế tạo Bàn chế tạo. Gỗ bán ở trang 2 shop hoặc lấy từ cây táo.");return; }
             IsBuilding=!IsBuilding;overlay.SetActive(IsBuilding);preview.SetActive(IsBuilding);
             if(IsBuilding && !HasPlacedTable) Select(6);
             hud.Notify(IsBuilding?"XÂY DỰNG: chuột trái đặt • phải tháo • R xoay • G thoát":"Đã tắt chế độ xây dựng.");
         }
-        void Select(int type)
+        public void Select(int type)
         {
             if(!HasPlacedTable && type!=6)
             { hud.Notify("Hãy đặt Bàn chế tạo trước.");SelectedType=6; }
@@ -103,11 +103,21 @@ namespace NongTrai
         }
         void Place()
         {
-            if(!preview.activeSelf)return;int item=FirstBlockItem+SelectedType;
-            if(!inventory.Remove(item,1)){hud.Notify("Không còn "+names[SelectedType]+" trong túi.");return;}
-            if(Vector3.Distance(preview.transform.position,player.transform.position)<1.25f)
-            { inventory.Add(item,1);hud.Notify("Không thể đặt khối sát nhân vật.");return; }
-            Create(SelectedType,preview.transform.position,new Vector3(0,rotation,0));FarmAudio.Instance?.Play(FarmAudio.Cue.Hoe);
+            if(!preview.activeSelf)return;
+            TryPlaceSelected(preview.transform.position,rotation);
+        }
+        public bool TryPlaceSelected(Vector3 position,float yAngle)
+        {
+            if(!IsBuilding)return false;
+            int item=FirstBlockItem+SelectedType;
+            if(SelectedType!=6&&!HasPlacedTable){hud.Notify("Hãy đặt Bàn chế tạo trước.");return false;}
+            if(Vector3.Distance(position,player.transform.position)<1.25f)
+            { hud.Notify("Không thể đặt khối sát nhân vật.");return false; }
+            foreach(var block in placed)if(block!=null && Vector3.Distance(block.transform.position,position)<.9f)
+            { hud.Notify("Ô này đã có khối xây.");return false; }
+            if(!inventory.Remove(item,1)){hud.Notify("Không còn "+names[SelectedType]+" trong túi.");return false;}
+            Create(SelectedType,position,new Vector3(0,yAngle,0));FarmAudio.Instance?.Play(FarmAudio.Cue.Hoe);
+            hud.Notify("Đã đặt "+names[SelectedType]+". Chuột phải vào khối để tháo và lấy lại.");return true;
         }
         void Remove()
         {
@@ -126,6 +136,7 @@ namespace NongTrai
                 Part(root.transform,"Mặt bàn",new Vector3(0,.25f,0),new Vector3(1.5f,.22f,.9f),colors[type]);
                 for(int x=-1;x<=1;x+=2)for(int z=-1;z<=1;z+=2)Part(root.transform,"Chân bàn",new Vector3(x*.58f,-.25f,z*.3f),new Vector3(.16f,.75f,.16f),colors[type]*.75f);
                 var collider=root.AddComponent<BoxCollider>();collider.center=new Vector3(0,0,0);collider.size=new Vector3(1.5f,1,.9f);
+                root.AddComponent<CraftingTable>();
             }
             else Part(root.transform,names[type],Vector3.zero,Vector3.one,colors[type]);
             return block;

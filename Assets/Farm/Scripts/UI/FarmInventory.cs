@@ -61,13 +61,15 @@ namespace NongTrai
                 FarmUi.Button(cell.transform,"Bán hết",new Vector2(158,-118),new Vector2(142,47),()=>Sell(item,int.MaxValue));
                 cell.AddComponent<FarmInventoryTooltip>().Initialize(this,item);
             }
-            FarmUi.Button(Panel.transform,"Trở lại game",new Vector2(30,-870),new Vector2(520,54),hud.Resume);
-            FarmUi.Button(Panel.transform,"Mở cửa hàng",new Vector2(570,-870),new Vector2(520,54),shop.Open);
+            FarmUi.Button(Panel.transform,"Trở lại game",new Vector2(30,-870),new Vector2(360,54),hud.Resume);
+            FarmUi.Button(Panel.transform,"Mở cửa hàng",new Vector2(400,-870),new Vector2(390,54),shop.Open);
+            FarmUi.Button(Panel.transform,"Xây dựng [G]",new Vector2(800,-870),new Vector2(360,54),OpenBuilding);
             Panel.SetActive(false);
             hud.player.PauseChanged += OnPause;
         }
         void OnDestroy() { if(hud!=null && hud.player!=null) hud.player.PauseChanged -= OnPause; }
         void OnPause(bool paused) { if (!paused && Panel!=null) Panel.SetActive(false); }
+        void OpenBuilding() { hud.Resume(); FarmBuildingSystem.Instance?.Toggle(); }
         public void Open()
         {
             hud.player.SetPaused(true);
@@ -123,7 +125,8 @@ namespace NongTrai
         public int SellAll()
         {
             int earned=0;
-            for(int i=0;i<itemNames.Length;i++) earned+=Sell(i,int.MaxValue);
+            // Bán nông sản nhanh không được làm mất vật liệu xây, quặng, ván hay bàn chế tạo.
+            for(int i=0;i<=11;i++) earned+=Sell(i,int.MaxValue);
             Refresh();
             return earned;
         }

@@ -133,7 +133,7 @@ namespace NongTrai.Editor
             Box("Awning", new Vector3(0, 2.3f, 0), new Vector3(3, .18f, 2), red, counter);
             for (int side = -1; side <= 1; side += 2)
                 Box("Support", new Vector3(side * 1.2f, 1.2f, .4f), new Vector3(.13f, 2.4f, .13f), cream, counter);
-            Sign(counter, new Vector3(-5, 0, 9.1f), "Cửa hàng", "Nhấn B mở shop; nhấn I xem túi đồ.");
+            Sign(counter, new Vector3(-5, 0, 9.1f), "Cửa hàng", "Nhấn B mở túi đồ rồi chọn Mở cửa hàng.");
             var tree = new GameObject("Cây táo");
             Shape("Trunk", PrimitiveType.Cylinder, new Vector3(0, 1.1f, 0), new Vector3(.45f, 1.1f, .45f), wood, tree.transform);
             Soft("Leaves", tree.transform, new Vector3(0, 2.5f, 0), new Vector3(3, 2.5f, 3), leaves);

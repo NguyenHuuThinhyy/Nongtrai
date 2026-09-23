@@ -93,6 +93,7 @@ namespace NongTrai
                 if(dot<.33f) continue;
                 float score=distance+(1-dot)*3.4f;
                 if(item is FarmPlot) score-=.15f;
+                if(item is IrrigationStation || item is WaterSource || item is ProcessingMachine || item is PaddockGate) score-=1.2f;
                 if(score<bestScore) { bestScore=score;best=item;bestCollider=collider; }
             }
             if(!ReferenceEquals(selected,best))

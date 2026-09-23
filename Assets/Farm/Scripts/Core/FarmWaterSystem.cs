@@ -125,8 +125,8 @@ namespace NongTrai
             if(expansion.Level<2) { Say("Cần đạt LV2 để xây trạm tưới.");return false; }
             if(!expansion.UnlockedRegions[region]) { Say("Cần mở vùng đất "+(region+1)+" trước.");return false; }
             if(!shop.TrySpend(prices[region])) { Say("Không đủ "+prices[region]+" xu.");return false; }
-            StationBuilt[region]=true;stations[region].gameObject.SetActive(true);
-            Say("Đã xây trạm tưới vùng "+(region+1)+".");FarmAudio.Instance?.Play(FarmAudio.Cue.Buy);return true;
+            StationBuilt[region]=true;StationWater[region]=8;stations[region].gameObject.SetActive(true);
+            Say("Đã xây trạm vùng "+(region+1)+" và nạp sẵn 8 nước. Lấy thêm nước ở hồ rồi E tại trạm.");FarmAudio.Instance?.Play(FarmAudio.Cue.Buy);return true;
         }
         public int TransferToStation(int region)
         {

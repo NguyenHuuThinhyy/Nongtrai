@@ -18,19 +18,19 @@ Mở `D:\GAME_NongTrai\Builds\Windows\NongTrai.exe`, giữ nguyên toàn bộ th
 | Chuột trái/phải | Nhấc vật nuôi / thả vào đúng chuồng |
 | 8, 9 | Chọn rìu để hạ cây táo lấy khối gỗ / giỏ để hái táo mà vẫn giữ cây |
 | 1–9, cuộn chuột | Chọn nhanh ô hotbar; tên, icon và công dụng hiện ngay phía trên thanh |
-| G | Bật/tắt xây dựng sau khi có Bàn chế tạo; 1–7 chọn khối, trái đặt, phải tháo, R xoay |
+| G hoặc nút Xây dựng trong túi | Bật/tắt xây dựng sau khi có Bàn chế tạo; 1–7 chọn khối, trái đặt, phải tháo, R xoay |
 | Esc | Đóng bảng đang mở hoặc tạm dừng; mở hướng dẫn, chỉnh âm lượng, lưu, tiếp tục hoặc thoát |
 | F8 | Bật/tắt bay trong chế độ sáng tạo; Space lên, X hoặc Ctrl xuống, Shift bay nhanh |
 
 ## Vòng chơi
 
-Ngắm ô đất gần người, chọn đúng ô hotbar rồi nhấn E: **5 cày, 1–3 gieo, 6 tưới, 7 thu hoạch**. Lúa mì/cà chua/đậu nành cần 2/3/5 phút khi được giữ ẩm; lúc khô vẫn lớn ở 20% tốc độ. Bình tưới chứa 8/16/24 nước theo bậc, nạp miễn phí tại hồ. Từ LV2 có thể dùng bảng cạnh hồ để mua trạm tưới cho từng vùng với giá 600/900/1.200/1.500 xu; mỗi trạm chứa 32 nước, tự tưới trong bán kính 6 m khi độ ẩm xuống dưới 20%. Mang nước từ hồ tới trạm và nhấn E để nạp.
+Ngắm ô đất gần người, chọn đúng ô hotbar rồi nhấn E: **5 cày, 1–3 gieo, 6 tưới, 7 thu hoạch**. Lúa mì/cà chua/đậu nành cần 2/3/5 phút khi được giữ ẩm; lúc khô vẫn lớn ở 20% tốc độ. Bình tưới chứa 8/16/24 nước theo bậc, nạp miễn phí tại hồ. Từ LV2 có thể dùng bảng cạnh hồ để mua trạm tưới cho từng vùng với giá 600/900/1.200/1.500 xu; mỗi trạm chứa 32 nước và có sẵn 8 nước khi mới xây. Trạm phun trong bán kính 6 m khi còn nước, tự tưới các ô khô dưới 20%. Mang nước từ hồ tới trạm và nhấn E để nạp tiếp.
 
 Gói 5 hạt lúa mì/cà chua/đậu nành có giá 20/40/75 xu; sản phẩm bán 8/18/32 xu mỗi đơn vị. Bán sản phẩm trong túi để kiếm xu; thu hoạch, chăm vật nuôi, chế biến và giao đơn cho XP. Nâng cấp **cuốc, bình tưới, liềm** từ đồng lên bạc rồi vàng bằng bảng N: số ô tác động cùng lúc là 1, 3, 5. Bốn vùng ruộng, mỗi vùng 20 ô, mở lần lượt bằng xu khi đạt cấp 1, 2, 4, 6; vùng đầu mở sẵn. Giá mở vùng sau tăng dần: 500, 1.200, 2.400 xu.
 
 Gà, bò, cừu và heo có độ no, độ vui. Một ngày trong game dài **10 phút**; độ no và vui giảm theo thời gian. Ngắm con vật và nhấn F để dùng một thức ăn. Vật nuôi cần đủ no và vui mới tạo sản phẩm. Gà đẻ trứng theo chu kỳ tại ổ, mỗi chuồng gà tối đa 5 con. Bò cho sữa mỗi 45 giây, cừu cho len mỗi 60 giây. Heo cho thịt một lần. Bảng P bán 10 thức ăn giá 50 xu, xây thêm chuồng bò/cừu và nâng cấp chuồng. Nâng cấp chuồng bò, cừu, heo tăng sức chứa; nâng chuồng gà rút ngắn chu kỳ đẻ, vẫn giữ tối đa 5 con. Mở shop từ nút trong túi đồ để mua chuồng gà thứ hai.
 
-Nhấn M để mở xưởng, hoặc đến bốn máy gần quầy shop và nhấn E. Công thức nằm trong `Assets/StreamingAssets/recipes.json`; mỗi máy có hàng đợi tối đa 5 lượt, nguyên liệu được trừ khi xếp việc và thành phẩm vào túi khi hết thời gian. Giá bán mỗi thành phẩm cao hơn tổng giá nguyên liệu:
+Nhấn M để mở xưởng, hoặc đến máy và nhấn E để chỉ xem công thức của máy đó. Bốn máy ở nông trại, xưởng cưa và lò nung ở Đảo Công Nghiệp. Máy quay khi đang chế biến. Công thức nằm trong `Assets/StreamingAssets/recipes.json`; mỗi máy có hàng đợi tối đa 5 lượt, nguyên liệu được trừ khi xếp việc và thành phẩm vào túi khi hết thời gian. Giá bán mỗi thành phẩm cao hơn tổng giá nguyên liệu:
 
 | Máy | Công thức | Chờ | Giá bán |
 |---|---|---:|---:|
@@ -43,7 +43,7 @@ Nhấn M để mở xưởng, hoặc đến bốn máy gần quầy shop và nh�
 
 Bàn chế tạo cố định và hộp thư nằm trước nhà. Bàn ghép tức thì Bó nông sản, Gói đậu, Giỏ táo, Đèn thủ công và Bàn chế tạo theo `Assets/StreamingAssets/crafting.json`. Hộp thư tạo hai đơn phù hợp tiến độ mỗi ngày; giao đủ một lần nhận 150% giá thường, XP và khối xây. Có thể đổi một đơn sau mỗi 5 phút chơi thực tế; đồng hồ đổi đơn dừng khi game tạm dừng. Hoàn thành tổng 2/4/6 đơn lần lượt mở bánh mì/phô mai/nước táo.
 
-Để xây, trồng cây táo rồi chọn ô 8 và dùng rìu để hạ cây lấy **6 khối gỗ**. Chọn ô 9 và dùng giỏ nếu chỉ muốn hái **5 táo**, cây vẫn còn. Dùng 5 khối gỗ chế tạo Bàn chế tạo, vào G và đặt bàn trước; sau đó có thể đặt khối gỗ, đá, gạch, kính, kim loại hoặc cỏ trên mọi đảo. Khối đá lấy ở mỏ; các loại khác đến từ shop, đơn hàng và chế biến. Tháo khối bằng chuột phải sẽ trả vật phẩm về túi. Chế độ sáng tạo vẫn phải có vật liệu, không tạo vật phẩm vô hạn.
+Để xây, chọn ô 8 và dùng rìu hạ cây táo lấy **6 khối gỗ**, hoặc mua gỗ ở **trang 2 của shop**. Chọn ô 9 và dùng giỏ nếu chỉ muốn hái **5 táo**, cây vẫn còn. Dùng 5 khối gỗ chế tạo Bàn chế tạo. Nhấn G hoặc nút Xây dựng trong túi, đặt bàn trước rồi chọn các khối gỗ, đá, gạch, kính, kim loại hoặc cỏ. Tất cả sáu loại đều bán trong trang 2; khối đá còn lấy ở mỏ, và đơn giao hàng thưởng khối. Tháo khối bằng chuột phải sẽ trả vật phẩm về túi. Bàn chế tạo đã đặt cũng dùng E để mở công thức. Chế độ sáng tạo vẫn phải có vật liệu, không tạo vật phẩm vô hạn.
 
 ## Ngày, mùa, bão và các đảo
 

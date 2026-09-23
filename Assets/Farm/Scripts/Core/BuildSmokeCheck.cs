@@ -103,6 +103,7 @@ namespace NongTrai
             shop.Open();
             if(!player.Paused || !shop.Panel.activeSelf || hud.pausePanel.activeSelf) throw new InvalidOperationException("Shop menu failed.");
             Capture(Path.Combine(folder,"shop-preview.png"),hud,camera);
+            shop.ShowPage(1);Capture(Path.Combine(folder,"shop-blocks-preview.png"),hud,camera);
             hud.Resume();
             if(shop.Panel.activeSelf) throw new InvalidOperationException("Shop did not close.");
             var inventory=hud.interaction.inventory;
@@ -140,11 +141,18 @@ namespace NongTrai
             if(shop.Purchase(8,out _) || shop.Money!=money) throw new InvalidOperationException("Insufficient funds failed.");
             if(shop.SellHarvest()!=174 || shop.SellHarvest()!=0) throw new InvalidOperationException("Selling crops failed.");
             if(!shop.Purchase(8,out _) || shop.BoughtTrees!=1) throw new InvalidOperationException("Fruit tree purchase failed.");
+            shop.Credit(500);
+            int woodBefore=inventory.Count(20),grassBefore=inventory.Count(25),feedBefore=shop.FeedStock;
+            if(!shop.Purchase(13,out _)||!shop.Purchase(14,out _)||!shop.Purchase(15,out _)||
+                inventory.Count(20)!=woodBefore+5||inventory.Count(25)!=grassBefore+5||shop.FeedStock!=feedBefore+10)
+                throw new InvalidOperationException("Expanded block and feed shop failed.");
             yield return null;
             var apple=FindFirstObjectByType<FruitTree>();
             apple.remaining=0; apple.Harvest(shop); apple.Harvest(shop);
             if(inventory.Count(3)!=5 || inventory.Sell(3,2)!=30 || inventory.Count(3)!=3 || shop.SellHarvest()!=45)
                 throw new InvalidOperationException("Individual fruit sales failed.");
+            if(inventory.Count(20)!=woodBefore+5 || inventory.Count(25)!=grassBefore+5)
+                throw new InvalidOperationException("Sell all crops must preserve building blocks.");
             var cow=FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None);
             FarmAnimal milkCow=null, sheep=null, pig=null, chicken=null;
             foreach(var a in cow) { if(a.species==AnimalSpecies.Cow) milkCow=a; if(a.species==AnimalSpecies.Sheep) sheep=a; if(a.species==AnimalSpecies.Pig) pig=a; if(a.species==AnimalSpecies.Chicken) chicken=a; }
@@ -254,6 +262,15 @@ namespace NongTrai
             inventory.Add(0,3);
             if(!processing.Enqueue(0) || processing.QueueCount!=1)
                 throw new InvalidOperationException("Processing queue failed.");
+            processing.OpenForMachine(0);
+            if(!processing.Panel.activeSelf || !player.Paused) throw new InvalidOperationException("Machine-specific panel failed.");
+            camera.transform.position=new Vector3(-12,3.5f,8);
+            camera.transform.LookAt(new Vector3(-13,.8f,12));
+            Capture(Path.Combine(folder,"machine-panel-preview.png"),hud,camera);
+            hud.Resume();
+            hud.gameObject.SetActive(false);
+            Capture(Path.Combine(folder,"machines-preview.png"),hud,camera);
+            hud.gameObject.SetActive(true);
             var fastJob=processing.Snapshot();fastJob[0].remaining=0;
             processing.Restore(fastJob);
             player.SetPaused(false);yield return null;
@@ -266,7 +283,7 @@ namespace NongTrai
                 throw new InvalidOperationException("Tool upgrade failed.");
             if(water.RefillCan()!=water.CanCapacity || !water.Consume(1) || water.CanWater!=water.CanCapacity-1)
                 throw new InvalidOperationException("Finite watering can failed.");
-            if(!water.BuyStation(0)) throw new InvalidOperationException("Irrigation station purchase failed.");
+            if(!water.BuyStation(0)||water.StationWater[0]!=8) throw new InvalidOperationException("Irrigation station initial charge failed.");
             water.RefillCan();
             if(water.TransferToStation(0)<=0 || water.StationWater[0]<=0)
                 throw new InvalidOperationException("Irrigation station transfer failed.");
@@ -281,12 +298,21 @@ namespace NongTrai
                 throw new InvalidOperationException("JSON crafting recipe failed.");
             inventory.Add(20,5);
             if(!orders.Craft(4) || inventory.Count(26)!=1) throw new InvalidOperationException("Crafting table recipe failed.");
-            building.Restore(new BuildingState{blocks=new[]{new PlacedBlockRecord{type=0,position=new Vector3(205,.5f,18),euler=Vector3.zero}}});
-            if(building.Snapshot().blocks.Length!=1) throw new InvalidOperationException("Placeable block restore failed.");
             building.Toggle();
-            if(!building.IsBuilding) throw new InvalidOperationException("Building mode failed to open with crafting table in inventory.");
+            if(!building.TryPlaceSelected(new Vector3(28,.5f,-20),0) || inventory.Count(26)!=0 || !building.HasPlacedTable)
+                throw new InvalidOperationException("Crafting table placement failed.");
+            building.Select(0);
+            int woodForBuilding=inventory.Count(20);
+            if(!building.TryPlaceSelected(new Vector3(30,.5f,-20),0) || inventory.Count(20)!=woodForBuilding-1 ||
+                building.Snapshot().blocks.Length!=2)
+                throw new InvalidOperationException("Block placement did not consume one block.");
+            building.Toggle();
+            building.Toggle();
+            if(!building.IsBuilding) throw new InvalidOperationException("Building mode failed to open with placed crafting table.");
             Capture(Path.Combine(folder,"building-preview.png"),hud,camera);
             building.Toggle();
+            building.Restore(new BuildingState{blocks=new[]{new PlacedBlockRecord{type=0,position=new Vector3(205,.5f,18),euler=Vector3.zero}}});
+            if(building.Snapshot().blocks.Length!=1) throw new InvalidOperationException("Placeable block restore failed.");
             if(!orders.Reroll(0) || orders.RerollRemaining<=0)
                 throw new InvalidOperationException("Order reroll cooldown failed.");
             for(int i=0;i<orders.Orders.Length;i++)
