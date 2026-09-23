@@ -30,7 +30,7 @@ namespace NongTrai
         void CreateHud()
         {
             overlay=FarmUi.Panel(hud.gameplayChrome.transform,"Chế độ xây dựng",new Vector2(900,175));
-            var r=overlay.GetComponent<RectTransform>();r.anchorMin=r.anchorMax=r.pivot=new Vector2(.5f,1);r.anchoredPosition=new Vector2(0,-180);
+            var r=overlay.GetComponent<RectTransform>();r.anchorMin=r.anchorMax=r.pivot=new Vector2(.5f,1);r.anchoredPosition=new Vector2(0,-245);
             title=FarmUi.TmpLabel(overlay.transform,"",new Vector2(18,-10),new Vector2(860,38),21);
             slots=new Image[names.Length];
             for(int i=0;i<names.Length;i++)

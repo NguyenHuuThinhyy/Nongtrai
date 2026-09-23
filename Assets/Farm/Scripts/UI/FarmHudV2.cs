@@ -54,7 +54,7 @@ namespace NongTrai
             tipRect.pivot=new Vector2(.5f,0);tipRect.anchoredPosition=new Vector2(0,130);
             tooltip.alignment=TextAlignmentOptions.Center;
             creativeControls=FarmUi.TmpLabel(root.transform,"",new Vector2(0,-24),new Vector2(920,48),21);
-            var cc=creativeControls.rectTransform;cc.anchorMin=cc.anchorMax=new Vector2(.5f,1);cc.pivot=new Vector2(.5f,1);cc.anchoredPosition=new Vector2(0,-24);
+            var cc=creativeControls.rectTransform;cc.anchorMin=cc.anchorMax=new Vector2(.5f,1);cc.pivot=new Vector2(.5f,1);cc.anchoredPosition=new Vector2(0,-185);
             creativeControls.alignment=TextAlignmentOptions.Center;
             slots=new Image[9];counts=new TextMeshProUGUI[9];
             for(int i=0;i<9;i++)
