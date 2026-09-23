@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace NongTrai
 {
@@ -37,11 +37,11 @@ namespace NongTrai
         void OnApplicationFocus(bool focus) { if (!focus) SetPaused(true); }
         void OnDisable() { Cursor.lockState = CursorLockMode.None; Cursor.visible = true; }
         public void Teleport(Vector3 position)
-        { controller.enabled=false;transform.position=position;verticalSpeed=0;controller.enabled=true;safePoint=IslandSafePoint(position); }
+        { ExplorationWorld.Instance?.EnsureAt(position);controller.enabled=false;transform.position=position;verticalSpeed=0;controller.enabled=true;safePoint=IslandSafePoint(position); }
 
         static Vector3 IslandSafePoint(Vector3 position)
         {
-            return position.x>100?IslandManager.ExploreArrival:IslandManager.FarmArrival;
+            return position.y>500?IslandManager.ExploreArrival:IslandManager.FarmArrival;
         }
 
         void Update()
@@ -84,8 +84,9 @@ namespace NongTrai
             if (move.sqrMagnitude > 0.01f)
                 visual.rotation = Quaternion.Slerp(visual.rotation, Quaternion.LookRotation(move), 14 * Time.deltaTime);
             // Điểm phục hồi nếu nhân vật lọt khỏi địa hình do chỉnh sửa scene.
-            if (transform.position.y < -10)
+            if (transform.position.y < (safePoint.y>500?990:-10))
             {
+                ExplorationWorld.Instance?.EnsureAt(safePoint);
                 controller.enabled = false;
                 transform.position = safePoint;
                 controller.enabled = true;

@@ -5,17 +5,32 @@ using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 namespace NongTrai
 {
-    [Serializable] public sealed class ExplorationState { public int[] removed; public int minedCount; }
+    [Serializable] public sealed class ExplorationState
+    {
+        public int[] removed; // v7 cell IDs
+        public int minedCount,seed,generatorVersion;
+        public Vector3Int[] excavated;
+    }
+    [DefaultExecutionOrder(-100)]
     public sealed class ExplorationWorld : MonoBehaviour
     {
         public static ExplorationWorld Instance {get;private set;}
         public FarmHud hud; public FarmInventory inventory;
-        const int Width=48,Height=18;
-        readonly Vector3 origin=new Vector3(175.5f,-4,-24.5f);
-        readonly int[,,] cells=new int[Width,Height,Width];
-        readonly HashSet<int> removed=new HashSet<int>();
-        MeshFilter filter; MeshCollider terrain; Mesh mesh; float hold; int target=-1;
+        public const int ChunkSize=16,Height=32;
+        const int Radius=2;
+        public static readonly Vector3 Origin=new Vector3(175.5f,996,-24.5f);
+        readonly HashSet<Vector3Int> removed=new HashSet<Vector3Int>();
+        readonly Dictionary<Vector2Int,Chunk> chunks=new Dictionary<Vector2Int,Chunk>();
+        Material[] materials;float hold;Vector3Int target;bool hasTarget;
         public int MinedCount {get;private set;}
+        public int Seed {get;private set;}
+        public int LoadedChunkCount=>chunks.Count;
+        public bool IsExploring=>hud!=null&&hud.player!=null&&hud.player.transform.position.y>500;
+        sealed class Chunk
+        {
+            public GameObject go;public MeshFilter filter;public MeshCollider collider;public Mesh mesh;
+            public int[,,] cells=new int[ChunkSize,Height,ChunkSize];
+        }
         static readonly Vector3Int[] dirs={Vector3Int.right,Vector3Int.left,Vector3Int.up,Vector3Int.down,new Vector3Int(0,0,1),new Vector3Int(0,0,-1)};
         static readonly Vector3[][] faces={
             new[]{new Vector3(1,0,0),new Vector3(1,1,0),new Vector3(1,1,1),new Vector3(1,0,1)},
@@ -26,10 +41,10 @@ namespace NongTrai
             new[]{new Vector3(0,0,0),new Vector3(0,1,0),new Vector3(1,1,0),new Vector3(1,0,0)}};
         void Awake()
         {
-            Instance=this;var go=new GameObject("Địa hình Khám phá - đào và xây");go.transform.position=origin;
-            filter=go.AddComponent<MeshFilter>();terrain=go.AddComponent<MeshCollider>();
-            var renderer=go.AddComponent<MeshRenderer>();var colors=new[]{new Color(.36f,.61f,.2f),new Color(.49f,.36f,.24f),new Color(.48f,.51f,.55f),new Color(.34f,.46f,.55f)};
-            var mats=new Material[4];for(int i=0;i<4;i++){mats[i]=new Material(Shader.Find("Universal Render Pipeline/Lit"));mats[i].color=colors[i];}renderer.sharedMaterials=mats;
+            Instance=this;
+            var colors=new[]{new Color(.34f,.58f,.22f),new Color(.48f,.33f,.21f),new Color(.45f,.49f,.53f),new Color(.28f,.4f,.49f),new Color(.77f,.66f,.4f),new Color(.85f,.91f,.94f)};
+            materials=new Material[colors.Length];
+            for(int i=0;i<colors.Length;i++){materials[i]=new Material(Shader.Find("Universal Render Pipeline/Lit"));materials[i].color=colors[i];}
             Restore(null);
         }
         void Start()=>CreateStarterOrchard();
@@ -37,71 +52,137 @@ namespace NongTrai
         {
             var shop=FindFirstObjectByType<FarmShop>();if(shop==null||shop.treePrefab==null)return;
             foreach(float x in new[]{180f,185f,190f,210f,215f,220f})
-                Instantiate(shop.treePrefab,new Vector3(x,0,-17),Quaternion.identity).GetComponent<FruitTree>().remaining=0;
+                Instantiate(shop.treePrefab,new Vector3(x,1000,-17),Quaternion.identity).GetComponent<FruitTree>().remaining=0;
         }
-        int Id(int x,int y,int z)=>(x*Height+y)*Width+z;
-        bool Inside(int x,int y,int z)=>x>=0&&x<Width&&y>=0&&y<Height&&z>=0&&z<Width;
-        bool Protected(int x,int z)=>Mathf.Abs(x-24)<=4&&z<=9;
+        public Vector3Int CellAt(Vector3 point)=>Vector3Int.FloorToInt(point-Origin);
+        Vector2Int Key(int x,int z)=>new Vector2Int(Mathf.FloorToInt(x/(float)ChunkSize),Mathf.FloorToInt(z/(float)ChunkSize));
+        bool Protected(int x,int z)=>Mathf.Abs(x-24)<=4&&z>=0&&z<=9;
+        float Noise(int x,int z,float scale,int salt)=>Mathf.PerlinNoise((x+Seed%10007+salt)*scale,(z+Seed/10007%10007+salt)*scale);
+        public int SurfaceHeight(int x,int z)
+        {
+            // Preserve the original farm-adjacent expedition area, including old saved edits.
+            if(x>=0&&x<48&&z>=0&&z<48)return z<10?4:4+Mathf.FloorToInt(Mathf.PerlinNoise(x*.085f+13,z*.085f+7)*7);
+            float biome=Noise(x,z,.006f,100);
+            float hill=Noise(x,z,.026f,29);
+            return Mathf.Clamp(4+Mathf.FloorToInt(hill*(biome>.6f?22:biome<.35f?8:13)),4,28);
+        }
+        public string BiomeAt(int x,int z)
+        {float b=Noise(x,z,.006f,100);return b>.6f?"Núi tuyết":b<.35f?"Đồi cát":"Đồng cỏ";}
+        int BaseCell(int x,int y,int z)
+        {
+            if(y<0||y>=Height)return 0;
+            int top=SurfaceHeight(x,z);if(y>=top)return 0;
+            if(y==0)return 3;
+            bool core=x>=0&&x<48&&z>=0&&z<48;
+            if(core)
+            {
+                bool cave=z>19&&y<5&&Mathf.PerlinNoise(x*.19f+31,z*.19f)>.58f;
+                if(cave)return 0;
+                return x<15&&z>12||y<top-3?((x*17+y*13+z*7)%19==0?4:3):y==top-1?1:2;
+            }
+            float caveNoise=Noise(x+y*11,z-y*7,.085f,223);
+            if(y>1&&y<top-2&&caveNoise>.68f)return 0;
+            if(y<top-3)return Hash(x,y,z)%23==0?4:3;
+            float biome=Noise(x,z,.006f,100);
+            if(biome<.35f)return 5;
+            return y==top-1?(biome>.6f?6:1):2;
+        }
+        uint Hash(int x,int y,int z){unchecked{uint h=(uint)(x*73856093^y*19349663^z*83492791^Seed);h^=h>>13;h*=1274126177;return h^(h>>16);}}
+        public int BlockAt(Vector3Int cell)=>removed.Contains(cell)?0:BaseCell(cell.x,cell.y,cell.z);
         public void Restore(ExplorationState state)
         {
-            removed.Clear();if(state?.removed!=null)foreach(int id in state.removed)removed.Add(id);
+            ClearChunks();removed.Clear();
+            Seed=state!=null&&state.generatorVersion>0?state.seed:Guid.NewGuid().GetHashCode()&int.MaxValue;
             MinedCount=state==null?0:Mathf.Max(0,state.minedCount);
-            for(int x=0;x<Width;x++)for(int z=0;z<Width;z++)
-            {
-                int top=z<10?4:4+Mathf.FloorToInt(Mathf.PerlinNoise(x*.085f+13,z*.085f+7)*7);
-                for(int y=0;y<Height;y++)
-                {
-                    bool cave=z>19 && y>0 && y<5 && Mathf.PerlinNoise(x*.19f+31,z*.19f)> .58f;
-                    bool quarry=x<15 && z>12;
-                    cells[x,y,z]=y>=top||cave||removed.Contains(Id(x,y,z))?0:
-                        quarry||y<top-3?((x*17+y*13+z*7)%19==0?4:3):y==top-1?1:2;
-                }
-            }
-            Rebuild();
+            if(state?.excavated!=null)foreach(var c in state.excavated)if(c.y>0&&c.y<Height)removed.Add(c);
+            if(state?.removed!=null)foreach(int id in state.removed)
+            {int x=id/(18*48),y=id/48%18,z=id%48;if(x>=0&&x<48&&y>0)removed.Add(new Vector3Int(x,y,z));}
+            EnsureAt(IslandManager.ExploreArrival);
         }
-        public ExplorationState Snapshot(){var ids=new int[removed.Count];removed.CopyTo(ids);return new ExplorationState{removed=ids,minedCount=MinedCount};}
+        public ExplorationState Snapshot()
+        {var ids=new Vector3Int[removed.Count];removed.CopyTo(ids);return new ExplorationState{seed=Seed,generatorVersion=1,excavated=ids,minedCount=MinedCount};}
+        public void EnsureAt(Vector3 point)
+        {
+            if(point.y<500)return;
+            var cell=CellAt(point);var center=Key(cell.x,cell.z);
+            // Synchronous collision only around arrival/current player; remaining chunks spread over frames.
+            for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++)Load(center+new Vector2Int(x,z));
+        }
+        void Stream(Vector3 point)
+        {
+            var cell=CellAt(point);var center=Key(cell.x,cell.z);
+            var unload=new List<Vector2Int>();
+            foreach(var pair in chunks)if(Mathf.Abs(pair.Key.x-center.x)>Radius+1||Mathf.Abs(pair.Key.y-center.y)>Radius+1)unload.Add(pair.Key);
+            foreach(var key in unload){Dispose(chunks[key]);chunks.Remove(key);}
+            EnsureAt(point);
+            for(int r=0;r<=Radius;r++)for(int x=-r;x<=r;x++)for(int z=-r;z<=r;z++)
+            {var key=center+new Vector2Int(x,z);if(!chunks.ContainsKey(key)){Load(key);return;}}
+        }
+        void Load(Vector2Int key)
+        {
+            if(chunks.ContainsKey(key))return;
+            var c=new Chunk();c.go=new GameObject("Địa hình "+key.x+", "+key.y);
+            c.go.transform.position=Origin+new Vector3(key.x*ChunkSize,0,key.y*ChunkSize);
+            c.filter=c.go.AddComponent<MeshFilter>();c.collider=c.go.AddComponent<MeshCollider>();
+            c.go.AddComponent<MeshRenderer>().sharedMaterials=materials;
+            for(int x=0;x<ChunkSize;x++)for(int z=0;z<ChunkSize;z++)for(int y=0;y<Height;y++)
+                c.cells[x,y,z]=BlockAt(new Vector3Int(key.x*ChunkSize+x,y,key.y*ChunkSize+z));
+            chunks.Add(key,c);Rebuild(key,c);
+        }
         public bool MineCell(Vector3Int c)
         {
-            if(!Inside(c.x,c.y,c.z)||c.y==0||Protected(c.x,c.z)||cells[c.x,c.y,c.z]==0)return false;
-            int type=cells[c.x,c.y,c.z];cells[c.x,c.y,c.z]=0;removed.Add(Id(c.x,c.y,c.z));MinedCount++;
-            inventory.Add(type<=2?25:type==4?13:21,1);FarmExpansion.Instance?.GainExperience(2);
-            if(MinedCount>=30)IslandManager.Instance?.UnlockMiningBlueprint();Rebuild();return true;
+            int type=BlockAt(c);if(c.y<=0||Protected(c.x,c.z)||type==0)return false;
+            removed.Add(c);MinedCount++;inventory.Add(type==4?13:type==3?21:25,1);
+            FarmExpansion.Instance?.GainExperience(2);if(MinedCount>=30)IslandManager.Instance?.UnlockMiningBlueprint();
+            var key=Key(c.x,c.z);
+            if(chunks.TryGetValue(key,out var chunk)){chunk.cells[c.x-key.x*ChunkSize,c.y,c.z-key.y*ChunkSize]=0;Rebuild(key,chunk);}
+            foreach(var dir in dirs)
+            {var neighbor=Key(c.x+dir.x,c.z+dir.z);if(neighbor!=key&&chunks.TryGetValue(neighbor,out var n))Rebuild(neighbor,n);}
+            return true;
         }
         void Update()
         {
-            if(hud==null||hud.player.Paused||hud.player.transform.position.x<100||FarmBuildingSystem.Instance.IsBuilding){hold=0;return;}
+            if(hud==null||hud.player==null)return;
+            if(IsExploring)Stream(hud.player.transform.position);
+            if(hud.player.Paused||!IsExploring||FarmBuildingSystem.Instance.IsBuilding){hold=0;return;}
             var cam=Camera.main;if(cam==null||Mouse.current==null)return;
-            if(Physics.Raycast(cam.transform.position,cam.transform.forward,out var hit,8)&&hit.collider==terrain)
+            if(Physics.Raycast(cam.transform.position,cam.transform.forward,out var hit,8)&&IsTerrain(hit.collider))
             {
-                var c=Vector3Int.FloorToInt(hit.point-hit.normal*.02f-origin);int id=Id(c.x,c.y,c.z);
-                if(target!=id){target=id;hold=0;}
+                var c=CellAt(hit.point-hit.normal*.02f);
+                if(!hasTarget||target!=c){target=c;hold=0;hasTarget=true;}
                 if(Mouse.current.leftButton.isPressed){hold+=Time.deltaTime;if(hold>=.55f){MineCell(c);hold=0;}}
                 else hold=0;
-            }else{target=-1;hold=0;}
+            }else{hasTarget=false;hold=0;}
         }
+        bool IsTerrain(Collider collider){foreach(var c in chunks.Values)if(c.collider==collider)return true;return false;}
         void OnGUI()
         {
-            if(hud==null||hud.player.Paused||hud.player.transform.position.x<100||FarmBuildingSystem.Instance.IsBuilding)return;
+            if(hud==null||hud.player.Paused||!IsExploring||FarmBuildingSystem.Instance.IsBuilding)return;
+            var cell=CellAt(hud.player.transform.position);
             GUI.Label(new Rect(Screen.width/2-5,Screen.height/2-12,24,24),"•");
-            GUI.Box(new Rect(Screen.width/2-245,Screen.height-195,490,45),"KHÁM PHÁ • Giữ chuột trái đào • G xây • Tab bản đồ\nĐã đào: "+MinedCount+" / 30 mở bản vẽ lò nung");
+            GUI.Box(new Rect(Screen.width/2-280,Screen.height-205,560,55),BiomeAt(cell.x,cell.z)+" • Seed "+Seed+" • "+cell.x+", "+cell.z+"\nGiữ chuột trái đào • G xây • Tab về nhà • Đã đào: "+MinedCount);
         }
-        void Rebuild()
+        void Rebuild(Vector2Int key,Chunk chunk)
         {
-            var vertices=new List<Vector3>();var triangles=new List<int>[4];for(int i=0;i<4;i++)triangles[i]=new List<int>();
-            for(int x=0;x<Width;x++)for(int y=0;y<Height;y++)for(int z=0;z<Width;z++)
+            var vertices=new List<Vector3>();var triangles=new List<int>[materials.Length];for(int i=0;i<triangles.Length;i++)triangles[i]=new List<int>();
+            for(int x=0;x<ChunkSize;x++)for(int y=0;y<Height;y++)for(int z=0;z<ChunkSize;z++)
             {
-                int type=cells[x,y,z];if(type==0)continue;
+                int type=chunk.cells[x,y,z];if(type==0)continue;
                 for(int face=0;face<6;face++)
                 {
-                    var n=new Vector3Int(x,y,z)+dirs[face];if(Inside(n.x,n.y,n.z)&&cells[n.x,n.y,n.z]!=0)continue;
+                    var n=new Vector3Int(x,y,z)+dirs[face];
+                    int adjacent=n.x>=0&&n.x<ChunkSize&&n.z>=0&&n.z<ChunkSize&&n.y>=0&&n.y<Height?chunk.cells[n.x,n.y,n.z]:BlockAt(new Vector3Int(key.x*ChunkSize+n.x,n.y,key.y*ChunkSize+n.z));
+                    if(adjacent!=0)continue;
                     int start=vertices.Count;foreach(var v in faces[face])vertices.Add(new Vector3(x,y,z)+v);
                     var t=triangles[type-1];t.Add(start);t.Add(start+1);t.Add(start+2);t.Add(start);t.Add(start+2);t.Add(start+3);
                 }
             }
-            var next=new Mesh{indexFormat=IndexFormat.UInt32};next.SetVertices(vertices);next.subMeshCount=4;
-            for(int i=0;i<4;i++)next.SetTriangles(triangles[i],i);next.RecalculateNormals();next.RecalculateBounds();
-            filter.sharedMesh=next;terrain.sharedMesh=null;terrain.sharedMesh=next;if(mesh!=null)Destroy(mesh);mesh=next;
+            var next=new Mesh{indexFormat=IndexFormat.UInt32};next.SetVertices(vertices);next.subMeshCount=triangles.Length;
+            for(int i=0;i<triangles.Length;i++)next.SetTriangles(triangles[i],i);next.RecalculateNormals();next.RecalculateBounds();
+            chunk.filter.sharedMesh=next;chunk.collider.sharedMesh=null;chunk.collider.sharedMesh=next;if(chunk.mesh!=null)Destroy(chunk.mesh);chunk.mesh=next;
         }
-        void OnDestroy(){if(Instance==this)Instance=null;if(terrain!=null)Destroy(terrain.gameObject);if(mesh!=null)Destroy(mesh);}
+        void Dispose(Chunk chunk){if(chunk.go!=null){chunk.go.SetActive(false);Destroy(chunk.go);}if(chunk.mesh!=null)Destroy(chunk.mesh);}
+        void ClearChunks(){foreach(var chunk in chunks.Values)Dispose(chunk);chunks.Clear();}
+        void OnDestroy(){if(Instance==this)Instance=null;ClearChunks();if(materials!=null)foreach(var material in materials)Destroy(material);}
     }
 }

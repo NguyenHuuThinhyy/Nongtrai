@@ -363,8 +363,8 @@ namespace NongTrai
             if(!islands.Travel(1) || Mathf.Abs(player.transform.position.x-200)>2 || islands.Travel(2) || islands.Travel(3))
                 throw new InvalidOperationException("Two map travel failed.");
             clock.Restore(clock.Day,.5f,FarmWeather.Sunny);
-            camera.transform.position=new Vector3(232,28,-36);
-            camera.transform.LookAt(new Vector3(199,1,0));
+            camera.transform.position=new Vector3(232,1028,-36);
+            camera.transform.LookAt(new Vector3(199,1001,0));
             Capture(Path.Combine(folder,"exploration-preview.png"),hud,camera);
             inventory.Add(13,2);
             if(processing.Enqueue(5)) throw new InvalidOperationException("Furnace worked without blueprint.");
@@ -374,6 +374,44 @@ namespace NongTrai
                 if(exploration.MineCell(new Vector3Int(x,2,z)))mined++;
             if(mined!=30 || exploration.MinedCount!=30 || islands.Blueprints!=1)
                 throw new InvalidOperationException("Voxel mining blueprint failed.");
+            int seed=exploration.Seed;
+            var farCell=new Vector3Int(-160,2,320);
+            while(exploration.BlockAt(farCell)==0)farCell.x++;
+
+            var farPoint=ExplorationWorld.Origin+new Vector3(farCell.x,exploration.SurfaceHeight(farCell.x,farCell.z)+2,farCell.z);
+            player.Teleport(farPoint);
+            yield return null;
+            if(!exploration.MineCell(farCell)||exploration.BlockAt(farCell)!=0)throw new InvalidOperationException("Far negative chunk mining failed.");
+            var chunkState=exploration.Snapshot();
+            int sampleHeight=exploration.SurfaceHeight(512,-512);
+            exploration.Restore(new ExplorationState{seed=seed,generatorVersion=1});
+            if(exploration.SurfaceHeight(512,-512)!=sampleHeight)throw new InvalidOperationException("Same seed changed terrain.");
+            var heights=new int[16];for(int n=0;n<16;n++)heights[n]=exploration.SurfaceHeight(256+n*16,-512);
+            bool changed=false;
+            exploration.Restore(new ExplorationState{seed=seed^73417,generatorVersion=1});
+            for(int n=0;n<16;n++)if(exploration.SurfaceHeight(256+n*16,-512)!=heights[n])changed=true;
+            if(!changed)throw new InvalidOperationException("Different seeds generated identical sampled terrain.");
+
+            exploration.Restore(chunkState);
+            if(exploration.Seed!=seed||exploration.BlockAt(farCell)!=0)throw new InvalidOperationException("Seeded terrain restore failed.");
+            for(int step=0;step<8;step++)
+            {
+                player.Teleport(ExplorationWorld.Origin+new Vector3(256+step*64,32,256));
+                yield return null;
+                if(exploration.LoadedChunkCount>49)throw new InvalidOperationException("Chunk streaming leaked loaded terrain.");
+            }
+            islands.Travel(1);
+            player.Teleport(farPoint);
+            for(int frame=0;frame<30;frame++)yield return null;
+            camera.transform.position=farPoint+new Vector3(0,3,-6);
+            camera.transform.LookAt(farPoint+new Vector3(0,0,14));
+            Capture(Path.Combine(folder,"streamed-world-preview.png"),hud,camera);
+            islands.Travel(1);
+            var legacy=new ExplorationState{removed=new[]{(0*18+2)*48+12},minedCount=30};
+            exploration.Restore(legacy);
+            if(exploration.BlockAt(new Vector3Int(0,2,12))!=0)throw new InvalidOperationException("v7 voxel migration failed.");
+            exploration.Restore(chunkState);
+            Debug.Log("FARM_STREAMING_OK: seeded terrain, distant/negative coordinates, unloading cap, excavated persistence and v7 voxel migration.");
             if(exploration.MineCell(new Vector3Int(24,2,4)))throw new InvalidOperationException("Spawn was mineable.");
             hud.Resume();
             if(!processing.Enqueue(5)) throw new InvalidOperationException("Furnace did not unlock.");
@@ -384,9 +422,16 @@ namespace NongTrai
             if(!save.Save()) throw new InvalidOperationException("Island save failed.");
             clock.Restore(1,.25f,FarmWeather.Sunny);player.Teleport(Vector3.zero);
             exploration.Restore(null);
-            if(!save.Load() || exploration.MinedCount!=30 || exploration.MineCell(new Vector3Int(0,2,12)) || clock.Day<=1 || islands.Blueprints!=1 ||
+            if(!save.Load() || exploration.MinedCount!=31 || exploration.MineCell(new Vector3Int(0,2,12)) || clock.Day<=1 || islands.Blueprints!=1 ||
                 Mathf.Abs(player.transform.position.x-200)>2)
                 throw new InvalidOperationException("Time/island save did not restore.");
+            string modernSave=File.ReadAllText(save.SavePath);
+            player.Teleport(new Vector3(200,.4f,-20));
+            if(!save.Save())throw new InvalidOperationException("Migration fixture save failed.");
+            string oldSave=File.ReadAllText(save.SavePath).Replace("\"version\": 8","\"version\": 7");
+            File.WriteAllText(save.SavePath,oldSave);
+            if(!save.Load()||Mathf.Abs(player.transform.position.y-1000.4f)>1)throw new InvalidOperationException("Legacy player position migration failed.");
+            File.WriteAllText(save.SavePath,modernSave);if(!save.Load())throw new InvalidOperationException("Modern restore failed.");
             File.Delete(save.SavePath);
             if(File.Exists(save.SavePath+".bak")) File.Delete(save.SavePath+".bak");
             save.pathOverride=null;
@@ -402,7 +447,7 @@ namespace NongTrai
             creative.ToggleFlight();if(CreativeModeManager.IsFlying) throw new InvalidOperationException("Creative flight toggle failed.");
             if(save.Save() || File.Exists(save.SavePath)) throw new InvalidOperationException("Creative mode wrote a save file.");
             save.pathOverride=null;
-            Debug.Log("FARM_WATER_ORDERS_CREATIVE_OK: finite water, irrigation, JSON craft, daily orders, v7 terrain/building save and discard-only creative mode.");
+            Debug.Log("FARM_WATER_ORDERS_CREATIVE_OK: finite water, irrigation, JSON craft, daily orders, v8 seeded chunk/terrain/building save and discard-only creative mode.");
             yield return new WaitForSeconds(2);
             Debug.Log("FARM_CROPS_SMOKE_OK: grounded, cameras, pause, 80 plots, three crops, dry growth blocked, watering, harvest inventory, replant, screenshot.");
             Application.Quit(0);

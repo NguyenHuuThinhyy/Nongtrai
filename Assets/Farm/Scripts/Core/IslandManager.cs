@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 namespace NongTrai
 {
@@ -15,7 +15,7 @@ namespace NongTrai
         public int Blueprints { get; private set; }
         public GameObject MapPanel { get; private set; }
         public static readonly Vector3 FarmArrival=new Vector3(0,.4f,14);
-        public static readonly Vector3 ExploreArrival=new Vector3(200,.4f,-20);
+        public static readonly Vector3 ExploreArrival=new Vector3(200,1000.4f,-20);
         void Awake()=>Instance=this;
         void Start()
         {

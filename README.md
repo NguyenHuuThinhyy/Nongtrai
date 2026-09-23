@@ -1,6 +1,6 @@
 ﻿# Nông Trại – First Harvest
 
-Game nông trại Unity cho Windows. Bản hiện tại có trồng cây bằng hotbar minh họa, lấy nước ở hồ, trạm tưới có vòng bán kính và hạt nước, chăn nuôi, chế biến và chế tạo theo JSON, đơn giao hàng mỗi ngày, mở đất theo cấp độ, nâng cấp dụng cụ, hai bản đồ: Nông trại và Khám phá với địa hình khối đào được, quặng, xây dựng và lưu địa hình. Một ngày game dài 10 phút, có bốn mùa, thời tiết, ngủ qua đêm và câu đố ứng phó bão. Menu chính có chế độ sáng tạo LV99 để bay và kiểm thử cả hai map mà không sửa bản lưu chơi thường.
+Game nông trại Unity cho Windows. Bản hiện tại có trồng cây bằng hotbar minh họa, lấy nước ở hồ, trạm tưới có vòng bán kính và hạt nước, chăn nuôi, chế biến và chế tạo theo JSON, đơn giao hàng mỗi ngày, mở đất theo cấp độ, nâng cấp dụng cụ, hai bản đồ: Nông trại và Khám phá với địa hình khối sinh liên tục theo seed, đồng cỏ/đồi cát/núi tuyết, đào quặng, xây dựng và lưu địa hình. Một ngày game dài 10 phút, có bốn mùa, thời tiết, ngủ qua đêm và câu đố ứng phó bão. Menu chính có chế độ sáng tạo LV99 để bay và kiểm thử cả hai map mà không sửa bản lưu chơi thường.
 
 **Chơi ngay:** mở `D:\GAME_NongTrai\Builds\Windows\NongTrai.exe`; giữ nguyên cả thư mục `Windows` khi sao chép sang máy khác. Không cần cài Unity để chạy bản Windows. Xem [CHOI_GAME.md](CHOI_GAME.md) để biết điều khiển và vòng chơi.
 
@@ -17,3 +17,5 @@ Game nông trại Unity cho Windows. Bản hiện tại có trồng cây bằng 
 ```
 
 Ảnh `ChatGPT Image Sep 20, 2026, 07_13_45 PM.png` là tham chiếu bố cục và màu sắc. Model hiện tại được dựng bằng primitive Unity; vẫn có thể thay bằng asset 3D về sau.
+
+Map khám phá tải/gỡ từng chunk 16×16 m quanh người chơi. Bản lưu v8 giữ seed và các ô đã đào; đọc được bản v2–v7, giữ vùng khởi đầu cũ. Chỉ bấm Lưu game mới ghi tiến độ.

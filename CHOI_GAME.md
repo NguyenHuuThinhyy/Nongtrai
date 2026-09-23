@@ -51,11 +51,15 @@ Bàn chế tạo cố định và hộp thư nằm trước nhà. Bàn ghép t�
 
 Nhấn Tab hoặc dùng cổng để đi giữa **Nông trại** và **Khám phá**, cả hai mở từ đầu. Đã bỏ ba khu chức năng cũ (Trung tâm, Thần bí, Công nghiệp), đấu giá NPC, minigame và cổng giới hạn cấp. Cấp tối đa thường là 99.
 
-Map Khám phá là địa hình khối hữu hạn 48 × 48 m, có đồi đất, lớp đá và quặng ở sâu. Nhấn V để dùng góc nhìn thứ nhất, hướng dấu chấm vào đất/đá trong tầm 8 m, giữ chuột trái để đào. Đất trả khối cỏ, đá trả khối đá, quặng trả nguyên liệu luyện kim. Đào 30 khối mở bản vẽ lò nung và đèn thủ công. Khu cổng và tầng đáy không đào được. Dùng G để xây bằng vật liệu trong túi, Tab để trở về. Khu vào map có sáu cây táo ban đầu để hái trái hoặc chặt lấy gỗ. Gỗ vẫn lấy từ cây táo bằng rìu hoặc mua shop; không có quặng gỗ.
+Map Khám phá sinh thêm địa hình theo **seed** khi bạn đi xa, theo cả bốn hướng; không còn dừng ở ô 48 × 48 m. Có đồng cỏ, đồi cát, núi tuyết, đá và quặng/hốc ngầm. Khu xuất phát 48 × 48 m được giữ để tương thích bản cũ; phần đất mới bên ngoài thay đổi theo seed. Mỗi thế giới chưa có bản lưu nhận seed ngẫu nhiên. Khi bấm Lưu game, seed được giữ cố định: quay lại vẫn gặp cùng địa hình, các khối đã đào không tự mọc lại.
+
+Nhấn V để dùng góc nhìn thứ nhất, hướng dấu chấm vào đất/đá trong tầm 8 m, giữ chuột trái để đào. Đất/cát/tuyết trả khối cỏ, đá trả khối đá, quặng trả nguyên liệu luyện kim. Đào 30 khối mở bản vẽ lò nung và đèn thủ công. Khu cổng và tầng đáy không đào được. Dùng G để xây bằng vật liệu trong túi, Tab để trở về. Khu vào map có sáu cây táo ban đầu để hái trái hoặc chặt lấy gỗ. Gỗ lấy từ cây táo bằng rìu hoặc mua shop; không có quặng gỗ.
+
+HUD phiêu lưu hiển thị seed, tên địa hình và tọa độ. Game tải từng vùng 16 × 16 m quanh nhân vật, gỡ vùng xa rồi tái tạo khi quay lại; các thay đổi đào và công trình vẫn giữ. Sương xa che ranh giới tải. Đây là thế giới mở rộng theo vùng trên máy chơi đơn, chưa có quái, sinh tồn hay multiplayer; đi quá xa vẫn chịu giới hạn độ chính xác tọa độ của Unity.
 
 Chế tạo bàn từ 5 khối gỗ, bật G và đặt bàn trước để xây các khối khác. Chế độ xây: 1–7/cuộn chuột chọn khối, chuột trái đặt, chuột phải tháo, R xoay, G thoát. Có thể xây ở cả hai map. Các khối đào và công trình chỉ được lưu khi bấm Lưu game.
 
-Bản lưu v7 đọc được bản cũ: giữ công trình nông trại, hoàn vật liệu của công trình ở đảo cũ vào túi, chuyển nhân vật ở đảo cũ về cổng khám phá. Quyền dùng bản vẽ cũ vẫn giữ.
+Bản lưu v8 đọc được bản cũ: giữ công trình nông trại, hoàn vật liệu của công trình ở đảo cũ vào túi, chuyển nhân vật ở đảo cũ về cổng khám phá. Quyền dùng bản vẽ cũ vẫn giữ. Với bản v7, khu khám phá và công trình được chuyển cùng nhau sang vị trí kỹ thuật mới để địa hình mở rộng không đè lên nông trại; giữ các ô đã đào.
 
 Trong menu chính, **Chế độ sáng tạo** đọc một bản sao của bản lưu thủ công, tạm nâng nhân vật lên **LV99**, bật bay ngay và cho đi mọi đảo. F8 bật/tắt bay; WASD di chuyển, Space lên, X hoặc Ctrl xuống và Shift bay nhanh. HUD luôn hiện các phím bay khi đang bay. Chế độ này vẫn giữ va chạm, không cấp tiền/vật phẩm vô hạn, khóa nút Lưu game và bỏ thay đổi khi về menu hoặc thoát. Khi vào lại chế độ thường, cấp độ cũ trong bản lưu được khôi phục.
 

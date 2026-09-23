@@ -14,7 +14,7 @@ namespace NongTrai
         [Serializable] sealed class ResourceRecord { public int id; public float remaining; }
         [Serializable] sealed class SaveData
         {
-            public int version=7,money,fruit,treeCount,selected,feed,level,xp,day,weather,levelCap;
+            public int version=8,money,fruit,treeCount,selected,feed,level,xp,day,weather,levelCap;
             public float dayTime,musicVolume,effectsVolume;
             public bool expanded;
             public int[] seeds,harvested,products;
@@ -111,9 +111,16 @@ namespace NongTrai
             try
             {
                 var data=JsonUtility.FromJson<SaveData>(File.ReadAllText(SavePath));
-                if(data==null || data.version<2 || data.version>7 || data.seeds==null || data.seeds.Length!=3 ||
+                if(data==null || data.version<2 || data.version>8 || data.seeds==null || data.seeds.Length!=3 ||
                     data.harvested==null || data.harvested.Length!=3 || data.products==null || data.products.Length<4)
                     throw new InvalidDataException("Phiên bản dữ liệu lưu không phù hợp.");
+                if(data.version<8)
+                {
+                    // Move the expedition vertically away from farm so it can expand in every direction.
+                    if(data.playerPosition.x>100)data.playerPosition+=Vector3.up*1000;
+                    if(data.trees!=null)foreach(var tree in data.trees)if(tree.position.x>100)tree.position+=Vector3.up*1000;
+                    if(data.building?.blocks!=null)foreach(var block in data.building.blocks)if(block.position.x>100)block.position+=Vector3.up*1000;
+                }
                 shop.RestoreState(data.money,data.fruit,data.expanded,data.treeCount,data.version>=3?data.feed:15);
                 Array.Copy(data.seeds,shop.Seeds,3);
                 Array.Copy(data.harvested,field.Harvested,3);

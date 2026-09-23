@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 
 namespace NongTrai
@@ -145,6 +145,12 @@ namespace NongTrai
             RenderSettings.ambientEquatorColor=sky*.75f*cloud;
             RenderSettings.ambientGroundColor=sky*.40f*cloud;
             if(viewCamera!=null) viewCamera.backgroundColor=sky*cloud;
+            bool exploring=player!=null&&player.transform.position.y>500;
+            RenderSettings.fogStartDistance=exploring?18:Weather==FarmWeather.Fog?12:Weather==FarmWeather.Storm?20:65;
+            RenderSettings.fogEndDistance=exploring?32:Weather==FarmWeather.Fog?48:Weather==FarmWeather.Storm?65:140;
+            RenderSettings.fogColor=exploring?sky*cloud:Weather==FarmWeather.Storm?new Color(.30f,.36f,.45f):
+                Weather==FarmWeather.Fog?new Color(.75f,.78f,.80f):new Color(.68f,.82f,.85f);
+
         }
         public void Restore(int day,float time,FarmWeather weather)
         {

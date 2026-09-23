@@ -1,4 +1,16 @@
-﻿# CẬP NHẬT ƯU TIÊN — 23/09/2026: CHỈ HAI MAP
+﻿# CẬP NHẬT ƯU TIÊN — MAP SINH LIÊN TỤC (v8)
+
+- ExplorationWorld thay mesh cố định bằng Dictionary<Vector2Int,Chunk>, chunk16x16, cao32; radius2 và vùng giữ thêm1. Một chunk bổ sung/frame, đồng bộ3x3 collider khi dịch chuyển. Gỡ mesh/GameObject xa; chỉ giữ seed và HashSet<Vector3Int> các ô đào. Không sinh thế giới mới khi quay lại.
+- GeneratorVersion1, seed ngẫu nhiên nếu chưa có; giữ core48x48 phiên bản trước, bên ngoài sinh đồng cỏ/cát/tuyết và hang/quặng bằng seed. Tọa độ âm dùng floor division.
+- Map khám phá chuyển lên y1000 để mở rộng bốn hướng không đè farm. Origin=(175.5,996,-24.5), spawn=(200,1000.4,-20). FarmPlayer nhận biết bằng y>500; phục hồi khi dưới990. Tuyệt đối không dùng x>100 để phân biệt map mới; chỉ dùng trong migration cũ.
+- FarmSave v8 migrate vị trí player/trees/buildings của map cũ +1000y; decode removed IDs v7 với stride18x48, giữ tiến độ/blueprint. Mọi thay đổi vẫn manual-save, creative không ghi.
+- Biome vật liệu mới chưa có ID túi riêng: cát/tuyết/đất cho item25, đá21, quặng13. Không có sinh tồn/quái/multiplayer. Cây táo khởi đầu vẫn sáu cây; không có hệ rừng streaming.
+- Test mới: chunk xa/tọa độ âm, cap49 sau stream, seed tái tạo, seed khác tạo terrain khác, đào lưu/tải, v7 cell migration và migration vị trí player. Thông tin hữu hạn48x48 ở các mục cũ phía dưới đã lỗi thời.
+- Rủi ro/khoản chưa làm: Unity floating-point ở tọa độ rất xa, build nhiều khối vẫn giữ GameObject độc lập, chưa greedy mesh/job thread. Không quảng cáo vô hạn tuyệt đối hay đảm bảo FPS máy yếu.
+
+---
+
+# CẬP NHẬT ƯU TIÊN — 23/09/2026: CHỈ HAI MAP
 
 Thông tin dưới mục này về bốn đảo, NPC, đấu giá và minigame đã lỗi thời. Ưu tiên code hiện tại và README/CHOI_GAME.
 
