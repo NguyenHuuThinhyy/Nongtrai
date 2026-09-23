@@ -87,7 +87,7 @@ namespace NongTrai
                 var progress=FarmExpansion.Instance;
                 farmingStatus.text = shop.Money+" xu  •  "+(progress==null?"":("LV "+progress.Level+" Ngày "+progress.Day+" • "))
                     +field.Current.displayName+": "+shop.Seeds[field.Selected]+" hạt\nThức ăn: "+shop.FeedStock
-                    +" • B Shop  I Túi  M Chế biến  N Đất  P Chuồng";
+                    +" • B Túi  G Xây  M Chế biến  N Đất  P Chuồng";
             }
             if (remaining > 0) { remaining -= Time.deltaTime; if (remaining <= 0) toast.text = ""; }
         }

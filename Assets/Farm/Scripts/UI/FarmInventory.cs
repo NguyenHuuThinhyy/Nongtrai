@@ -11,10 +11,10 @@ namespace NongTrai
         public FarmHud hud;
         public FieldManager field;
         public FarmShop shop;
-        public int[] AnimalProducts { get; private set; } = new int[16];
+        public int[] AnimalProducts { get; private set; } = new int[23];
         public GameObject Panel { get; private set; }
-        readonly string[] itemNames = { "Lúa mì", "Cà chua", "Đậu nành", "Táo", "Trứng", "Sữa", "Lông cừu", "Thịt heo", "Bột mì", "Bánh mì", "Phô mai", "Nước táo", "Gỗ", "Quặng", "Ván", "Kim loại", "Bó nông sản", "Gói đậu", "Giỏ táo", "Đèn thủ công" };
-        readonly int[] unitPrices = { 8, 18, 32, 15, 8, 20, 25, 30, 22, 65, 65, 35, 12, 18, 34, 50, 45, 55, 95, 165 };
+        readonly string[] itemNames = { "Lúa mì", "Cà chua", "Đậu nành", "Táo", "Trứng", "Sữa", "Lông cừu", "Thịt heo", "Bột mì", "Bánh mì", "Phô mai", "Nước táo", "Gỗ cũ", "Quặng", "Ván", "Kim loại", "Bó nông sản", "Gói đậu", "Giỏ táo", "Đèn thủ công", "Khối gỗ", "Khối đá", "Khối gạch", "Khối kính", "Khối kim loại", "Khối cỏ", "Bàn chế tạo" };
+        readonly int[] unitPrices = { 8,18,32,15,8,20,25,30,22,65,65,35,12,18,34,50,45,55,95,165,18,14,24,35,55,16,90 };
         public int Price(int item) => item>=0 && item<unitPrices.Length?unitPrices[item]:0;
         public string Name(int item) => item>=0 && item<itemNames.Length?itemNames[item]:"?";
         TMP_Text[] amounts;
@@ -31,16 +31,20 @@ namespace NongTrai
             var content=new GameObject("Inventory content",typeof(RectTransform));
             var contentRect=content.GetComponent<RectTransform>();contentRect.SetParent(viewport.transform,false);
             contentRect.anchorMin=new Vector2(0,1);contentRect.anchorMax=new Vector2(1,1);contentRect.pivot=new Vector2(0,1);
-            contentRect.anchoredPosition=Vector2.zero;contentRect.sizeDelta=new Vector2(0,920);
+            contentRect.anchoredPosition=Vector2.zero;contentRect.sizeDelta=new Vector2(0,1300);
             var scroll=viewport.AddComponent<ScrollRect>();scroll.viewport=vr;scroll.content=contentRect;scroll.horizontal=false;scroll.vertical=true;
             scroll.movementType=ScrollRect.MovementType.Clamped;scroll.scrollSensitivity=38;
             status=FarmUi.TmpLabel(Panel.transform,"Di chuột lên vật phẩm để xem mô tả; bán từng loại ở dưới.",
                 new Vector2(30,-785),new Vector2(1300,48),21);
             amounts=new TMP_Text[itemNames.Length];
+            int visibleIndex=0;
             for (int i=0;i<itemNames.Length;i++)
             {
+                // Item 12 chỉ còn để đọc bản lưu cũ; loader đã đổi nó thành Khối gỗ.
+                if(i==12) continue;
                 int item = i;
-                float x=(i%4)*330, y=-(i/4)*182;
+                float x=(visibleIndex%4)*330, y=-(visibleIndex/4)*182;
+                visibleIndex++;
                 var cell=FarmUi.Panel(content.transform,"Item "+itemNames[i],new Vector2(310,174));
                 var cr=cell.GetComponent<RectTransform>();cr.anchorMin=cr.anchorMax=cr.pivot=new Vector2(0,1);
                 cr.anchoredPosition=new Vector2(x,y);cell.GetComponent<Image>().color=new Color(.16f,.27f,.22f,.95f);
@@ -50,7 +54,7 @@ namespace NongTrai
                 var picture=new GameObject("Minh họa "+itemNames[i],typeof(RectTransform),typeof(Image));
                 var pr=picture.GetComponent<RectTransform>();pr.SetParent(icon.transform,false);pr.anchorMin=pr.anchorMax=new Vector2(.5f,.5f);
                 pr.pivot=new Vector2(.5f,.5f);pr.anchoredPosition=Vector2.zero;pr.sizeDelta=new Vector2(58,58);
-                var pi=picture.GetComponent<Image>();pi.sprite=FarmItemIconLibrary.Get(i);pi.color=Color.white;pi.preserveAspect=true;pi.raycastTarget=false;
+                var pi=picture.GetComponent<Image>();pi.sprite=FarmItemIconLibrary.Get(i<20?i:10+i);pi.color=Color.white;pi.preserveAspect=true;pi.raycastTarget=false;
                 FarmUi.TmpLabel(cell.transform,itemNames[i],new Vector2(88,-12),new Vector2(208,48),23);
                 amounts[i]=FarmUi.TmpLabel(cell.transform,"",new Vector2(88,-62),new Vector2(208,46),19);
                 FarmUi.Button(cell.transform,"Bán 1",new Vector2(10,-118),new Vector2(137,47),()=>Sell(item,1));
@@ -58,6 +62,7 @@ namespace NongTrai
                 cell.AddComponent<FarmInventoryTooltip>().Initialize(this,item);
             }
             FarmUi.Button(Panel.transform,"Trở lại game",new Vector2(30,-870),new Vector2(520,54),hud.Resume);
+            FarmUi.Button(Panel.transform,"Mở cửa hàng",new Vector2(570,-870),new Vector2(520,54),shop.Open);
             Panel.SetActive(false);
             hud.player.PauseChanged += OnPause;
         }
@@ -125,7 +130,7 @@ namespace NongTrai
         void Refresh()
         {
             if(amounts==null) return;
-            for(int i=0;i<amounts.Length;i++) amounts[i].text="Có "+Count(i)+" • "+unitPrices[i]+" xu";
+            for(int i=0;i<amounts.Length;i++) if(amounts[i]!=null) amounts[i].text="Có "+Count(i)+" • "+unitPrices[i]+" xu";
         }
         public void Tooltip(int item)
         { if(status!=null) status.text=item<0?"Di chuột lên vật phẩm để xem mô tả; bán từng loại ở dưới.":

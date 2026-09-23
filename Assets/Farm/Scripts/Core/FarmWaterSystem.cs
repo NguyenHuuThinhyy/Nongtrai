@@ -64,28 +64,44 @@ namespace NongTrai
                 foreach(var plot in plots) if(expansion.RegionFor(plot)==region) { center+=plot.transform.position;count++; }
                 if(count>0) center/=count;
                 center+=new Vector3(0,1.05f,0);
-                var go=GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                go.name="Trạm tưới vùng "+(region+1)+" - E";go.transform.position=center;
-                go.transform.localScale=new Vector3(.65f,1.05f,.65f);
-                var material=new Material(Shader.Find("Universal Render Pipeline/Lit"));
-                material.color=new Color(.25f,.58f,.72f);go.GetComponent<Renderer>().material=material;
+                var go=new GameObject("Trạm tưới vùng "+(region+1)+" - E");go.transform.position=center;
+                var collider=go.AddComponent<CapsuleCollider>();collider.center=new Vector3(0,.55f,0);collider.radius=.8f;collider.height=3.4f;
+                RuntimePart(go.transform,"Bệ trạm",PrimitiveType.Cylinder,new Vector3(0,-.75f,0),new Vector3(1.15f,.22f,1.15f),new Color(.22f,.36f,.40f));
+                RuntimePart(go.transform,"Bồn nước",PrimitiveType.Cylinder,new Vector3(0,0,0),new Vector3(.72f,.72f,.72f),new Color(.25f,.58f,.72f));
+                RuntimePart(go.transform,"Nắp bồn",PrimitiveType.Sphere,new Vector3(0,.72f,0),new Vector3(.76f,.20f,.76f),new Color(.55f,.83f,.92f));
+                RuntimePart(go.transform,"Cột phun",PrimitiveType.Cylinder,new Vector3(0,1.35f,0),new Vector3(.13f,.75f,.13f),new Color(.66f,.72f,.73f));
+                var arms=new GameObject("Cánh tay tưới").transform;arms.SetParent(go.transform,false);arms.localPosition=new Vector3(0,2.05f,0);
+                RuntimePart(arms,"Ống ngang",PrimitiveType.Cube,Vector3.zero,new Vector3(3.4f,.11f,.11f),new Color(.38f,.72f,.86f));
+                RuntimePart(arms,"Ống dọc",PrimitiveType.Cube,Vector3.zero,new Vector3(.11f,.11f,3.4f),new Color(.38f,.72f,.86f));
                 var station=go.AddComponent<IrrigationStation>();station.region=region;stations[region]=station;
+                station.InitializeVisuals(arms);
                 go.SetActive(false);
             }
         }
+        static GameObject RuntimePart(Transform parent,string name,PrimitiveType type,Vector3 local,Vector3 scale,Color color)
+        {
+            var go=GameObject.CreatePrimitive(type);go.name=name;go.transform.SetParent(parent,false);go.transform.localPosition=local;go.transform.localScale=scale;
+            Destroy(go.GetComponent<Collider>());var material=new Material(Shader.Find("Universal Render Pipeline/Lit"));material.color=color;go.GetComponent<Renderer>().material=material;return go;
+        }
         void CreateWaterSource()
         {
-            var source=GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            source.name="Điểm lấy nước hồ - E";source.transform.position=new Vector3(27.5f,.55f,-11);
-            source.transform.localScale=new Vector3(.75f,.55f,.75f);
-            var material=new Material(Shader.Find("Universal Render Pipeline/Lit"));
-            material.color=new Color(.35f,.72f,.90f);source.GetComponent<Renderer>().material=material;
+            var source=new GameObject("Máy bơm lấy nước hồ - E");source.transform.position=new Vector3(27.5f,.75f,-11);
+            var sourceCollider=source.AddComponent<CapsuleCollider>();sourceCollider.center=new Vector3(0,.55f,0);sourceCollider.radius=.65f;sourceCollider.height=2.5f;
+            RuntimePart(source.transform,"Chân bơm",PrimitiveType.Cylinder,new Vector3(0,-.45f,0),new Vector3(.68f,.18f,.68f),new Color(.24f,.42f,.48f));
+            RuntimePart(source.transform,"Thân bơm",PrimitiveType.Cylinder,new Vector3(0,.38f,0),new Vector3(.40f,.85f,.40f),new Color(.30f,.62f,.72f));
+            RuntimePart(source.transform,"Đầu bơm",PrimitiveType.Sphere,new Vector3(0,1.18f,0),new Vector3(.46f,.28f,.46f),new Color(.55f,.83f,.92f));
+            RuntimePart(source.transform,"Vòi bơm",PrimitiveType.Cube,new Vector3(.52f,.82f,0),new Vector3(.72f,.13f,.18f),new Color(.66f,.72f,.73f));
+            RuntimePart(source.transform,"Miệng vòi",PrimitiveType.Cylinder,new Vector3(.88f,.68f,0),new Vector3(.16f,.25f,.16f),new Color(.35f,.70f,.84f));
+            var handle=RuntimePart(source.transform,"Tay bơm",PrimitiveType.Cube,new Vector3(-.10f,1.52f,0),new Vector3(.12f,.70f,.14f),new Color(.76f,.53f,.25f));
+            handle.transform.localRotation=Quaternion.Euler(0,0,-58);
+            RuntimePart(source.transform,"Xô nước",PrimitiveType.Cylinder,new Vector3(1.05f,-.33f,0),new Vector3(.38f,.42f,.38f),new Color(.28f,.62f,.82f));
             source.AddComponent<WaterSource>();
             var board=GameObject.CreatePrimitive(PrimitiveType.Cube);
-            board.name="Bảng quản lý nước - E";board.transform.position=new Vector3(25.8f,1.15f,-10.4f);
-            board.transform.localScale=new Vector3(1.8f,1.5f,.18f);
+            board.name="Bảng quản lý nước - E";board.transform.position=new Vector3(25.4f,1.45f,-10.4f);
+            board.transform.localScale=new Vector3(2.4f,1.15f,.18f);
             var boardMaterial=new Material(Shader.Find("Universal Render Pipeline/Lit"));
             boardMaterial.color=new Color(.28f,.42f,.32f);board.GetComponent<Renderer>().material=boardMaterial;
+            RuntimePart(board.transform,"Biểu tượng giọt nước",PrimitiveType.Sphere,new Vector3(0,0,-.7f),new Vector3(.18f,.28f,.12f),new Color(.35f,.78f,1));
             board.AddComponent<WaterManagementBoard>();
         }
         public void Open()
@@ -180,8 +196,47 @@ namespace NongTrai
 
     public sealed class IrrigationStation : MonoBehaviour,IInteractable
     {
-        public int region;
-        public string InteractionHint => "[E] Nạp trạm tưới vùng "+(region+1)+" từ bình";
+        public int region;Transform arms;ParticleSystem spray;LineRenderer range;Transform[] droplets;
+        public string InteractionHint => "[E] Nạp trạm vùng "+(region+1)+" • "+(FarmWaterSystem.Instance==null?0:FarmWaterSystem.Instance.StationWater[region])+"/32 nước • bán kính 6m";
+        public void InitializeVisuals(Transform rotatingArms)
+        {
+            arms=rotatingArms;
+            var ring=new GameObject("Vùng tưới 6 mét");ring.transform.SetParent(transform,false);ring.transform.localPosition=new Vector3(0,-1.02f,0);
+            range=ring.AddComponent<LineRenderer>();range.useWorldSpace=false;range.loop=true;range.positionCount=72;range.widthMultiplier=.055f;
+            range.startColor=range.endColor=new Color(.18f,.75f,1,.82f);range.material=new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            range.material.color=new Color(.18f,.75f,1,.82f);
+            for(int i=0;i<72;i++){float a=i*Mathf.PI*2/72;range.SetPosition(i,new Vector3(Mathf.Cos(a)*6,.04f,Mathf.Sin(a)*6));}
+            var particles=new GameObject("Hạt phun nước");particles.transform.SetParent(arms,false);particles.transform.localPosition=Vector3.zero;
+            spray=particles.AddComponent<ParticleSystem>();var main=spray.main;main.startLifetime=1.45f;main.startSpeed=5.2f;main.startSize=.11f;
+            main.startColor=new Color(.35f,.78f,1,.82f);main.gravityModifier=.7f;main.maxParticles=260;
+            var emission=spray.emission;emission.rateOverTime=110;emission.enabled=false;
+            var shape=spray.shape;shape.shapeType=ParticleSystemShapeType.Circle;shape.radius=1.45f;shape.radiusThickness=1;
+            var renderer=spray.GetComponent<ParticleSystemRenderer>();var material=new Material(Shader.Find("Universal Render Pipeline/Lit"));material.color=new Color(.25f,.72f,1,.9f);renderer.material=material;
+            var sphere=GameObject.CreatePrimitive(PrimitiveType.Sphere);renderer.renderMode=ParticleSystemRenderMode.Mesh;
+            renderer.mesh=sphere.GetComponent<MeshFilter>().sharedMesh;Destroy(sphere);
+            droplets=new Transform[16];
+            for(int i=0;i<droplets.Length;i++)
+            {
+                var drop=GameObject.CreatePrimitive(PrimitiveType.Sphere);drop.name="Giọt nước "+(i+1);drop.transform.SetParent(transform,false);
+                drop.transform.localScale=Vector3.one*.13f;Destroy(drop.GetComponent<Collider>());
+                var dropMaterial=new Material(Shader.Find("Universal Render Pipeline/Lit"));dropMaterial.color=new Color(.12f,.68f,1);
+                drop.GetComponent<Renderer>().material=dropMaterial;drop.SetActive(false);droplets[i]=drop.transform;
+            }
+        }
+        void Update()
+        {
+            bool active=FarmWaterSystem.Instance!=null&&FarmWaterSystem.Instance.StationWater[region]>0;
+            if(arms!=null&&active)arms.Rotate(0,42*Time.deltaTime,0,Space.Self);
+            if(spray!=null){var emission=spray.emission;emission.enabled=active;}
+            if(droplets!=null)for(int i=0;i<droplets.Length;i++)
+            {
+                droplets[i].gameObject.SetActive(active);if(!active)continue;
+                float phase=Mathf.Repeat(Time.time*1.15f+i/(float)droplets.Length,1);
+                float angle=i*Mathf.PI*2/droplets.Length+Time.time*.73f;
+                float radius=1.25f+phase*3.9f;
+                droplets[i].localPosition=new Vector3(Mathf.Cos(angle)*radius,2.05f+.25f-phase*phase*2.25f,Mathf.Sin(angle)*radius);
+            }
+        }
         public bool CanInteract(FarmPlayer player) => true;
         public void Interact(PlayerInteraction actor)
         {

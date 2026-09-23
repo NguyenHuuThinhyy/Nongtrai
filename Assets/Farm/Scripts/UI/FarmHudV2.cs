@@ -14,18 +14,18 @@ namespace NongTrai
         public FarmInventory inventory;
         public FarmExpansion progress;
         public FieldManager field;
-        TextMeshProUGUI levelText,coinText,environmentText,tooltip;
+        TextMeshProUGUI levelText,coinText,environmentText,tooltip,creativeControls;
         Image xpFill;
         Image[] slots;
         TextMeshProUGUI[] counts;
         float displayedMoney;
         int selectedSlot;
         public int SelectedSlot => selectedSlot;
-        readonly string[] names={"Lúa mì","Cà chua","Đậu nành","Thức ăn","Cuốc","Bình tưới","Liềm","Táo","Sữa"};
-        readonly int[] iconIds={0,1,2,20,21,22,23,3,5};
+        readonly string[] names={"Lúa mì","Cà chua","Đậu nành","Thức ăn","Cuốc","Bình tưới","Liềm","Rìu","Giỏ hái"};
+        readonly int[] iconIds={0,1,2,20,21,22,23,24,25};
         readonly string[] actions={"Gieo hạt vào đất đã cày","Gieo hạt vào đất đã cày","Gieo hạt vào đất đã cày",
             "Cho vật nuôi ăn bằng F","Cày đất bằng E","Tưới cây bằng E","Thu hoạch bằng E",
-            "Vật phẩm trong túi","Vật phẩm trong túi"};
+            "Chặt cây táo lấy khối gỗ","Hái táo mà giữ nguyên cây"};
         static readonly Key[] digitKeys={Key.Digit1,Key.Digit2,Key.Digit3,Key.Digit4,Key.Digit5,
             Key.Digit6,Key.Digit7,Key.Digit8,Key.Digit9};
         void Start()
@@ -40,6 +40,12 @@ namespace NongTrai
             bar.GetComponent<Image>().color=new Color(.12f,.20f,.17f);
             var fill=CreatePanel(bar.transform,"XP fill",Vector2.zero,new Vector2(420,28),new Vector2(0,1));
             xpFill=fill.GetComponent<Image>();xpFill.color=new Color(.98f,.72f,.22f);
+            var bag=CreatePanel(root.transform,"B • Túi đồ",new Vector2(24,-180),new Vector2(230,70),new Vector2(0,1));
+            var bagButton=bag.AddComponent<Button>();bagButton.onClick.AddListener(inventory.Open);
+            var bagIcon=new GameObject("Icon túi",typeof(RectTransform),typeof(Image));var bir=bagIcon.GetComponent<RectTransform>();
+            bir.SetParent(bag.transform,false);bir.anchorMin=bir.anchorMax=bir.pivot=new Vector2(0,.5f);bir.anchoredPosition=new Vector2(12,0);bir.sizeDelta=new Vector2(52,52);
+            bagIcon.GetComponent<Image>().sprite=FarmItemIconLibrary.Get(20);bagIcon.GetComponent<Image>().preserveAspect=true;
+            FarmUi.TmpLabel(bag.transform,"[B]  TÚI ĐỒ",new Vector2(72,-14),new Vector2(145,42),22);
             var right=CreatePanel(root.transform,"Thông tin nông trại",new Vector2(-24,-24),new Vector2(650,146),new Vector2(1,1));
             coinText=FarmUi.TmpLabel(right.transform,"",new Vector2(20,-12),new Vector2(610,52),30);
             environmentText=FarmUi.TmpLabel(right.transform,"",new Vector2(20,-72),new Vector2(610,65),21);
@@ -47,6 +53,9 @@ namespace NongTrai
             var tipRect=tooltip.rectTransform;tipRect.anchorMin=tipRect.anchorMax=new Vector2(.5f,0);
             tipRect.pivot=new Vector2(.5f,0);tipRect.anchoredPosition=new Vector2(0,130);
             tooltip.alignment=TextAlignmentOptions.Center;
+            creativeControls=FarmUi.TmpLabel(root.transform,"",new Vector2(0,-24),new Vector2(920,48),21);
+            var cc=creativeControls.rectTransform;cc.anchorMin=cc.anchorMax=new Vector2(.5f,1);cc.pivot=new Vector2(.5f,1);cc.anchoredPosition=new Vector2(0,-24);
+            creativeControls.alignment=TextAlignmentOptions.Center;
             slots=new Image[9];counts=new TextMeshProUGUI[9];
             for(int i=0;i<9;i++)
             {
@@ -88,15 +97,16 @@ namespace NongTrai
         void Update()
         {
             if(hud.player.Paused) return;
+            bool building=FarmBuildingSystem.Instance!=null&&FarmBuildingSystem.Instance.IsBuilding;
             var keyboard=Keyboard.current;
-            if(keyboard!=null)
+            if(keyboard!=null&&!building)
             {
                 for(int i=0;i<9;i++)
                 {
                     if(keyboard[digitKeys[i]].wasPressedThisFrame) { Select(i);break; }
                 }
             }
-            if(Mouse.current!=null)
+            if(Mouse.current!=null&&!building)
             {
                 float wheel=Mouse.current.scroll.ReadValue().y;
                 if(Mathf.Abs(wheel)>1) Select((selectedSlot+(wheel<0?1:8))%9);
@@ -108,11 +118,14 @@ namespace NongTrai
             var clock=TimeManager.Instance;
             if(clock!=null) environmentText.text=clock.ClockText;
             if(CreativeModeManager.IsCreative) environmentText.text+=" • SÁNG TẠO"+(CreativeModeManager.IsFlying?" • ĐANG BAY":"");
+            creativeControls.text=CreativeModeManager.IsCreative?
+                (CreativeModeManager.IsFlying?"ĐANG BAY • WASD di chuyển • SPACE lên • X xuống • SHIFT nhanh • F8 tắt bay":"SÁNG TẠO • F8 bật bay • [G] Xây dựng"):
+                "[B] Túi đồ • [G] Xây dựng • Lăn chuột đổi vật phẩm";
             counts[0].text=shop.Seeds[0].ToString();counts[1].text=shop.Seeds[1].ToString();counts[2].text=shop.Seeds[2].ToString();
             counts[3].text=shop.FeedStock.ToString();
             for(int i=0;i<3;i++) counts[4+i].text=(progress.ToolTiers[i]+1).ToString();
             if(FarmWaterSystem.Instance!=null) counts[5].text=FarmWaterSystem.Instance.CanWater+"/"+FarmWaterSystem.Instance.CanCapacity;
-            counts[7].text=shop.Fruit.ToString();counts[8].text=inventory.Count(5).ToString();
+            counts[7].text="1";counts[8].text="1";
         }
     }
 

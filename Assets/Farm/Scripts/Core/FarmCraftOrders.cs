@@ -67,7 +67,7 @@ namespace NongTrai
             CraftPanel=FarmUi.Panel(hud.transform,"Bàn chế tạo",new Vector2(1020,740));
             FarmUi.TmpLabel(CraftPanel.transform,"BÀN CHẾ TẠO",new Vector2(30,-22),new Vector2(960,55),31);
             craftStatus=FarmUi.Label(CraftPanel.transform,"",new Vector2(30,-84),new Vector2(960,78),20);
-            for(int i=0;i<Recipes.Length && i<4;i++)
+            for(int i=0;i<Recipes.Length && i<5;i++)
             {
                 int recipe=i;
                 FarmUi.Button(CraftPanel.transform,RecipeLabel(i),new Vector2(30,-185-i*84),new Vector2(960,66),()=>Craft(recipe));
@@ -118,7 +118,8 @@ namespace NongTrai
         {
             if(index<2) return true;
             if(index==2) return expansion.Level>=4 || inventory.Count(14)>0;
-            return IslandManager.Instance!=null && IslandManager.Instance.Blueprints>0;
+            if(index==3) return IslandManager.Instance!=null && IslandManager.Instance.Blueprints>0;
+            return true;
         }
         public bool Craft(int index)
         {
@@ -144,7 +145,7 @@ namespace NongTrai
             var pool=new List<int>();
             if(craft)
             {
-                for(int i=0;i<Recipes.Length;i++) if(CraftUnlocked(i) && Recipes[i].output!=excluded) pool.Add(Recipes[i].output);
+                for(int i=0;i<Recipes.Length;i++) if(CraftUnlocked(i) && Recipes[i].output<26 && Recipes[i].output!=excluded) pool.Add(Recipes[i].output);
             }
             else
             {
@@ -172,7 +173,8 @@ namespace NongTrai
             if(!inventory.Remove(order.item,order.count))
             { SayMail("Chưa đủ "+order.count+" "+inventory.Name(order.item)+" để giao.");return false; }
             order.completed=true;CompletedOrders++;shop.Credit(order.reward);expansion.GainExperience(20+order.count*2);
-            SayMail("Giao thành công: +"+order.reward+" xu. Tổng đơn hoàn thành: "+CompletedOrders+".");
+            int blockReward=20+(CompletedOrders-1)%6;inventory.Add(blockReward,2);
+            SayMail("Giao thành công: +"+order.reward+" xu và +2 "+inventory.Name(blockReward)+". Tổng đơn: "+CompletedOrders+".");
             FarmEffects.Burst(hud.player.transform.position+Vector3.up*2,"+"+order.reward+" xu",Color.yellow);
             FarmAudio.Instance?.Play(FarmAudio.Cue.Sell);FarmProcessing.Instance?.RefreshLocks();return true;
         }
@@ -213,7 +215,7 @@ namespace NongTrai
             return result;
         }
         void RefreshCraft()
-        { if(craftStatus!=null) craftStatus.text="Công thức mở: "+(2+(CraftUnlocked(2)?1:0)+(CraftUnlocked(3)?1:0))+"/4 • Thành phẩm dùng cho đơn hộp thư."; }
+        { if(craftStatus!=null) craftStatus.text="Công thức mở: "+(3+(CraftUnlocked(2)?1:0)+(CraftUnlocked(3)?1:0))+"/5 • Bàn chế tạo cần 5 khối gỗ."; }
         void RefreshMail()
         {
             if(mailStatus==null || Orders==null || Orders.Length<2) return;

@@ -14,7 +14,7 @@ namespace NongTrai
         [Serializable] sealed class ResourceRecord { public int id; public float remaining; }
         [Serializable] sealed class SaveData
         {
-            public int version=5,money,fruit,treeCount,selected,feed,level,xp,day,weather,levelCap;
+            public int version=6,money,fruit,treeCount,selected,feed,level,xp,day,weather,levelCap;
             public float dayTime,musicVolume,effectsVolume;
             public bool expanded;
             public int[] seeds,harvested,products;
@@ -25,6 +25,7 @@ namespace NongTrai
             public ResourceRecord[] resources;
             public WaterState water;
             public OrderSystemState orders;
+            public BuildingState building;
             public Vector3 playerPosition;
             public PlotRecord[] plots;
             public AnimalRecord[] animals;
@@ -41,6 +42,7 @@ namespace NongTrai
         public IslandManager islands;
         public FarmWaterSystem water;
         public FarmCraftOrders orders;
+        public FarmBuildingSystem building;
         public string pathOverride;
         public string SavePath => string.IsNullOrEmpty(pathOverride)
             ? Path.Combine(Application.persistentDataPath,"farm-manual-save.json") : pathOverride;
@@ -65,7 +67,8 @@ namespace NongTrai
                     processing=processing.Snapshot(),island=islands.Snapshot(),playerPosition=player.transform.position,
                     weather=(int)clock.Weather,musicVolume=FarmAudio.Instance.MusicVolume,
                     effectsVolume=FarmAudio.Instance.EffectsVolume,
-                    water=water==null?null:water.Snapshot(),orders=orders==null?null:orders.Snapshot() };
+                    water=water==null?null:water.Snapshot(),orders=orders==null?null:orders.Snapshot(),
+                    building=building==null?null:building.Snapshot() };
                 var plots=FindObjectsByType<FarmPlot>(FindObjectsSortMode.None);
                 data.plots=new PlotRecord[plots.Length];
                 for(int i=0;i<plots.Length;i++)
@@ -107,7 +110,7 @@ namespace NongTrai
             try
             {
                 var data=JsonUtility.FromJson<SaveData>(File.ReadAllText(SavePath));
-                if(data==null || data.version<2 || data.version>5 || data.seeds==null || data.seeds.Length!=3 ||
+                if(data==null || data.version<2 || data.version>6 || data.seeds==null || data.seeds.Length!=3 ||
                     data.harvested==null || data.harvested.Length!=3 || data.products==null || data.products.Length<4)
                     throw new InvalidDataException("Phiên bản dữ liệu lưu không phù hợp.");
                 shop.RestoreState(data.money,data.fruit,data.expanded,data.treeCount,data.version>=3?data.feed:15);
@@ -115,6 +118,12 @@ namespace NongTrai
                 Array.Copy(data.harvested,field.Harvested,3);
                 Array.Clear(inventory.AnimalProducts,0,inventory.AnimalProducts.Length);
                 Array.Copy(data.products,inventory.AnimalProducts,Mathf.Min(data.products.Length,inventory.AnimalProducts.Length));
+                // Save cũ dùng item 12 cho đống gỗ. Chuyển toàn bộ sang khối gỗ xây dựng mới.
+                if(data.version<6 && inventory.AnimalProducts.Length>16 && inventory.AnimalProducts[8]>0)
+                {
+                    inventory.AnimalProducts[16]+=inventory.AnimalProducts[8];
+                    inventory.AnimalProducts[8]=0;
+                }
                 if(data.version>=3)
                 {
                     expansion.Restore(data.level,data.xp,data.day,data.dayTime,data.toolTiers,data.regions,
@@ -158,6 +167,7 @@ namespace NongTrai
                 }
                 if(water!=null) water.Restore(data.version>=5?data.water:null);
                 if(orders!=null) orders.Restore(data.version>=5?data.orders:null,data.version<5);
+                if(building!=null) building.Restore(data.version>=6?data.building:null);
                 return true;
             }
             catch(Exception error) { Debug.LogError("Tải nông trại thất bại: "+error); return false; }

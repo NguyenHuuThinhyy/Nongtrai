@@ -30,6 +30,7 @@ namespace NongTrai
             Pause = map.AddAction("Pause", InputActionType.Button, "<Keyboard>/escape");
             FlyToggle = map.AddAction("Creative fly", InputActionType.Button, "<Keyboard>/f8");
             Descend = map.AddAction("Fly down", InputActionType.Button, "<Keyboard>/leftCtrl");
+            Descend.AddBinding("<Keyboard>/x");
         }
         void OnEnable() => map.Enable();
         void OnDisable() => map.Disable();

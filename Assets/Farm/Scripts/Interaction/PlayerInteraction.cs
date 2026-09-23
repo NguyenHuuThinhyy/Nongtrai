@@ -38,19 +38,21 @@ namespace NongTrai
             var keyboard=Keyboard.current;
             if(player.Paused)
             {
-                if(keyboard!=null && keyboard.iKey.wasPressedThisFrame && inventory.Panel!=null && inventory.Panel.activeSelf)
+                if(keyboard!=null && (keyboard.iKey.wasPressedThisFrame||keyboard.bKey.wasPressedThisFrame) && inventory.Panel!=null && inventory.Panel.activeSelf)
                     inventory.hud.Resume();
                 ClearSelection();return;
             }
             if(keyboard!=null)
             {
-                if(keyboard.bKey.wasPressedThisFrame) { shop.Open();return; }
+                if(keyboard.bKey.wasPressedThisFrame) { inventory.Open();return; }
                 if(keyboard.iKey.wasPressedThisFrame) { inventory.Open();return; }
                 if(keyboard.mKey.wasPressedThisFrame) { FarmProcessing.Instance?.Open();return; }
                 if(keyboard.nKey.wasPressedThisFrame) { FarmExpansion.Instance?.Open();return; }
                 if(keyboard.pKey.wasPressedThisFrame) { shop.barn?.Open();return; }
                 if(keyboard.tabKey.wasPressedThisFrame) { IslandManager.Instance?.OpenMap();return; }
             }
+            if(FarmBuildingSystem.Instance!=null&&FarmBuildingSystem.Instance.IsBuilding)
+            { ClearSelection();return; }
             ScanNearest();
             if(Mouse.current!=null)
             {

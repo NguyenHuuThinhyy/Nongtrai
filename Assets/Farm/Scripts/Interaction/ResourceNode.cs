@@ -9,7 +9,7 @@ namespace NongTrai
         void Start() => player=FindFirstObjectByType<FarmPlayer>();
         void Update() { if(player!=null && !player.Paused) remaining=Mathf.Max(0,remaining-Time.deltaTime); }
         public string InteractionHint => remaining>0?"Tài nguyên hồi sau "+Mathf.CeilToInt(remaining)+" giây":
-            "[E] Thu thập "+(item==12?"gỗ":"quặng");
+            "[E] Khai thác "+(item==21?"khối đá":"quặng");
         public bool CanInteract(FarmPlayer source) => true;
         public void Interact(PlayerInteraction actor)
         {

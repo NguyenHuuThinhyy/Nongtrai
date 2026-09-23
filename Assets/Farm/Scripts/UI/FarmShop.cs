@@ -23,20 +23,20 @@ namespace NongTrai
         public int AnimalCount => FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None).Length;
         public GameObject Panel { get; private set; }
         Text balance, feedback;
-        readonly int[] prices={20,40,75,220,120,150,60,400,150};
-        readonly string[] names={"5 hạt lúa mì","5 hạt cà chua","5 hạt đậu nành","Bò","Heo","Cừu","Gà","Chuồng gà thứ hai (5 chỗ)","Cây táo"};
+        readonly int[] prices={20,40,75,220,120,150,60,400,150,60,100,120,180};
+        readonly string[] names={"5 hạt lúa mì","5 hạt cà chua","5 hạt đậu nành","Bò","Heo","Cừu","Gà","Chuồng gà thứ hai (5 chỗ)","Cây táo","5 khối đá","5 khối gạch","3 khối kính","3 khối kim loại"};
         void Start()
         {
             Panel=new GameObject("Shop",typeof(RectTransform),typeof(Image));
-            var rect=Panel.GetComponent<RectTransform>(); rect.SetParent(hud.transform,false); rect.anchorMin=rect.anchorMax=rect.pivot=new Vector2(.5f,.5f); rect.sizeDelta=new Vector2(1000,790);
+            var rect=Panel.GetComponent<RectTransform>(); rect.SetParent(hud.transform,false); rect.anchorMin=rect.anchorMax=rect.pivot=new Vector2(.5f,.5f); rect.sizeDelta=new Vector2(1000,1000);
             Panel.GetComponent<Image>().color=new Color(.07f,.14f,.11f,.99f);
             balance=Label("",new Vector2(35,-25),new Vector2(920,70),26);
-            for(int i=0;i<names.Length;i++) { int item=i; Button(names[i]+" — "+prices[i]+" xu",new Vector2(35+(i%2)*475,-110-(i/2)*95),()=>Buy(item)); }
-            Button("Bán toàn bộ nông sản",new Vector2(510,-490),Sell);
-            Button("Xem túi đồ",new Vector2(510,-675),inventory.Open);
-            Button("Quản lý chuồng",new Vector2(35,-580),barn.Open);
-            Button("Trở lại game",new Vector2(35,-675),hud.Resume);
-            feedback=Label("Hạt đã mua được thêm vào túi. Cây táo được trồng tại vườn phía tây.",new Vector2(510,-580),new Vector2(455,75),19);
+            for(int i=0;i<names.Length;i++) { int item=i; Button(names[i]+" — "+prices[i]+" xu",new Vector2(35+(i%2)*475,-105-(i/2)*82),()=>Buy(item)); }
+            Button("Bán toàn bộ nông sản",new Vector2(510,-755),Sell);
+            Button("Xem túi đồ",new Vector2(510,-845),inventory.Open);
+            Button("Quản lý chuồng",new Vector2(35,-755),barn.Open);
+            Button("Trở lại game",new Vector2(35,-845),hud.Resume);
+            feedback=Label("Có thể mua vật nuôi, cây và khối xây. Khối gỗ lấy bằng rìu từ cây táo.",new Vector2(35,-690),new Vector2(920,48),19);
             Panel.SetActive(false); hud.player.PauseChanged+=OnPause;
         }
         void OnDestroy() { if(hud!=null && hud.player!=null) hud.player.PauseChanged-=OnPause; }
@@ -76,11 +76,17 @@ namespace NongTrai
                 go.GetComponent<FarmAnimal>().AssignPen(destination);
             }
             else if(item==7) { extraPen.SetActive(true); Expanded=true; }
-            else { Instantiate(treePrefab,new Vector3(-28-(BoughtTrees%2)*5,0,-5-(BoughtTrees/2)*6),Quaternion.identity); BoughtTrees++; }
+            else if(item==8) { Instantiate(treePrefab,new Vector3(-28-(BoughtTrees%2)*5,0,-5-(BoughtTrees/2)*6),Quaternion.identity); BoughtTrees++; }
+            else
+            {
+                int pack=item-9;int[] blockItems={21,22,23,24};int[] amounts={5,5,3,3};
+                inventory.Add(blockItems[pack],amounts[pack]);
+            }
             Money-=prices[item]; result="Đã mua "+names[item]+".";
             FarmAudio.Instance?.Play(FarmAudio.Cue.Buy);return true;
         }
         void Buy(int item) { Purchase(item,out string message); feedback.text=message; Refresh(); }
+        public void TreeCut() => BoughtTrees=Mathf.Max(0,BoughtTrees-1);
         public int SellHarvest() => inventory.SellAll();
         void Sell() { feedback.text="Đã bán nông sản: +"+SellHarvest()+" xu."; Refresh(); }
         void Refresh() { balance.text="CỬA HÀNG NÔNG TRẠI     "+Money+" xu\nBò "+speciesPens[0].AnimalCount()+"/4 • Heo "+speciesPens[1].AnimalCount()+"/4 • Cừu "+speciesPens[2].AnimalCount()+"/4 • Gà "+speciesPens[3].AnimalCount()+"/5"+(Expanded?" (+chuồng gà 2)":""); }

@@ -335,7 +335,7 @@ namespace NongTrai.Editor
             Button(hud.pausePanel.transform,"Thoát game",new Vector2(35,-415),hud.Quit);
             hud.saveStatus=Label(hud.pausePanel.transform,"Chỉ lưu khi nhấn Lưu game.",new Vector2(35,-505),new Vector2(520,38),19,Color.white);
             hud.instructions=Panel(hud.pausePanel.transform,"Instructions",new Vector2(595,-35),new Vector2(665,510),new Color(.15f,.25f,.19f,1));
-            Label(hud.instructions.transform,"HƯỚNG DẪN\n\nWASD đi • Shift chạy • Space nhảy\nChuột nhìn • V đổi góc nhìn • E tương tác\n1–3 Hạt • 5 Cuốc • 6 Tưới • 7 Liềm\nLấy nước ở hồ; xây trạm tưới từ bảng cạnh hồ\nF cho thú ăn • Chuột trái nhấc, phải thả\nB Shop • I Túi • M Chế biến • Tab Bản đồ\nN Mở đất & dụng cụ • P Quản lý chuồng\nBàn chế tạo và hộp thư ở trước nhà\nSáng tạo: F8 bay • Space lên • Ctrl xuống\n\nThoát không tự lưu. Nhấn Lưu game để lưu.",new Vector2(25,-25),new Vector2(615,470),20,Color.white);
+            Label(hud.instructions.transform,"HƯỚNG DẪN\n\nWASD đi • Shift chạy • Space nhảy\nChuột nhìn • V đổi góc nhìn • E tương tác\n1–3 Hạt • 5 Cuốc • 6 Tưới • 7 Liềm\n8 Rìu hạ cây lấy gỗ • 9 Giỏ hái táo\nB Túi đồ rồi chọn Shop • M Chế biến\nG xây dựng • Trái đặt • Phải tháo • R xoay\nF cho thú ăn • Tab Bản đồ • P Chuồng\nSáng tạo: F8 bay • Space lên • X xuống\nEsc đóng bảng hoặc tạm dừng\n\nThoát không tự lưu. Nhấn Lưu game để lưu.",new Vector2(25,-25),new Vector2(615,470),19,Color.white);
             Button(hud.pausePanel.transform,"Cài đặt âm lượng",new Vector2(560,-415),hud.OpenSettings);
             Button(hud.pausePanel.transform,"Về menu chính",new Vector2(560,-315),hud.ReturnToMain);
             hud.instructions.SetActive(false);

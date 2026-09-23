@@ -229,7 +229,8 @@ namespace NongTrai
             var water=FarmWaterSystem.Instance;
             var orders=FarmCraftOrders.Instance;
             var creative=CreativeModeManager.Instance;
-            if(progress==null || processing==null || processing.Recipes.Length!=6 || water==null || orders==null || creative==null)
+            var building=FarmBuildingSystem.Instance;
+            if(progress==null || processing==null || processing.Recipes.Length!=6 || water==null || orders==null || creative==null || building==null)
                 throw new InvalidOperationException("Expansion systems or JSON recipes missing.");
             water.Open();if(!player.Paused || !water.Panel.activeSelf) throw new InvalidOperationException("Water modal failed to open.");
             hud.Resume();if(water.Panel.activeSelf) throw new InvalidOperationException("Water modal did not close with resume/ESC flow.");
@@ -269,9 +270,23 @@ namespace NongTrai
             water.RefillCan();
             if(water.TransferToStation(0)<=0 || water.StationWater[0]<=0)
                 throw new InvalidOperationException("Irrigation station transfer failed.");
+            var irrigation=FindFirstObjectByType<IrrigationStation>();
+            if(irrigation==null) throw new InvalidOperationException("Built irrigation station visual missing.");
+            player.SetPaused(false);yield return new WaitForSeconds(.6f);
+            camera.transform.position=irrigation.transform.position+new Vector3(7,4.5f,-7);
+            camera.transform.LookAt(irrigation.transform.position+Vector3.up*.7f);
+            Capture(Path.Combine(folder,"irrigation-preview.png"),hud,camera);
             int bundles=inventory.Count(16);inventory.Add(0,2);inventory.Add(1,1);
             if(!orders.Craft(0) || inventory.Count(16)!=bundles+1)
                 throw new InvalidOperationException("JSON crafting recipe failed.");
+            inventory.Add(20,5);
+            if(!orders.Craft(4) || inventory.Count(26)!=1) throw new InvalidOperationException("Crafting table recipe failed.");
+            building.Restore(new BuildingState{blocks=new[]{new PlacedBlockRecord{type=0,position=new Vector3(205,.5f,18),euler=Vector3.zero}}});
+            if(building.Snapshot().blocks.Length!=1) throw new InvalidOperationException("Placeable block restore failed.");
+            building.Toggle();
+            if(!building.IsBuilding) throw new InvalidOperationException("Building mode failed to open with crafting table in inventory.");
+            Capture(Path.Combine(folder,"building-preview.png"),hud,camera);
+            building.Toggle();
             if(!orders.Reroll(0) || orders.RerollRemaining<=0)
                 throw new InvalidOperationException("Order reroll cooldown failed.");
             for(int i=0;i<orders.Orders.Length;i++)
@@ -282,10 +297,10 @@ namespace NongTrai
             int savedLevel=progress.Level,savedFeed=shop.FeedStock,savedStation=water.StationWater[0],savedOrders=orders.CompletedOrders;
             if(!save.Save()) throw new InvalidOperationException("Expansion save failed.");
             progress.Restore(1,0,1,0,null,null);shop.AddFeed(9);
-            water.Restore(null);orders.Restore(null,false);
+            water.Restore(null);orders.Restore(null,false);building.Restore(null);
             if(!save.Load() || progress.Level!=savedLevel || !progress.UnlockedRegions[1] ||
                 progress.ToolRadius(0)!=3 || shop.FeedStock!=savedFeed || water.StationWater[0]!=savedStation ||
-                orders.CompletedOrders!=savedOrders)
+                orders.CompletedOrders!=savedOrders || building.Snapshot().blocks.Length!=1)
                 throw new InvalidOperationException("Expansion save did not restore state.");
             File.Delete(save.SavePath);
             if(File.Exists(save.SavePath+".bak")) File.Delete(save.SavePath+".bak");
@@ -357,7 +372,7 @@ namespace NongTrai
             creative.ToggleFlight();if(CreativeModeManager.IsFlying) throw new InvalidOperationException("Creative flight toggle failed.");
             if(save.Save() || File.Exists(save.SavePath)) throw new InvalidOperationException("Creative mode wrote a save file.");
             save.pathOverride=null;
-            Debug.Log("FARM_WATER_ORDERS_CREATIVE_OK: finite water, irrigation, JSON craft, daily orders, v5 save and discard-only creative mode.");
+            Debug.Log("FARM_WATER_ORDERS_CREATIVE_OK: finite water, irrigation, JSON craft, daily orders, v6 building save and discard-only creative mode.");
             yield return new WaitForSeconds(2);
             Debug.Log("FARM_CROPS_SMOKE_OK: grounded, cameras, pause, 80 plots, three crops, dry growth blocked, watering, harvest inventory, replant, screenshot.");
             Application.Quit(0);

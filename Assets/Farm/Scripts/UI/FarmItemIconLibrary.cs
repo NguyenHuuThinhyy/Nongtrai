@@ -48,6 +48,15 @@ namespace NongTrai
                 case 21: Line(p,18,12,42,52,brown,6);Rect(p,36,45,55,54,gray);break;
                 case 22: Rect(p,13,16,43,43,blue);Rect(p,20,43,38,54,gray);Line(p,43,36,57,28,blue,6);break;
                 case 23: Line(p,18,11,34,51,brown,6);Arc(p,39,39,18,gray);break;
+                case 24: Line(p,19,10,39,53,brown,6);Rect(p,34,43,53,55,gray);break;
+                case 25: Rect(p,12,12,52,39,brown);Line(p,16,40,23,54,brown,4);Line(p,48,40,41,54,brown,4);Line(p,23,54,41,54,brown,4);break;
+                case 30: Rect(p,9,9,55,55,brown);for(int y=15;y<56;y+=10)Line(p,10,y,54,y,Hex("B5793E"),2);break;
+                case 31: Rect(p,9,9,55,55,gray);for(int i=0;i<8;i++)Disk(p,16+(i%4)*11,18+(i/4)*22,4,Hex("7D888B"));break;
+                case 32: Rect(p,9,9,55,55,Hex("B84D3C"));for(int y=20;y<56;y+=15){Line(p,9,y,55,y,cream,2);Line(p,y%30==20?25:38,y-11,y%30==20?25:38,y,cream,2);}break;
+                case 33: Rect(p,9,9,55,55,new Color(.4f,.82f,.92f,.65f));Line(p,13,50,48,15,Color.white,3);break;
+                case 34: Rect(p,9,9,55,55,gray);Line(p,13,49,49,13,Color.white,4);Line(p,15,15,49,49,Hex("7B8588"),2);break;
+                case 35: Rect(p,9,9,55,55,Hex("81532D"));Rect(p,9,35,55,55,green);break;
+                case 36: Rect(p,8,30,56,39,brown);for(int x=13;x<=51;x+=13)Rect(p,x,10,x+5,30,brown);Rect(p,12,39,52,51,Hex("B77A3E"));break;
                 default: Rect(p,13,13,51,51,dark);break;
             }
         }

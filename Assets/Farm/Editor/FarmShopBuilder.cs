@@ -113,6 +113,10 @@ namespace NongTrai.Editor
             save.orders=orders;
             var creative=hud.gameObject.AddComponent<CreativeModeManager>();
             creative.hud=hud;creative.player=hud.player;creative.save=save;creative.expansion=expansion;
+            var building=hud.gameObject.AddComponent<FarmBuildingSystem>();
+            building.hud=hud;building.inventory=inventory;building.player=hud.player;building.viewCamera=interaction.viewCamera;
+            save.building=building;
+            var held=hud.player.visual.gameObject.AddComponent<HeldItemVisual>();held.player=hud.player;
             var sound=new GameObject("Farm audio").AddComponent<FarmAudio>();
             shop.animalPrefabs = new GameObject[4];
             for (int i = 0; i < 4; i++)

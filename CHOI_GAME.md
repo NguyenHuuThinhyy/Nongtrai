@@ -9,17 +9,18 @@ Mở `D:\GAME_NongTrai\Builds\Windows\NongTrai.exe`, giữ nguyên toàn bộ th
 | E | Tương tác với ô đất, hồ, trạm tưới, bàn chế tạo, hộp thư, quầy/máy, vật thể và cửa chuồng |
 | 1, 2, 3 | Chọn lúa mì, cà chua, đậu nành |
 | 5, 6, 7 | Chọn cuốc, bình tưới, liềm trước khi thao tác ruộng |
-| B | Shop mua hạt, vật nuôi, cây táo, chuồng gà |
-| I | Túi đồ, bán từng loại hoặc bán hết |
+| B hoặc I | Mở túi đồ; dùng nút **Mở cửa hàng** trong túi để vào shop |
 | M | Máy chế biến và hàng đợi |
 | N | Cấp độ, mua vùng đất và nâng cấp dụng cụ |
 | P | Quản lý chuồng, mua thức ăn và chuồng mới |
 | Tab | Mở bản đồ bốn đảo và dịch chuyển |
 | F | Cho vật nuôi đang ngắm ăn |
 | Chuột trái/phải | Nhấc vật nuôi / thả vào đúng chuồng |
-| 1–9, cuộn chuột | Chọn nhanh ô hotbar; tên và công dụng hiện ngay phía trên thanh |
+| 8, 9 | Chọn rìu để hạ cây táo lấy khối gỗ / giỏ để hái táo mà vẫn giữ cây |
+| 1–9, cuộn chuột | Chọn nhanh ô hotbar; tên, icon và công dụng hiện ngay phía trên thanh |
+| G | Bật/tắt xây dựng sau khi có Bàn chế tạo; 1–7 chọn khối, trái đặt, phải tháo, R xoay |
 | Esc | Đóng bảng đang mở hoặc tạm dừng; mở hướng dẫn, chỉnh âm lượng, lưu, tiếp tục hoặc thoát |
-| F8 | Bật/tắt bay trong chế độ sáng tạo; Space lên, Ctrl xuống, Shift bay nhanh |
+| F8 | Bật/tắt bay trong chế độ sáng tạo; Space lên, X hoặc Ctrl xuống, Shift bay nhanh |
 
 ## Vòng chơi
 
@@ -27,7 +28,7 @@ Ngắm ô đất gần người, chọn đúng ô hotbar rồi nhấn E: **5 cà
 
 Gói 5 hạt lúa mì/cà chua/đậu nành có giá 20/40/75 xu; sản phẩm bán 8/18/32 xu mỗi đơn vị. Bán sản phẩm trong túi để kiếm xu; thu hoạch, chăm vật nuôi, chế biến và giao đơn cho XP. Nâng cấp **cuốc, bình tưới, liềm** từ đồng lên bạc rồi vàng bằng bảng N: số ô tác động cùng lúc là 1, 3, 5. Bốn vùng ruộng, mỗi vùng 20 ô, mở lần lượt bằng xu khi đạt cấp 1, 2, 4, 6; vùng đầu mở sẵn. Giá mở vùng sau tăng dần: 500, 1.200, 2.400 xu.
 
-Gà, bò, cừu và heo có độ no, độ vui. Một ngày trong game dài **10 phút**; độ no và vui giảm theo thời gian. Ngắm con vật và nhấn F để dùng một thức ăn. Vật nuôi cần đủ no và vui mới tạo sản phẩm. Gà đẻ trứng theo chu kỳ tại ổ, mỗi chuồng gà tối đa 5 con. Bò cho sữa mỗi 45 giây, cừu cho len mỗi 60 giây. Heo cho thịt một lần. Bảng P bán 10 thức ăn giá 50 xu, xây thêm chuồng bò/cừu và nâng cấp chuồng. Nâng cấp chuồng bò, cừu, heo tăng sức chứa; nâng chuồng gà rút ngắn chu kỳ đẻ, vẫn giữ tối đa 5 con. Shop B bán chuồng gà thứ hai.
+Gà, bò, cừu và heo có độ no, độ vui. Một ngày trong game dài **10 phút**; độ no và vui giảm theo thời gian. Ngắm con vật và nhấn F để dùng một thức ăn. Vật nuôi cần đủ no và vui mới tạo sản phẩm. Gà đẻ trứng theo chu kỳ tại ổ, mỗi chuồng gà tối đa 5 con. Bò cho sữa mỗi 45 giây, cừu cho len mỗi 60 giây. Heo cho thịt một lần. Bảng P bán 10 thức ăn giá 50 xu, xây thêm chuồng bò/cừu và nâng cấp chuồng. Nâng cấp chuồng bò, cừu, heo tăng sức chứa; nâng chuồng gà rút ngắn chu kỳ đẻ, vẫn giữ tối đa 5 con. Mở shop từ nút trong túi đồ để mua chuồng gà thứ hai.
 
 Nhấn M để mở xưởng, hoặc đến bốn máy gần quầy shop và nhấn E. Công thức nằm trong `Assets/StreamingAssets/recipes.json`; mỗi máy có hàng đợi tối đa 5 lượt, nguyên liệu được trừ khi xếp việc và thành phẩm vào túi khi hết thời gian. Giá bán mỗi thành phẩm cao hơn tổng giá nguyên liệu:
 
@@ -37,20 +38,22 @@ Nhấn M để mở xưởng, hoặc đến bốn máy gần quầy shop và nh�
 | Lò bánh | 2 bột mì → 1 bánh mì | 35 giây | 65 xu |
 | Thùng ủ | 2 sữa → 1 phô mai | 40 giây | 65 xu |
 | Máy ép | 3 táo → 2 nước táo | 30 giây | 70 xu |
-| Xưởng cưa | 2 gỗ → 1 ván | 45 giây | 34 xu |
+| Xưởng cưa | 2 khối gỗ → 1 ván | 45 giây | 34 xu |
 | Lò nung | 2 quặng → 1 kim loại | 55 giây | 50 xu |
 
-Bàn chế tạo và hộp thư nằm trước nhà. Bàn ghép tức thì Bó nông sản, Gói đậu, Giỏ táo và Đèn thủ công theo `Assets/StreamingAssets/crafting.json`. Hộp thư tạo hai đơn phù hợp tiến độ mỗi ngày; giao đủ một lần nhận 150% giá thường và XP. Có thể đổi một đơn sau mỗi 5 phút chơi thực tế; đồng hồ đổi đơn dừng khi game tạm dừng. Hoàn thành tổng 2/4/6 đơn lần lượt mở bánh mì/phô mai/nước táo.
+Bàn chế tạo cố định và hộp thư nằm trước nhà. Bàn ghép tức thì Bó nông sản, Gói đậu, Giỏ táo, Đèn thủ công và Bàn chế tạo theo `Assets/StreamingAssets/crafting.json`. Hộp thư tạo hai đơn phù hợp tiến độ mỗi ngày; giao đủ một lần nhận 150% giá thường, XP và khối xây. Có thể đổi một đơn sau mỗi 5 phút chơi thực tế; đồng hồ đổi đơn dừng khi game tạm dừng. Hoàn thành tổng 2/4/6 đơn lần lượt mở bánh mì/phô mai/nước táo.
+
+Để xây, trồng cây táo rồi chọn ô 8 và dùng rìu để hạ cây lấy **6 khối gỗ**. Chọn ô 9 và dùng giỏ nếu chỉ muốn hái **5 táo**, cây vẫn còn. Dùng 5 khối gỗ chế tạo Bàn chế tạo, vào G và đặt bàn trước; sau đó có thể đặt khối gỗ, đá, gạch, kính, kim loại hoặc cỏ trên mọi đảo. Khối đá lấy ở mỏ; các loại khác đến từ shop, đơn hàng và chế biến. Tháo khối bằng chuột phải sẽ trả vật phẩm về túi. Chế độ sáng tạo vẫn phải có vật liệu, không tạo vật phẩm vô hạn.
 
 ## Ngày, mùa, bão và các đảo
 
 Đồng hồ trên HUD hiển thị năm, ngày, giờ, mùa và thời tiết. Mỗi mùa dài 28 ngày; lá và cỏ đổi màu theo mùa. Trời mưa hoặc bão tự tưới ruộng. Khi có bão, trả lời câu hỏi gia cố trong 25 giây: đúng thì không thiệt hại, sai hoặc hết giờ sẽ mất 30–80% nông sản và máy bị chậm. Từ 18:00 đến trước 06:00, vào nhà và nhấn E ở giường để ngủ đến sáng.
 
-Nhấn Tab hoặc dùng cổng để đi giữa **Đảo Nông Trại**, **Đảo Trung Tâm**, **Đảo Thần Bí** và **Đảo Công Nghiệp**. Đảo Trung Tâm có NPC để trò chuyện hai ngày rồi kết bạn, chợ đấu giá nông sản với người mua NPC và trò chơi ba rương. Đảo Thần Bí mở ở LV3, có mê cung, bẫy và di tích; đạt LV5 rồi giải câu đố tại di tích để mở giới hạn LV10 và lấy bản vẽ hiếm. Đảo Công Nghiệp mở ở LV4, có gỗ, quặng, xưởng cưa và lò nung; luyện kim cần bản vẽ từ di tích. Các hoạt động xã hội và đấu giá hiện hoạt động **chơi đơn với NPC**.
+Nhấn Tab hoặc dùng cổng để đi giữa **Đảo Nông Trại**, **Đảo Trung Tâm**, **Đảo Thần Bí** và **Đảo Công Nghiệp**. Đảo Trung Tâm có NPC để trò chuyện hai ngày rồi kết bạn, chợ đấu giá nông sản với người mua NPC và trò chơi ba rương. Đảo Thần Bí mở ở LV3, có mê cung, bẫy và di tích; đạt LV5 rồi giải câu đố tại di tích để mở giới hạn LV10 và lấy bản vẽ hiếm. Đảo Công Nghiệp mở ở LV4, có mỏ đá, quặng, xưởng cưa và lò nung; luyện kim cần bản vẽ từ di tích. Các hoạt động xã hội và đấu giá hiện hoạt động **chơi đơn với NPC**.
 
-Trong menu chính, **Chế độ sáng tạo** đọc một bản sao của bản lưu thủ công, tạm nâng nhân vật lên **LV99**, bật bay ngay và cho đi mọi đảo. F8 bật/tắt bay; WASD di chuyển, Space lên, Ctrl xuống và Shift bay nhanh. Chế độ này vẫn giữ va chạm, không cấp tiền/vật phẩm vô hạn, khóa nút Lưu game và bỏ thay đổi khi về menu hoặc thoát. Khi vào lại chế độ thường, cấp độ cũ trong bản lưu được khôi phục.
+Trong menu chính, **Chế độ sáng tạo** đọc một bản sao của bản lưu thủ công, tạm nâng nhân vật lên **LV99**, bật bay ngay và cho đi mọi đảo. F8 bật/tắt bay; WASD di chuyển, Space lên, X hoặc Ctrl xuống và Shift bay nhanh. HUD luôn hiện các phím bay khi đang bay. Chế độ này vẫn giữ va chạm, không cấp tiền/vật phẩm vô hạn, khóa nút Lưu game và bỏ thay đổi khi về menu hoặc thoát. Khi vào lại chế độ thường, cấp độ cũ trong bản lưu được khôi phục.
 
-Trong menu Esc, chỉ nút **Lưu game** ghi bản lưu khi chơi thường. Thoát game không tự lưu. Mở lại game tải bản lưu thủ công gần nhất. Loader vẫn đọc bản lưu v2–v4; bản v5 lưu thêm nước, trạm tưới, vật phẩm chế tạo, đơn hàng, thời gian đổi đơn và công thức đã mở. Đường dẫn lưu trên Windows: `%USERPROFILE%\AppData\LocalLow\Nong Trai Studio\Nong Trai - First Harvest\farm-manual-save.json`.
+Trong menu Esc, chỉ nút **Lưu game** ghi bản lưu khi chơi thường. Thoát game không tự lưu. Mở lại game tải bản lưu thủ công gần nhất. Loader vẫn đọc bản lưu v2–v5; bản v6 lưu thêm các khối đã đặt và tự đổi tài nguyên gỗ cũ thành khối gỗ. Đường dẫn lưu trên Windows: `%USERPROFILE%\AppData\LocalLow\Nong Trai Studio\Nong Trai - First Harvest\farm-manual-save.json`.
 
 ## Build lại
 

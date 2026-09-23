@@ -38,6 +38,12 @@ namespace NongTrai.Editor
                 Shape("Đầu NPC",PrimitiveType.Sphere,new Vector3(x,2.45f,-4),Vector3.one*.72f,cream,parent,false);
                 Shape("Mũ NPC",PrimitiveType.Sphere,new Vector3(x,2.2f,-4),new Vector3(1.2f,.4f,1.2f),wood,parent,false);
                 for(int side=-1;side<=1;side+=2)
+                {
+                    Shape("Mắt NPC",PrimitiveType.Sphere,new Vector3(x+side*.18f,2.52f,-4.66f),Vector3.one*.075f,Mat("NPC eyes","242321"),parent,false);
+                    Shape("Chân NPC",PrimitiveType.Capsule,new Vector3(x+side*.25f,.38f,-4),new Vector3(.28f,.48f,.30f),Mat("NPC pants","365F83"),parent,false);
+                    Shape("Giày NPC",PrimitiveType.Sphere,new Vector3(x+side*.25f,.08f,-4.13f),new Vector3(.34f,.20f,.48f),Mat("NPC shoes","302B29"),parent,false);
+                }
+                for(int side=-1;side<=1;side+=2)
                     Shape("Tay NPC",PrimitiveType.Capsule,new Vector3(x+side*.8f,1.25f,-4),new Vector3(.25f,.65f,.25f),cream,parent,false);
             }
             var auction=Box("Quầy đấu giá",new Vector3(193,1,10),new Vector3(4,2,2),wood,parent);
@@ -80,9 +86,9 @@ namespace NongTrai.Editor
             Box("Cột cần cẩu",new Vector3(588,3,8),new Vector3(.5f,6,.5f),metal,parent);
             Shape("Bánh răng trang trí",PrimitiveType.Cylinder,new Vector3(604,1.3f,14),new Vector3(1.5f,.25f,1.5f),gold,parent,false).transform.rotation=Quaternion.Euler(90,0,0);
             Sign(parent,new Vector3(600,0,-13),"Đảo Công Nghiệp","Xưởng cưa và lò nung chế tác vật liệu. Lò nung cần bản vẽ di tích.");
-            Resource(parent,new Vector3(-29,.8f,-16),12,0,wood);
+            Resource(parent,new Vector3(-29,.8f,-16),21,0,stone);
             Resource(parent,new Vector3(30,.8f,-28),13,1,metal);
-            Resource(parent,new Vector3(389,.8f,16),12,2,wood);
+            Resource(parent,new Vector3(389,.8f,16),21,2,stone);
             Resource(parent,new Vector3(411,.8f,17),13,3,metal);
         }
         static void Portal(Transform parent,Vector3 point,int destination,string label,Material material)
@@ -102,13 +108,11 @@ namespace NongTrai.Editor
         }
         static void Resource(Transform parent,Vector3 point,int item,int id,Material material)
         {
-            var root=Pivot(item==12?"Đống gỗ minh họa":"Mỏ quặng minh họa",parent,point);
-            if(item==12)
+            var root=Pivot(item==21?"Mỏ đá xây dựng":"Mỏ quặng minh họa",parent,point);
+            if(item==21)
             {
-                for(int i=0;i<4;i++)
-                { var log=Shape("Khúc gỗ",PrimitiveType.Cylinder,new Vector3((i%2-.5f)*1.1f,(i/2)*.65f,0),
-                    new Vector3(.55f,1.25f,.55f),material,root);log.transform.rotation=Quaternion.Euler(90,0,0); }
-                Shape("Lá trên gỗ",PrimitiveType.Sphere,new Vector3(0,1.5f,0),new Vector3(1.2f,.35f,.7f),leaves,root,false);
+                for(int i=0;i<6;i++) Shape("Đá xây dựng",PrimitiveType.Sphere,
+                    new Vector3((i%3-1)*.75f,(i/3)*.62f,(i%2-.5f)*.65f),new Vector3(.82f,.72f,.78f),material,root);
             }
             else
             {
@@ -117,7 +121,7 @@ namespace NongTrai.Editor
                     new Vector3(.72f,1.05f,.72f),i%2==0?material:gold,root);
             }
             var resource=root.gameObject.AddComponent<ResourceNode>();resource.id=id;resource.item=item;
-            Sign(parent,point+new Vector3(0,-.8f,-2.2f),item==12?"GỖ":"QUẶNG","Đến gần và nhấn E để thu thập 2 đơn vị.");
+            Sign(parent,point+new Vector3(0,-.8f,-2.2f),item==21?"MỎ ĐÁ":"QUẶNG","Đến gần và nhấn E để thu thập 2 đơn vị.");
         }
     }
 }
