@@ -378,7 +378,7 @@ namespace NongTrai.Editor
                 scenes = new[] { Root + "Scenes/Farm.unity" },
                 locationPathName = "Builds/Windows/NongTrai.exe",
                 target = BuildTarget.StandaloneWindows64,
-                options = BuildOptions.Development
+                options = BuildOptions.None
             });
             if (result.summary.result != BuildResult.Succeeded)
                 throw new System.Exception("Windows build failed: " + result.summary.result);
