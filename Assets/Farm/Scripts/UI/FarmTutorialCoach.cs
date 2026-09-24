@@ -12,7 +12,7 @@ namespace NongTrai
         readonly string[] titles={"1/7 • DI CHUYỂN","2/7 • CHỌN DỤNG CỤ","3/7 • TRỒNG CÂY","4/7 • NƯỚC & VẬT NUÔI",
             "5/7 • CHẾ TẠO & ĐƠN HÀNG","6/7 • KHÁM PHÁ & XÂY DỰNG","7/7 • LƯU TIẾN ĐỘ"};
         readonly string[] steps={
-            "WASD đi, chuột nhìn quanh, Space nhảy. Dấu + ở giữa màn hình là vị trí tương tác. Esc mở menu.",
+            "WASD đi, chuột nhìn quanh, Space nhảy. Dấu + ở giữa màn hình là vị trí tương tác. E mở bản đồ việc cần làm; Esc mở menu.",
             "B mở túi. Kéo vật phẩm vào 9 ô dưới cùng; bấm 1–9 hoặc lăn chuột để đổi nhanh. Tên món đang cầm hiện ở đáy màn hình.",
             "Chọn ô 5 Cuốc rồi ngắm ô đất, bấm chuột trái. Chọn hạt ô 1–3 và bấm trái để gieo; ô 7 Liềm dùng khi cây chín.",
             "Chọn ô 6 Bình tưới, tới hồ nạp nước rồi tưới bằng chuột trái. Nếu thú đói, bảng bên trái báo số con; ngắm thú và nhấn F để cho ăn.",

@@ -233,6 +233,14 @@ namespace NongTrai
                 var wild=hit.collider.GetComponentInParent<WildAnimal>();
                 if(wild!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
                 {if(entityTarget!=wild.GetInstanceID()){entityTarget=wild.GetInstanceID();hold=0;}breakDuration=.5f;miningHint=wild.Status;hasTarget=true;if(pressed){hold+=elapsed;if(hold>=.5f){wild.Hit();hold=0;}}else hold=0;return false;}
+                var chest=hit.collider.GetComponentInParent<FarmChest>();
+                if(chest!=null&&chest.isExploration&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
+                {
+                    if(entityTarget!=chest.GetInstanceID()){entityTarget=chest.GetInstanceID();hold=0;}
+                    breakDuration=.8f;hasTarget=true;hold=pressed?hold+elapsed:0;
+                    miningHint="Rương ẩn • Chuột phải mở • Giữ trái phá: "+Mathf.Min(100,Mathf.FloorToInt(hold/.8f*100))+"%";
+                    if(hold>=.8f){hold=0;chest.BreakExploration();return true;}return false;
+                }
                 var placed=hit.collider.GetComponentInParent<PlacedBlock>();
                 if(placed!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
                 {

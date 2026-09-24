@@ -25,7 +25,30 @@ namespace NongTrai
         public float EggProgress { get; private set; }
         FarmPlayer player;
 
-        void Start() => player = FindFirstObjectByType<FarmPlayer>();
+        void Start() { player = FindFirstObjectByType<FarmPlayer>();CreateRestSpots(); }
+        public Vector3 RestPointFor(FarmAnimal animal)
+        {
+            int slot=Mathf.Abs(animal.GetInstanceID())%3;
+            return new Vector3(Mathf.Lerp(minimum.x+.6f,maximum.x-.6f,(slot+.5f)/3f),animal.transform.position.y,maximum.y-.65f);
+        }
+        void CreateRestSpots()
+        {
+            if(species==AnimalSpecies.Chicken)return;
+            for(int i=0;i<3;i++)
+            {
+                var spot=GameObject.CreatePrimitive(PrimitiveType.Cube);spot.name="Ổ nằm "+FarmBarnMenu.SpeciesName(species)+" "+(i+1);
+                spot.transform.SetParent(transform,false);
+                spot.transform.position=new Vector3(Mathf.Lerp(minimum.x+.6f,maximum.x-.6f,(i+.5f)/3f),.12f,maximum.y-.65f);
+                spot.transform.localScale=new Vector3(1.5f,.24f,1.1f);
+                var material=new Material(Shader.Find("Universal Render Pipeline/Lit"));material.color=new Color(.80f,.63f,.31f);spot.GetComponent<Renderer>().material=material;
+                spot.AddComponent<AnimalRestSpot>().pen=this;
+                var sign=GameObject.CreatePrimitive(PrimitiveType.Cube);sign.name="Bảng lấy sản phẩm "+(i+1);sign.transform.SetParent(transform,false);
+                sign.transform.position=spot.transform.position+new Vector3(0,.72f,-.58f);
+                sign.transform.localScale=new Vector3(.48f,.65f,.22f);
+                var signMaterial=new Material(Shader.Find("Universal Render Pipeline/Lit"));signMaterial.color=new Color(.46f,.27f,.13f);sign.GetComponent<Renderer>().material=signMaterial;
+                sign.AddComponent<AnimalRestSpot>().pen=this;
+            }
+        }
         public bool Contains(Vector3 point) => point.x > minimum.x && point.x < maximum.x
             && point.z > minimum.y && point.z < maximum.y;
         public int AnimalCount()

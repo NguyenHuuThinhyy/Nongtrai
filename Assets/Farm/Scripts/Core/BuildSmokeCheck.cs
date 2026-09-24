@@ -94,6 +94,12 @@ namespace NongTrai
             Capture(path, hud, Camera.main);
             if(FarmTutorialCoach.Instance==null)throw new InvalidOperationException("Beginner guide missing.");
             FarmTutorialCoach.Instance.Restore(true);
+            var taskMap=FarmNoticeBoard.Instance;
+            if(taskMap==null)throw new InvalidOperationException("Task map missing.");
+            taskMap.Open();
+            if(!taskMap.IsOpen||!player.Paused)throw new InvalidOperationException("E task map did not open with cursor.");
+            Capture(Path.Combine(Path.GetDirectoryName(path),"task-map-preview.png"),hud,Camera.main);
+            taskMap.Close();
             var animals = FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None);
             if (animals.Length != 6) throw new InvalidOperationException("Expected six animals.");
             float[] travelled = new float[animals.Length];
@@ -173,6 +179,7 @@ namespace NongTrai
             var cow=FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None);
             FarmAnimal milkCow=null, sheep=null, pig=null, chicken=null;
             foreach(var a in cow) { if(a.species==AnimalSpecies.Cow) milkCow=a; if(a.species==AnimalSpecies.Sheep) sheep=a; if(a.species==AnimalSpecies.Pig) pig=a; if(a.species==AnimalSpecies.Chicken) chicken=a; }
+            milkCow.RestoreCooldown(0);sheep.RestoreCooldown(0);pig.RestoreCooldown(0);
             milkCow.TryCollect(inventory,out _); milkCow.TryCollect(inventory,out _);
             sheep.TryCollect(inventory,out _); sheep.TryCollect(inventory,out _);
             if(inventory.Count(5)!=3 || inventory.Count(6)!=2) throw new InvalidOperationException("Milk/wool cooldown failed.");
@@ -260,7 +267,7 @@ namespace NongTrai
             water.Open();if(!player.Paused || !water.Panel.activeSelf) throw new InvalidOperationException("Water modal failed to open.");
             hud.Resume();if(water.Panel.activeSelf) throw new InvalidOperationException("Water modal did not close with resume/ESC flow.");
             orders.OpenCraft();if(!player.Paused || !orders.CraftPanel.activeSelf) throw new InvalidOperationException("Craft modal failed to open.");
-            if(orders.Recipes.Length!=13)throw new InvalidOperationException("Expanded JSON crafting book missing.");
+            if(orders.Recipes.Length!=15)throw new InvalidOperationException("Expanded JSON crafting book missing.");
             Capture(Path.Combine(folder,"craft-preview.png"),hud,camera);
             hud.Resume();if(orders.CraftPanel.activeSelf) throw new InvalidOperationException("Craft modal did not close with resume/ESC flow.");
             var beforeCraftRay=player.transform.position;
@@ -343,6 +350,23 @@ namespace NongTrai
             building.Toggle();
             building.Restore(new BuildingState{blocks=new[]{new PlacedBlockRecord{type=0,position=new Vector3(205,.5f,18),euler=Vector3.zero}}});
             if(building.Snapshot().blocks.Length!=1) throw new InvalidOperationException("Placeable block restore failed.");
+            building.Restore(new BuildingState{blocks=new[]{new PlacedBlockRecord{type=12,position=new Vector3(5,.5f,-35),euler=Vector3.zero}}});
+            if(!AdventureWolves.Instance.IsSafe(new Vector3(5,.5f,-35)))throw new InvalidOperationException("Campfire did not repel wolves.");
+            building.Restore(new BuildingState{blocks=new[]{new PlacedBlockRecord{type=0,position=new Vector3(205,.5f,18),euler=Vector3.zero}}});
+            var store=FarmStorage.Instance;
+            if(store==null||orders.Orders.Length!=5||AdventureWolves.Instance==null)
+                throw new InvalidOperationException("Five orders, storage or wolf system missing.");
+            var orderItems=new System.Collections.Generic.HashSet<int>();
+            foreach(var order in orders.Orders)
+                if(order.remaining<=0||order.difficulty<1||order.difficulty>5||!orderItems.Add(order.item))
+                    throw new InvalidOperationException("Order variety, difficulty or deadline failed.");
+            orders.OpenMail();Capture(Path.Combine(folder,"mail-preview.png"),hud,camera);hud.Resume();
+            int stored=store.Warehouse[0];inventory.Add(0,3);
+            if(!store.Transfer(0,3,true)||store.Warehouse[0]!=stored+3||!store.Transfer(0,3,false)||store.Warehouse[0]!=stored)
+                throw new InvalidOperationException("Warehouse transfer failed.");
+            var testChest=FarmChest.Create(new Vector3(5,1,-35),true,"smoke",new int[38]);
+            testChest.items[20]=3;testChest.BreakExploration();
+            if(testChest.items[20]!=0)throw new InvalidOperationException("Broken chest did not drop its contents.");
             if(!orders.Reroll(0) || orders.RerollRemaining<=0)
                 throw new InvalidOperationException("Order reroll cooldown failed.");
             for(int i=0;i<orders.Orders.Length;i++)
@@ -351,12 +375,13 @@ namespace NongTrai
                 throw new InvalidOperationException("Order recipe unlock failed.");
             save.pathOverride=Path.Combine(Application.temporaryCachePath,"farm-expansion-smoke-save.json");
             int savedLevel=progress.Level,savedFeed=shop.FeedStock,savedStation=water.StationWater[0],savedOrders=orders.CompletedOrders;
+            store.Warehouse[20]=4;
             if(!save.Save()) throw new InvalidOperationException("Expansion save failed.");
             progress.Restore(1,0,1,0,null,null);shop.AddFeed(9);
-            water.Restore(null);orders.Restore(null,false);building.Restore(null);
+            water.Restore(null);orders.Restore(null,false);building.Restore(null);store.Restore(null);
             if(!save.Load() || progress.Level!=savedLevel || !progress.UnlockedRegions[1] ||
                 progress.ToolRadius(0)!=3 || shop.FeedStock!=savedFeed || water.StationWater[0]!=savedStation ||
-                orders.CompletedOrders!=savedOrders || building.Snapshot().blocks.Length!=1)
+                orders.CompletedOrders!=savedOrders || building.Snapshot().blocks.Length!=1 || store.Warehouse[20]!=4)
                 throw new InvalidOperationException("Expansion save did not restore state.");
             File.Delete(save.SavePath);
             if(File.Exists(save.SavePath+".bak")) File.Delete(save.SavePath+".bak");
@@ -481,7 +506,7 @@ namespace NongTrai
             string modernSave=File.ReadAllText(save.SavePath);
             player.Teleport(new Vector3(200,.4f,-20));
             if(!save.Save())throw new InvalidOperationException("Migration fixture save failed.");
-            string oldSave=File.ReadAllText(save.SavePath).Replace("\"version\": 10","\"version\": 7");
+            string oldSave=File.ReadAllText(save.SavePath).Replace("\"version\": 11","\"version\": 7");
             File.WriteAllText(save.SavePath,oldSave);
             if(!save.Load()||Mathf.Abs(player.transform.position.y-1000.4f)>1)throw new InvalidOperationException("Legacy player position migration failed.");
             File.WriteAllText(save.SavePath,modernSave);if(!save.Load())throw new InvalidOperationException("Modern restore failed.");

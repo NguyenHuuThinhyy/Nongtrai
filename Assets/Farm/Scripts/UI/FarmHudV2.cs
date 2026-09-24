@@ -77,6 +77,8 @@ namespace NongTrai
                 tile.AddComponent<FarmTooltipTrigger>().Initialize(this,names[i]);
             }
             displayedMoney=shop.Money;Select(0);
+            hud.gameObject.AddComponent<FarmStorage>();
+            hud.gameObject.AddComponent<AdventureWolves>();
             hud.gameObject.AddComponent<FarmNoticeBoard>().Initialize(hud,root.transform);
             hud.gameObject.AddComponent<FarmTutorialCoach>().Initialize(hud,root.transform);
         }
@@ -144,7 +146,7 @@ namespace NongTrai
             if(CreativeModeManager.IsCreative) environmentText.text+=" • SÁNG TẠO"+(CreativeModeManager.IsFlying?" • ĐANG BAY":"");
             creativeControls.text=CreativeModeManager.IsCreative?
                 (CreativeModeManager.IsFlying?"ĐANG BAY • WASD di chuyển • SPACE lên • X xuống • SHIFT nhanh • F8 tắt bay":"SÁNG TẠO • F8 bật bay • [G] Xây dựng"):
-                "[B] Túi đồ • [G] Xây dựng • Lăn chuột đổi vật phẩm";
+                "[E] Bản đồ việc • [B] Túi đồ • [G] Xây dựng • Lăn chuột đổi vật phẩm";
             var bag=AdventureBag.Instance;
             if(bag!=null)
             {

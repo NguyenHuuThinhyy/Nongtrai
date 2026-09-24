@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace NongTrai
 {
-    [Serializable] public sealed class PlacedBlockRecord { public int type;public Vector3 position,euler; }
+    [Serializable] public sealed class PlacedBlockRecord { public int type;public Vector3 position,euler;public int[] chestItems; }
     [Serializable] public sealed class BuildingState { public PlacedBlockRecord[] blocks; }
 
     public sealed class FarmBuildingSystem : MonoBehaviour
@@ -19,12 +19,12 @@ namespace NongTrai
         public int SelectedType { get; private set; }
         public bool HasPlacedTable { get { foreach(var b in placed) if(b!=null && b.type==6) return true;return false; } }
         public const int FirstBlockItem=20;
-        static readonly int[] blockItems={20,21,22,23,24,25,26,28,29,30,31};
+        static readonly int[] blockItems={20,21,22,23,24,25,26,28,29,30,31,36,37};
         public static int TypeForItem(int item){for(int i=0;i<blockItems.Length;i++)if(blockItems[i]==item)return i;return -1;}
         public static int ItemForType(int type)=>type>=0&&type<blockItems.Length?blockItems[type]:-1;
-        readonly string[] names={"Khối gỗ","Khối đá","Khối gạch","Khối kính","Khối kim loại","Khối cỏ","Bàn chế tạo","Bậc gỗ","Đuốc","Hàng rào","Ván cầu"};
+        readonly string[] names={"Khối gỗ","Khối đá","Khối gạch","Khối kính","Khối kim loại","Khối cỏ","Bàn chế tạo","Bậc gỗ","Đuốc","Hàng rào","Ván cầu","Rương đồ","Đống lửa"};
         readonly Color[] colors={new Color(.55f,.31f,.14f),new Color(.47f,.51f,.53f),new Color(.68f,.25f,.18f),
-            new Color(.38f,.78f,.88f,.62f),new Color(.55f,.62f,.66f),new Color(.33f,.65f,.22f),new Color(.45f,.27f,.13f),new Color(.6f,.38f,.19f),new Color(1,.75f,.3f),new Color(.49f,.27f,.12f),new Color(.66f,.42f,.2f)};
+            new Color(.38f,.78f,.88f,.62f),new Color(.55f,.62f,.66f),new Color(.33f,.65f,.22f),new Color(.45f,.27f,.13f),new Color(.6f,.38f,.19f),new Color(1,.75f,.3f),new Color(.49f,.27f,.12f),new Color(.66f,.42f,.2f),new Color(.42f,.25f,.13f),new Color(1,.51f,.16f)};
         readonly List<PlacedBlock> placed=new List<PlacedBlock>();
         GameObject overlay,preview;TMP_Text title;Image[] slots;float rotation;
 
@@ -33,13 +33,13 @@ namespace NongTrai
         void OnDestroy(){if(Instance==this)Instance=null;}
         void CreateHud()
         {
-            overlay=FarmUi.Panel(hud.gameplayChrome.transform,"Chế độ xây dựng",new Vector2(900,175));
+            overlay=FarmUi.Panel(hud.gameplayChrome.transform,"Chế độ xây dựng",new Vector2(1100,175));
             var r=overlay.GetComponent<RectTransform>();r.anchorMin=r.anchorMax=r.pivot=new Vector2(.5f,1);r.anchoredPosition=new Vector2(0,-245);
-            title=FarmUi.TmpLabel(overlay.transform,"",new Vector2(18,-10),new Vector2(860,38),21);
+            title=FarmUi.TmpLabel(overlay.transform,"",new Vector2(18,-10),new Vector2(1060,38),21);
             slots=new Image[names.Length];
             for(int i=0;i<names.Length;i++)
             {
-                int type=i;var button=FarmUi.Button(overlay.transform,"",new Vector2(8+i*80,-54),new Vector2(76,104),()=>Select(type));
+                int type=i;var button=FarmUi.Button(overlay.transform,"",new Vector2(8+i*83,-54),new Vector2(76,104),()=>Select(type));
                 button.GetComponentInChildren<Text>().enabled=false;
                 slots[i]=button.GetComponent<Image>();
                 var pic=new GameObject("Icon "+names[i],typeof(RectTransform),typeof(Image));var pr=pic.GetComponent<RectTransform>();
@@ -125,13 +125,14 @@ namespace NongTrai
         {
             if(!Target(out var hit))return;var block=hit.collider.GetComponentInParent<PlacedBlock>();if(block==null)return;
             bool removedTable=block.type==6;
+            block.GetComponentInChildren<FarmChest>()?.DropContents();
             inventory.Add(ItemForType(block.type),1);placed.Remove(block);Destroy(block.gameObject);
             if(removedTable && !HasPlacedTable) Select(6);
             hud.Notify("Đã tháo "+names[block.type]+" và trả vào túi.");
         }
         public bool BreakPlaced(PlacedBlock block,bool drop)
-        {if(block==null||!placed.Remove(block))return false;if(drop)WorldPickup.Spawn(ItemForType(block.type),1,block.transform.position);block.gameObject.SetActive(false);Destroy(block.gameObject);return true;}
-        PlacedBlock Create(int type,Vector3 position,Vector3 euler)
+        {if(block==null||!placed.Remove(block))return false;block.GetComponentInChildren<FarmChest>()?.DropContents();if(drop||block.type==11)WorldPickup.Spawn(ItemForType(block.type),1,block.transform.position);block.gameObject.SetActive(false);Destroy(block.gameObject);return true;}
+        PlacedBlock Create(int type,Vector3 position,Vector3 euler,int[] chestItems=null)
         {
             GameObject root=new GameObject("Khối xây • "+names[type]);root.transform.SetPositionAndRotation(position,Quaternion.Euler(euler));
             var block=root.AddComponent<PlacedBlock>();block.type=type;placed.Add(block);
@@ -151,6 +152,16 @@ namespace NongTrai
             }
             else if(type==9){for(int x=-1;x<=1;x+=2)Part(root.transform,"Cọc hàng rào",new Vector3(x*.42f,0,0),new Vector3(.14f,1.1f,.14f),colors[type]);for(int y=-1;y<=1;y+=2)Part(root.transform,"Thanh chắn",new Vector3(0,y*.25f,0),new Vector3(1,.12f,.12f),colors[type]);}
             else if(type==10)Part(root.transform,"Mặt cầu",new Vector3(0,-.38f,0),new Vector3(1.4f,.18f,2),colors[type]);
+            else if(type==11)
+            {var chest=FarmChest.Create(position,false,"",chestItems==null?new int[38]:(int[])chestItems.Clone());chest.transform.SetParent(root.transform,true);}
+            else if(type==12)
+            {
+                for(int i=0;i<6;i++){float angle=i*Mathf.PI/3;Part(root.transform,"Vòng đá",new Vector3(Mathf.Cos(angle)*.36f,-.35f,Mathf.Sin(angle)*.36f),new Vector3(.27f,.24f,.27f),colors[1]);}
+                Part(root.transform,"Củi cháy",new Vector3(0,-.18f,0),new Vector3(.65f,.16f,.28f),colors[0]);
+                var flame=GameObject.CreatePrimitive(PrimitiveType.Sphere);flame.name="Ngọn lửa";flame.transform.SetParent(root.transform,false);flame.transform.localPosition=new Vector3(0,.12f,0);flame.transform.localScale=new Vector3(.43f,.75f,.43f);
+                Destroy(flame.GetComponent<Collider>());var material=new Material(Shader.Find("Universal Render Pipeline/Lit"));material.color=colors[type];flame.GetComponent<Renderer>().material=material;
+                var light=new GameObject("Vùng sáng an toàn").AddComponent<Light>();light.transform.SetParent(root.transform,false);light.transform.localPosition=Vector3.up*.4f;light.type=LightType.Point;light.range=9;light.intensity=3;light.color=new Color(1,.57f,.24f);
+            }
             else Part(root.transform,names[type],Vector3.zero,Vector3.one,colors[type]);
             return block;
         }
@@ -159,13 +170,14 @@ namespace NongTrai
          var material=new Material(Shader.Find("Universal Render Pipeline/Lit"));material.color=color;go.GetComponent<Renderer>().material=material;}
         public BuildingState Snapshot()
         {
-            var records=new List<PlacedBlockRecord>();foreach(var block in placed)if(block!=null)records.Add(new PlacedBlockRecord{type=block.type,position=block.transform.position,euler=block.transform.eulerAngles});
+            var records=new List<PlacedBlockRecord>();foreach(var block in placed)if(block!=null)records.Add(new PlacedBlockRecord{type=block.type,position=block.transform.position,euler=block.transform.eulerAngles,
+                chestItems=block.GetComponentInChildren<FarmChest>()==null?null:(int[])block.GetComponentInChildren<FarmChest>().items.Clone()});
             return new BuildingState{blocks=records.ToArray()};
         }
         public void Restore(BuildingState state)
         {
             foreach(var block in placed)if(block!=null)Destroy(block.gameObject);placed.Clear();
-            if(state?.blocks!=null)foreach(var record in state.blocks)if(record.type>=0&&record.type<names.Length)Create(record.type,record.position,record.euler);
+            if(state?.blocks!=null)foreach(var record in state.blocks)if(record.type>=0&&record.type<names.Length)Create(record.type,record.position,record.euler,record.chestItems);
         }
     }
     public sealed class PlacedBlock:MonoBehaviour{public int type;}

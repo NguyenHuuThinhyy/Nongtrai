@@ -60,8 +60,8 @@ namespace NongTrai
                 new Color(.59f,.43f,.26f),new Color(.42f,.49f,.56f)};
             for(int i=0;i<names.Length;i++)
             {
-                var go=new GameObject(names[i]+" - nhấn E");
-                go.name=names[i]+" - nhấn E";
+                var go=new GameObject(names[i]+" - click trái");
+                go.name=names[i]+" - click trái";
                 go.transform.position=i<4?new Vector3(-16+i*2.5f,.85f,12):new Vector3(-16+(i-4)*4,.85f,7);
                 var collider=go.AddComponent<BoxCollider>();collider.size=new Vector3(1.8f,1.8f,1.7f);
                 var machine=go.AddComponent<ProcessingMachine>();machine.processing=this;machine.recipeIndex=i;
@@ -95,7 +95,7 @@ namespace NongTrai
                   MachinePart(go.transform,"Lửa lò",PrimitiveType.Sphere,new Vector3(0,-.18f,-.83f),new Vector3(.52f,.58f,.12f),new Color(1,.42f,.07f)); }
                 var labelObject=new GameObject("Tên máy",typeof(TextMeshPro));labelObject.transform.SetParent(go.transform,false);
                 labelObject.transform.localPosition=new Vector3(0,2.15f,0);labelObject.transform.localScale=Vector3.one*.30f;
-                var label=labelObject.GetComponent<TextMeshPro>();label.font=FarmUi.Font;label.text=names[i].ToUpper()+"  [E]";
+                var label=labelObject.GetComponent<TextMeshPro>();label.font=FarmUi.Font;label.text=names[i].ToUpper()+"  [CLICK TRÁI]";
                 label.fontSize=5;label.alignment=TextAlignmentOptions.Center;label.color=Color.white;
                 label.outlineColor=Color.black;label.outlineWidth=.2f;label.rectTransform.sizeDelta=new Vector2(8,1.5f);
                 label.text=names[i].ToUpper()+"  [CHUỘT TRÁI]";machine.worldLabel=labelObject.transform;

@@ -14,6 +14,8 @@ namespace NongTrai
     {
         public int item,count,reward;
         public bool completed;
+        public int difficulty;
+        public float remaining;
     }
     [Serializable] public sealed class OrderSystemState
     {
@@ -36,7 +38,12 @@ namespace NongTrai
         public GameObject CraftPanel { get; private set; }
         public GameObject MailPanel { get; private set; }
         Text craftStatus,mailStatus;
-        int orderDay,rerollNonce;
+        TextMeshProUGUI detail;
+        TextMeshProUGUI[] orderLabels=new TextMeshProUGUI[5];
+        Image[] orderIcons=new Image[5];
+        int orderDay,rerollNonce,selectedOrder;
+        string mailMessage="Chọn một đơn để xem hàng đang có và giao hoặc đổi.";
+        public int SelectedOrder=>selectedOrder;
 
         void Awake() => Instance=this;
         void Start()
@@ -50,8 +57,17 @@ namespace NongTrai
         { if(!paused) { if(CraftPanel!=null) CraftPanel.SetActive(false);if(MailPanel!=null) MailPanel.SetActive(false); } }
         void Update()
         {
-            if(hud==null || hud.player.Paused || RerollRemaining<=0) return;
+            if(hud==null || hud.player.Paused) return;
             RerollRemaining=Mathf.Max(0,RerollRemaining-Time.deltaTime);
+            for(int i=0;i<Orders.Length;i++)
+            {
+                if(Orders[i].completed)continue;
+                Orders[i].remaining=Mathf.Max(0,Orders[i].remaining-Time.deltaTime);
+                if(Orders[i].remaining>0)continue;
+                int previous=Orders[i].item;rerollNonce++;
+                Orders[i]=CreateOrder(i,previous,orderDay*11717+rerollNonce*101,UsedItems(i));
+                hud.Notify("Đơn "+(i+1)+" hết hạn; hộp thư đã nhận đơn mới.");
+            }
             if(MailPanel!=null && MailPanel.activeSelf) RefreshMail();
         }
         void LoadRecipes()
@@ -88,18 +104,23 @@ namespace NongTrai
             FarmUi.Label(CraftPanel.transform,"ESC để đóng",new Vector2(900,-22),new Vector2(170,35),17);
             CraftPanel.SetActive(false);
 
-            MailPanel=FarmUi.Panel(hud.transform,"Hộp thư giao hàng",new Vector2(1040,760));
-            FarmUi.TmpLabel(MailPanel.transform,"HỘP THƯ • ĐƠN HÀNG HÔM NAY",new Vector2(30,-22),new Vector2(980,55),30);
-            mailStatus=FarmUi.Label(MailPanel.transform,"",new Vector2(30,-83),new Vector2(980,150),21);
-            FarmItemIconLibrary.Attach(MailPanel.transform,16,new Vector2(920,-176),new Vector2(66,66));
-            FarmUi.Button(MailPanel.transform,"Giao đơn 1",new Vector2(30,-265),new Vector2(470,65),()=>Deliver(0));
-            FarmUi.Button(MailPanel.transform,"Đổi đơn 1",new Vector2(520,-265),new Vector2(490,65),()=>Reroll(0));
-            FarmUi.Button(MailPanel.transform,"Giao đơn 2",new Vector2(30,-350),new Vector2(470,65),()=>Deliver(1));
-            FarmUi.Button(MailPanel.transform,"Đổi đơn 2",new Vector2(520,-350),new Vector2(490,65),()=>Reroll(1));
-            FarmUi.Label(MailPanel.transform,"Đơn chưa giao sẽ hết hạn vào ngày kế tiếp. Đổi đơn dùng chung thời gian chờ 5 phút chơi.",
-                new Vector2(30,-465),new Vector2(980,75),19);
-            FarmUi.Button(MailPanel.transform,"Trở lại game",new Vector2(30,-650),new Vector2(980,55),hud.Resume);
-            FarmUi.Label(MailPanel.transform,"ESC để đóng",new Vector2(835,-22),new Vector2(160,35),17);
+            MailPanel=FarmUi.Panel(hud.transform,"Hộp thư giao hàng",new Vector2(1120,910));
+            FarmUi.TmpLabel(MailPanel.transform,"BẢNG ĐI ĐƠN • 5 CHUYẾN HÔM NAY",new Vector2(30,-20),new Vector2(1060,55),30);
+            mailStatus=FarmUi.Label(MailPanel.transform,"",new Vector2(30,-78),new Vector2(1050,55),19);
+            for(int i=0;i<5;i++)
+            {
+                int index=i;
+                var button=FarmUi.Button(MailPanel.transform,"",new Vector2(30,-145-i*95),new Vector2(1060,86),()=>SelectOrder(index));
+                button.GetComponentInChildren<Text>().enabled=false;
+                orderIcons[i]=FarmItemIconLibrary.Attach(button.transform,0,new Vector2(12,-11),new Vector2(64,64));
+                orderLabels[i]=FarmUi.TmpLabel(button.transform,"",new Vector2(90,-11),new Vector2(950,68),21);
+                orderLabels[i].alignment=TextAlignmentOptions.MidlineLeft;
+            }
+            detail=FarmUi.TmpLabel(MailPanel.transform,"",new Vector2(30,-633),new Vector2(1060,72),20);
+            FarmUi.Button(MailPanel.transform,"GIAO ĐƠN ĐÃ CHỌN",new Vector2(30,-715),new Vector2(500,58),()=>Deliver(selectedOrder));
+            FarmUi.Button(MailPanel.transform,"ĐỔI ĐƠN ĐÃ CHỌN",new Vector2(550,-715),new Vector2(540,58),()=>Reroll(selectedOrder));
+            FarmUi.Button(MailPanel.transform,"Trở lại game",new Vector2(30,-810),new Vector2(1060,55),hud.Resume);
+            FarmUi.Label(MailPanel.transform,"ESC để đóng",new Vector2(915,-22),new Vector2(170,35),17);
             MailPanel.SetActive(false);
         }
         string RecipeLabel(int index)
@@ -165,28 +186,35 @@ namespace NongTrai
         void GenerateOrders(int day)
         {
             orderDay=day;
-            Orders=new[]{CreateOrder(true,-1,day*92821+rerollNonce),CreateOrder(false,-1,day*39133+rerollNonce+7)};
+            var next=new DeliveryOrder[5];var used=new HashSet<int>();
+            for(int i=0;i<5;i++){next[i]=CreateOrder(i,-1,day*92821+i*39133+rerollNonce,used);used.Add(next[i].item);}
+            Orders=next;selectedOrder=0;
             RefreshMail();
         }
-        DeliveryOrder CreateOrder(bool craft,int excluded,int seed)
+        HashSet<int> UsedItems(int skip)
+        {var used=new HashSet<int>();for(int i=0;i<Orders.Length;i++)if(i!=skip)used.Add(Orders[i].item);return used;}
+        DeliveryOrder CreateOrder(int slot,int excluded,int seed,HashSet<int> used)
         {
             var pool=new List<int>();
+            bool craft=slot%2==0;
             if(craft)
             {
                 for(int i=0;i<Recipes.Length;i++) if(CraftUnlocked(i) && Recipes[i].output!=excluded &&
-                    (Recipes[i].output<20||Recipes[i].output>=32) && CanMake(Recipes[i])) pool.Add(Recipes[i].output);
+                    (Recipes[i].output<20||Recipes[i].output>=32) && CanMake(Recipes[i]) && !used.Contains(Recipes[i].output)) pool.Add(Recipes[i].output);
             }
             else
             {
                 int[] candidates={0,1,2,4,5,6,8,9,10,11};
-                foreach(int item in candidates) if(item!=excluded && CanRequest(item)) pool.Add(item);
+                foreach(int item in candidates) if(item!=excluded && CanRequest(item)&&!used.Contains(item)) pool.Add(item);
             }
+            if(pool.Count==0)for(int i=0;i<20;i++)if(i!=excluded&&!used.Contains(i)&&inventory.Price(i)>0)pool.Add(i);
             if(pool.Count==0) pool.Add(craft?16:0);
             var random=new System.Random(seed);
             int selected=pool[random.Next(pool.Count)];
-            int count=craft?1+random.Next(2):2+random.Next(4);
-            int reward=Mathf.CeilToInt(inventory.Price(selected)*count*1.5f);
-            return new DeliveryOrder { item=selected,count=count,reward=reward };
+            int difficulty=slot+1;
+            int count=craft?1+slot/2+random.Next(2):2+slot+random.Next(3);
+            int reward=Mathf.CeilToInt(inventory.Price(selected)*count*(1.5f+difficulty*.12f));
+            return new DeliveryOrder { item=selected,count=count,reward=reward,difficulty=difficulty,remaining=540+slot*135 };
         }
         bool CanRequest(int item)
         {
@@ -205,7 +233,7 @@ namespace NongTrai
             var order=Orders[index];
             if(!inventory.Remove(order.item,order.count))
             { SayMail("Chưa đủ "+order.count+" "+inventory.Name(order.item)+" để giao.");return false; }
-            order.completed=true;CompletedOrders++;shop.Credit(order.reward);expansion.GainExperience(20+order.count*2);
+            order.completed=true;CompletedOrders++;shop.Credit(order.reward);expansion.GainExperience(20+order.count*2+order.difficulty*5);
             int blockReward=20+(CompletedOrders-1)%6;inventory.Add(blockReward,2);
             SayMail("Giao thành công: +"+order.reward+" xu và +2 "+inventory.Name(blockReward)+". Tổng đơn: "+CompletedOrders+".");
             FarmEffects.Burst(hud.player.transform.position+Vector3.up*2,"+"+order.reward+" xu",Color.yellow);
@@ -216,7 +244,7 @@ namespace NongTrai
             if(index<0 || index>=Orders.Length || Orders[index].completed) return false;
             if(RerollRemaining>0) { SayMail("Có thể đổi tiếp sau "+Mathf.CeilToInt(RerollRemaining)+" giây.");return false; }
             int previous=Orders[index].item;rerollNonce++;
-            Orders[index]=CreateOrder(index==0,previous,orderDay*11717+rerollNonce*101);
+            Orders[index]=CreateOrder(index,previous,orderDay*11717+rerollNonce*101,UsedItems(index));
             RerollRemaining=300;SayMail("Đã đổi đơn "+(index+1)+". Lần đổi tiếp theo sau 5 phút chơi.");return true;
         }
         public bool ProcessingUnlocked(string id)
@@ -234,8 +262,13 @@ namespace NongTrai
             rerollNonce=state==null?0:Mathf.Max(0,state.rerollNonce);
             RerollRemaining=state==null?0:Mathf.Max(0,state.rerollRemaining);
             int day=TimeManager.Instance==null?1:TimeManager.Instance.Day;
-            if(state!=null && state.orders!=null && state.orders.Length==2 && state.day==day)
-            { orderDay=state.day;Orders=CloneOrders(state.orders); }
+            if(state!=null && state.orders!=null && state.orders.Length>=2 && state.day==day)
+            { orderDay=state.day;Orders=new DeliveryOrder[5];var used=new HashSet<int>();
+              for(int i=0;i<5;i++)
+              {if(i<state.orders.Length){Orders[i]=CloneOrder(state.orders[i]);if(Orders[i].difficulty<=0)Orders[i].difficulty=i+1;
+                  if(Orders[i].remaining<=0&&!Orders[i].completed)Orders[i].remaining=540+i*135;}
+               else Orders[i]=CreateOrder(i,-1,day*92821+i*39133+rerollNonce,used);
+               used.Add(Orders[i].item);} }
             else GenerateOrders(day);
             FarmProcessing.Instance?.RefreshLocks();RefreshCraft();RefreshMail();
         }
@@ -243,22 +276,31 @@ namespace NongTrai
         {
             if(source==null) return Array.Empty<DeliveryOrder>();
             var result=new DeliveryOrder[source.Length];
-            for(int i=0;i<source.Length;i++) result[i]=new DeliveryOrder { item=source[i].item,count=source[i].count,
-                reward=source[i].reward,completed=source[i].completed };
+            for(int i=0;i<source.Length;i++) result[i]=CloneOrder(source[i]);
             return result;
         }
+        static DeliveryOrder CloneOrder(DeliveryOrder source)=>new DeliveryOrder {item=source.item,count=source.count,reward=source.reward,
+            completed=source.completed,difficulty=source.difficulty,remaining=source.remaining};
         void RefreshCraft()
         { if(craftStatus!=null){int opened=0;for(int i=0;i<Recipes.Length;i++)if(CraftUnlocked(i))opened++;craftStatus.text="Công thức mở: "+opened+"/"+Recipes.Length+" • Kéo danh sách để xem thêm • Gỗ từ cây táo bằng rìu.";} }
         void RefreshMail()
         {
-            if(mailStatus==null || Orders==null || Orders.Length<2) return;
-            string Line(int i) => "Đơn "+(i+1)+": "+(Orders[i].completed?"ĐÃ GIAO":Orders[i].count+" "+inventory.Name(Orders[i].item)
-                +" → "+Orders[i].reward+" xu");
-            mailStatus.text=Line(0)+"\n"+Line(1)+"\nĐã hoàn thành: "+CompletedOrders
-                +" • Đổi đơn: "+(RerollRemaining<=0?"sẵn sàng":Mathf.CeilToInt(RerollRemaining)+"s");
+            if(mailStatus==null || Orders==null || Orders.Length!=5) return;
+            string[] levels={"Dễ","Vừa","Khá","Khó","Rất khó"};
+            mailStatus.text="Đã giao: "+CompletedOrders+" • Đổi đơn sau: "+(RerollRemaining<=0?"sẵn sàng":Mathf.CeilToInt(RerollRemaining)+"s")+" • "+mailMessage;
+            for(int i=0;i<5;i++)
+            {var order=Orders[i];orderLabels[i].text="ĐƠN "+(i+1)+" • "+levels[Mathf.Clamp(order.difficulty-1,0,4)]+" • "+order.count+" "+inventory.Name(order.item)
+                +" • "+(order.completed?"ĐÃ GIAO":Mathf.CeilToInt(order.remaining/60)+" phút còn lại")+" • "+order.reward+" xu";
+             orderIcons[i].sprite=FarmItemIconLibrary.Get(FarmItemIconLibrary.ForItem(order.item));
+             orderLabels[i].transform.parent.GetComponent<Image>().color=i==selectedOrder?new Color(.62f,.49f,.21f):new Color(.25f,.39f,.25f);}
+            var chosen=Orders[selectedOrder];int have=inventory.Count(chosen.item);
+            detail.text="ĐANG CHỌN ĐƠN "+(selectedOrder+1)+" • "+inventory.Name(chosen.item)+"  "+have+"/"+chosen.count+
+                (chosen.completed?" • Đã giao":have>=chosen.count?" • ĐÃ ĐỦ HÀNG":" • Còn thiếu "+(chosen.count-have))+
+                "\nThưởng "+chosen.reward+" xu + XP • Hết hạn không trừ hàng • Đổi đơn cần chờ 5 phút chơi.";
         }
+        public void SelectOrder(int index){selectedOrder=Mathf.Clamp(index,0,4);RefreshMail();}
         void SayCraft(string value) { if(craftStatus!=null) craftStatus.text=value;hud.Notify(value); }
-        void SayMail(string value) { if(mailStatus!=null) mailStatus.text=value;hud.Notify(value);RefreshMail(); }
+        void SayMail(string value) { mailMessage=value;hud.Notify(value);RefreshMail(); }
     }
 
     public sealed class CraftingTable : MonoBehaviour,IInteractable

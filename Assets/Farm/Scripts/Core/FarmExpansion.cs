@@ -141,7 +141,7 @@ namespace NongTrai
                 worked++;
             }
             if(worked==0) return center.State==PlotState.Tilled?"Hết hạt giống. Nhấn B để mở shop.":
-                center.State==PlotState.Growing?"Bình đã hết nước. Đến hồ và nhấn E để lấy nước.":"Chưa thể thao tác.";
+                center.State==PlotState.Growing?"Bình đã hết nước. Đến hồ và click trái để lấy nước.":"Chưa thể thao tác.";
             var cue=tool==0?FarmAudio.Cue.Hoe:tool==1?FarmAudio.Cue.Water:tool==2?FarmAudio.Cue.Harvest:FarmAudio.Cue.Buy;
             FarmAudio.Instance?.Play(cue);
             if(harvestedTotal>0) FarmEffects.Burst(center.transform.position+Vector3.up*.4f,"+"+harvestedTotal+" nông sản",new Color(1,.87f,.28f));

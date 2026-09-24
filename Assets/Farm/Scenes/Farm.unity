@@ -3021,8 +3021,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NongTrai.FarmSign
   title: "Chu\u1ED3ng b\xF2 2"
-  message: "Nh\u1EA5p tr\xE1i \u0111\u1EC3 nh\u1EA5c th\xFA, nh\u1EA5p ph\u1EA3i
-    th\u1EA3 trong \u0111\xFAng chu\u1ED3ng. Nh\u1EA5n E l\u1EA5y s\u1EA3n ph\u1EA9m."
+  message: "Click tr\xE1i v\xE0o th\xFA \u0111\u1EC3 nh\u1EA5c, ph\u1EA3i \u0111\u1EC3
+    th\u1EA3 \u0111\xFAng chu\u1ED3ng. Khi bi\u1EC3u t\u01B0\u1EE3ng hi\u1EC7n tr\xEAn
+    \u0111\u1EA7u, click \u1ED5 n\u1EB1m \u0111\u1EC3 l\u1EA5y s\u1EA3n ph\u1EA9m."
 --- !u!23 &51555159
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -11495,7 +11496,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NongTrai.FarmSign
   title: "Nh\xE0 \u1EDF"
-  message: "V\xE0o nh\xE0, ng\u1EAFm gi\u01B0\u1EDDng v\xE0 nh\u1EA5n E \u0111\u1EC3
+  message: "V\xE0o nh\xE0, ng\u1EAFm gi\u01B0\u1EDDng r\u1ED3i click tr\xE1i \u0111\u1EC3
     ng\u1EE7 qua \u0111\xEAm."
 --- !u!23 &253894933
 MeshRenderer:
@@ -33437,8 +33438,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NongTrai.FarmSign
   title: "Chu\u1ED3ng c\u1EEBu 2"
-  message: "Nh\u1EA5p tr\xE1i \u0111\u1EC3 nh\u1EA5c th\xFA, nh\u1EA5p ph\u1EA3i
-    th\u1EA3 trong \u0111\xFAng chu\u1ED3ng. Nh\u1EA5n E l\u1EA5y s\u1EA3n ph\u1EA9m."
+  message: "Click tr\xE1i v\xE0o th\xFA \u0111\u1EC3 nh\u1EA5c, ph\u1EA3i \u0111\u1EC3
+    th\u1EA3 \u0111\xFAng chu\u1ED3ng. Khi bi\u1EC3u t\u01B0\u1EE3ng hi\u1EC7n tr\xEAn
+    \u0111\u1EA7u, click \u1ED5 n\u1EB1m \u0111\u1EC3 l\u1EA5y s\u1EA3n ph\u1EA9m."
 --- !u!23 &649063786
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -70003,9 +70005,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NongTrai.FarmSign
   title: "Ch\xE0o m\u1EEBng"
-  message: "Nh\u1EA5n 1\u20133 ch\u1ECDn h\u1EA1t. Nh\xECn xu\u1ED1ng \xF4 \u0111\u1EA5t
-    g\u1EA7n b\u1EA1n, nh\u1EA5n E \u0111\u1EC3 c\xE0y, gieo, t\u01B0\u1EDBi v\xE0
-    thu ho\u1EA1ch."
+  message: "Ch\u1ECDn h\u1EA1t/c\xF4ng c\u1EE5 b\u1EB1ng 1\u20139 ho\u1EB7c l\u0103n
+    chu\u1ED9t. Ng\u1EAFm \xF4 \u0111\u1EA5t r\u1ED3i click tr\xE1i \u0111\u1EC3
+    c\xE0y, gieo, t\u01B0\u1EDBi, thu ho\u1EA1ch. E m\u1EDF b\u1EA3n \u0111\u1ED3
+    vi\u1EC7c."
 --- !u!23 &1353221101
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -72436,8 +72439,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NongTrai.FarmSign
   title: "Chu\u1ED3ng c\u1EEBu"
-  message: "Nh\u1EA5p tr\xE1i \u0111\u1EC3 nh\u1EA5c th\xFA, nh\u1EA5p ph\u1EA3i
-    th\u1EA3 trong \u0111\xFAng chu\u1ED3ng. Nh\u1EA5n E l\u1EA5y s\u1EA3n ph\u1EA9m."
+  message: "Click tr\xE1i v\xE0o th\xFA \u0111\u1EC3 nh\u1EA5c, ph\u1EA3i \u0111\u1EC3
+    th\u1EA3 \u0111\xFAng chu\u1ED3ng. Khi bi\u1EC3u t\u01B0\u1EE3ng hi\u1EC7n tr\xEAn
+    \u0111\u1EA7u, click \u1ED5 n\u1EB1m \u0111\u1EC3 l\u1EA5y s\u1EA3n ph\u1EA9m."
 --- !u!23 &1409642841
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -92864,8 +92868,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NongTrai.FarmSign
   title: "Chu\u1ED3ng heo"
-  message: "Nh\u1EA5p tr\xE1i \u0111\u1EC3 nh\u1EA5c th\xFA, nh\u1EA5p ph\u1EA3i
-    th\u1EA3 trong \u0111\xFAng chu\u1ED3ng. Nh\u1EA5n E l\u1EA5y s\u1EA3n ph\u1EA9m."
+  message: "Click tr\xE1i v\xE0o th\xFA \u0111\u1EC3 nh\u1EA5c, ph\u1EA3i \u0111\u1EC3
+    th\u1EA3 \u0111\xFAng chu\u1ED3ng. Khi bi\u1EC3u t\u01B0\u1EE3ng hi\u1EC7n tr\xEAn
+    \u0111\u1EA7u, click \u1ED5 n\u1EB1m \u0111\u1EC3 l\u1EA5y s\u1EA3n ph\u1EA9m."
 --- !u!23 &1757218384
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -105561,8 +105566,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NongTrai.FarmSign
   title: "Chu\u1ED3ng b\xF2"
-  message: "Nh\u1EA5p tr\xE1i \u0111\u1EC3 nh\u1EA5c th\xFA, nh\u1EA5p ph\u1EA3i
-    th\u1EA3 trong \u0111\xFAng chu\u1ED3ng. Nh\u1EA5n E l\u1EA5y s\u1EA3n ph\u1EA9m."
+  message: "Click tr\xE1i v\xE0o th\xFA \u0111\u1EC3 nh\u1EA5c, ph\u1EA3i \u0111\u1EC3
+    th\u1EA3 \u0111\xFAng chu\u1ED3ng. Khi bi\u1EC3u t\u01B0\u1EE3ng hi\u1EC7n tr\xEAn
+    \u0111\u1EA7u, click \u1ED5 n\u1EB1m \u0111\u1EC3 l\u1EA5y s\u1EA3n ph\u1EA9m."
 --- !u!23 &2033059963
 MeshRenderer:
   m_ObjectHideFlags: 0

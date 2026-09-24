@@ -61,7 +61,7 @@ namespace NongTrai.Editor
             var body = door.gameObject.AddComponent<Rigidbody>(); body.isKinematic = true; body.useGravity = false;
             Sign(root, new Vector3(xMin + 2, 0, zMin - .7f), "Chuồng " + title,
                 species == AnimalSpecies.Chicken ? "Gà đẻ trứng sau 30 giây; nhặt ở ổ trứng. Mỗi chuồng tối đa 5 con."
-                : "Nhấp trái để nhấc thú, nhấp phải thả trong đúng chuồng. Nhấn E lấy sản phẩm.");
+                : "Click trái vào thú để nhấc, phải để thả đúng chuồng. Khi biểu tượng hiện trên đầu, click ổ nằm để lấy sản phẩm.");
             if (species == AnimalSpecies.Chicken)
             {
                 var nest = Pivot("Ổ trứng - E", root, new Vector3(xMax - 1.6f, 0, zMax - 1.4f));

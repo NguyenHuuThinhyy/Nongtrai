@@ -7,7 +7,7 @@ namespace NongTrai
     // không phụ thuộc font hay asset bên ngoài.
     public static class FarmItemIconLibrary
     {
-        public static int ForItem(int item)=>item==27?54:item>=28&&item<=35?40+item-28:item>=20&&item<=26?10+item:item;
+        public static int ForItem(int item)=>item==27?54:item>=28&&item<=37?40+item-28:item>=20&&item<=26?10+item:item;
         public static UnityEngine.UI.Image Attach(Transform parent,int item,Vector2 position,Vector2 size)
         {
             var go=new GameObject("Minh họa "+item,typeof(RectTransform),typeof(UnityEngine.UI.Image));
@@ -74,6 +74,8 @@ namespace NongTrai
                 case 45: Rect(p,18,13,46,44,red);Rect(p,21,43,43,50,cream);Disk(p,32,31,8,gold);break;
                 case 46: Bag(p,gold);Disk(p,24,29,5,green);Disk(p,39,35,5,green);break;
                 case 47: Bag(p,green);Disk(p,31,30,8,brown);break;
+                case 48: Rect(p,9,15,55,43,brown);Rect(p,9,42,55,52,Hex("B67B3E"));Rect(p,28,24,37,39,gold);break;
+                case 49: for(int i=0;i<4;i++)Line(p,13+i*10,15,35+i*3,30,brown,5);Triangle(p,19,29,48,29,32,58,gold);break;
                 case 50: Disk(p,32,30,20,cream);Disk(p,23,35,6,dark);Disk(p,42,35,6,dark);Rect(p,24,14,40,27,Hex("DFA9A0"));break;
                 case 51: Disk(p,32,29,21,Hex("E6A195"));Disk(p,24,19,5,Hex("B66660"));Disk(p,40,19,5,Hex("B66660"));break;
                 case 52: for(int x=16;x<53;x+=12)Disk(p,x,34,12,cream);Disk(p,32,24,12,dark);break;

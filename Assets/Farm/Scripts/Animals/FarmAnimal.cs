@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 namespace NongTrai
 {
     public sealed class FarmAnimal : MonoBehaviour, IInteractable
@@ -15,6 +16,7 @@ namespace NongTrai
         public float Hunger { get; private set; } = 80;
         public float Happiness { get; private set; } = 75;
         public bool WellCared => Hunger >= 35 && Happiness >= 35;
+        public bool ProductReady => !IsCarried&&pen!=null&&species!=AnimalSpecies.Chicken&&WellCared&&ProductCooldown<=0;
         public void RestoreCare(float hunger,float happiness)
         { Hunger=Mathf.Clamp(hunger,0,100); Happiness=Mathf.Clamp(happiness,0,100); }
         public bool Feed(FarmShop shop,out string message)
@@ -36,23 +38,41 @@ namespace NongTrai
             Hunger=Mathf.Max(0,Hunger-65*dayFraction);
             Happiness=Mathf.Max(0,Happiness-(Hunger<35?55:20)*dayFraction);
         }
-        public void RestoreCooldown(float seconds) => ProductCooldown = Mathf.Max(0,seconds);
-        public void AdvanceCooldown(float seconds) => ProductCooldown=Mathf.Max(0,ProductCooldown-seconds);
+        bool cooldownRestored;
+        public void RestoreCooldown(float seconds) { ProductCooldown = Mathf.Max(0,seconds);cooldownRestored=true; }
+        public void AdvanceCooldown(float seconds) {if(WellCared)ProductCooldown=Mathf.Max(0,ProductCooldown-seconds);}
         public float DistanceTravelled { get; private set; }
-        public string InteractionHint => "[E] "+(species==AnimalSpecies.Cow?"Lấy sữa":species==AnimalSpecies.Sheep?"Lấy len":species==AnimalSpecies.Pig?"Lấy thịt":"Xem ổ trứng")
-            +"  [F] Cho ăn • No "+Mathf.RoundToInt(Hunger)+"% Vui "+Mathf.RoundToInt(Happiness)+"%";
+        public string InteractionHint => "[Chuột trái] Nhấc thú • [F] Cho ăn • Sản phẩm ở ổ nằm • No "+Mathf.RoundToInt(Hunger)+"% Vui "+Mathf.RoundToInt(Happiness)+"%";
         public bool CanInteract(FarmPlayer source) => !IsCarried;
-        public void Interact(PlayerInteraction actor)
-        { bool collected=TryCollect(actor.inventory,out string result);actor.Say(result);
-          if(collected) { FarmExpansion.Instance?.GainExperience(12);FarmAudio.Instance?.Play(FarmAudio.Cue.Harvest); } }
+        public void Interact(PlayerInteraction actor) => actor.Say("Nhấp trái để nhấc thú; lấy sản phẩm ở ổ nằm khi thấy biểu tượng trên đầu.");
         public void SetHighlighted(bool selected) => InteractionOutline.Set(this,selected);
         static readonly List<FarmAnimal> herd = new List<FarmAnimal>();
         FarmPlayer player;
+        Canvas productCanvas;
         Vector3 goal;
         float resting, phase;
         void OnEnable() => herd.Add(this);
         void OnDisable() => herd.Remove(this);
-        void Start() { player=FindFirstObjectByType<FarmPlayer>(); ChooseGoal(); }
+        void Start() { player=FindFirstObjectByType<FarmPlayer>(); if(!cooldownRestored&&species!=AnimalSpecies.Chicken)
+            ProductCooldown=species==AnimalSpecies.Cow?45:species==AnimalSpecies.Sheep?60:90;
+            ChooseGoal();CreateProductIcon(); }
+        void CreateProductIcon()
+        {
+            if(species==AnimalSpecies.Chicken)return;
+            var root=new GameObject("Biểu tượng sản phẩm",typeof(RectTransform),typeof(Canvas));root.transform.SetParent(transform,false);
+            root.transform.localPosition=Vector3.up*2.05f;root.transform.localScale=Vector3.one*.009f;
+            productCanvas=root.GetComponent<Canvas>();productCanvas.renderMode=RenderMode.WorldSpace;
+            var picture=new GameObject("Sẵn sàng thu hoạch",typeof(RectTransform),typeof(Image));picture.transform.SetParent(root.transform,false);
+            var rect=picture.GetComponent<RectTransform>();rect.sizeDelta=new Vector2(66,66);
+            var icon=picture.GetComponent<Image>();icon.sprite=FarmItemIconLibrary.Get(species==AnimalSpecies.Cow?5:species==AnimalSpecies.Sheep?6:7);
+            icon.preserveAspect=true;icon.raycastTarget=false;
+            root.SetActive(false);
+        }
+        void LateUpdate()
+        {
+            if(productCanvas==null)return;productCanvas.gameObject.SetActive(ProductReady);
+            if(ProductReady&&Camera.main!=null)productCanvas.transform.rotation=Camera.main.transform.rotation;
+        }
         public void AssignPen(AnimalPen target)
         {
             pen = target;
@@ -72,17 +92,14 @@ namespace NongTrai
         {
             if (species == AnimalSpecies.Chicken) { message = "Đến ổ trứng trong chuồng gà để lấy trứng."; return false; }
             if (!WellCared) { message="Vật nuôi đang đói hoặc buồn. Nhấn F để cho ăn trước."; return false; }
+            if (ProductCooldown>0)
+            {message="Chưa có sản phẩm. Chờ "+Mathf.CeilToInt(ProductCooldown)+" giây.";return false;}
             if (species == AnimalSpecies.Pig)
             {
                 inventory.AddProduct(FarmInventory.Meat, 6);
                 message = "Đã lấy 6 thịt từ heo. Heo rời chuồng; hãy mua con mới nếu muốn nuôi tiếp.";
                 Destroy(gameObject);
                 return true;
-            }
-            if (ProductCooldown > 0)
-            {
-                message = "Chưa đến lượt lấy sản phẩm. Chờ " + Mathf.CeilToInt(ProductCooldown) + " giây.";
-                return false;
             }
             if (species == AnimalSpecies.Cow)
             {
@@ -105,6 +122,16 @@ namespace NongTrai
             if (player == null || player.Paused || IsCarried) return;
             float step=Time.fixedDeltaTime;
             AdvanceCooldown(step);
+            if(ProductReady&&pen!=null)
+            {
+                goal=pen.RestPointFor(this);
+                Vector3 toBed=goal-transform.position;toBed.y=0;
+                if(toBed.sqrMagnitude<.32f)
+                {foreach(var leg in legs)leg.localRotation=Quaternion.identity;
+                 if(head!=null)head.localRotation=Quaternion.Euler(18+Mathf.Sin(Time.time*2)*3,0,0);
+                 return;}
+                resting=0;
+            }
             if (resting>0)
             {
                 resting-=step;
@@ -114,7 +141,7 @@ namespace NongTrai
             }
             head.localRotation=Quaternion.identity;
             Vector3 direction=goal-transform.position; direction.y=0;
-            if(direction.magnitude<0.4f) { resting=Random.Range(1f,3f); ChooseGoal(); return; }
+            if(direction.magnitude<0.4f) { if(!ProductReady){resting=Random.Range(1f,3f); ChooseGoal();} return; }
             Vector3 move=direction.normalized;
             // Tránh người chơi và các con khác trong chuồng, không cần NavMesh cho sân trống.
             foreach(var animal in herd)

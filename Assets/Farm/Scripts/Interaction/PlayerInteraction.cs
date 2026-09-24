@@ -44,6 +44,7 @@ namespace NongTrai
             }
             if(keyboard!=null)
             {
+                if(keyboard.eKey.wasPressedThisFrame) { FarmNoticeBoard.Instance?.Open();return; }
                 if(keyboard.bKey.wasPressedThisFrame) { inventory.Open();return; }
                 if(keyboard.iKey.wasPressedThisFrame) { inventory.Open();return; }
                 if(keyboard.mKey.wasPressedThisFrame) { FarmProcessing.Instance?.Open();return; }
@@ -57,6 +58,7 @@ namespace NongTrai
                 if(FarmAim.Hit(viewCamera,out var useHit)&&Vector3.Distance(useHit.point,player.transform.position)<6)
                 {
                     var wild=useHit.collider.GetComponentInParent<WildAnimal>();if(wild!=null){wild.Feed();return;}
+                    var chest=useHit.collider.GetComponentInParent<FarmChest>();if(chest!=null){chest.Interact(this);return;}
                     var farmAnimal=useHit.collider.GetComponentInParent<FarmAnimal>();
                     if(farmAnimal!=null&&bag!=null&&bag.Item==34)
                     {farmAnimal.FeedPremium(inventory,out string feedback);Say(feedback);return;}
@@ -86,8 +88,6 @@ namespace NongTrai
             }
             if(Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame&&!ExplorationWorld.Instance.IsExploring)
                 if(TryLeftInteractRay(FarmAim.Ray(viewCamera)))return;
-            // E remains as a compatibility shortcut for older players and accessibility.
-            if(selected!=null && player.Input.Interact.WasPressedThisFrame()) selected.Interact(this);
         }
         static IInteractable FindTarget(Collider collider)
         {

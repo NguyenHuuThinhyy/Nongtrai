@@ -14,7 +14,7 @@ namespace NongTrai
         [Serializable] sealed class ResourceRecord { public int id; public float remaining; }
         [Serializable] sealed class SaveData
         {
-            public int version=10,money,fruit,treeCount,selected,feed,level,xp,day,weather,levelCap;
+            public int version=11,money,fruit,treeCount,selected,feed,level,xp,day,weather,levelCap;
             public float dayTime,musicVolume,effectsVolume;
             public bool expanded,tutorialDone;
             public int[] seeds,harvested,products;
@@ -26,6 +26,8 @@ namespace NongTrai
             public WaterState water;
             public OrderSystemState orders;
             public BuildingState building;
+            public StorageState storage;
+            public float playerHealth=100;
             public ExplorationState exploration;
             public BagState bag;public PickupRecord[] drops;public WildlifeState wildlife;
             public Vector3 playerPosition;
@@ -70,7 +72,8 @@ namespace NongTrai
                     weather=(int)clock.Weather,musicVolume=FarmAudio.Instance.MusicVolume,
                     effectsVolume=FarmAudio.Instance.EffectsVolume,
                     water=water==null?null:water.Snapshot(),orders=orders==null?null:orders.Snapshot(),
-                    bag=AdventureBag.Instance?.Snapshot(),drops=WorldPickup.Snapshot(),wildlife=AdventureWildlife.Instance?.Snapshot(),exploration=ExplorationWorld.Instance?.Snapshot(),building=building==null?null:building.Snapshot() };
+                    bag=AdventureBag.Instance?.Snapshot(),drops=WorldPickup.Snapshot(),wildlife=AdventureWildlife.Instance?.Snapshot(),exploration=ExplorationWorld.Instance?.Snapshot(),building=building==null?null:building.Snapshot(),
+                    storage=FarmStorage.Instance?.Snapshot(),playerHealth=AdventureWolves.Instance==null?100:AdventureWolves.Instance.Health };
                 var plots=FindObjectsByType<FarmPlot>(FindObjectsSortMode.None);
                 data.plots=new PlotRecord[plots.Length];
                 for(int i=0;i<plots.Length;i++)
@@ -114,7 +117,7 @@ namespace NongTrai
             try
             {
                 var data=JsonUtility.FromJson<SaveData>(File.ReadAllText(SavePath));
-                if(data==null || data.version<2 || data.version>10 || data.seeds==null || data.seeds.Length!=3 ||
+                if(data==null || data.version<2 || data.version>11 || data.seeds==null || data.seeds.Length!=3 ||
                     data.harvested==null || data.harvested.Length!=3 || data.products==null || data.products.Length<4)
                     throw new InvalidDataException("Phiên bản dữ liệu lưu không phù hợp.");
                 if(data.version<8)
@@ -189,6 +192,8 @@ namespace NongTrai
                     data.building.blocks=keep.ToArray();
                 }
                 if(building!=null) building.Restore(data.version>=6?data.building:null);
+                FarmStorage.Instance?.Restore(data.version>=11?data.storage:null);
+                AdventureWolves.Instance?.RestoreHealth(data.version>=11?data.playerHealth:100);
                 WorldPickup.Restore(data.drops);AdventureBag.Instance?.Restore(data.bag);AdventureWildlife.Instance?.Restore(data.wildlife);
                 if(data.version<10)islands?.Snapshot();
                 return true;

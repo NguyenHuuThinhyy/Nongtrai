@@ -11,10 +11,10 @@ namespace NongTrai
         public FarmHud hud;
         public FieldManager field;
         public FarmShop shop;
-        public int[] AnimalProducts { get; private set; } = new int[32];
+        public int[] AnimalProducts { get; private set; } = new int[34];
         public GameObject Panel { get; private set; }
-        readonly string[] itemNames = { "Lúa mì", "Cà chua", "Đậu nành", "Táo", "Trứng", "Sữa", "Lông cừu", "Thịt heo", "Bột mì", "Bánh mì", "Phô mai", "Nước táo", "Gỗ cũ", "Quặng", "Ván", "Kim loại", "Bó nông sản", "Gói đậu", "Giỏ táo", "Đèn thủ công", "Khối gỗ", "Khối đá", "Khối gạch", "Khối kính", "Khối kim loại", "Khối cỏ", "Bàn chế tạo", "Hạt cây gỗ", "Bậc gỗ", "Đuốc", "Hàng rào", "Ván cầu", "Bánh táo", "Mứt cà chua", "Cám dinh dưỡng", "Phân bón" };
-        readonly int[] unitPrices = { 8,18,32,15,8,20,25,30,22,65,65,35,12,18,34,50,45,55,95,165,18,14,24,35,55,16,90,12,35,55,26,45,65,48,40,25 };
+        readonly string[] itemNames = { "Lúa mì", "Cà chua", "Đậu nành", "Táo", "Trứng", "Sữa", "Lông cừu", "Thịt heo", "Bột mì", "Bánh mì", "Phô mai", "Nước táo", "Gỗ cũ", "Quặng", "Ván", "Kim loại", "Bó nông sản", "Gói đậu", "Giỏ táo", "Đèn thủ công", "Khối gỗ", "Khối đá", "Khối gạch", "Khối kính", "Khối kim loại", "Khối cỏ", "Bàn chế tạo", "Hạt cây gỗ", "Bậc gỗ", "Đuốc", "Hàng rào", "Ván cầu", "Bánh táo", "Mứt cà chua", "Cám dinh dưỡng", "Phân bón", "Rương đồ", "Đống lửa" };
+        readonly int[] unitPrices = { 8,18,32,15,8,20,25,30,22,65,65,35,12,18,34,50,45,55,95,165,18,14,24,35,55,16,90,12,35,55,26,45,65,48,40,25,95,85 };
         public int Price(int item) => item>=0 && item<unitPrices.Length?unitPrices[item]:0;
         public string Name(int item) => item>=0 && item<itemNames.Length?itemNames[item]:"?";
         TMP_Text[] amounts;

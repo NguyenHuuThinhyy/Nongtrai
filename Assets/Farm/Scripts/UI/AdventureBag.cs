@@ -76,7 +76,7 @@ namespace NongTrai
         public void Sync()
         {
             if(inventory==null)return;
-            for(int id=0;id<36;id++)
+            for(int id=0;id<38;id++)
             {
                 int difference=inventory.Count(id)-Total(id);
                 if(difference>0){int overflow=Insert(id,difference);if(overflow>0){inventory.Remove(id,overflow);WorldPickup.Spawn(id,overflow,inventory.hud.player.transform.position);}}

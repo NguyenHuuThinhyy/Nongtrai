@@ -178,6 +178,24 @@
           "count": 1
         }
       ]
+    },
+    {
+      "id": "storage_chest",
+      "name": "Rương đồ",
+      "output": 36,
+      "inputs": [
+        { "item": 20, "count": 4 },
+        { "item": 14, "count": 1 }
+      ]
+    },
+    {
+      "id": "campfire",
+      "name": "Đống lửa",
+      "output": 37,
+      "inputs": [
+        { "item": 20, "count": 3 },
+        { "item": 21, "count": 2 }
+      ]
     }
   ]
 }

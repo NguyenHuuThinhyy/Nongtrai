@@ -187,7 +187,7 @@ namespace NongTrai.Editor
                 var boundary = Box("Map boundary", p, p.x != 0 ? new Vector3(1, 6, 100) : new Vector3(100, 6, 1), grass, environment);
                 boundary.GetComponent<Renderer>().enabled = false;
             }
-            Sign(environment, new Vector3(2.6f, 0, 7), "Chào mừng", "Nhấn 1–3 chọn hạt. Nhìn xuống ô đất gần bạn, nhấn E để cày, gieo, tưới và thu hoạch.");
+            Sign(environment, new Vector3(2.6f, 0, 7), "Chào mừng", "Chọn hạt/công cụ bằng 1–9 hoặc lăn chuột. Ngắm ô đất rồi click trái để cày, gieo, tưới, thu hoạch. E mở bản đồ việc.");
             Sign(environment, new Vector3(-5, 0, -3), "Khu canh tác", "Cây cần nước để lớn. Sau 35–55 giây được tưới, cây chín và có thể thu hoạch bằng E.");
             var sun = new GameObject("Sun - fixed morning light").AddComponent<Light>();
             sun.type = LightType.Directional; sun.intensity = 2.2f;
@@ -216,7 +216,7 @@ namespace NongTrai.Editor
             var bed=Box("Giường ngủ - E",new Vector3(-1.5f,.52f,1.4f),new Vector3(2.5f,.65f,1.6f),wood,home);
             bed.AddComponent<FarmBed>();
             Box("Chăn",new Vector3(-1.5f,.90f,1.4f),new Vector3(2.3f,.12f,1.2f),red,home,false);
-            Sign(home,new Vector3(0,0,29),"Nhà ở","Vào nhà, ngắm giường và nhấn E để ngủ qua đêm.");
+            Sign(home,new Vector3(0,0,29),"Nhà ở","Vào nhà, ngắm giường rồi click trái để ngủ qua đêm.");
         }
 
         static void Barn(Transform parent, Vector3 position, float scale)
