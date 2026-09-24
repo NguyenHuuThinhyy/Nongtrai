@@ -16,7 +16,7 @@ namespace NongTrai
         public float Hunger { get; private set; } = 80;
         public float Happiness { get; private set; } = 75;
         public bool WellCared => Hunger >= 35 && Happiness >= 35;
-        public bool ProductReady => !IsCarried&&pen!=null&&species!=AnimalSpecies.Chicken&&WellCared&&ProductCooldown<=0;
+        public bool ProductReady => !IsCarried&&pen!=null&&(species==AnimalSpecies.Chicken?pen.StoredEggs>0:WellCared&&ProductCooldown<=0);
         public void RestoreCare(float hunger,float happiness)
         { Hunger=Mathf.Clamp(hunger,0,100); Happiness=Mathf.Clamp(happiness,0,100); }
         public bool Feed(FarmShop shop,out string message)
@@ -42,7 +42,7 @@ namespace NongTrai
         public void RestoreCooldown(float seconds) { ProductCooldown = Mathf.Max(0,seconds);cooldownRestored=true; }
         public void AdvanceCooldown(float seconds) {if(WellCared)ProductCooldown=Mathf.Max(0,ProductCooldown-seconds);}
         public float DistanceTravelled { get; private set; }
-        public string InteractionHint => "[Chuột trái] Nhấc thú • [F] Cho ăn • Sản phẩm ở ổ nằm • No "+Mathf.RoundToInt(Hunger)+"% Vui "+Mathf.RoundToInt(Happiness)+"%";
+        public string InteractionHint => "[Chuột trái] "+(ProductReady?"Lấy sản phẩm":"Nhấc thú")+" • [F] Cho ăn • No "+Mathf.RoundToInt(Hunger)+"% Vui "+Mathf.RoundToInt(Happiness)+"%";
         public bool CanInteract(FarmPlayer source) => !IsCarried;
         public void Interact(PlayerInteraction actor) => actor.Say("Nhấp trái để nhấc thú; lấy sản phẩm ở ổ nằm khi thấy biểu tượng trên đầu.");
         public void SetHighlighted(bool selected) => InteractionOutline.Set(this,selected);
@@ -58,13 +58,12 @@ namespace NongTrai
             ChooseGoal();CreateProductIcon(); }
         void CreateProductIcon()
         {
-            if(species==AnimalSpecies.Chicken)return;
             var root=new GameObject("Biểu tượng sản phẩm",typeof(RectTransform),typeof(Canvas));root.transform.SetParent(transform,false);
             root.transform.localPosition=Vector3.up*2.05f;root.transform.localScale=Vector3.one*.009f;
             productCanvas=root.GetComponent<Canvas>();productCanvas.renderMode=RenderMode.WorldSpace;
             var picture=new GameObject("Sẵn sàng thu hoạch",typeof(RectTransform),typeof(Image));picture.transform.SetParent(root.transform,false);
             var rect=picture.GetComponent<RectTransform>();rect.sizeDelta=new Vector2(66,66);
-            var icon=picture.GetComponent<Image>();icon.sprite=FarmItemIconLibrary.Get(species==AnimalSpecies.Cow?5:species==AnimalSpecies.Sheep?6:7);
+            var icon=picture.GetComponent<Image>();icon.sprite=FarmItemIconLibrary.Get(species==AnimalSpecies.Chicken?4:species==AnimalSpecies.Cow?5:species==AnimalSpecies.Sheep?6:7);
             icon.preserveAspect=true;icon.raycastTarget=false;
             root.SetActive(false);
         }
@@ -90,7 +89,9 @@ namespace NongTrai
         }
         public bool TryCollect(FarmInventory inventory, out string message)
         {
-            if (species == AnimalSpecies.Chicken) { message = "Đến ổ trứng trong chuồng gà để lấy trứng."; return false; }
+            if (species == AnimalSpecies.Chicken)
+            {int eggs=pen==null?0:pen.CollectEggs();if(eggs<=0){message="Chưa có trứng chín.";return false;}
+             inventory.Add(4,eggs);message="Đã nhặt "+eggs+" trứng.";return true;}
             if (!WellCared) { message="Vật nuôi đang đói hoặc buồn. Nhấn F để cho ăn trước."; return false; }
             if (ProductCooldown>0)
             {message="Chưa có sản phẩm. Chờ "+Mathf.CeilToInt(ProductCooldown)+" giây.";return false;}

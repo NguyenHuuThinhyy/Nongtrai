@@ -33,11 +33,11 @@ namespace NongTrai
             string path=Path.Combine(Application.streamingAssetsPath,"recipes.json");
             try { Recipes=JsonUtility.FromJson<FarmRecipeBook>(File.ReadAllText(path)).recipes; }
             catch(Exception ex) { Debug.LogError("Không đọc được công thức JSON: "+ex); Recipes=Array.Empty<FarmRecipe>(); }
-            Panel=FarmUi.Panel(hud.transform,"Xưởng chế biến",new Vector2(1000,740));
+            Panel=FarmUi.Panel(hud.transform,"Xưởng chế biến",new Vector2(1000,900));
             header=FarmUi.Label(Panel.transform,"XƯỞNG CHẾ BIẾN",new Vector2(30,-20),new Vector2(920,50),30);
             status=FarmUi.Label(Panel.transform,"",new Vector2(30,-78),new Vector2(920,75),20);
             recipeButtons=new GameObject[Recipes.Length];
-            for(int i=0;i<Recipes.Length && i<6;i++)
+            for(int i=0;i<Recipes.Length && i<7;i++)
             {
                 int index=i; var r=Recipes[i];
                 string label=r.machine+" • "+r.name+" : "+r.inputCount+" "+inventory.Name(r.input)
@@ -46,8 +46,8 @@ namespace NongTrai
                 var caption=recipeButtons[i].GetComponentInChildren<Text>();caption.rectTransform.anchoredPosition=new Vector2(78,-5);caption.rectTransform.sizeDelta=new Vector2(845,52);
                 FarmItemIconLibrary.Attach(recipeButtons[i].transform,r.output,new Vector2(10,-5),new Vector2(54,54));
             }
-            feedback=FarmUi.Label(Panel.transform,"Nguyên liệu trừ khi xếp hàng; sản phẩm vào túi khi hoàn tất.",new Vector2(30,-615),new Vector2(940,42),19);
-            FarmUi.Button(Panel.transform,"Trở lại game",new Vector2(30,-670),new Vector2(940,54),hud.Resume);
+            feedback=FarmUi.Label(Panel.transform,"Nguyên liệu trừ khi xếp hàng; sản phẩm vào túi khi hoàn tất.",new Vector2(30,-760),new Vector2(940,42),19);
+            FarmUi.Button(Panel.transform,"Trở lại game",new Vector2(30,-815),new Vector2(940,54),hud.Resume);
             Panel.SetActive(false);hud.player.PauseChanged+=OnPause;
             CreateMachines();
         }
@@ -55,9 +55,9 @@ namespace NongTrai
         void OnPause(bool paused) { if(!paused && Panel!=null) Panel.SetActive(false); }
         void CreateMachines()
         {
-            string[] names={"Cối xay","Lò bánh","Thùng ủ","Máy ép","Xưởng cưa","Lò nung"};
+            string[] names={"Cối xay","Lò bánh","Thùng ủ","Máy ép","Xưởng cưa","Lò nung","Máy ủ phân"};
             Color[] colors={new Color(.82f,.68f,.37f),new Color(.76f,.38f,.25f),new Color(.56f,.69f,.78f),new Color(.67f,.48f,.35f),
-                new Color(.59f,.43f,.26f),new Color(.42f,.49f,.56f)};
+                new Color(.59f,.43f,.26f),new Color(.42f,.49f,.56f),new Color(.39f,.59f,.28f)};
             for(int i=0;i<names.Length;i++)
             {
                 var go=new GameObject(names[i]+" - click trái");

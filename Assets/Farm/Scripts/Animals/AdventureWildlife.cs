@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace NongTrai
 {
-    [Serializable] public sealed class WildRecord { public string id;public int species;public Vector3 position;public float health=30,love,age=180,breedCooldown;public bool dead; }
+    [Serializable] public sealed class WildRecord { public string id;public int species;public Vector3 position;public float health=30,love,age=180,breedCooldown,respawnRemaining;public bool dead; }
     [Serializable] public sealed class WildlifeState {public WildRecord[] animals;public int births;}
     public sealed class AdventureWildlife:MonoBehaviour
     {
@@ -15,6 +15,8 @@ namespace NongTrai
         void Update()
         {
             if(world==null||Player==null||Player.Paused)return;tick+=Time.deltaTime;if(tick<1)return;tick=0;
+            foreach(var record in records.Values)if(record.dead)
+            {record.respawnRemaining=Mathf.Max(0,record.respawnRemaining-1);if(record.respawnRemaining<=0){record.dead=false;record.health=30;record.age=180;}}
             foreach(var pair in new List<KeyValuePair<string,WildAnimal>>(active))
                 if(pair.Value==null){active.Remove(pair.Key);}else if(!world.IsExploring||Vector3.Distance(pair.Value.transform.position,Player.transform.position)>55){pair.Value.Sync();Destroy(pair.Value.gameObject);active.Remove(pair.Key);}
             if(!world.IsExploring)return;var cell=world.CellAt(Player.transform.position);int cx=Mathf.FloorToInt(cell.x/16f),cz=Mathf.FloorToInt(cell.z/16f);
@@ -23,7 +25,7 @@ namespace NongTrai
             {
                 if(active.Count>=16)return;int x=(cx+dx)*16+4+n*7,z=(cz+dz)*16+6+n*5;
                 if(x>=0&&x<48&&z>=0&&z<48||world.BiomeAt(x,z)!="Đồng cỏ")continue;
-                string id=(cx+dx)+":"+(cz+dz)+":"+n;if(records.ContainsKey(id))continue;
+                string id=(cx+dx)+":"+(cz+dz)+":"+n;if(records.ContainsKey(id)||records.Count>=256)continue;
                 var pos=ExplorationWorld.Origin+new Vector3(x+.5f,world.SurfaceHeight(x,z)+.1f,z+.5f);
                 if(!Physics.Raycast(pos+Vector3.up*3,Vector3.down,out var hit,5,1,QueryTriggerInteraction.Ignore))continue;
                 pos.y=hit.point.y+.1f;var record=new WildRecord{id=id,species=(Mathf.Abs(cx+cz+n)%2==0?0:2),position=pos};records[id]=record;Spawn(record);
@@ -42,7 +44,7 @@ namespace NongTrai
         public void Breed(WildAnimal parent)
         {
             int local=0;foreach(var r in records.Values)if(!r.dead&&Vector3.Distance(r.position,parent.transform.position)<16)local++;if(local>=4)return;
-            if(active.Count>=16||parent.record.age<180||parent.record.love<=0)return;
+            if(active.Count>=20||parent.record.age<180||parent.record.love<=0)return;
             foreach(var mate in active.Values)
             {
                 if(mate==null||mate==parent||mate.record.species!=parent.record.species||mate.record.love<=0||mate.record.age<180||Vector3.Distance(mate.transform.position,parent.transform.position)>3)continue;
@@ -55,7 +57,7 @@ namespace NongTrai
     }
     public sealed class WildAnimal:MonoBehaviour
     {
-        public AdventureWildlife manager;public WildRecord record;CharacterController body;Vector3 goal;float timer,fall,flee;Transform healthCanvas;UnityEngine.UI.Image healthFill;
+        public AdventureWildlife manager;public WildRecord record;CharacterController body;Vector3 goal,knockback;float timer,fall,flee;Transform healthCanvas;UnityEngine.UI.Image healthFill;
         public string Status=>(record.species==0?"Bò":"Cừu")+" • Máu "+Mathf.CeilToInt(record.health)+"/30 • Phải: cho lúa mì • Trái: đánh";
         void Start()
         {
@@ -81,7 +83,8 @@ namespace NongTrai
             var ahead=transform.position+move*.8f+Vector3.up;
             if(!Physics.Raycast(ahead,Vector3.down,out var ground,2.1f,1,QueryTriggerInteraction.Ignore)||Mathf.Abs(ground.point.y-transform.position.y)>.65f){move=Vector3.zero;timer=0;}
             if(body.isGrounded&&fall<0)fall=-2;else fall=Mathf.Max(-20,fall-22*Time.deltaTime);
-            body.Move((move*(flee>0?3:1)+Vector3.up*fall)*Time.deltaTime);
+            body.Move((move*(flee>0?3:1)+knockback+Vector3.up*fall)*Time.deltaTime);
+            knockback=Vector3.MoveTowards(knockback,Vector3.zero,Time.deltaTime*8);
             if(move.sqrMagnitude>.1f)transform.rotation=Quaternion.Slerp(transform.rotation,Quaternion.LookRotation(move),Time.deltaTime*4);
             if(record.love>0)manager.Breed(this);Sync();
         }
@@ -89,9 +92,10 @@ namespace NongTrai
         {if(record.breedCooldown>0)return false;int food=AdventureBag.Instance.Item;if((food!=0&&food!=34)||!manager.world.inventory.Remove(food,1))return false;record.health=Mathf.Min(30,record.health+(food==34?18:8));record.love=40;flee=0;manager.world.hud.Notify("Đã cho ăn. Dẫn đến gần một con cùng loài đã được cho ăn để sinh sản.");return true;}
         public void Hit()
         {
-            var bag=AdventureBag.Instance;if(bag.Item>=104&&!bag.DamageTool())return;
-            record.health-=bag.Item==107?15:5;flee=5;
-            if(record.health>0)return;record.dead=true;
+            var bag=AdventureBag.Instance;if((bag.Item==104||bag.Item==106||bag.Item==107)&&!bag.DamageTool())return;
+            record.health-=bag.Item==106?20+(FarmExpansion.Instance==null?0:FarmExpansion.Instance.ToolTiers[2]*5):bag.Item==107?15:5;flee=5;
+            knockback=(transform.position-manager.Player.transform.position).normalized*3.5f;knockback.y=0;
+            if(record.health>0)return;record.dead=true;record.respawnRemaining=UnityEngine.Random.Range(240f,420f);
             WorldPickup.Spawn(7,record.age<180?1:3,transform.position);if(record.species==2)WorldPickup.Spawn(6,2,transform.position);
             gameObject.SetActive(false);Destroy(gameObject);
         }

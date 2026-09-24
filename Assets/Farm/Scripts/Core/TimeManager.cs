@@ -32,6 +32,7 @@ namespace NongTrai
         ParticleSystem rain;
         AudioSource rainSound;
         float rainTick;
+        public float WeatherRemaining { get; private set; }
         void Awake() => Instance=this;
         void Start()
         {
@@ -82,6 +83,8 @@ namespace NongTrai
             if(player==null || player.Paused) return;
             float fraction=Time.deltaTime/DayLengthSeconds;
             NormalizedTime+=fraction;
+            if(WeatherRemaining>0)
+            {WeatherRemaining=Mathf.Max(0,WeatherRemaining-Time.deltaTime);if(WeatherRemaining<=0&&(Weather==FarmWeather.Rain||Weather==FarmWeather.Storm))SetWeather(FarmWeather.Sunny);}
             foreach(var animal in FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None)) animal.AdvanceCare(fraction);
             if(NormalizedTime>=1f) { NormalizedTime-=1f;NewDay(); }
             if(Weather==FarmWeather.Rain || Weather==FarmWeather.Storm)
@@ -102,7 +105,7 @@ namespace NongTrai
         }
         public void SetWeather(FarmWeather value,bool triggerPuzzle=false)
         {
-            Weather=value;ApplyWeather();
+            Weather=value;WeatherRemaining=value==FarmWeather.Rain||value==FarmWeather.Storm?DayLengthSeconds*.25f:0;ApplyWeather();
             if((value==FarmWeather.Rain || value==FarmWeather.Storm)) WaterFields(1);
             if(value==FarmWeather.Storm && triggerPuzzle) disaster?.BeginStorm();
         }
@@ -152,10 +155,12 @@ namespace NongTrai
                 Weather==FarmWeather.Fog?new Color(.75f,.78f,.80f):new Color(.68f,.82f,.85f);
 
         }
-        public void Restore(int day,float time,FarmWeather weather)
+        public void Restore(int day,float time,FarmWeather weather,float remaining=-1)
         {
             Day=Mathf.Max(1,day);NormalizedTime=Mathf.Repeat(time,1f);
-            Weather=weather;ApplySeason();ApplyWeather();ApplyLighting();
+            Weather=weather;WeatherRemaining=remaining<0?(weather==FarmWeather.Rain||weather==FarmWeather.Storm?Mathf.Max(0,(.25f-NormalizedTime)*DayLengthSeconds):0):remaining;
+            if(WeatherRemaining<=0&&(Weather==FarmWeather.Rain||Weather==FarmWeather.Storm))Weather=FarmWeather.Sunny;
+            ApplySeason();ApplyWeather();ApplyLighting();
         }
         public float SleepUntilMorning()
         {
@@ -165,10 +170,15 @@ namespace NongTrai
             foreach(var animal in FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None))
             { animal.AdvanceCare(skippedDays);animal.AdvanceCooldown(skippedSeconds); }
             foreach(var pen in FindObjectsByType<AnimalPen>(FindObjectsSortMode.None)) pen.Advance(skippedSeconds);
-            foreach(var tree in FindObjectsByType<FruitTree>(FindObjectsSortMode.None)) tree.remaining=Mathf.Max(0,tree.remaining-skippedSeconds);
+            foreach(var tree in FindObjectsByType<FruitTree>(FindObjectsSortMode.None))
+            {float grow=tree.planted?Mathf.Min(skippedSeconds,Mathf.Max(0,240-tree.age)):0;tree.age+=grow;tree.remaining=Mathf.Max(0,tree.remaining-(skippedSeconds-grow));}
             FarmProcessing.Instance?.Advance(skippedSeconds);
-            if(NormalizedTime>=.25f) NewDay();
-            NormalizedTime=.25f;ApplyLighting();
+            bool crossedDay=NormalizedTime>=.25f;
+            if(crossedDay)NewDay();
+            NormalizedTime=.25f;
+            WeatherRemaining=Mathf.Max(0,WeatherRemaining-(crossedDay?DayLengthSeconds*.25f:skippedSeconds));
+            if(WeatherRemaining<=0&&(Weather==FarmWeather.Rain||Weather==FarmWeather.Storm))SetWeather(FarmWeather.Sunny);
+            ApplyLighting();
             return skippedSeconds;
         }
     }

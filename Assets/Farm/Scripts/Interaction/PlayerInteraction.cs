@@ -42,9 +42,9 @@ namespace NongTrai
                     inventory.hud.Resume();
                 ClearSelection();return;
             }
+            if(FarmHud.WorldClickSuppressed){ClearSelection();return;}
             if(keyboard!=null)
             {
-                if(keyboard.eKey.wasPressedThisFrame) { FarmNoticeBoard.Instance?.Open();return; }
                 if(keyboard.bKey.wasPressedThisFrame) { inventory.Open();return; }
                 if(keyboard.iKey.wasPressedThisFrame) { inventory.Open();return; }
                 if(keyboard.mKey.wasPressedThisFrame) { FarmProcessing.Instance?.Open();return; }
@@ -64,10 +64,17 @@ namespace NongTrai
                     {farmAnimal.FeedPremium(inventory,out string feedback);Say(feedback);return;}
                     var plot=useHit.collider.GetComponentInParent<FarmPlot>();
                     if(plot!=null&&bag!=null&&bag.Item==35)
-                    {if(FarmExpansion.Instance.IsUnlocked(plot)&&plot.State==PlotState.Growing&&inventory.Remove(35,1)&&plot.ApplyFertilizer())Say("Đã bón phân: cây lớn nhanh hơn 12% và giữ ẩm.");
+                    {bool wasMutated=plot.Mutated;
+                     if(FarmExpansion.Instance.IsUnlocked(plot)&&plot.State==PlotState.Growing&&inventory.Remove(35,1)&&plot.ApplyFertilizer())
+                       Say(!wasMutated&&plot.Mutated?"Cây ĐỘT BIẾN! Hào quang cầu vồng, bán gấp 3 lần.":"Đã bón phân: cây lớn nhanh hơn 12% và giữ ẩm (8% cơ hội đột biến).");
                      else Say("Chỉ bón phân được cho cây đang lớn trên đất đã mở.");return;}
+                    var fruitTree=useHit.collider.GetComponentInParent<FruitTree>();
+                    if(fruitTree!=null&&bag!=null&&bag.Item==35)
+                    {fruitTree.Fertilize(inventory,out string feedback);Say(feedback);return;}
                     if(bag!=null&&bag.Item==27&&ExplorationWorld.Instance.IsExploring)
                     {bool planted=ExplorationWorld.Instance.Plant(ExplorationWorld.Instance.CellAt(useHit.point-useHit.normal*.02f));Say(planted?"Đã gieo cây gỗ. Cây lớn theo từng giai đoạn ban ngày.":"Cần mặt đất trống để trồng cây.");return;}
+                    if(bag!=null&&bag.Item==27&&!ExplorationWorld.Instance.IsExploring)
+                    {FruitTree.TryPlantAt(useHit.point,shop,inventory,out string feedback);Say(feedback);return;}
                 }
                 if(bag!=null&&bag.Eat())return;
                 ScanNearest();if(selected!=null){selected.Interact(this);return;}
@@ -86,6 +93,8 @@ namespace NongTrai
                 if(fed) { FarmExpansion.Instance?.GainExperience(6);FarmAudio.Instance?.Play(FarmAudio.Cue.Buy); }
                 return;
             }
+            if(Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame&&!ExplorationWorld.Instance.IsExploring)
+                if(FarmPenPlacement.Instance!=null&&(FarmPenPlacement.Instance.Pending>=0||FarmPenPlacement.Instance.ConsumedFrame==Time.frameCount))return;
             if(Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame&&!ExplorationWorld.Instance.IsExploring)
                 if(TryLeftInteractRay(FarmAim.Ray(viewCamera)))return;
         }
@@ -131,7 +140,8 @@ namespace NongTrai
                 Vector3.Distance(hit.point,player.transform.position+Vector3.up)>=5)return false;
             var target=FindTarget(hit.collider);
             if(target is FarmAnimal animal)
-            {if(carry.Pickup(animal)){Say(carry.LastMessage);ClearSelection();}return true;}
+            {if(animal.ProductReady){animal.TryCollect(inventory,out string message);Say(message);}
+             else if(carry.Pickup(animal)){Say(carry.LastMessage);ClearSelection();}return true;}
             if(target==null||!target.CanInteract(player))return false;
             target.Interact(this);return true;
         }

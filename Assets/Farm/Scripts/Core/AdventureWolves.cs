@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace NongTrai
 {
@@ -10,10 +11,15 @@ namespace NongTrai
         public static AdventureWolves Instance { get; private set; }
         public int ActiveCount => wolves.Count;
         public float Health { get; private set; } = 100;
+        public bool IsAwaitingRespawn=>deathPanel!=null&&deathPanel.activeSelf;
         readonly List<NightWolf> wolves = new List<NightWolf>();
         FarmHud hud;
         TMP_Text status;
         float spawnTimer;
+        float starvationTimer;
+        GameObject deathPanel;
+        TMP_Text deathText;
+        Button payButton;
         bool warned;
         void Awake() { Instance = this; }
         void Start()
@@ -24,6 +30,12 @@ namespace NongTrai
             rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0, 1);
             rect.anchoredPosition = new Vector2(24, -258);
             status.color = new Color(1, .8f, .62f);
+            deathPanel=FarmUi.Panel(hud.transform,"Hồi sinh",new Vector2(760,460));
+            FarmUi.TmpLabel(deathPanel.transform,"BẠN ĐÃ KIỆT SỨC",new Vector2(35,-30),new Vector2(690,60),34);
+            deathText=FarmUi.TmpLabel(deathPanel.transform,"",new Vector2(35,-105),new Vector2(690,90),23);
+            payButton=FarmUi.Button(deathPanel.transform,"Trả 100 xu • giữ đồ",new Vector2(35,-230),new Vector2(690,65),()=>Respawn(true));
+            FarmUi.Button(deathPanel.transform,"Rơi 3 món ngẫu nhiên • hồi sinh",new Vector2(35,-320),new Vector2(690,65),()=>Respawn(false));
+            deathPanel.SetActive(false);
         }
         void OnDestroy() { if (Instance == this) Instance = null; }
         public void RestoreHealth(float value) { Health = Mathf.Clamp(value <= 0 ? 100 : value, 1, 100); }
@@ -41,7 +53,11 @@ namespace NongTrai
             bool exploring = ExplorationWorld.Instance != null && ExplorationWorld.Instance.IsExploring;
             bool night = exploring && IsNight;
             status.gameObject.SetActive(exploring);
-            if (exploring) status.text = "Sức khỏe " + Mathf.CeilToInt(Health) + "/100" + (night ? " • Sói ra khỏi hang khi trời tối • Đuốc/đống lửa bảo vệ" : " • Sói về hang khi trời sáng");
+            if (exploring) status.text = night ? "Sói ra khỏi hang • Đuốc/đống lửa bảo vệ" : "Sói về hang khi trời sáng";
+            var bag=AdventureBag.Instance;
+            if(bag!=null&&bag.Satiety<=0)
+            {starvationTimer+=Time.deltaTime;if(starvationTimer>=5){starvationTimer-=5;Damage(2,"Đói cạn: -2 máu. Hãy ăn thức ăn chín.");}}
+            else starvationTimer=0;
             for (int i = wolves.Count - 1; i >= 0; i--) if (wolves[i] == null) wolves.RemoveAt(i);
             if (!night)
             {
@@ -69,12 +85,42 @@ namespace NongTrai
         public void Bite()
         {
             if (IsSafe(hud.player.transform.position)) return;
-            Health = Mathf.Max(0, Health - 12);
-            hud.Notify("Sói cắn! -12 sức khỏe. Hãy chạy tới đuốc hoặc đống lửa.");
-            if (Health > 0) return;
-            Health = 100;
-            hud.player.Teleport(IslandManager.ExploreArrival);
-            hud.Notify("Bạn kiệt sức và trở về cổng khám phá. Đồ trong túi được giữ lại.");
+            Damage(12,"Sói cắn! -12 máu. Hãy chạy tới đuốc hoặc đống lửa.");
+        }
+        public void Damage(float amount,string message)
+        {
+            if(IsAwaitingRespawn||Health<=0)return;
+            Health=Mathf.Max(0,Health-Mathf.Max(0,amount));hud.Notify(message);
+            if(Health>0)return;
+            hud.player.SetPaused(true);hud.pausePanel.SetActive(false);
+            deathPanel.SetActive(true);payButton.interactable=hud.interaction.shop.Money>=100;
+            deathText.text="Chọn cách hồi sinh. Bạn có "+hud.interaction.shop.Money+" xu.\nTrả xu để giữ đồ hoặc rơi tối đa 3 món tại nơi ngã xuống.";
+        }
+        public void Respawn(bool pay)
+        {
+            if(!IsAwaitingRespawn)return;
+            var shop=hud.interaction.shop;
+            if(pay&&!shop.TrySpend(100))return;
+            if(!pay)
+            {
+                var bag=AdventureBag.Instance;bag?.Sync();
+                if(bag!=null)for(int n=0;n<3;n++)
+                {
+                    var choices=new List<int>();
+                    for(int i=0;i<bag.Slots.Length;i++)if(bag.Slots[i].count>0&&
+                        (bag.Slots[i].item<100||bag.Slots[i].item>=104))choices.Add(i);
+                    if(choices.Count==0)break;
+                    int slot=choices[Random.Range(0,choices.Count)];int item=bag.Slots[slot].item;
+                    int crop=item==38?hud.interaction.inventory.FirstMutantCrop():-1;
+                    if(item<100)hud.interaction.inventory.Remove(item,1);
+                    else{bag.Slots[slot].count--;if(bag.Slots[slot].count<=0)bag.Slots[slot]=new BagSlot();}
+                    WorldPickup.Spawn(item,1,hud.player.transform.position+Vector3.up,crop);
+                    bag.Sync();
+                }
+            }
+            Health=100;starvationTimer=0;deathPanel.SetActive(false);
+            hud.player.Teleport(hud.player.transform.position.y>500?IslandManager.ExploreArrival:IslandManager.FarmArrival);
+            hud.Resume();hud.Notify(pay?"Đã hồi sinh và giữ đồ (-100 xu).":"Đã hồi sinh. 3 món đã rơi tại vị trí ngã xuống.");
         }
     }
 
@@ -82,7 +128,10 @@ namespace NongTrai
     {
         AdventureWolves pack;
         CharacterController controller;
-        float gravity, biteTimer;
+        float gravity, biteTimer,health=45;
+        Vector3 knockback;
+        Transform healthCanvas;
+        Image healthFill;
         GameObject den;
         Vector3 denPosition;
         bool retreating;
@@ -106,7 +155,20 @@ namespace NongTrai
                 Part(root.transform, "Mắt", new Vector3(side * .19f, .98f, 1.0f), new Vector3(.09f, .09f, .06f), new Color(1, .5f, .1f));
                 foreach (float z in new[] { -.43f, .43f }) Part(root.transform, "Chân", new Vector3(side * .3f, .22f, z), new Vector3(.18f, .45f, .2f), new Color(.24f, .27f, .3f));
             }
+            var canvas=new GameObject("Máu sói",typeof(RectTransform),typeof(Canvas));canvas.GetComponent<Canvas>().renderMode=RenderMode.WorldSpace;
+            wolf.healthCanvas=canvas.transform;wolf.healthCanvas.SetParent(root.transform,false);wolf.healthCanvas.localPosition=Vector3.up*1.65f;wolf.healthCanvas.localScale=Vector3.one*.01f;
+            var back=FarmUi.Panel(wolf.healthCanvas,"Nền máu",new Vector2(100,12));
+            var fill=FarmUi.Panel(back.transform,"Máu còn",new Vector2(96,8));wolf.healthFill=fill.GetComponent<Image>();wolf.healthFill.color=new Color(.9f,.2f,.2f);
+            var fr=fill.GetComponent<RectTransform>();fr.anchorMin=fr.anchorMax=fr.pivot=new Vector2(0,.5f);fr.anchoredPosition=new Vector2(2,0);
             return wolf;
+        }
+        public void Hit(Vector3 attacker)
+        {
+            var bag=AdventureBag.Instance;int item=bag==null?-1:bag.Item;
+            if((item==104||item==106||item==107)&&!bag.DamageTool())return;
+            health-=item==106?24+(FarmExpansion.Instance==null?0:FarmExpansion.Instance.ToolTiers[2]*6):item==107?18:6;
+            knockback=(transform.position-attacker).normalized*3.5f;knockback.y=0;
+            if(health<=0){WorldPickup.Spawn(7,1,transform.position);Destroy(gameObject);}
         }
         void OnDestroy(){if(den!=null)Destroy(den);}
         public void Retreat(){retreating=true;}
@@ -120,6 +182,7 @@ namespace NongTrai
         void Update()
         {
             if (pack == null || TimeManager.Instance.player.Paused) return;
+            if(healthCanvas!=null&&Camera.main!=null){healthCanvas.rotation=Camera.main.transform.rotation;healthFill.rectTransform.sizeDelta=new Vector2(96*Mathf.Clamp01(health/45),8);}
             var player = TimeManager.Instance.player.transform;
             var delta = player.position - transform.position; delta.y = 0;
             if(retreating)
@@ -144,7 +207,8 @@ namespace NongTrai
             }
             if (direction.sqrMagnitude > .01f) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 5);
             gravity = controller.isGrounded ? -.8f : Mathf.Max(-20, gravity - 25 * Time.deltaTime);
-            var collision=controller.Move((direction * (afraid ? 4.2f : 2.2f) + Vector3.up * gravity) * Time.deltaTime);
+            var collision=controller.Move((direction * (afraid ? 4.2f : 2.2f) + knockback + Vector3.up * gravity) * Time.deltaTime);
+            knockback=Vector3.MoveTowards(knockback,Vector3.zero,Time.deltaTime*8);
             if((collision&CollisionFlags.Sides)!=0&&controller.isGrounded)gravity=5.2f;
         }
     }

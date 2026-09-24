@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace NongTrai
 {
-    public sealed class AnimalPen : MonoBehaviour
+    public sealed class AnimalPen : MonoBehaviour,IInteractable
     {
         public AnimalSpecies species;
         public Vector2 minimum, maximum;
@@ -83,6 +83,17 @@ namespace NongTrai
             int result = StoredEggs;
             StoredEggs = 0;
             return result;
+        }
+        public string InteractionHint=>"[Chuột trái] Thu toàn bộ sản phẩm sẵn có trong chuồng "+FarmBarnMenu.SpeciesName(species);
+        public bool CanInteract(FarmPlayer source)=>true;
+        public void SetHighlighted(bool selected)=>InteractionOutline.Set(this,selected);
+        public void Interact(PlayerInteraction actor)
+        {
+            int collected=0;
+            if(species==AnimalSpecies.Chicken){collected=CollectEggs();if(collected>0)actor.inventory.Add(4,collected);}
+            else foreach(var animal in FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None))
+                if(animal.pen==this&&animal.ProductReady&&animal.TryCollect(actor.inventory,out _))collected++;
+            actor.Say(collected>0?"Đã thu sản phẩm từ chuồng "+FarmBarnMenu.SpeciesName(species)+" ("+collected+").":"Chuồng chưa có sản phẩm sẵn sàng.");
         }
         public void RestoreProduction(int eggs,float progress)
         { StoredEggs=Mathf.Clamp(eggs,0,25); EggProgress=Mathf.Clamp(progress,0,30); }

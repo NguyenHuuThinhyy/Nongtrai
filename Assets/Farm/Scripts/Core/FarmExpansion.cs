@@ -24,7 +24,7 @@ namespace NongTrai
         Text summary, feedback;
         readonly int[] regionLevels = { 1, 2, 4, 6 };
         readonly int[] regionPrices = { 0, 500, 1200, 2400 };
-        readonly string[] toolNames = { "Cuốc", "Bình tưới", "Liềm" };
+        readonly string[] toolNames = { "Xẻng", "Bình tưới", "Kiếm" };
         readonly string[] tierNames = { "Đồng", "Bạc", "Vàng" };
         public int ExperienceNeeded => Level * 100;
         public int ToolRadius(int tool) => ToolTiers[tool] == 0 ? 1 : ToolTiers[tool] == 1 ? 3 : 5;
@@ -79,7 +79,7 @@ namespace NongTrai
             string regions="";
             for(int i=0;i<4;i++) regions+=(i>0?" • ":"")+"V"+(i+1)+":"+(UnlockedRegions[i]?"mở":"khóa");
             summary.text="Ngày "+Day+" • LV "+Level+"/"+LevelCap+" ("+Experience+"/"+ExperienceNeeded+" XP) • "+shop.Money+" xu\n"
-                +regions+"\nCuốc "+tierNames[ToolTiers[0]]+" • Tưới "+tierNames[ToolTiers[1]]+" • Liềm "+tierNames[ToolTiers[2]];
+                +regions+"\nXẻng "+tierNames[ToolTiers[0]]+" • Tưới "+tierNames[ToolTiers[1]]+" • Kiếm "+tierNames[ToolTiers[2]];
         }
         public bool BuyRegion(int region)
         {
@@ -107,7 +107,7 @@ namespace NongTrai
         {
             Level=Mathf.Max(1,level); Experience=Mathf.Max(0,xp);
             LevelCap=99;
-            if(clock!=null) clock.Restore(day,time,clock.Weather);
+            if(clock!=null) clock.Restore(day,time,clock.Weather,clock.WeatherRemaining);
             for(int i=0;i<3;i++) ToolTiers[i]=tiers!=null && i<tiers.Length?Mathf.Clamp(tiers[i],0,2):0;
             for(int i=0;i<4;i++) UnlockedRegions[i]=i==0 || (regions!=null && i<regions.Length && regions[i]);
             foreach(var plot in FindObjectsByType<FarmPlot>(FindObjectsSortMode.None)) plot.Highlight(false);
@@ -118,11 +118,11 @@ namespace NongTrai
             if(!IsUnlocked(center)) return "Vùng đất chưa mở. Cần LV "+regionLevels[RegionFor(center)]+" và "
                 +regionPrices[RegionFor(center)]+" xu. Nhấn N để mua.";
             int slot=FarmHudV2.Instance==null?0:FarmHudV2.Instance.SelectedSlot;
-            if(center.State==PlotState.Untilled && slot!=4) return "Hãy chọn Cuốc trên hotbar trước khi cày.";
+            if(center.State==PlotState.Untilled && slot!=4) return "Hãy chọn Xẻng trên hotbar trước khi xới.";
             if(center.State==PlotState.Tilled && (slot<0 || slot>2)) return "Hãy chọn hạt giống trên hotbar trước khi gieo.";
             if(center.State==PlotState.Growing && slot!=5) return "Hãy chọn Bình tưới trên hotbar trước khi tưới.";
-            if(center.State==PlotState.Ready && slot!=6) return "Hãy chọn Liềm trên hotbar trước khi thu hoạch.";
-            int tool=center.State==PlotState.Untilled?0:center.State==PlotState.Growing?1:center.State==PlotState.Ready?2:-1;
+            int tool=center.State==PlotState.Untilled?0:center.State==PlotState.Growing?1:-1;
+            if(tool==0&&AdventureBag.Instance!=null&&!AdventureBag.Instance.DamageTool())return "Xẻng đã hỏng. Sửa trong túi hoặc mua xẻng mới.";
             int range=tool<0?1:ToolRadius(tool);
             var plots=FindObjectsByType<FarmPlot>(FindObjectsSortMode.None);
             Array.Sort(plots,(a,b)=>Vector3.SqrMagnitude(a.transform.position-center.transform.position)
@@ -135,9 +135,9 @@ namespace NongTrai
                     Vector3.Distance(plot.transform.position,center.transform.position)>4.5f) continue;
                 if(plot.State==PlotState.Tilled && !shop.ConsumeSeed(field.Selected)) break;
                 if(plot.State==PlotState.Growing && (FarmWaterSystem.Instance==null || !FarmWaterSystem.Instance.Consume(1))) break;
-                CropDefinition crop=plot.Crop;
+                CropDefinition crop=plot.Crop;bool mutated=plot.Mutated;
                 plot.Work(field.Current,out int harvest);
-                if(harvest>0) { field.Record(crop,harvest); harvestedTotal+=harvest; GainExperience(8); }
+                if(harvest>0) { if(mutated) inventory.AddMutated(Array.IndexOf(field.crops,crop),harvest);else field.Record(crop,harvest); harvestedTotal+=harvest; GainExperience(8); }
                 worked++;
             }
             if(worked==0) return center.State==PlotState.Tilled?"Hết hạt giống. Nhấn B để mở shop.":

@@ -262,12 +262,12 @@ namespace NongTrai
             var orders=FarmCraftOrders.Instance;
             var creative=CreativeModeManager.Instance;
             var building=FarmBuildingSystem.Instance;
-            if(progress==null || processing==null || processing.Recipes.Length!=6 || water==null || orders==null || creative==null || building==null)
+            if(progress==null || processing==null || processing.Recipes.Length!=7 || water==null || orders==null || creative==null || building==null)
                 throw new InvalidOperationException("Expansion systems or JSON recipes missing.");
             water.Open();if(!player.Paused || !water.Panel.activeSelf) throw new InvalidOperationException("Water modal failed to open.");
             hud.Resume();if(water.Panel.activeSelf) throw new InvalidOperationException("Water modal did not close with resume/ESC flow.");
             orders.OpenCraft();if(!player.Paused || !orders.CraftPanel.activeSelf) throw new InvalidOperationException("Craft modal failed to open.");
-            if(orders.Recipes.Length!=15)throw new InvalidOperationException("Expanded JSON crafting book missing.");
+            if(orders.Recipes.Length!=18)throw new InvalidOperationException("Expanded JSON crafting book missing.");
             Capture(Path.Combine(folder,"craft-preview.png"),hud,camera);
             hud.Resume();if(orders.CraftPanel.activeSelf) throw new InvalidOperationException("Craft modal did not close with resume/ESC flow.");
             var beforeCraftRay=player.transform.position;
@@ -509,7 +509,7 @@ namespace NongTrai
             string modernSave=File.ReadAllText(save.SavePath);
             player.Teleport(new Vector3(200,.4f,-20));
             if(!save.Save())throw new InvalidOperationException("Migration fixture save failed.");
-            string oldSave=File.ReadAllText(save.SavePath).Replace("\"version\": 11","\"version\": 7");
+            string oldSave=File.ReadAllText(save.SavePath).Replace("\"version\": 12","\"version\": 7");
             File.WriteAllText(save.SavePath,oldSave);
             if(!save.Load()||Mathf.Abs(player.transform.position.y-1000.4f)>1)throw new InvalidOperationException("Legacy player position migration failed.");
             File.WriteAllText(save.SavePath,modernSave);if(!save.Load())throw new InvalidOperationException("Modern restore failed.");
@@ -518,6 +518,7 @@ namespace NongTrai
             save.pathOverride=null;
             Debug.Log("FARM_ISLANDS_TIME_OK: 18-minute day, seasons, rain, storm puzzle, sleep, two portals with remembered positions, voxel mining, level cap, furnace blueprint, hotbar and manual save.");
             yield return AdventureChecks.Run(save,player);
+            yield return FarmV12Checks.Run(save,player);
             save.pathOverride=Path.Combine(Application.temporaryCachePath,"farm-creative-do-not-save.json");
             if(File.Exists(save.SavePath)) File.Delete(save.SavePath);
             creative.StartCreative();

@@ -25,7 +25,7 @@ namespace NongTrai
             Physics.SyncTransforms();if(building.TryPlaceSelected(place,0)||building.TryPlaceSelected(player.transform.position+Vector3.up*.5f,0))throw new Exception("Placement overlap accepted");
             PlacedBlock block=null;foreach(var b in UnityEngine.Object.FindObjectsByType<PlacedBlock>(FindObjectsSortMode.None))if(Vector3.Distance(b.transform.position,place)<.1f)block=b;
             if(!building.BreakPlaced(block,true)||WorldPickup.Snapshot().Length==0)throw new Exception("Placed block destruction did not drop loot");
-            bag.Slots[0]=new BagSlot{item=109,count=1,durability=2};bag.Select(0);
+            bag.Slots[0]=new BagSlot{item=104,count=1,durability=2};bag.Select(0);
             if(bag.BreakSeconds(3)>=2||!bag.DamageTool()||!bag.DamageTool()||bag.DamageTool())throw new Exception("Tool hardness/durability failed");
             inv.Add(27,1);var soil=new Vector3Int(15,3,6);if(!world.Plant(soil))throw new Exception("Sapling planting failed");
             var random=UnityEngine.Random.state;UnityEngine.Random.InitState(813);TimeManager.Instance.Restore(2,.5f,FarmWeather.Sunny);
@@ -40,6 +40,7 @@ namespace NongTrai
             if(wheat<0)throw new Exception("Food unavailable");if(wheat!=0){bag.BeginDrag(wheat,false);bag.Drop(0);}bag.Select(0);
             WildAnimal a=null,b2=null;foreach(var a2 in UnityEngine.Object.FindObjectsByType<WildAnimal>(FindObjectsSortMode.None)){if(a2.record.id=="test-a")a=a2;if(a2.record.id=="test-b")b2=a2;}
             if(a==null||b2==null||!a.Feed()||!b2.Feed())throw new Exception("Wild animal feeding failed");
+            b2.transform.position=a.transform.position+Vector3.right;Physics.SyncTransforms();
             wildlife.Breed(a);if(wildlife.Snapshot().births!=1)throw new Exception("Wild animal breeding failed");
             for(int i=0;i<6;i++)a.Hit();if(!a.record.dead)throw new Exception("Wild animal combat failed");
             if(!save.Save())throw new Exception("New adventure state save failed");bag.Restore(null);wildlife.Restore(null);WorldPickup.Restore(null);

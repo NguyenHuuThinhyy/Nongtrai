@@ -79,6 +79,8 @@ namespace NongTrai
             }
             float speed=Input.Run.IsPressed()?settings.runSpeed:settings.walkSpeed;
             if(flying && Input.Run.IsPressed()) speed*=2;
+            if(!flying&&transform.position.y<.15f&&transform.position.x>25.5f&&transform.position.x<38.5f&&transform.position.z>-25&&transform.position.z<-5)
+                speed*=.48f;
             controller.Move((move * speed
                 + Vector3.up * verticalSpeed*(flying?speed:1)) * Time.deltaTime);
             if (move.sqrMagnitude > 0.01f)

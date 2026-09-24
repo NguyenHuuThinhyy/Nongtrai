@@ -219,7 +219,7 @@ namespace NongTrai
             if(hud==null||hud.player==null)return;
             if(!hud.player.Paused)AdvanceTrees(Time.deltaTime);
             if(IsExploring)Stream(hud.player.transform.position);
-            if(hud.player.Paused||FarmBuildingSystem.Instance.IsBuilding){hold=0;return;}
+            if(hud.player.Paused||FarmHud.WorldClickSuppressed||FarmBuildingSystem.Instance.IsBuilding){hold=0;return;}
             var cam=Camera.main;if(cam==null||Mouse.current==null)return;
             UpdateMiningRay(FarmAim.Ray(cam),Mouse.current.leftButton.isPressed,Time.deltaTime);
         }
@@ -230,9 +230,14 @@ namespace NongTrai
             // The third-person ray must pass through the player's own layer and reach past the camera offset.
             if(Physics.Raycast(ray,out var hit,24,~(1<<8),QueryTriggerInteraction.Ignore))
             {
+                var wolf=hit.collider.GetComponentInParent<NightWolf>();
+                if(wolf!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
+                {miningHint="Sói đêm • Chuột trái: đánh từng đòn";hasTarget=true;hold=0;
+                 if(Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame)wolf.Hit(hud.player.transform.position);return false;}
                 var wild=hit.collider.GetComponentInParent<WildAnimal>();
                 if(wild!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
-                {if(entityTarget!=wild.GetInstanceID()){entityTarget=wild.GetInstanceID();hold=0;}breakDuration=.5f;miningHint=wild.Status;hasTarget=true;if(pressed){hold+=elapsed;if(hold>=.5f){wild.Hit();hold=0;}}else hold=0;return false;}
+                {entityTarget=wild.GetInstanceID();hold=0;breakDuration=.35f;miningHint=wild.Status;hasTarget=true;
+                 if(Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame)wild.Hit();return false;}
                 var chest=hit.collider.GetComponentInParent<FarmChest>();
                 if(chest!=null&&chest.isExploration&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
                 {
@@ -244,11 +249,14 @@ namespace NongTrai
                 var placed=hit.collider.GetComponentInParent<PlacedBlock>();
                 if(placed!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
                 {
+                    var fire=placed.GetComponent<CampfireCooker>();
+                    if(fire!=null&&AdventureBag.Instance!=null&&AdventureBag.Instance.Item==7&&Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame)
+                    {fire.Interact(hud.interaction);hold=0;return false;}
                     if(entityTarget!=placed.GetInstanceID()){entityTarget=placed.GetInstanceID();hold=0;}
                     int material=placed.type==0?7:placed.type==1||placed.type==4?3:1;
                     var bag=AdventureBag.Instance;breakDuration=bag.BreakSeconds(material);hasTarget=true;hold=pressed?hold+elapsed:0;
                     miningHint="Giữ trái: phá khối • "+Mathf.FloorToInt(hold/breakDuration*100)+"%";
-                    if(hold>=breakDuration){hold=0;bool correct=material==1||bag.CorrectTool(material);if(bag.Item>=104)correct&=bag.DamageTool();return FarmBuildingSystem.Instance.BreakPlaced(placed,correct);}return false;
+                    if(hold>=breakDuration){hold=0;if(bag.Item==104||bag.Item==107)bag.DamageTool();return FarmBuildingSystem.Instance.BreakPlaced(placed,true);}return false;
                 }
             }
             if(IsExploring&&hit.collider!=null&&IsTerrain(hit.collider))
@@ -263,8 +271,8 @@ namespace NongTrai
                 string name=BlockAt(c)==7?"Thân gỗ":BlockAt(c)==8?"Lá":BlockAt(c)==4?"Quặng":BlockAt(c)==3?"Đá":"Đất";
                 if(pressed)hold+=Mathf.Max(0,elapsed);else hold=0;
                 miningHint=name+" • Giữ CHUỘT TRÁI: "+Mathf.Min(100,Mathf.FloorToInt(hold/seconds*100))+"%";
-                if(hold>=seconds){hold=0;var bag=AdventureBag.Instance;bool correct=bag==null||bag.CorrectTool(BlockAt(c));
-                    bool durable=bag==null||bag.Item<104||bag.DamageTool();return MineCell(c,true,durable&&(BlockAt(c)!=3&&BlockAt(c)!=4&&BlockAt(c)!=7||correct));}
+                if(hold>=seconds){hold=0;var bag=AdventureBag.Instance;
+                    if(bag!=null&&(bag.Item==104||bag.Item==107))bag.DamageTool();return MineCell(c,true,true);}
             }
             else{hasTarget=false;hold=0;}
             return false;

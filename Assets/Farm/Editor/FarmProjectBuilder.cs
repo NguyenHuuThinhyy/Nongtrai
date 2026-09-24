@@ -133,7 +133,13 @@ namespace NongTrai.Editor
         static void BuildLandscape()
         {
             var environment = new GameObject("Environment - replaceable primitive art").transform;
-            Box("Meadow", new Vector3(0, -0.3f, 0), new Vector3(100, 0.6f, 100), grass, environment);
+            // Tách collider mặt đất để hồ có đáy thấp hơn một khối, đồng thời nối khu vườn phía đông.
+            Box("Meadow west",new Vector3(-12.25f,-.3f,0),new Vector3(75.5f,.6f,100),grass,environment);
+            Box("Meadow east",new Vector3(64.25f,-.3f,0),new Vector3(51.5f,.6f,100),grass,environment);
+            Box("Meadow pond south",new Vector3(32,-.3f,-37.5f),new Vector3(13,.6f,25),grass,environment);
+            Box("Meadow pond north",new Vector3(32,-.3f,22.5f),new Vector3(13,.6f,55),grass,environment);
+            Box("Pond bottom",new Vector3(32,-1.3f,-15),new Vector3(13,.6f,20),earth,environment);
+            Box("Vườn cây phía đông",new Vector3(68,.015f,0),new Vector3(29,.03f,75),Mat("Orchard path","A9B66C"),environment,false);
             Box("Farm lane", new Vector3(0, 0.015f, 3), new Vector3(6, 0.035f, 83), Mat("Path", "BEA777"), environment, false);
             Box("Courtyard", new Vector3(3, 0.02f, 16), new Vector3(33, 0.04f, 13), Mat("Path", "BEA777"), environment, false);
             for (int field = 0; field < 4; field++)
@@ -162,7 +168,7 @@ namespace NongTrai.Editor
             Shape("Silo dome", PrimitiveType.Sphere, new Vector3(-23, 8, 24), new Vector3(4.8f, 2, 4.8f), metal, environment, false);
             for (int i = 0; i < 4; i++)
                 Shape("Hay bale", PrimitiveType.Cylinder, new Vector3(-23 + i * 2.2f, 0.85f, 14), new Vector3(1.6f, 0.85f, 1.6f), gold, environment);
-            Box("Pond surface - decorative", new Vector3(32, 0.07f, -15), new Vector3(13, 0.1f, 20), water, environment, false);
+            Box("Pond surface - decorative", new Vector3(32, -0.05f, -15), new Vector3(13, 0.08f, 20), water, environment, false);
             for (int i = 0; i < 11; i++)
             {
                 var board=Box("Pond boardwalk", new Vector3(27.5f + i * 0.7f, 0.3f, -11), new Vector3(0.62f, 0.35f, 3), wood, environment);
@@ -173,7 +179,7 @@ namespace NongTrai.Editor
             {
                 float angle = i * Mathf.PI * 2 / 36;
                 float radius = 38 + (float)random.NextDouble() * 7;
-                Tree(environment, new Vector3(Mathf.Sin(angle) * radius, 0, Mathf.Cos(angle) * radius), 0.85f + (float)random.NextDouble() * 0.6f);
+                Tree(environment, new Vector3(Mathf.Sin(angle) * radius, 0, Mathf.Cos(angle) * radius), 0.85f + (float)random.NextDouble() * 0.6f,i);
             }
             for (int i = -9; i <= 9; i++)
             {
@@ -182,13 +188,16 @@ namespace NongTrai.Editor
                 Fence(environment, new Vector3(39, 0, i * 4), true);
             }
             // Biên mềm của bản đồ: collider vô hình cao để không thể nhảy ra ngoài.
-            foreach (Vector3 p in new[] { new Vector3(-49, 3, 0), new Vector3(49, 3, 0), new Vector3(0, 3, -49), new Vector3(0, 3, 49) })
+            foreach (Vector3 p in new[] { new Vector3(-49, 3, 0), new Vector3(89, 3, 0), new Vector3(20, 3, -49), new Vector3(20, 3, 49) })
             {
-                var boundary = Box("Map boundary", p, p.x != 0 ? new Vector3(1, 6, 100) : new Vector3(100, 6, 1), grass, environment);
+                var boundary = Box("Map boundary", p, p.x == -49||p.x==89 ? new Vector3(1, 6, 100) : new Vector3(140, 6, 1), grass, environment);
                 boundary.GetComponent<Renderer>().enabled = false;
             }
+            var orchardGate=Box("Cổng vườn LV6",new Vector3(49.8f,1.3f,0),new Vector3(.35f,2.6f,85),wood,environment);
+            orchardGate.AddComponent<FarmOrchardGate>();
+            Sign(environment,new Vector3(53,0,35),"Vườn cây LV6","Mở vùng đất 4, chọn hạt cây nhặt từ Khám phá và chuột phải trên đất để trồng.");
             Sign(environment, new Vector3(2.6f, 0, 7), "Chào mừng", "Chọn hạt/công cụ bằng 1–9 hoặc lăn chuột. Ngắm ô đất rồi click trái để cày, gieo, tưới, thu hoạch. E mở bản đồ việc.");
-            Sign(environment, new Vector3(-5, 0, -3), "Khu canh tác", "Cây cần nước để lớn. Sau 35–55 giây được tưới, cây chín và có thể thu hoạch bằng E.");
+            Sign(environment, new Vector3(-5, 0, -3), "Khu canh tác", "Chọn xẻng để xới, hạt để gieo, bình để tưới. Cây chín click trái để hái, không cần liềm.");
             var sun = new GameObject("Sun - fixed morning light").AddComponent<Light>();
             sun.type = LightType.Directional; sun.intensity = 2.2f;
             sun.color = new Color(1, 0.93f, 0.79f); sun.shadows = LightShadows.Soft;
@@ -234,11 +243,12 @@ namespace NongTrai.Editor
             Box("Lintel", new Vector3(0, 3.4f, -4.15f), new Vector3(4.7f, 0.22f, 0.2f), cream, barn);
             Box("Window", new Vector3(0, 4.35f, -4.12f), new Vector3(1.2f, 0.85f, 0.16f), metal, barn);
         }
-        static void Tree(Transform parent, Vector3 p, float s)
+        static void Tree(Transform parent, Vector3 p, float s,int id)
         {
-            Shape("Tree trunk", PrimitiveType.Cylinder, p + Vector3.up * 1.7f * s, new Vector3(0.65f, 1.7f, 0.65f) * s, wood, parent);
-            Shape("Tree crown", PrimitiveType.Sphere, p + Vector3.up * 4.4f * s, new Vector3(4.5f, 4.3f, 4.2f) * s, leaves, parent, false);
-            Shape("Tree crown highlight", PrimitiveType.Sphere, p + new Vector3(1, 5.2f, -0.5f) * s, new Vector3(3, 2.8f, 3) * s, grass, parent, false);
+            var root=Pivot("Cây gỗ nông trại "+id,parent,p);root.gameObject.AddComponent<FarmDecorTree>().id=id;
+            Shape("Tree trunk", PrimitiveType.Cylinder, Vector3.up * 1.7f * s, new Vector3(0.65f, 1.7f, 0.65f) * s, wood, root);
+            Shape("Tree crown", PrimitiveType.Sphere, Vector3.up * 4.4f * s, new Vector3(4.5f, 4.3f, 4.2f) * s, leaves, root, false);
+            Shape("Tree crown highlight", PrimitiveType.Sphere, new Vector3(1, 5.2f, -0.5f) * s, new Vector3(3, 2.8f, 3) * s, grass, root, false);
         }
         static void Fence(Transform parent, Vector3 p, bool sideways)
         {
@@ -335,7 +345,7 @@ namespace NongTrai.Editor
             Button(hud.pausePanel.transform,"Thoát game",new Vector2(35,-415),hud.Quit);
             hud.saveStatus=Label(hud.pausePanel.transform,"Chỉ lưu khi nhấn Lưu game.",new Vector2(35,-505),new Vector2(520,38),19,Color.white);
             hud.instructions=Panel(hud.pausePanel.transform,"Instructions",new Vector2(595,-35),new Vector2(665,510),new Color(.15f,.25f,.19f,1));
-            Label(hud.instructions.transform,"HƯỚNG DẪN\n\nWASD đi • Shift chạy • Space nhảy\nChuột nhìn • V đổi góc nhìn • E tương tác\n1–3 Hạt • 5 Cuốc • 6 Tưới • 7 Liềm\n8 Rìu hạ cây lấy gỗ • 9 Giỏ hái táo\nB Túi đồ rồi chọn Shop • M Chế biến\nG xây dựng • Trái đặt • Phải tháo • R xoay\nF cho thú ăn • Tab Bản đồ • P Chuồng\nSáng tạo: F8 bay • Space lên • X xuống\nEsc đóng bảng hoặc tạm dừng\n\nThoát không tự lưu. Nhấn Lưu game để lưu.",new Vector2(25,-25),new Vector2(615,470),19,Color.white);
+            Label(hud.instructions.transform,"HƯỚNG DẪN\n\nWASD đi • Shift chạy • Space nhảy\nChuột nhìn • V đổi góc nhìn • E bản đồ việc\n1–3 Hạt • 5 Xẻng xới/đào • 6 Tưới • 7 Kiếm\nCây chín click trái để hái tay • 8 Rìu đốn nhanh\nB Túi đồ rồi chọn Shop • M Máy chế biến\nG xây dựng • Trái đặt/giữ phá • R xoay\nF cho thú ăn • Tab Đổi map • P Chuồng\nThịt sống + đống lửa: click để nướng 10 giây\nX hoặc Esc đóng bảng • Sáng tạo F8 bay\nMáu cạn: chọn trả 100 xu hoặc rơi 3 món\n\nThoát không tự lưu. Nhấn Lưu game để lưu.",new Vector2(25,-25),new Vector2(615,470),19,Color.white);
             Button(hud.pausePanel.transform,"Cài đặt âm lượng",new Vector2(560,-415),hud.OpenSettings);
             Button(hud.pausePanel.transform,"Về menu chính",new Vector2(560,-315),hud.ReturnToMain);
             hud.instructions.SetActive(false);

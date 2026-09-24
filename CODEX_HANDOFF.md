@@ -1,13 +1,12 @@
-# CẬP NHẬT ƯU TIÊN — 24/09/2026: TRẠNG THÁI MÃ MỚI NHẤT
+# CẬP NHẬT ƯU TIÊN — 24/09/2026: BẢN v12 ĐÃ KIỂM TRA
 
 Các mục cũ bên dưới là lịch sử và có thể sai về phiên bản lưu, hotbar hoặc tính năng. Khi mâu thuẫn, kiểm tra code trước.
 
-- FarmSave schema v11 đọc v2–v11. Ghi túi đồ 36 ô, vật phẩm rơi, thú hoang, vị trí hai map, kho/rương, sức khỏe và hướng dẫn. Không tự lưu; sáng tạo LV99 dùng bản RAM.
-- PlayerInteraction dùng ray từ dấu + để click trái tương tác trên nông trại; E mở bản đồ nhiệm vụ tương tác. ExplorationWorld hiển thị dấu + ở cả hai map. IslandManager nhớ và lưu vị trí từng map, Tab trở về đúng chỗ đã rời.
-- FarmCraftOrders có 15 công thức trong Assets/StreamingAssets/crafting.json, danh sách cuộn và icon; hộp thư năm đơn/ngày với độ khó/thời hạn. FarmShop có ba trang 24 mặt hàng. FarmItemIconLibrary vẽ icon và FarmBuildingSystem có 13 loại khối, gồm rương và đống lửa.
-- FarmNoticeBoard hiển thị sơ đồ tọa độ thu nhỏ và bản đồ E có marker click được cho ruộng, thú đói, đơn đủ hàng, rương và nguy hiểm. FarmStorage tạo nhà kho và rương khám phá rải thưa; AdventureWolves có sói đêm sợ đuốc/đống lửa và về hang khi sáng. FarmAnimal chờ ở ổ khi có sản phẩm, click ổ lấy, click con chỉ bế.
-- TimeManager có một ngày 1080 giây/18 phút, tỉ lệ nắng/mưa/sương/bão 67/15/14/4%. Thông số 10 phút trong phần cũ đã lỗi thời.
-- Build release ở Logs/build-release-20260924-den.log đã thành công; runtime smoke Logs/smoke-release-20260924-den.log có FARM_CROPS_SMOKE_OK và thoát 0. Build Windows ở Builds/Windows/NongTrai.exe. Ảnh preview nằm ngoài gói phát hành, trong Logs/Previews-20260924-final.
+- FarmSave ghi schema v12 và đọc v2–v11. Dữ liệu mới gồm cây/ruộng đột biến, vườn LV6, chuồng tự đặt, sản phẩm đột biến theo giống, thịt đang nướng, thời lượng mưa, túi/kho/rương, máu/đói và đơn hàng. Công cụ cuốc/cuốc chim bản cũ chuyển thành xẻng. Chỉ nút Lưu game mới ghi bản lưu; sáng tạo LV99 bỏ thay đổi khi thoát.
+- Hai map là Nông trại và Khám phá. Bấm E mở bản đồ nhiệm vụ tương tác đúng map; Tab đổi map và nhớ vị trí. Bấm chuột trái hái nông sản/táo không cần liềm; xẻng xới đất/đào, kiếm đánh, rìu chặt cây nhanh, phá khối luôn làm rơi đồ.
+- Có 18 công thức JSON tại `Assets/StreamingAssets/crafting.json`, bảy máy chế biến tại `Assets/StreamingAssets/recipes.json` gồm máy ủ phân, 40 mã hàng 0–39, cửa hàng bốn trang 32 mặt hàng, năm đơn/ngày; đơn đã giao ẩn đến ngày kế tiếp. Kho/rương kéo-thả với túi đồ; lưới kho hiện phân theo mã hàng.
+- Minimap đã thu nhỏ ở góc phải; các bảng có nút X và đóng bằng ESC/click ngoài; nhân vật có máu/đói ở cả hai map, hai lựa chọn hồi sinh. Vật nuôi sẵn sản phẩm có thể click con hoặc chuồng để thu; thú hoang tái sinh có giới hạn.
+- Một ngày vẫn 1080 giây/18 phút; mưa/bão tối đa 270 giây thực (6 giờ game). Bản build Windows thành công trong `Logs/build-v12-verified.log`; smoke `Logs/smoke-v12-verified.log` thoát 0 với `FARM_V12_OK` và `FARM_CROPS_SMOKE_OK`. Xem `README.md` và `CHOI_GAME.md` cho hướng dẫn hiện hành.
 
 ---
 # CẬP NHẬT ƯU TIÊN — SỬA ĐÀO / NHẢY / HƯỚNG DẪN TAB

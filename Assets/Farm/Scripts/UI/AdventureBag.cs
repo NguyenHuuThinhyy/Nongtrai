@@ -23,10 +23,10 @@ namespace NongTrai
         public bool HoldingBlock=>FarmBuildingSystem.TypeForItem(Item)>=0;
         Image[] pictures=new Image[36],backgrounds=new Image[36];TMP_Text[] labels=new TMP_Text[36];TMP_Text status,dragLabel;Image dragGhost;
         public int dragSource=-1;BagSlot held;bool accepted;int inspected;int lastItem=int.MinValue;
-        readonly string[] tools={"Hạt lúa mì","Hạt cà chua","Hạt đậu nành","Thức ăn thú","Cuốc ruộng","Bình tưới","Liềm","Rìu","Giỏ hái","Cuốc chim","Xẻng"};
+        readonly string[] tools={"Hạt lúa mì","Hạt cà chua","Hạt đậu nành","Thức ăn thú","Xẻng","Bình tưới","Kiếm","Rìu","Giỏ hái","Xẻng cũ","Xẻng cũ"};
         void Awake(){Instance=this;Defaults();}
         void OnDestroy(){if(Instance==this)Instance=null;}
-        void Defaults(){for(int i=0;i<36;i++)Slots[i]=new BagSlot();for(int i=0;i<11;i++)Slots[i]=new BagSlot{item=100+i,count=1,durability=i>=4?100:0};}
+        void Defaults(){for(int i=0;i<36;i++)Slots[i]=new BagSlot();for(int i=0;i<9;i++)Slots[i]=new BagSlot{item=100+i,count=1,durability=i==7?20:i==4||i==6?100:0};}
         public string Name(int id)=>id<0?"Ô trống":id>=100&&id<=110?tools[id-100]:inventory.Name(id);
         public int Icon(int id)=>id>=100?new[]{0,1,2,20,21,22,23,24,25,21,21}[Mathf.Clamp(id-100,0,10)]:FarmItemIconLibrary.ForItem(id);
         public string CountText(int index)
@@ -59,12 +59,12 @@ namespace NongTrai
             var ghost=new GameObject("Vật phẩm đang kéo",typeof(RectTransform),typeof(Image));ghost.transform.SetParent(parent,false);dragGhost=ghost.GetComponent<Image>();dragGhost.raycastTarget=false;dragGhost.rectTransform.sizeDelta=new Vector2(64,64);dragGhost.gameObject.SetActive(false);
             Sync();RefreshView();
         }
-        void Repair(){var s=Slots[inspected];if(s.item<104||s.durability>=100)return;if(!inventory.shop.TrySpend(20)){Tell("Cần 20 xu để sửa.");return;}s.durability=100;Tell("Đã sửa dụng cụ.");}
+        void Repair(){var s=Slots[inspected];int limit=s.item==107?20:100;if(s.item<104||s.durability>=limit)return;if(!inventory.shop.TrySpend(20)){Tell("Cần 20 xu để sửa.");return;}s.durability=limit;Tell("Đã sửa dụng cụ.");}
         public void Select(int index){Selected=Mathf.Clamp(index,0,8);if(LegacySlot>=0&&LegacySlot<3)inventory.field.Select(LegacySlot);FarmBuildingSystem.Instance?.EquipBlock(HoldingBlock?FarmBuildingSystem.TypeForItem(Item):-1);}
         public void Inspect(int index){inspected=index;Tell(Name(Slots[index].item)+" • "+CountText(index));}
         void Tell(string text){if(status!=null)status.text=text;}
         int Total(int id){int count=held!=null&&held.item==id?held.count:0;foreach(var s in Slots)if(s.item==id)count+=s.count;return count;}
-        public int Space(int id){int space=0;foreach(var s in Slots)if(s.count==0)space+=64;else if(s.item==id)space+=Mathf.Max(0,64-s.count);return space;}
+        public int Space(int id){int space=0;foreach(var s in Slots)if(s.count==0)space+=id>=100?1:64;else if(s.item==id&&id<100)space+=Mathf.Max(0,64-s.count);return space;}
         int Insert(int id,int amount)
         {
             for(int pass=0;pass<2;pass++)for(int i=0;i<36&&amount>0;i++)
@@ -72,11 +72,13 @@ namespace NongTrai
             return amount;
         }
         public bool Pickup(int id,int amount)
-        {Sync();if(Space(id)<amount)return false;inventory.Add(id,amount);Sync();return true;}
+        {Sync();if(Space(id)<amount)return false;
+         if(id>=100){for(int i=0;i<36&&amount>0;i++)if(Slots[i].count==0){Slots[i]=new BagSlot{item=id,count=1,durability=id==107?20:100};amount--;}RefreshView();return amount==0;}
+         inventory.Add(id,amount);Sync();return true;}
         public void Sync()
         {
             if(inventory==null)return;
-            for(int id=0;id<38;id++)
+            for(int id=0;id<40;id++)
             {
                 int difference=inventory.Count(id)-Total(id);
                 if(difference>0){int overflow=Insert(id,difference);if(overflow>0){inventory.Remove(id,overflow);WorldPickup.Spawn(id,overflow,inventory.hud.player.transform.position);}}
@@ -84,8 +86,8 @@ namespace NongTrai
             }
         }
         public bool DamageTool()
-        {var s=Slots[Selected];if(s.item<104)return true;if(s.durability<=0){Tell("Dụng cụ hỏng: chọn ô rồi sửa trong túi.");return false;}s.durability--;return true;}
-        public bool CorrectTool(int material)=>material==7?Item==107:material==3||material==4?Item==109:material==8||Item==110;
+        {var s=Slots[Selected];if(s.item!=104&&s.item!=106&&s.item!=107)return true;if(s.durability<=0){Tell("Dụng cụ hỏng: chọn ô rồi sửa trong túi.");return false;}s.durability--;return true;}
+        public bool CorrectTool(int material)=>material==7?Item==107:material==3||material==4||material==8?Item==104:false;
         public float BreakSeconds(int material)
         {float seconds=material==3||material==4?2:material==7?1.6f:material==8?.35f:.8f;return CorrectTool(material)&&Slots[Selected].durability>0?seconds*.4f:seconds;}
         public void BeginDrag(int index,bool half)
@@ -113,8 +115,17 @@ namespace NongTrai
             if(s.count==0)Slots[index]=new BagSlot();else Tell("Hotbar đầy: kéo vật phẩm vào ô để đổi chỗ.");Select(Selected);
         }
         public BagState Snapshot(){EndDrag();Sync();return new BagState{slots=Slots,selected=Selected,satiety=Satiety};}
-        public void Restore(BagState state)
-        {held=null;dragSource=-1;Defaults();if(state?.slots!=null&&state.slots.Length==36){Slots=state.slots;for(int i=0;i<36;i++)if(Slots[i]==null)Slots[i]=new BagSlot();}Satiety=state==null?100:state.satiety;Sync();Select(state==null?0:state.selected);}
+        public void Restore(BagState state,bool migrateLegacy=false)
+        {held=null;dragSource=-1;Defaults();if(state?.slots!=null&&state.slots.Length==36)
+         {Slots=state.slots;bool shovelFound=false;int shovelSlot=-1;
+          for(int i=0;i<36;i++)
+          {if(Slots[i]==null)Slots[i]=new BagSlot();
+           if(migrateLegacy&&(Slots[i].item==109||Slots[i].item==110))Slots[i].item=104;
+           if(migrateLegacy&&Slots[i].item==104&&Slots[i].count>0)
+           {if(shovelFound){Slots[shovelSlot].durability=Mathf.Max(Slots[shovelSlot].durability,Slots[i].durability);Slots[i]=new BagSlot();}
+            else{shovelFound=true;shovelSlot=i;}}
+           if(Slots[i].item==107)Slots[i].durability=Mathf.Min(20,Slots[i].durability);
+          }}Satiety=state==null?100:state.satiety;Sync();Select(state==null?0:state.selected);}
         void Update()
         {
             if(inventory==null)return;Sync();
@@ -134,7 +145,7 @@ namespace NongTrai
             if(dragGhost!=null){dragGhost.gameObject.SetActive(held!=null);if(held!=null){dragGhost.sprite=FarmItemIconLibrary.Get(Icon(held.item));RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)inventory.Panel.transform,Mouse.current.position.ReadValue(),null,out var point);dragGhost.rectTransform.anchoredPosition=point;}}
         }
         public bool Eat()
-        {if(Item<0||Item>33||Item>11&&Item<32||Satiety>=99)return false;int id=Item;if(!inventory.Remove(id,1))return false;Satiety=Mathf.Min(100,Satiety+(id>=32?40:20));inventory.hud.Notify("Đã ăn "+Name(id)+" • No "+Mathf.RoundToInt(Satiety)+"%");return true;}
+        {int id=Item;if(!(id>=0&&id<=11&&id!=7||id==32||id==33||id==39)||Satiety>=99)return false;if(!inventory.Remove(id,1))return false;Satiety=Mathf.Min(100,Satiety+(id>=32?40:20));inventory.hud.Notify("Đã ăn "+Name(id)+" • No "+Mathf.RoundToInt(Satiety)+"%");return true;}
     }
     public sealed class BagSlotDrag:MonoBehaviour,IBeginDragHandler,IDragHandler,IEndDragHandler,IDropHandler,IPointerClickHandler
     {

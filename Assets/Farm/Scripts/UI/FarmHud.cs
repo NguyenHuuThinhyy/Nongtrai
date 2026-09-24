@@ -2,11 +2,14 @@
 using UnityEngine.UI;
 using System.Collections;
 using System;
+using UnityEngine.InputSystem;
 
 namespace NongTrai
 {
     public sealed class FarmHud : MonoBehaviour
     {
+        public static bool WorldClickSuppressed=>Time.frameCount==worldClickBlockedFrame;
+        static int worldClickBlockedFrame=-1;
         public FarmPlayer player;
         public PlayerInteraction interaction;
         public Text prompt;
@@ -20,6 +23,7 @@ namespace NongTrai
         public Button saveButton;
         public GameObject mainMenu,settingsPanel;
         bool settingsFromMain;
+        GameObject modalWithClose;
         float remaining;
         IEnumerator Start()
         {
@@ -66,7 +70,34 @@ namespace NongTrai
         { settingsPanel.SetActive(false);if(settingsFromMain) mainMenu.SetActive(true);else pausePanel.SetActive(true); }
         public bool HandleEscape()
         { if(settingsPanel!=null && settingsPanel.activeSelf) { CloseSettings();return true; }
+          if(AdventureWolves.Instance!=null&&AdventureWolves.Instance.IsAwaitingRespawn)return true;
+          if(CloseOverlay()) return true;
           return mainMenu!=null && mainMenu.activeSelf; }
+        GameObject ActiveOverlay()
+        {
+            foreach(Transform child in transform)
+                if(child.gameObject.activeSelf && child.gameObject!=mainMenu && child.gameObject!=settingsPanel &&
+                   child.gameObject!=pausePanel && child.gameObject!=gameplayChrome &&
+                   child.GetComponent<RectTransform>()!=null && child.GetComponent<Image>()!=null)
+                    return child.gameObject;
+            return null;
+        }
+        public bool CloseOverlay()
+        {
+            if(AdventureWolves.Instance!=null&&AdventureWolves.Instance.IsAwaitingRespawn)return false;
+            var overlay=ActiveOverlay();
+            if(overlay==null)return false;
+            overlay.SetActive(false);Resume();return true;
+        }
+        void EnsureCloseButton(GameObject overlay)
+        {
+            if(overlay==modalWithClose)return;
+            modalWithClose=overlay;
+            if(overlay.transform.Find("Đóng bảng [X]")!=null)return;
+            var button=FarmUi.Button(overlay.transform,"Đóng bảng [X]",new Vector2(-160,-12),new Vector2(145,48),()=>CloseOverlay());
+            var rect=button.GetComponent<RectTransform>();rect.anchorMin=rect.anchorMax=rect.pivot=new Vector2(1,1);
+            rect.anchoredPosition=new Vector2(-12,-12);button.transform.SetAsLastSibling();
+        }
         void OnEnable() { interaction.Message += ShowMessage; player.PauseChanged += OnPause; }
         void OnDisable() { interaction.Message -= ShowMessage; player.PauseChanged -= OnPause; }
         void OnPause(bool paused)
@@ -78,6 +109,29 @@ namespace NongTrai
         public void Notify(string text) => ShowMessage(text);
         void Update()
         {
+            var keysForMap=Keyboard.current;
+            if(!player.Paused&&keysForMap!=null&&keysForMap.eKey.wasPressedThisFrame)
+            {FarmNoticeBoard.Instance?.Open();return;}
+            var overlay=ActiveOverlay();
+            if(overlay!=null && player.Paused && (AdventureWolves.Instance==null||!AdventureWolves.Instance.IsAwaitingRespawn))
+            {
+                EnsureCloseButton(overlay);
+                var keys=Keyboard.current;
+                if(keys!=null && keys.xKey.wasPressedThisFrame){CloseOverlay();return;}
+                if(keys!=null && keys.eKey.wasPressedThisFrame)
+                {
+                    bool map=FarmNoticeBoard.Instance!=null&&FarmNoticeBoard.Instance.IsOpen;
+                    CloseOverlay();if(!map)FarmNoticeBoard.Instance?.Open();return;
+                }
+                var mouse=Mouse.current;
+                if(mouse!=null&&mouse.leftButton.wasPressedThisFrame)
+                {
+                    var canvas=GetComponentInParent<Canvas>();
+                    var camera=canvas!=null&&canvas.renderMode!=RenderMode.ScreenSpaceOverlay?canvas.worldCamera:null;
+                    if(!RectTransformUtility.RectangleContainsScreenPoint(overlay.GetComponent<RectTransform>(),mouse.position.ReadValue(),camera))
+                    {CloseOverlay();return;}
+                }
+            }
             if(saveButton!=null) saveButton.interactable=!CreativeModeManager.IsCreative;
             prompt.text = player.Paused?"":interaction.Hint.Replace("[E]","[CHUỘT TRÁI]");
             if (farmingStatus != null && interaction.field != null)
@@ -93,7 +147,7 @@ namespace NongTrai
         }
         public void StartNormal() => CreativeModeManager.Instance?.StartNormal();
         public void StartCreative() => CreativeModeManager.Instance?.StartCreative();
-        public void Resume() { if(mainMenu!=null) mainMenu.SetActive(false);if(settingsPanel!=null) settingsPanel.SetActive(false);player.SetPaused(false); }
+        public void Resume() { worldClickBlockedFrame=Time.frameCount;if(mainMenu!=null) mainMenu.SetActive(false);if(settingsPanel!=null) settingsPanel.SetActive(false);player.SetPaused(false); }
         public void SaveNow()
         {
             if(CreativeModeManager.IsCreative) { saveStatus.text="Chế độ sáng tạo không ghi vào bản lưu.";return; }

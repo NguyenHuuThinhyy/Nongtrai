@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace NongTrai
 {
-    [Serializable] public sealed class PlacedBlockRecord { public int type;public Vector3 position,euler;public int[] chestItems; }
+    [Serializable] public sealed class PlacedBlockRecord { public int type;public Vector3 position,euler;public int[] chestItems,chestMutated;public bool cooking;public float cookRemaining; }
     [Serializable] public sealed class BuildingState { public PlacedBlockRecord[] blocks; }
 
     public sealed class FarmBuildingSystem : MonoBehaviour
@@ -85,7 +85,7 @@ namespace NongTrai
             {
                 float wheel=mouse.scroll.ReadValue().y;if(PaletteOpen&&Mathf.Abs(wheel)>1)Select((SelectedType+(wheel<0?1:names.Length-1))%names.Length);
                 UpdatePreview();
-                if(mouse.leftButton.wasPressedThisFrame)Place();
+                if(mouse.leftButton.wasPressedThisFrame&&!FarmHud.WorldClickSuppressed)Place();
 
             }
             Refresh();
@@ -131,8 +131,8 @@ namespace NongTrai
             hud.Notify("Đã tháo "+names[block.type]+" và trả vào túi.");
         }
         public bool BreakPlaced(PlacedBlock block,bool drop)
-        {if(block==null||!placed.Remove(block))return false;block.GetComponentInChildren<FarmChest>()?.DropContents();if(drop||block.type==11)WorldPickup.Spawn(ItemForType(block.type),1,block.transform.position);block.gameObject.SetActive(false);Destroy(block.gameObject);return true;}
-        PlacedBlock Create(int type,Vector3 position,Vector3 euler,int[] chestItems=null)
+        {if(block==null||!placed.Remove(block))return false;block.GetComponentInChildren<FarmChest>()?.DropContents();WorldPickup.Spawn(ItemForType(block.type),1,block.transform.position);block.gameObject.SetActive(false);Destroy(block.gameObject);return true;}
+        PlacedBlock Create(int type,Vector3 position,Vector3 euler,int[] chestItems=null,int[] chestMutated=null)
         {
             GameObject root=new GameObject("Khối xây • "+names[type]);root.transform.SetPositionAndRotation(position,Quaternion.Euler(euler));
             var block=root.AddComponent<PlacedBlock>();block.type=type;placed.Add(block);
@@ -153,9 +153,10 @@ namespace NongTrai
             else if(type==9){for(int x=-1;x<=1;x+=2)Part(root.transform,"Cọc hàng rào",new Vector3(x*.42f,0,0),new Vector3(.14f,1.1f,.14f),colors[type]);for(int y=-1;y<=1;y+=2)Part(root.transform,"Thanh chắn",new Vector3(0,y*.25f,0),new Vector3(1,.12f,.12f),colors[type]);}
             else if(type==10)Part(root.transform,"Mặt cầu",new Vector3(0,-.38f,0),new Vector3(1.4f,.18f,2),colors[type]);
             else if(type==11)
-            {var chest=FarmChest.Create(position,false,"",chestItems==null?new int[38]:(int[])chestItems.Clone());chest.transform.SetParent(root.transform,true);}
+            {var chest=FarmChest.Create(position,false,"",chestItems==null?new int[40]:(int[])chestItems.Clone(),chestMutated==null?new int[4]:(int[])chestMutated.Clone());chest.transform.SetParent(root.transform,true);}
             else if(type==12)
             {
+                root.AddComponent<CampfireCooker>();
                 for(int i=0;i<6;i++){float angle=i*Mathf.PI/3;Part(root.transform,"Vòng đá",new Vector3(Mathf.Cos(angle)*.36f,-.35f,Mathf.Sin(angle)*.36f),new Vector3(.27f,.24f,.27f),colors[1]);}
                 Part(root.transform,"Củi cháy",new Vector3(0,-.18f,0),new Vector3(.65f,.16f,.28f),colors[0]);
                 var flame=GameObject.CreatePrimitive(PrimitiveType.Sphere);flame.name="Ngọn lửa";flame.transform.SetParent(root.transform,false);flame.transform.localPosition=new Vector3(0,.12f,0);flame.transform.localScale=new Vector3(.43f,.75f,.43f);
@@ -171,14 +172,37 @@ namespace NongTrai
         public BuildingState Snapshot()
         {
             var records=new List<PlacedBlockRecord>();foreach(var block in placed)if(block!=null)records.Add(new PlacedBlockRecord{type=block.type,position=block.transform.position,euler=block.transform.eulerAngles,
-                chestItems=block.GetComponentInChildren<FarmChest>()==null?null:(int[])block.GetComponentInChildren<FarmChest>().items.Clone()});
+                chestItems=block.GetComponentInChildren<FarmChest>()==null?null:(int[])block.GetComponentInChildren<FarmChest>().items.Clone(),
+                chestMutated=block.GetComponentInChildren<FarmChest>()==null?null:(int[])block.GetComponentInChildren<FarmChest>().mutated.Clone(),
+                cooking=block.GetComponent<CampfireCooker>()!=null&&block.GetComponent<CampfireCooker>().Cooking,
+                cookRemaining=block.GetComponent<CampfireCooker>()==null?0:block.GetComponent<CampfireCooker>().Remaining});
             return new BuildingState{blocks=records.ToArray()};
         }
         public void Restore(BuildingState state)
         {
             foreach(var block in placed)if(block!=null)Destroy(block.gameObject);placed.Clear();
-            if(state?.blocks!=null)foreach(var record in state.blocks)if(record.type>=0&&record.type<names.Length)Create(record.type,record.position,record.euler,record.chestItems);
+            if(state?.blocks!=null)foreach(var record in state.blocks)if(record.type>=0&&record.type<names.Length)
+            {var block=Create(record.type,record.position,record.euler,record.chestItems,record.chestMutated);block.GetComponent<CampfireCooker>()?.Restore(record.cooking,record.cookRemaining);}
         }
     }
     public sealed class PlacedBlock:MonoBehaviour{public int type;}
+    public sealed class CampfireCooker:MonoBehaviour,IInteractable
+    {
+        public bool Cooking {get;private set;}
+        public float Remaining {get;private set;}
+        public string InteractionHint=>Cooking?"Thịt đang nướng • "+Mathf.CeilToInt(Remaining)+" giây":"Chọn thịt sống rồi [Chuột trái] vào lửa để nướng";
+        public bool CanInteract(FarmPlayer player)=>true;
+        public void SetHighlighted(bool value)=>InteractionOutline.Set(this,value);
+        public void Interact(PlayerInteraction actor)
+        {if(Cooking){actor.Say(InteractionHint);return;}
+         if(AdventureBag.Instance==null||AdventureBag.Instance.Item!=7){actor.Say("Chọn thịt sống trong hotbar rồi click lửa.");return;}
+         if(!actor.inventory.Remove(7,1)){actor.Say("Không còn thịt sống.");return;}
+         Cooking=true;Remaining=10;actor.Say("Đang nướng 1 miếng thịt (10 giây).");}
+        public void Restore(bool cooking,float remaining){Cooking=cooking;Remaining=Mathf.Max(0,remaining);}
+        void Update()
+        {if(!Cooking||TimeManager.Instance==null||TimeManager.Instance.player.Paused)return;
+         Remaining-=Time.deltaTime;if(Remaining>0)return;Cooking=false;Remaining=0;
+         FindFirstObjectByType<FarmInventory>()?.Add(39,1);
+         FarmEffects.Burst(transform.position+Vector3.up,"+1 thịt nướng",new Color(1,.65f,.2f));}
+    }
 }

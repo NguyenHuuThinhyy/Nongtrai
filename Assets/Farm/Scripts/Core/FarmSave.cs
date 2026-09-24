@@ -7,17 +7,17 @@ namespace NongTrai
 {
     public sealed class FarmSave : MonoBehaviour
     {
-        [Serializable] sealed class PlotRecord { public int id,state,crop; public float growth,moisture; }
+        [Serializable] sealed class PlotRecord { public int id,state,crop; public float growth,moisture;public bool mutated; }
         [Serializable] sealed class AnimalRecord { public int species,pen; public Vector3 position; public float cooldown,hunger,happiness; }
-        [Serializable] sealed class TreeRecord { public Vector3 position; public float remaining; }
-        [Serializable] sealed class PenRecord { public int id,eggs,upgrade; public float progress; public bool open,active; }
+        [Serializable] sealed class TreeRecord { public Vector3 position; public float remaining,age;public bool planted,mutated; }
+        [Serializable] sealed class PenRecord { public int id,eggs,upgrade,species; public float progress; public bool open,active,placed;public Vector3 position; }
         [Serializable] sealed class ResourceRecord { public int id; public float remaining; }
         [Serializable] sealed class SaveData
         {
-            public int version=11,money,fruit,treeCount,selected,feed,level,xp,day,weather,levelCap;
-            public float dayTime,musicVolume,effectsVolume;
+            public int version=12,money,fruit,treeCount,selected,feed,level,xp,day,weather,levelCap;
+            public float dayTime,musicVolume,effectsVolume,weatherRemaining;
             public bool expanded,tutorialDone;
-            public int[] seeds,harvested,products;
+            public int[] seeds,harvested,products,mutatedCrops;
             public int[] toolTiers;
             public bool[] regions;
             public ProcessingRecord[] processing;
@@ -34,6 +34,8 @@ namespace NongTrai
             public PlotRecord[] plots;
             public AnimalRecord[] animals;
             public TreeRecord[] trees;
+            public int[] cutDecorTrees;
+            public int pendingPen=-1;
             public PenRecord[] pens;
         }
         public FarmShop shop;
@@ -64,21 +66,22 @@ namespace NongTrai
                 var data=new SaveData { money=shop.Money,fruit=shop.Fruit,expanded=shop.Expanded,
                     treeCount=shop.BoughtTrees,selected=field.Selected,tutorialDone=FarmTutorialCoach.Instance!=null&&FarmTutorialCoach.Instance.Completed,
                     seeds=(int[])shop.Seeds.Clone(),harvested=(int[])field.Harvested.Clone(),
-                    products=(int[])inventory.AnimalProducts.Clone(),feed=shop.FeedStock,
+                    products=(int[])inventory.AnimalProducts.Clone(),mutatedCrops=(int[])inventory.MutatedCrops.Clone(),feed=shop.FeedStock,
                     level=expansion.Level,xp=expansion.Experience,levelCap=expansion.LevelCap,
                     day=expansion.Day,dayTime=expansion.DayTime,
                     toolTiers=(int[])expansion.ToolTiers.Clone(),regions=(bool[])expansion.UnlockedRegions.Clone(),
                     processing=processing.Snapshot(),island=islands.Snapshot(),playerPosition=player.transform.position,
-                    weather=(int)clock.Weather,musicVolume=FarmAudio.Instance.MusicVolume,
+                    weather=(int)clock.Weather,weatherRemaining=clock.WeatherRemaining,musicVolume=FarmAudio.Instance.MusicVolume,
                     effectsVolume=FarmAudio.Instance.EffectsVolume,
                     water=water==null?null:water.Snapshot(),orders=orders==null?null:orders.Snapshot(),
                     bag=AdventureBag.Instance?.Snapshot(),drops=WorldPickup.Snapshot(),wildlife=AdventureWildlife.Instance?.Snapshot(),exploration=ExplorationWorld.Instance?.Snapshot(),building=building==null?null:building.Snapshot(),
-                    storage=FarmStorage.Instance?.Snapshot(),playerHealth=AdventureWolves.Instance==null?100:AdventureWolves.Instance.Health };
+                    storage=FarmStorage.Instance?.Snapshot(),playerHealth=AdventureWolves.Instance==null?100:AdventureWolves.Instance.Health,
+                    cutDecorTrees=FarmDecorTree.SnapshotCuts(),pendingPen=FarmPenPlacement.Instance==null?-1:FarmPenPlacement.Instance.Pending };
                 var plots=FindObjectsByType<FarmPlot>(FindObjectsSortMode.None);
                 data.plots=new PlotRecord[plots.Length];
                 for(int i=0;i<plots.Length;i++)
                     data.plots[i]=new PlotRecord { id=plots[i].id,state=(int)plots[i].State,
-                        crop=Array.IndexOf(field.crops,plots[i].Crop),growth=plots[i].Growth,moisture=plots[i].Moisture };
+                        crop=Array.IndexOf(field.crops,plots[i].Crop),growth=plots[i].Growth,moisture=plots[i].Moisture,mutated=plots[i].Mutated };
                 var validAnimals=new System.Collections.Generic.List<FarmAnimal>();
                 foreach(var a in FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None))if(a.pen!=null)validAnimals.Add(a);
                 var animals=validAnimals.ToArray();
@@ -91,13 +94,14 @@ namespace NongTrai
                         cooldown=animals[i].ProductCooldown,hunger=animals[i].Hunger,happiness=animals[i].Happiness };
                 var trees=FindObjectsByType<FruitTree>(FindObjectsSortMode.None);
                 data.trees=new TreeRecord[trees.Length];
-                for(int i=0;i<trees.Length;i++) data.trees[i]=new TreeRecord { position=trees[i].transform.position,remaining=trees[i].remaining };
+                for(int i=0;i<trees.Length;i++) data.trees[i]=new TreeRecord { position=trees[i].transform.position,remaining=trees[i].remaining,age=trees[i].age,planted=trees[i].planted,mutated=trees[i].mutated };
                 var pens=FindObjectsByType<AnimalPen>(FindObjectsInactive.Include,FindObjectsSortMode.None);
                 data.pens=new PenRecord[pens.Length];
                 for(int i=0;i<pens.Length;i++)
                     data.pens[i]=new PenRecord { id=pens[i].id,eggs=pens[i].StoredEggs,progress=pens[i].EggProgress,
                     open=pens[i].GetComponentInChildren<PaddockGate>(true).IsOpen,
-                    upgrade=pens[i].UpgradeLevel,active=pens[i].gameObject.activeInHierarchy };
+                    upgrade=pens[i].UpgradeLevel,active=pens[i].gameObject.activeInHierarchy,
+                    placed=pens[i].id>=7,position=pens[i].transform.position,species=(int)pens[i].species };
                 var resources=FindObjectsByType<ResourceNode>(FindObjectsSortMode.None);
                 data.resources=new ResourceRecord[resources.Length];
                 for(int i=0;i<resources.Length;i++)
@@ -117,7 +121,7 @@ namespace NongTrai
             try
             {
                 var data=JsonUtility.FromJson<SaveData>(File.ReadAllText(SavePath));
-                if(data==null || data.version<2 || data.version>11 || data.seeds==null || data.seeds.Length!=3 ||
+                if(data==null || data.version<2 || data.version>12 || data.seeds==null || data.seeds.Length!=3 ||
                     data.harvested==null || data.harvested.Length!=3 || data.products==null || data.products.Length<4)
                     throw new InvalidDataException("Phiên bản dữ liệu lưu không phù hợp.");
                 if(data.version<8)
@@ -132,6 +136,7 @@ namespace NongTrai
                 Array.Copy(data.harvested,field.Harvested,3);
                 Array.Clear(inventory.AnimalProducts,0,inventory.AnimalProducts.Length);
                 Array.Copy(data.products,inventory.AnimalProducts,Mathf.Min(data.products.Length,inventory.AnimalProducts.Length));
+                inventory.RestoreMutated(data.version>=12?data.mutatedCrops:null);
                 // Save cũ dùng item 12 cho đống gỗ. Chuyển toàn bộ sang khối gỗ xây dựng mới.
                 if(data.version<6 && inventory.AnimalProducts.Length>16 && inventory.AnimalProducts[8]>0)
                 {
@@ -142,13 +147,19 @@ namespace NongTrai
                 {
                     expansion.Restore(data.level,data.xp,data.day,data.dayTime,data.toolTiers,data.regions,
                         data.version>=4?data.levelCap:5);
-                    if(data.version>=4) clock.Restore(data.day,data.dayTime,(FarmWeather)Mathf.Clamp(data.weather,0,3));
+                    if(data.version>=4) clock.Restore(data.day,data.dayTime,(FarmWeather)Mathf.Clamp(data.weather,0,3),data.version>=12?data.weatherRemaining:-1);
                     processing.Restore(data.processing);
                     if(data.version>=4) islands.Restore(data.island);
                     FarmAudio.Instance.SetMusic(data.musicVolume);FarmAudio.Instance.SetEffects(data.effectsVolume);
                 }
                 FarmTutorialCoach.Instance?.Restore(data.version>=10&&data.tutorialDone);
                 field.Select(data.selected);
+                foreach(var oldPen in FindObjectsByType<AnimalPen>(FindObjectsSortMode.None))
+                    if(oldPen.id>=7){oldPen.gameObject.SetActive(false);Destroy(oldPen.gameObject);}
+                if(data.version>=12&&data.pens!=null&&FarmPenPlacement.Instance!=null)
+                    foreach(var item in data.pens)if(item.placed&&item.id>=7&&item.species>=0&&item.species<4)
+                        FarmPenPlacement.Instance.Create((AnimalSpecies)item.species,item.position,item.id);
+                FarmPenPlacement.Instance?.RestorePending(data.version>=12?data.pendingPen:-1);
                 var pens=FindObjectsByType<AnimalPen>(FindObjectsInactive.Include,FindObjectsSortMode.None);
                 if(data.pens!=null) foreach(var item in data.pens)
                     foreach(var pen in pens) if(pen.id==item.id)
@@ -158,7 +169,7 @@ namespace NongTrai
                 var plots=FindObjectsByType<FarmPlot>(FindObjectsSortMode.None);
                 if(data.plots!=null) foreach(var item in data.plots)
                     foreach(var plot in plots) if(plot.id==item.id)
-                    { plot.Restore((PlotState)item.state,item.crop>=0 && item.crop<field.crops.Length?field.crops[item.crop]:null,item.growth,item.moisture);break; }
+                    { plot.Restore((PlotState)item.state,item.crop>=0 && item.crop<field.crops.Length?field.crops[item.crop]:null,item.growth,item.moisture,data.version>=12&&item.mutated);break; }
                 foreach(var animal in FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None)) Destroy(animal.gameObject);
                 if(data.animals!=null) foreach(var item in data.animals)
                 {
@@ -172,8 +183,10 @@ namespace NongTrai
                 }
                 foreach(var tree in FindObjectsByType<FruitTree>(FindObjectsSortMode.None)) Destroy(tree.gameObject);
                 if(data.trees!=null) foreach(var item in data.trees)
-                    Instantiate(shop.treePrefab,item.position,Quaternion.identity).GetComponent<FruitTree>().remaining=item.remaining;
+                {var tree=Instantiate(shop.treePrefab,item.position,Quaternion.identity).GetComponent<FruitTree>();tree.remaining=item.remaining;
+                 tree.planted=data.version>=12&&item.planted;tree.age=tree.planted?item.age:240;tree.mutated=data.version>=12&&item.mutated;}
                 if(data.version<7) ExplorationWorld.Instance?.CreateStarterOrchard();
+                FarmDecorTree.RestoreCuts(data.version>=12?data.cutDecorTrees:null);
                 if(data.version>=4)
                 {
                     if(data.resources!=null) foreach(var item in data.resources)
@@ -194,7 +207,9 @@ namespace NongTrai
                 if(building!=null) building.Restore(data.version>=6?data.building:null);
                 FarmStorage.Instance?.Restore(data.version>=11?data.storage:null);
                 AdventureWolves.Instance?.RestoreHealth(data.version>=11?data.playerHealth:100);
-                WorldPickup.Restore(data.drops);AdventureBag.Instance?.Restore(data.bag);AdventureWildlife.Instance?.Restore(data.wildlife);
+                if(data.version<12&&data.drops!=null)
+                    foreach(var drop in data.drops)if(drop.item==109||drop.item==110)drop.item=104;
+                WorldPickup.Restore(data.drops);AdventureBag.Instance?.Restore(data.bag,data.version<12);AdventureWildlife.Instance?.Restore(data.wildlife);
                 if(data.version<10)islands?.Snapshot();
                 return true;
             }

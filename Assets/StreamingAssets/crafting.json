@@ -196,6 +196,24 @@
         { "item": 20, "count": 3 },
         { "item": 21, "count": 2 }
       ]
+    },
+    {
+      "id": "shovel",
+      "name": "Xẻng",
+      "output": 104,
+      "inputs": [ { "item": 20, "count": 2 }, { "item": 21, "count": 2 } ]
+    },
+    {
+      "id": "sword",
+      "name": "Kiếm",
+      "output": 106,
+      "inputs": [ { "item": 20, "count": 1 }, { "item": 15, "count": 2 } ]
+    },
+    {
+      "id": "axe",
+      "name": "Rìu",
+      "output": 107,
+      "inputs": [ { "item": 20, "count": 2 }, { "item": 15, "count": 1 } ]
     }
   ]
 }

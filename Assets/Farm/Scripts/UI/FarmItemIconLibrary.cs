@@ -7,7 +7,7 @@ namespace NongTrai
     // không phụ thuộc font hay asset bên ngoài.
     public static class FarmItemIconLibrary
     {
-        public static int ForItem(int item)=>item==27?54:item>=28&&item<=37?40+item-28:item>=20&&item<=26?10+item:item;
+        public static int ForItem(int item)=>item==104?21:item==105?22:item==106?23:item==107?24:item==108?25:item==27?54:item>=28&&item<=37?40+item-28:item==38?55:item==39?56:item>=20&&item<=26?10+item:item;
         public static UnityEngine.UI.Image Attach(Transform parent,int item,Vector2 position,Vector2 size)
         {
             var go=new GameObject("Minh họa "+item,typeof(RectTransform),typeof(UnityEngine.UI.Image));
@@ -56,7 +56,7 @@ namespace NongTrai
                 case 20: Bag(p,Hex("B77A3E"));Line(p,22,42,42,42,cream,4);break;
                 case 21: Line(p,18,12,42,52,brown,6);Rect(p,36,45,55,54,gray);break;
                 case 22: Rect(p,13,16,43,43,blue);Rect(p,20,43,38,54,gray);Line(p,43,36,57,28,blue,6);break;
-                case 23: Line(p,18,11,34,51,brown,6);Arc(p,39,39,18,gray);break;
+                case 23: Line(p,31,8,31,43,brown,5);Triangle(p,22,40,42,40,32,59,gray);Line(p,19,35,45,35,gold,5);break;
                 case 24: Line(p,19,10,39,53,brown,6);Rect(p,34,43,53,55,gray);break;
                 case 25: Rect(p,12,12,52,39,brown);Line(p,16,40,23,54,brown,4);Line(p,48,40,41,54,brown,4);Line(p,23,54,41,54,brown,4);break;
                 case 30: Rect(p,9,9,55,55,brown);for(int y=15;y<56;y+=10)Line(p,10,y,54,y,Hex("B5793E"),2);break;
@@ -81,6 +81,8 @@ namespace NongTrai
                 case 52: for(int x=16;x<53;x+=12)Disk(p,x,34,12,cream);Disk(p,32,24,12,dark);break;
                 case 53: Disk(p,32,28,20,cream);Triangle(p,24,31,40,31,32,22,gold);Disk(p,40,48,8,red);break;
                 case 54: Line(p,32,11,32,40,brown,8);for(int x=19;x<=46;x+=13)Disk(p,x,43,12,green);Disk(p,24,34,4,red);break;
+                case 55: Disk(p,32,31,22,new Color(.75f,.28f,.95f));Disk(p,27,37,11,gold);Disk(p,40,25,9,blue);Disk(p,20,22,5,lightGreen);break;
+                case 56: Oval(p,32,30,22,16,Hex("A44D2C"));Oval(p,31,34,14,8,Hex("DD8745"));break;
                 default: Rect(p,13,13,51,51,dark);break;
             }
         }

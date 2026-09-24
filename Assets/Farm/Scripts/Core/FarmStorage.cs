@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace NongTrai
 {
-    [Serializable] public sealed class LootChestRecord {public string key;public Vector3 position;public int[] items;}
-    [Serializable] public sealed class StorageState {public int[] warehouse;public LootChestRecord[] explored;public string[] broken;}
+    [Serializable] public sealed class LootChestRecord {public string key;public Vector3 position;public int[] items,mutated;}
+    [Serializable] public sealed class StorageState {public int[] warehouse,warehouseMutated;public LootChestRecord[] explored;public string[] broken;}
 
     public sealed class FarmStorage:MonoBehaviour
     {
@@ -15,12 +16,15 @@ namespace NongTrai
         public static readonly Vector3 WarehouseSite=new Vector3(-10,1.25f,30);
         public Vector3 WarehousePosition=>WarehouseSite;
         public GameObject Panel {get;private set;}
-        public int[] Warehouse=new int[38];
+        public int[] Warehouse=new int[40];
+        public int[] WarehouseMutated=new int[4];
         readonly Dictionary<string,LootChestRecord> explored=new Dictionary<string,LootChestRecord>();
         readonly HashSet<string> broken=new HashSet<string>();
         readonly Dictionary<string,FarmChest> active=new Dictionary<string,FarmChest>();
         FarmHud hud;FarmInventory inventory;FarmChest current;
-        TextMeshProUGUI title,status;TextMeshProUGUI[] rows=new TextMeshProUGUI[38];
+        TextMeshProUGUI title,status;TextMeshProUGUI[] bagRows=new TextMeshProUGUI[36],storeRows=new TextMeshProUGUI[40];
+        Image[] bagIcons=new Image[36],storeIcons=new Image[40];
+        bool draggingFromBag,dragHalf;int dragIndex=-1;
         float chestTick;
         void Awake()=>Instance=this;
         void Start()
@@ -48,31 +52,43 @@ namespace NongTrai
         }
         void CreatePanel()
         {
-            Panel=FarmUi.Panel(hud.transform,"Kho và rương đồ",new Vector2(1220,860));
-            title=FarmUi.TmpLabel(Panel.transform,"",new Vector2(25,-15),new Vector2(1150,54),31);
-            status=FarmUi.TmpLabel(Panel.transform,"",new Vector2(25,-70),new Vector2(1150,58),20);
-            var viewport=new GameObject("Các ngăn đồ",typeof(RectTransform),typeof(Image),typeof(RectMask2D),typeof(ScrollRect));
-            var vr=viewport.GetComponent<RectTransform>();vr.SetParent(Panel.transform,false);vr.anchorMin=vr.anchorMax=vr.pivot=new Vector2(0,1);vr.anchoredPosition=new Vector2(25,-140);vr.sizeDelta=new Vector2(1170,615);
-            viewport.GetComponent<Image>().color=new Color(.04f,.09f,.07f,.4f);
-            var content=new GameObject("Danh sách vật phẩm",typeof(RectTransform));var cr=content.GetComponent<RectTransform>();cr.SetParent(viewport.transform,false);
-            cr.anchorMin=new Vector2(0,1);cr.anchorMax=new Vector2(1,1);cr.pivot=new Vector2(0,1);cr.anchoredPosition=Vector2.zero;cr.sizeDelta=new Vector2(0,38*67);
-            var scroll=viewport.GetComponent<ScrollRect>();scroll.content=cr;scroll.viewport=vr;scroll.horizontal=false;scroll.vertical=true;scroll.scrollSensitivity=38;
-            for(int item=0;item<38;item++)
-            {
-                int id=item;var row=FarmUi.Panel(content.transform,"Ngăn "+item,new Vector2(1145,62));
-                var rr=row.GetComponent<RectTransform>();rr.anchorMin=rr.anchorMax=rr.pivot=new Vector2(0,1);rr.anchoredPosition=new Vector2(5,-item*67);
-                row.GetComponent<Image>().color=new Color(.15f,.25f,.20f,.9f);
-                FarmItemIconLibrary.Attach(row.transform,item,new Vector2(6,-5),new Vector2(50,50));
-                rows[item]=FarmUi.TmpLabel(row.transform,"",new Vector2(65,-6),new Vector2(485,50),18);
-                FarmUi.Button(row.transform,"Cất 1",new Vector2(560,-5),new Vector2(130,50),()=>Transfer(id,1,true));
-                FarmUi.Button(row.transform,"Cất hết",new Vector2(695,-5),new Vector2(140,50),()=>Transfer(id,int.MaxValue,true));
-                FarmUi.Button(row.transform,"Lấy 1",new Vector2(840,-5),new Vector2(130,50),()=>Transfer(id,1,false));
-                FarmUi.Button(row.transform,"Lấy hết",new Vector2(975,-5),new Vector2(155,50),()=>Transfer(id,int.MaxValue,false));
-            }
-            FarmUi.Button(Panel.transform,"Đóng kho",new Vector2(25,-783),new Vector2(1170,55),hud.Resume);
+            Panel=FarmUi.Panel(hud.transform,"Kho và rương đồ",new Vector2(1510,900));
+            title=FarmUi.TmpLabel(Panel.transform,"",new Vector2(25,-15),new Vector2(1400,54),31);
+            status=FarmUi.TmpLabel(Panel.transform,"",new Vector2(25,-70),new Vector2(1400,58),20);
+            FarmUi.TmpLabel(Panel.transform,"TÚI ĐỒ • 36 Ô",new Vector2(25,-135),new Vector2(670,38),24);
+            FarmUi.TmpLabel(Panel.transform,"KHO / RƯƠNG • KÉO VẬT PHẨM QUA LẠI",new Vector2(750,-135),new Vector2(720,38),24);
+            for(int i=0;i<36;i++)
+            {int slot=i;var cell=FarmUi.Panel(Panel.transform,"Túi "+i,new Vector2(72,78));var rect=cell.GetComponent<RectTransform>();
+             rect.anchorMin=rect.anchorMax=rect.pivot=new Vector2(0,1);rect.anchoredPosition=new Vector2(25+i%9*77,-185-i/9*87);
+             bagIcons[i]=FarmItemIconLibrary.Attach(cell.transform,0,new Vector2(11,-5),new Vector2(49,49));
+             bagRows[i]=FarmUi.TmpLabel(cell.transform,"",new Vector2(3,-54),new Vector2(67,20),13);
+             cell.AddComponent<FarmStorageSlotDrag>().Initialize(this,true,slot);}
+            for(int i=0;i<40;i++)
+            {int item=i;var cell=FarmUi.Panel(Panel.transform,"Kho "+i,new Vector2(82,78));var rect=cell.GetComponent<RectTransform>();
+             rect.anchorMin=rect.anchorMax=rect.pivot=new Vector2(0,1);rect.anchoredPosition=new Vector2(750+i%8*88,-185-i/8*87);
+             storeIcons[i]=FarmItemIconLibrary.Attach(cell.transform,item,new Vector2(16,-5),new Vector2(49,49));
+             storeRows[i]=FarmUi.TmpLabel(cell.transform,"",new Vector2(3,-54),new Vector2(76,20),13);
+             cell.AddComponent<FarmStorageSlotDrag>().Initialize(this,false,item);}
+            FarmUi.TmpLabel(Panel.transform,"Kéo cả chồng • kéo bằng chuột phải: nửa chồng • Shift + click: chuyển nhanh • click: chuyển 1 món.",new Vector2(25,-640),new Vector2(1420,55),20);
+            FarmUi.Button(Panel.transform,"Đóng kho",new Vector2(25,-818),new Vector2(1420,55),hud.Resume);
             Panel.SetActive(false);
         }
+        public void BeginGridDrag(bool fromBag,int index,bool half){draggingFromBag=fromBag;dragIndex=index;dragHalf=half;}
+        public void EndGridDrag(){dragIndex=-1;}
+        public void DropGrid(bool toBag,int index)
+        {
+            if(dragIndex<0||draggingFromBag==toBag)return;
+            int item=draggingFromBag?AdventureBag.Instance.Slots[dragIndex].item:dragIndex;
+            if(item<0||item>=40){status.text="Dụng cụ đang cầm không thể cất ở ngăn hàng hóa.";return;}
+            int amount=draggingFromBag?AdventureBag.Instance.Slots[dragIndex].count:Current[item];
+            if(dragHalf)amount=Mathf.Max(1,(amount+1)/2);
+            Transfer(item,amount,draggingFromBag);
+        }
+        public void ClickGrid(bool fromBag,int index,bool quick)
+        {int item=fromBag?AdventureBag.Instance.Slots[index].item:index;
+         if(item<0||item>=40)return;Transfer(item,quick?int.MaxValue:1,fromBag);}
         int[] Current=>current==null?Warehouse:current.items;
+        int[] CurrentMutated=>current==null?WarehouseMutated:current.mutated;
         int Capacity=>current==null?36*64:18*64;
         int Total(int[] items){int sum=0;foreach(int amount in items)sum+=Mathf.Max(0,amount);return sum;}
         public void Open(FarmChest chest=null)
@@ -81,14 +97,20 @@ namespace NongTrai
         }
         public bool Transfer(int item,int amount,bool deposit)
         {
-            if(item<0||item>=38||amount<=0)return false;
+            if(item<0||item>=40||amount<=0)return false;
             AdventureBag.Instance?.Sync();
             var slots=Current;int available=deposit?inventory.Count(item):slots[item];
             int space=deposit?Capacity-Total(slots):AdventureBag.Instance.Space(item);
             int quantity=Mathf.Min(amount,available,Mathf.Max(0,space));
             if(quantity<=0){status.text=deposit?"Không còn đồ hoặc kho đã đầy.":"Rương trống hoặc túi đã đầy.";return false;}
-            if(deposit){if(!inventory.Remove(item,quantity))return false;slots[item]+=quantity;}
-            else{slots[item]-=quantity;inventory.Add(item,quantity);AdventureBag.Instance.Sync();}
+            if(deposit)
+            {if(item==38){int left=quantity;for(int crop=0;crop<4&&left>0;crop++){int n=Mathf.Min(left,inventory.MutatedCrops[crop]);CurrentMutated[crop]+=n;left-=n;}}
+             if(!inventory.Remove(item,quantity))return false;slots[item]+=quantity;}
+            else
+            {slots[item]-=quantity;
+             if(item==38){int left=quantity;for(int crop=0;crop<4&&left>0;crop++){int n=Mathf.Min(left,CurrentMutated[crop]);CurrentMutated[crop]-=n;left-=n;inventory.AddMutated(crop,n);}if(left>0)inventory.Add(38,left);}
+             else inventory.Add(item,quantity);
+             AdventureBag.Instance.Sync();}
             Refresh();return true;
         }
         void Refresh()
@@ -96,26 +118,32 @@ namespace NongTrai
             if(title==null)return;var slots=Current;
             title.text=current==null?"NHÀ KHO NÔNG TRẠI":"RƯƠNG ĐỒ • "+(current.isExploration?"KHÁM PHÁ":"ĐÃ ĐẶT");
             status.text="Đã dùng "+Total(slots)+"/"+Capacity+" chỗ • Cất/lấy một món hoặc tất cả bằng các nút bên dưới.";
-            for(int i=0;i<38;i++)rows[i].text=inventory.Name(i)+" • Túi "+inventory.Count(i)+" • Kho "+slots[i];
+            var bag=AdventureBag.Instance;
+            for(int i=0;i<36;i++)
+            {var slot=bag.Slots[i];bagIcons[i].enabled=slot.count>0;if(slot.count>0)bagIcons[i].sprite=FarmItemIconLibrary.Get(bag.Icon(slot.item));
+             bagRows[i].text=slot.count>0?""+slot.count:"";}
+            for(int i=0;i<40;i++){storeIcons[i].enabled=slots[i]>0;storeRows[i].text=slots[i]>0?slots[i].ToString():"";}
         }
         public StorageState Snapshot()
         {
-            return new StorageState{warehouse=(int[])Warehouse.Clone(),explored=new List<LootChestRecord>(explored.Values).ToArray(),broken=new List<string>(broken).ToArray()};
+            return new StorageState{warehouse=(int[])Warehouse.Clone(),warehouseMutated=(int[])WarehouseMutated.Clone(),explored=new List<LootChestRecord>(explored.Values).ToArray(),broken=new List<string>(broken).ToArray()};
         }
         public void Restore(StorageState state)
         {
             foreach(var chest in active.Values)if(chest!=null){chest.gameObject.SetActive(false);Destroy(chest.gameObject);}active.Clear();
-            Warehouse=new int[38];if(state?.warehouse!=null)Array.Copy(state.warehouse,Warehouse,Mathf.Min(38,state.warehouse.Length));
+            Warehouse=new int[40];if(state?.warehouse!=null)Array.Copy(state.warehouse,Warehouse,Mathf.Min(40,state.warehouse.Length));
+            WarehouseMutated=new int[4];if(state?.warehouseMutated!=null)Array.Copy(state.warehouseMutated,WarehouseMutated,Mathf.Min(4,state.warehouseMutated.Length));
             explored.Clear();if(state?.explored!=null)foreach(var record in state.explored)if(record!=null&&!string.IsNullOrEmpty(record.key))
-            {if(record.items==null||record.items.Length!=38){var items=new int[38];if(record.items!=null)Array.Copy(record.items,items,Mathf.Min(38,record.items.Length));record.items=items;}
+            {if(record.items==null||record.items.Length!=40){var items=new int[40];if(record.items!=null)Array.Copy(record.items,items,Mathf.Min(40,record.items.Length));record.items=items;}
+             if(record.mutated==null||record.mutated.Length!=4){var values=new int[4];if(record.mutated!=null)Array.Copy(record.mutated,values,Mathf.Min(4,record.mutated.Length));record.mutated=values;}
              explored[record.key]=record;}
             broken.Clear();if(state?.broken!=null)foreach(var key in state.broken)broken.Add(key);
-            if(Panel!=null&&Panel.activeSelf)Refresh();
         }
         public void ChestBroken(FarmChest chest)
         {if(chest!=null&&chest.isExploration){broken.Add(chest.key);active.Remove(chest.key);explored.Remove(chest.key);}}
         void Update()
         {
+            if(Panel!=null&&Panel.activeSelf)Refresh();
             if(hud==null||hud.player.Paused||ExplorationWorld.Instance==null)return;
             chestTick+=Time.deltaTime;if(chestTick<1)return;chestTick=0;
             bool exploring=ExplorationWorld.Instance.IsExploring;
@@ -131,12 +159,22 @@ namespace NongTrai
                 int px=x*16+7,pz=z*16+7;if(px>=0&&px<48&&pz>=0&&pz<48)continue;
                 string key=x+":"+z;if(broken.Contains(key)||active.ContainsKey(key)||active.Count>=4)continue;
                 if(!explored.TryGetValue(key,out var record))
-                {var random=new System.Random(hash);var items=new int[38];items[20]=2+random.Next(4);items[random.Next(2)==0?13:21]=1+random.Next(3);if(random.Next(3)==0)items[27]=1;
-                 record=new LootChestRecord{key=key,position=ExplorationWorld.Origin+new Vector3(px+.5f,world.SurfaceHeight(px,pz)+1,pz+.5f),items=items};explored[key]=record;}
+                {var random=new System.Random(hash);var items=new int[40];items[20]=2+random.Next(4);items[random.Next(2)==0?13:21]=1+random.Next(3);if(random.Next(3)==0)items[27]=1;
+                 record=new LootChestRecord{key=key,position=ExplorationWorld.Origin+new Vector3(px+.5f,world.SurfaceHeight(px,pz)+1,pz+.5f),items=items,mutated=new int[4]};explored[key]=record;}
                 if(Vector3.Distance(record.position,hud.player.transform.position)>45)continue;
-                var chest=FarmChest.Create(record.position,true,key,record.items);active[key]=chest;
+                var chest=FarmChest.Create(record.position,true,key,record.items,record.mutated);active[key]=chest;
             }
         }
+    }
+    public sealed class FarmStorageSlotDrag:MonoBehaviour,IBeginDragHandler,IEndDragHandler,IDropHandler,IPointerClickHandler
+    {
+        FarmStorage owner;bool bag;int index;
+        public void Initialize(FarmStorage storage,bool fromBag,int slot){owner=storage;bag=fromBag;index=slot;}
+        public void OnBeginDrag(PointerEventData e)=>owner.BeginGridDrag(bag,index,e.button==PointerEventData.InputButton.Right);
+        public void OnEndDrag(PointerEventData e)=>owner.EndGridDrag();
+        public void OnDrop(PointerEventData e)=>owner.DropGrid(bag,index);
+        public void OnPointerClick(PointerEventData e)
+        {var keyboard=UnityEngine.InputSystem.Keyboard.current;owner.ClickGrid(bag,index,keyboard!=null&&(keyboard.leftShiftKey.isPressed||keyboard.rightShiftKey.isPressed));}
     }
     public sealed class WarehouseDoor:MonoBehaviour,IInteractable
     {
@@ -148,24 +186,32 @@ namespace NongTrai
     }
     public sealed class FarmChest:MonoBehaviour,IInteractable
     {
-        public bool isExploration;public string key;public int[] items=new int[38];
+        public bool isExploration;public string key;public int[] items=new int[40],mutated=new int[4];
         public string InteractionHint=>"[Chuột phải] Mở rương • giữ trái để phá và nhặt đồ";
         public bool CanInteract(FarmPlayer player)=>true;
         public void Interact(PlayerInteraction actor)=>FarmStorage.Instance?.Open(this);
         public void SetHighlighted(bool selected)=>InteractionOutline.Set(this,selected);
-        public static FarmChest Create(Vector3 position,bool exploration,string key,int[] contents=null)
+        public static FarmChest Create(Vector3 position,bool exploration,string key,int[] contents=null,int[] mutatedContents=null)
         {
             var root=GameObject.CreatePrimitive(PrimitiveType.Cube);root.name=exploration?"Rương ẩn khám phá":"Rương đã đặt";
             root.transform.position=position;root.transform.localScale=new Vector3(.9f,.75f,.8f);
             var m=new Material(Shader.Find("Universal Render Pipeline/Lit"));m.color=new Color(.42f,.25f,.12f);root.GetComponent<Renderer>().material=m;
-            var chest=root.AddComponent<FarmChest>();chest.isExploration=exploration;chest.key=key;chest.items=contents??new int[38];
+            var chest=root.AddComponent<FarmChest>();chest.isExploration=exploration;chest.key=key;
+            chest.items=contents!=null&&contents.Length==40?contents:new int[40];
+            if(contents!=null&&contents.Length!=40)Array.Copy(contents,chest.items,Mathf.Min(contents.Length,40));
+            chest.mutated=mutatedContents!=null&&mutatedContents.Length==4?mutatedContents:new int[4];
+            if(mutatedContents!=null&&mutatedContents.Length!=4)Array.Copy(mutatedContents,chest.mutated,Mathf.Min(mutatedContents.Length,4));
             var trim=GameObject.CreatePrimitive(PrimitiveType.Cube);trim.name="Nắp rương";trim.transform.SetParent(root.transform,false);
             trim.transform.localPosition=new Vector3(0,.52f,0);trim.transform.localScale=new Vector3(1.10f,.18f,1.08f);Destroy(trim.GetComponent<Collider>());
             trim.GetComponent<Renderer>().material=m;
             return chest;
         }
         public void DropContents()
-        {for(int i=0;i<items.Length;i++)if(items[i]>0){WorldPickup.Spawn(i,items[i],transform.position+Vector3.up);items[i]=0;}}
+        {for(int i=0;i<items.Length;i++)if(items[i]>0)
+         {if(i==38)
+          {int left=items[i];for(int crop=0;crop<4;crop++){int n=Mathf.Min(left,mutated[crop]);if(n>0)WorldPickup.Spawn(i,n,transform.position+Vector3.up,crop);left-=n;mutated[crop]=0;}
+           if(left>0)WorldPickup.Spawn(i,left,transform.position+Vector3.up);}
+          else WorldPickup.Spawn(i,items[i],transform.position+Vector3.up);items[i]=0;}}
         public void BreakExploration()
         {if(!isExploration)return;DropContents();WorldPickup.Spawn(36,1,transform.position);FarmStorage.Instance?.ChestBroken(this);
          gameObject.SetActive(false);Destroy(gameObject);}

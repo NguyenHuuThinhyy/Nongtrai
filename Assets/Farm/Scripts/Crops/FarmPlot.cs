@@ -9,17 +9,18 @@ namespace NongTrai
         public CropDefinition Crop { get; private set; }
         public float Moisture { get; private set; }
         public float Growth { get; private set; }
+        public bool Mutated { get; private set; }
         Transform plants;
         int stage = -1;
         static Material green, stem;
         Material fruit;
         void Start() => Highlight(false);
         string RequiredAction => State==PlotState.Untilled?"chọn Cuốc":State==PlotState.Tilled?"chọn Hạt giống":
-            State==PlotState.Ready?"chọn Liềm":"chọn Bình tưới";
+            State==PlotState.Ready?"hái tay":"chọn Bình tưới";
         public string Description => FarmExpansion.Instance!=null && !FarmExpansion.Instance.IsUnlocked(this)
             ? "Vùng đất chưa mở • [N] Mua đất khi đủ cấp" : State == PlotState.Untilled ? "Đất trống • chọn Cuốc rồi [Chuột trái]" :
             State == PlotState.Tilled ? "Đất đã cày • chọn Hạt giống rồi [Chuột trái]" :
-            State == PlotState.Ready ? Crop.displayName + " chín • chọn Liềm rồi [Chuột trái]" :
+            State == PlotState.Ready ? Crop.displayName + (Mutated?" đột biến":"") + " chín • [Chuột trái] để hái" :
             Crop.displayName + " • " + Mathf.FloorToInt(Growth * 100) + "% • Nước " + Mathf.CeilToInt(Moisture * 100) + "% • "+RequiredAction+" rồi [Chuột trái]";
         public string InteractionHint => Description;
         public bool CanInteract(FarmPlayer player) => true;
@@ -38,7 +39,7 @@ namespace NongTrai
             }
             if (State == PlotState.Growing) { Moisture = 1; Refresh(); return "Đã tưới đầy nước cho " + Crop.displayName; }
             harvested = Crop.yield; string result = "Thu hoạch +" + harvested + " " + Crop.displayName;
-            State = PlotState.Tilled; Crop = null; Growth = 0; Moisture = 0;
+            State = PlotState.Tilled; Crop = null; Growth = 0; Moisture = 0;Mutated=false;
             if (fruit != null) Destroy(fruit);
             Refresh(); return result + ". Ô đất sẵn sàng gieo vụ mới.";
         }
@@ -64,15 +65,22 @@ namespace NongTrai
             if(State!=PlotState.Growing)return false;
             Moisture=Mathf.Min(1,Moisture+.35f);
             Growth=Mathf.Min(1,Growth+.12f);
+            if(!Mutated&&Random.value<.08f)Mutated=true;
             if(Growth>=1)State=PlotState.Ready;
             Refresh();return true;
         }
-        public void Restore(PlotState state,CropDefinition crop,float growth,float moisture)
+        public void Restore(PlotState state,CropDefinition crop,float growth,float moisture,bool mutated=false)
         {
-            State=state; Crop=crop; Growth=Mathf.Clamp01(growth); Moisture=Mathf.Clamp01(moisture);
+            State=state; Crop=crop; Growth=Mathf.Clamp01(growth); Moisture=Mathf.Clamp01(moisture);Mutated=mutated;
             if(fruit!=null) Destroy(fruit);
             fruit=crop==null?null:Material(crop.fruitColor);
             stage=-99;Refresh();
+        }
+        void Update()
+        {
+            if(!Mutated||fruit==null)return;
+            var glow=Color.HSVToRGB(Mathf.Repeat(Time.time*.22f+id*.08f,1),.75f,1);
+            fruit.color=glow;fruit.SetColor("_EmissionColor",glow*2.2f);fruit.EnableKeyword("_EMISSION");
         }
         public void Highlight(bool value)
         {
