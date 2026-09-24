@@ -45,7 +45,7 @@ namespace NongTrai
             for (int i = wolves.Count - 1; i >= 0; i--) if (wolves[i] == null) wolves.RemoveAt(i);
             if (!night)
             {
-                if (wolves.Count > 0) { foreach (var wolf in wolves) if (wolf != null) Destroy(wolf.gameObject); wolves.Clear(); if (exploring) hud.Notify("Trời sáng: sói đã về hang."); }
+                if (wolves.Count > 0) { foreach (var wolf in wolves) if (wolf != null) { if (exploring) wolf.Retreat(); else Destroy(wolf.gameObject); } wolves.Clear(); if (exploring) hud.Notify("Trời sáng: sói đang rút về hang."); }
                 warned = false;
                 return;
             }
@@ -83,11 +83,18 @@ namespace NongTrai
         AdventureWolves pack;
         CharacterController controller;
         float gravity, biteTimer;
+        GameObject den;
+        Vector3 denPosition;
+        bool retreating;
         public static NightWolf Create(Vector3 point, AdventureWolves owner)
         {
             var root = new GameObject("Sói đêm", typeof(CharacterController), typeof(NightWolf));
             root.transform.position = point;
             var wolf = root.GetComponent<NightWolf>(); wolf.pack = owner;
+            wolf.denPosition=point-new Vector3(0,0,1.5f);
+            wolf.den=new GameObject("Hang sói");wolf.den.transform.position=wolf.denPosition;
+            Part(wolf.den.transform,"Vách hang",new Vector3(0,.55f,0),new Vector3(2.2f,1.25f,1.1f),new Color(.24f,.26f,.27f));
+            Part(wolf.den.transform,"Cửa hang",new Vector3(0,.55f,.58f),new Vector3(1.1f,.85f,.08f),new Color(.035f,.04f,.045f));
             wolf.controller = root.GetComponent<CharacterController>(); wolf.controller.height = 1.1f; wolf.controller.radius = .42f; wolf.controller.center = new Vector3(0, .55f, 0);
             wolf.controller.stepOffset = .8f; wolf.controller.slopeLimit = 50;
             Part(root.transform, "Thân sói", new Vector3(0, .65f, 0), new Vector3(.9f, .65f, 1.25f), new Color(.31f, .34f, .37f));
@@ -101,6 +108,8 @@ namespace NongTrai
             }
             return wolf;
         }
+        void OnDestroy(){if(den!=null)Destroy(den);}
+        public void Retreat(){retreating=true;}
         static void Part(Transform parent, string name, Vector3 position, Vector3 scale, Color color)
         {
             var piece = GameObject.CreatePrimitive(PrimitiveType.Cube); piece.name = name; piece.transform.SetParent(parent, false);
@@ -110,9 +119,21 @@ namespace NongTrai
         }
         void Update()
         {
-            if (pack == null || pack.IsNight == false || TimeManager.Instance.player.Paused) return;
+            if (pack == null || TimeManager.Instance.player.Paused) return;
             var player = TimeManager.Instance.player.transform;
             var delta = player.position - transform.position; delta.y = 0;
+            if(retreating)
+            {
+                var home=denPosition-transform.position;home.y=0;
+                if(home.sqrMagnitude<1.2f){Destroy(gameObject);return;}
+                Vector3 retreat=home.normalized;
+                gravity=controller.isGrounded?-.8f:Mathf.Max(-20,gravity-25*Time.deltaTime);
+                var flags=controller.Move((retreat*4.8f+Vector3.up*gravity)*Time.deltaTime);
+                if((flags&CollisionFlags.Sides)!=0&&controller.isGrounded)gravity=5.2f;
+                transform.rotation=Quaternion.Slerp(transform.rotation,Quaternion.LookRotation(retreat),Time.deltaTime*8);
+                return;
+            }
+            if(!pack.IsNight){Retreat();return;}
             bool afraid = pack.IsSafe(transform.position) || pack.IsSafe(player.position);
             Vector3 direction = afraid ? -delta.normalized : delta.normalized;
             if (delta.magnitude > 23) direction = delta.normalized;

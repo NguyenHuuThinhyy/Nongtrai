@@ -352,6 +352,9 @@ namespace NongTrai
             if(building.Snapshot().blocks.Length!=1) throw new InvalidOperationException("Placeable block restore failed.");
             building.Restore(new BuildingState{blocks=new[]{new PlacedBlockRecord{type=12,position=new Vector3(5,.5f,-35),euler=Vector3.zero}}});
             if(!AdventureWolves.Instance.IsSafe(new Vector3(5,.5f,-35)))throw new InvalidOperationException("Campfire did not repel wolves.");
+            var retreatWolf=NightWolf.Create(new Vector3(5,.5f,-35),AdventureWolves.Instance);retreatWolf.Retreat();
+            player.SetPaused(false);yield return new WaitForSeconds(1);
+            if(retreatWolf!=null)throw new InvalidOperationException("Wolf did not return to its den at sunrise.");
             building.Restore(new BuildingState{blocks=new[]{new PlacedBlockRecord{type=0,position=new Vector3(205,.5f,18),euler=Vector3.zero}}});
             var store=FarmStorage.Instance;
             if(store==null||orders.Orders.Length!=5||AdventureWolves.Instance==null)
