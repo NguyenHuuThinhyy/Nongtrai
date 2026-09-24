@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System;
@@ -79,7 +79,7 @@ namespace NongTrai
         void Update()
         {
             if(saveButton!=null) saveButton.interactable=!CreativeModeManager.IsCreative;
-            prompt.text = player.Paused?"":interaction.Hint;
+            prompt.text = player.Paused?"":interaction.Hint.Replace("[E]","[CHUỘT TRÁI]");
             if (farmingStatus != null && interaction.field != null)
             {
                 var field = interaction.field;

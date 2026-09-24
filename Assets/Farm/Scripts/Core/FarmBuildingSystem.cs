@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -15,12 +15,16 @@ namespace NongTrai
         public static FarmBuildingSystem Instance { get; private set; }
         public FarmHud hud;public FarmInventory inventory;public FarmPlayer player;public Camera viewCamera;
         public bool IsBuilding { get; private set; }
+        public bool PaletteOpen {get;private set;}
         public int SelectedType { get; private set; }
         public bool HasPlacedTable { get { foreach(var b in placed) if(b!=null && b.type==6) return true;return false; } }
         public const int FirstBlockItem=20;
-        readonly string[] names={"Khối gỗ","Khối đá","Khối gạch","Khối kính","Khối kim loại","Khối cỏ","Bàn chế tạo"};
+        static readonly int[] blockItems={20,21,22,23,24,25,26,28,29,30,31};
+        public static int TypeForItem(int item){for(int i=0;i<blockItems.Length;i++)if(blockItems[i]==item)return i;return -1;}
+        public static int ItemForType(int type)=>type>=0&&type<blockItems.Length?blockItems[type]:-1;
+        readonly string[] names={"Khối gỗ","Khối đá","Khối gạch","Khối kính","Khối kim loại","Khối cỏ","Bàn chế tạo","Bậc gỗ","Đuốc","Hàng rào","Ván cầu"};
         readonly Color[] colors={new Color(.55f,.31f,.14f),new Color(.47f,.51f,.53f),new Color(.68f,.25f,.18f),
-            new Color(.38f,.78f,.88f,.62f),new Color(.55f,.62f,.66f),new Color(.33f,.65f,.22f),new Color(.45f,.27f,.13f)};
+            new Color(.38f,.78f,.88f,.62f),new Color(.55f,.62f,.66f),new Color(.33f,.65f,.22f),new Color(.45f,.27f,.13f),new Color(.6f,.38f,.19f),new Color(1,.75f,.3f),new Color(.49f,.27f,.12f),new Color(.66f,.42f,.2f)};
         readonly List<PlacedBlock> placed=new List<PlacedBlock>();
         GameObject overlay,preview;TMP_Text title;Image[] slots;float rotation;
 
@@ -35,40 +39,36 @@ namespace NongTrai
             slots=new Image[names.Length];
             for(int i=0;i<names.Length;i++)
             {
-                int type=i;var button=FarmUi.Button(overlay.transform,"",new Vector2(16+i*124,-54),new Vector2(116,104),()=>Select(type));
+                int type=i;var button=FarmUi.Button(overlay.transform,"",new Vector2(8+i*80,-54),new Vector2(76,104),()=>Select(type));
+                button.GetComponentInChildren<Text>().enabled=false;
                 slots[i]=button.GetComponent<Image>();
                 var pic=new GameObject("Icon "+names[i],typeof(RectTransform),typeof(Image));var pr=pic.GetComponent<RectTransform>();
-                pr.SetParent(button.transform,false);pr.anchorMin=pr.anchorMax=new Vector2(.5f,.5f);pr.pivot=new Vector2(.5f,.5f);pr.anchoredPosition=new Vector2(0,12);pr.sizeDelta=new Vector2(48,48);
-                var image=pic.GetComponent<Image>();image.sprite=FarmItemIconLibrary.Get(30+i);image.preserveAspect=true;image.raycastTarget=false;
-                var text=FarmUi.TmpLabel(button.transform,(i+1)+" • "+names[i],new Vector2(5,-72),new Vector2(106,27),14);text.alignment=TextAlignmentOptions.Center;
+                pr.SetParent(button.transform,false);pr.anchorMin=pr.anchorMax=new Vector2(.5f,.5f);pr.pivot=new Vector2(.5f,.5f);pr.anchoredPosition=new Vector2(0,12);pr.sizeDelta=new Vector2(44,44);
+                var image=pic.GetComponent<Image>();image.sprite=FarmItemIconLibrary.Get(FarmItemIconLibrary.ForItem(ItemForType(i)));image.preserveAspect=true;image.raycastTarget=false;
+                var label=FarmUi.TmpLabel(button.transform,names[i],new Vector2(2,-72),new Vector2(72,27),12);label.alignment=TextAlignmentOptions.Center;
             }
             overlay.SetActive(false);
         }
         void CreatePreview()
         {
             preview=GameObject.CreatePrimitive(PrimitiveType.Cube);preview.name="Xem trước khối xây";
-            Destroy(preview.GetComponent<Collider>());var material=new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            preview.layer=2;preview.GetComponent<Collider>().enabled=false;Destroy(preview.GetComponent<Collider>());var material=new Material(Shader.Find("Universal Render Pipeline/Lit"));
             material.color=new Color(.25f,.85f,1);preview.GetComponent<Renderer>().material=material;preview.SetActive(false);
         }
+        public void EquipBlock(int type)
+        {if(PaletteOpen)return;IsBuilding=type>=0;if(type>=0)SelectedType=Mathf.Clamp(type,0,names.Length-1);if(preview!=null)preview.SetActive(false);}
         public void Toggle()
         {
-            if(!IsBuilding && !HasPlacedTable && inventory.Count(26)<=0)
-            { FarmCraftOrders.Instance?.OpenCraft();hud.Notify("Cần 5 khối gỗ để chế tạo Bàn chế tạo. Gỗ bán ở trang 2 shop hoặc lấy từ cây táo.");return; }
-            IsBuilding=!IsBuilding;overlay.SetActive(IsBuilding);preview.SetActive(IsBuilding);
-            if(IsBuilding && !HasPlacedTable) Select(6);
-            hud.Notify(IsBuilding?"XÂY DỰNG: chuột trái đặt • phải tháo • R xoay • G thoát":"Đã tắt chế độ xây dựng.");
+            PaletteOpen=!PaletteOpen;IsBuilding=PaletteOpen;overlay.SetActive(PaletteOpen);preview.SetActive(false);
+            if(PaletteOpen)SelectedType=inventory.Count(26)>0?6:0;
+            else EquipBlock(AdventureBag.Instance!=null&&AdventureBag.Instance.HoldingBlock?TypeForItem(AdventureBag.Instance.Item):-1);
+            hud.Notify(PaletteOpen?"Chọn bằng click hoặc lăn chuột • Trái đặt • G đóng bảng • B kéo khối vào hotbar":"Đã đóng bảng xây.");
         }
-        public void Select(int type)
-        {
-            if(!HasPlacedTable && type!=6)
-            { hud.Notify("Hãy đặt Bàn chế tạo trước.");SelectedType=6; }
-            else SelectedType=Mathf.Clamp(type,0,names.Length-1);
-            Refresh();
-        }
+        public void Select(int type){SelectedType=Mathf.Clamp(type,0,names.Length-1);Refresh();}
         void Refresh()
         {
             if(title==null)return;
-            title.text="[G] XÂY DỰNG • "+names[SelectedType]+" x"+inventory.Count(FirstBlockItem+SelectedType)+" • Trái đặt • Phải tháo • R xoay • Lăn chuột đổi";
+            title.text="[G] XÂY DỰNG • "+names[SelectedType]+" x"+inventory.Count(ItemForType(SelectedType))+" • Trái đặt • R xoay • Lăn chuột đổi";
             for(int i=0;i<slots.Length;i++)slots[i].color=i==SelectedType?new Color(.92f,.68f,.22f,.98f):new Color(.16f,.29f,.23f,.98f);
         }
         void Update()
@@ -79,18 +79,18 @@ namespace NongTrai
             if(keyboard!=null)
             {
                 if(keyboard.rKey.wasPressedThisFrame)rotation=(rotation+90)%360;
-                for(int i=0;i<7;i++)if(keyboard[(Key)((int)Key.Digit1+i)].wasPressedThisFrame)Select(i);
+                if(PaletteOpen)for(int i=0;i<9;i++)if(keyboard[(Key)((int)Key.Digit1+i)].wasPressedThisFrame)Select(i);
             }
             if(mouse!=null)
             {
-                float wheel=mouse.scroll.ReadValue().y;if(Mathf.Abs(wheel)>1)Select((SelectedType+(wheel<0?1:6))%7);
+                float wheel=mouse.scroll.ReadValue().y;if(PaletteOpen&&Mathf.Abs(wheel)>1)Select((SelectedType+(wheel<0?1:names.Length-1))%names.Length);
                 UpdatePreview();
                 if(mouse.leftButton.wasPressedThisFrame)Place();
-                if(mouse.rightButton.wasPressedThisFrame)Remove();
+
             }
             Refresh();
         }
-        bool Target(out RaycastHit hit)=>Physics.Raycast(viewCamera.transform.position,viewCamera.transform.forward,out hit,8f,1,QueryTriggerInteraction.Ignore);
+        bool Target(out RaycastHit hit)=>FarmAim.Hit(viewCamera,out hit)&&Vector3.Distance(hit.point,player.transform.position+Vector3.up)<6;
         Vector3 Snap(RaycastHit hit)
         {
             Vector3 point=hit.point+hit.normal*.51f;
@@ -109,24 +109,28 @@ namespace NongTrai
         public bool TryPlaceSelected(Vector3 position,float yAngle)
         {
             if(!IsBuilding)return false;
-            int item=FirstBlockItem+SelectedType;
-            if(SelectedType!=6&&!HasPlacedTable){hud.Notify("Hãy đặt Bàn chế tạo trước.");return false;}
+            int item=ItemForType(SelectedType);
+            var half=SelectedType==6?new Vector3(.74f,.49f,.44f):Vector3.one*.49f;
+            if(Physics.CheckBox(position,half,Quaternion.Euler(0,yAngle,0),~(1<<2),QueryTriggerInteraction.Ignore))
+            {hud.Notify("Ô bị chiếm hoặc chạm nhân vật. Chọn mặt ngoài của khối.");return false;}
             if(Vector3.Distance(position,player.transform.position)<1.25f)
             { hud.Notify("Không thể đặt khối sát nhân vật.");return false; }
             foreach(var block in placed)if(block!=null && Vector3.Distance(block.transform.position,position)<.9f)
             { hud.Notify("Ô này đã có khối xây.");return false; }
             if(!inventory.Remove(item,1)){hud.Notify("Không còn "+names[SelectedType]+" trong túi.");return false;}
             Create(SelectedType,position,new Vector3(0,yAngle,0));FarmAudio.Instance?.Play(FarmAudio.Cue.Hoe);
-            hud.Notify("Đã đặt "+names[SelectedType]+". Chuột phải vào khối để tháo và lấy lại.");return true;
+            hud.Notify("Đã đặt "+names[SelectedType]+". Bỏ chọn khối rồi giữ chuột trái để phá và nhặt lại.");return true;
         }
         void Remove()
         {
             if(!Target(out var hit))return;var block=hit.collider.GetComponentInParent<PlacedBlock>();if(block==null)return;
             bool removedTable=block.type==6;
-            inventory.Add(FirstBlockItem+block.type,1);placed.Remove(block);Destroy(block.gameObject);
+            inventory.Add(ItemForType(block.type),1);placed.Remove(block);Destroy(block.gameObject);
             if(removedTable && !HasPlacedTable) Select(6);
             hud.Notify("Đã tháo "+names[block.type]+" và trả vào túi.");
         }
+        public bool BreakPlaced(PlacedBlock block,bool drop)
+        {if(block==null||!placed.Remove(block))return false;if(drop)WorldPickup.Spawn(ItemForType(block.type),1,block.transform.position);block.gameObject.SetActive(false);Destroy(block.gameObject);return true;}
         PlacedBlock Create(int type,Vector3 position,Vector3 euler)
         {
             GameObject root=new GameObject("Khối xây • "+names[type]);root.transform.SetPositionAndRotation(position,Quaternion.Euler(euler));
@@ -138,6 +142,15 @@ namespace NongTrai
                 var collider=root.AddComponent<BoxCollider>();collider.center=new Vector3(0,0,0);collider.size=new Vector3(1.5f,1,.9f);
                 root.AddComponent<CraftingTable>();
             }
+            else if(type==7){Part(root.transform,"Bậc 1",new Vector3(0,-.28f,-.22f),new Vector3(1,.44f,.55f),colors[type]);Part(root.transform,"Bậc 2",new Vector3(0,-.03f,.24f),new Vector3(1,.94f,.48f),colors[type]);}
+            else if(type==8)
+            {
+                Part(root.transform,"Cán đuốc",new Vector3(0,0,0),new Vector3(.12f,1,.12f),colors[0]);
+                Part(root.transform,"Lửa",new Vector3(0,.55f,0),new Vector3(.35f,.38f,.35f),colors[type]);
+                var light=new GameObject("Ánh sáng đuốc").AddComponent<Light>();light.transform.SetParent(root.transform,false);light.transform.localPosition=Vector3.up*.7f;light.type=LightType.Point;light.range=9;light.intensity=2;light.color=new Color(1,.68f,.3f);
+            }
+            else if(type==9){for(int x=-1;x<=1;x+=2)Part(root.transform,"Cọc hàng rào",new Vector3(x*.42f,0,0),new Vector3(.14f,1.1f,.14f),colors[type]);for(int y=-1;y<=1;y+=2)Part(root.transform,"Thanh chắn",new Vector3(0,y*.25f,0),new Vector3(1,.12f,.12f),colors[type]);}
+            else if(type==10)Part(root.transform,"Mặt cầu",new Vector3(0,-.38f,0),new Vector3(1.4f,.18f,2),colors[type]);
             else Part(root.transform,names[type],Vector3.zero,Vector3.one,colors[type]);
             return block;
         }

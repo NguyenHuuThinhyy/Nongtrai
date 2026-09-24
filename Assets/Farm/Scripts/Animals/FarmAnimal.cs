@@ -25,6 +25,12 @@ namespace NongTrai
             message="Đã cho "+name+" ăn. Đói "+Mathf.RoundToInt(Hunger)+"%, vui "+Mathf.RoundToInt(Happiness)+"%.";
             return true;
         }
+        public bool FeedPremium(FarmInventory inventory,out string message)
+        {
+            if(Hunger>=95&&Happiness>=95){message="Vật nuôi đã no và vui.";return false;}
+            if(!inventory.Remove(34,1)){message="Cần một cám dinh dưỡng trong túi.";return false;}
+            Hunger=100;Happiness=100;message="Đã cho "+name+" ăn cám dinh dưỡng: no và vui 100%.";return true;
+        }
         public void AdvanceCare(float dayFraction)
         {
             Hunger=Mathf.Max(0,Hunger-65*dayFraction);

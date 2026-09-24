@@ -1,9 +1,183 @@
 {
   "recipes": [
-    { "id": "produce_bundle", "name": "Bó nông sản", "output": 16, "inputs": [{"item":0,"count":2},{"item":1,"count":1}] },
-    { "id": "soy_pack", "name": "Gói đậu", "output": 17, "inputs": [{"item":2,"count":2},{"item":0,"count":1}] },
-    { "id": "apple_basket", "name": "Giỏ táo", "output": 18, "inputs": [{"item":3,"count":3},{"item":14,"count":1}] },
-    { "id": "handmade_lamp", "name": "Đèn thủ công", "output": 19, "inputs": [{"item":14,"count":2},{"item":15,"count":1}] },
-    { "id": "craft_table", "name": "Bàn chế tạo", "output": 26, "inputs": [{"item":20,"count":5}] }
+    {
+      "id": "produce_bundle",
+      "name": "Bó nông sản",
+      "output": 16,
+      "inputs": [
+        {
+          "item": 0,
+          "count": 2
+        },
+        {
+          "item": 1,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "soy_pack",
+      "name": "Gói đậu",
+      "output": 17,
+      "inputs": [
+        {
+          "item": 2,
+          "count": 2
+        },
+        {
+          "item": 0,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "apple_basket",
+      "name": "Giỏ táo",
+      "output": 18,
+      "inputs": [
+        {
+          "item": 3,
+          "count": 3
+        },
+        {
+          "item": 14,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "handmade_lamp",
+      "name": "Đèn thủ công",
+      "output": 19,
+      "inputs": [
+        {
+          "item": 14,
+          "count": 2
+        },
+        {
+          "item": 15,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_table",
+      "name": "Bàn chế tạo",
+      "output": 26,
+      "inputs": [
+        {
+          "item": 20,
+          "count": 5
+        }
+      ]
+    },
+    {
+      "id": "wood_steps",
+      "name": "Bậc gỗ",
+      "output": 28,
+      "inputs": [
+        {
+          "item": 20,
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "torch",
+      "name": "Đuốc",
+      "output": 29,
+      "inputs": [
+        {
+          "item": 20,
+          "count": 1
+        },
+        {
+          "item": 15,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "fence",
+      "name": "Hàng rào",
+      "output": 30,
+      "inputs": [
+        {
+          "item": 20,
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "bridge",
+      "name": "Ván cầu",
+      "output": 31,
+      "inputs": [
+        {
+          "item": 14,
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "apple_cake",
+      "name": "Bánh táo",
+      "output": 32,
+      "inputs": [
+        {
+          "item": 3,
+          "count": 2
+        },
+        {
+          "item": 0,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "tomato_jam",
+      "name": "Mứt cà chua",
+      "output": 33,
+      "inputs": [
+        {
+          "item": 1,
+          "count": 3
+        },
+        {
+          "item": 3,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "premium_feed",
+      "name": "Cám dinh dưỡng",
+      "output": 34,
+      "inputs": [
+        {
+          "item": 0,
+          "count": 2
+        },
+        {
+          "item": 2,
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "fertilizer",
+      "name": "Phân bón",
+      "output": 35,
+      "inputs": [
+        {
+          "item": 2,
+          "count": 2
+        },
+        {
+          "item": 25,
+          "count": 1
+        }
+      ]
+    }
   ]
 }

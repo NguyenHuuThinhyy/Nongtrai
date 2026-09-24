@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 namespace NongTrai
 {
     public enum PlotState { Untilled, Tilled, Growing, Ready }
@@ -14,13 +14,13 @@ namespace NongTrai
         static Material green, stem;
         Material fruit;
         void Start() => Highlight(false);
-        string RequiredAction => State==PlotState.Untilled?"chọn [5] Cuốc":State==PlotState.Tilled?"chọn [1–3] Hạt giống":
-            State==PlotState.Ready?"chọn [7] Liềm":"chọn [6] Bình tưới";
+        string RequiredAction => State==PlotState.Untilled?"chọn Cuốc":State==PlotState.Tilled?"chọn Hạt giống":
+            State==PlotState.Ready?"chọn Liềm":"chọn Bình tưới";
         public string Description => FarmExpansion.Instance!=null && !FarmExpansion.Instance.IsUnlocked(this)
-            ? "Vùng đất chưa mở • [N] Mua đất khi đủ cấp" : State == PlotState.Untilled ? "Đất trống • chọn [5] Cuốc rồi [E]" :
-            State == PlotState.Tilled ? "Đất đã cày • chọn [1–3] Hạt giống rồi [E]" :
-            State == PlotState.Ready ? Crop.displayName + " chín • chọn [7] Liềm rồi [E]" :
-            Crop.displayName + " • " + Mathf.FloorToInt(Growth * 100) + "% • Nước " + Mathf.CeilToInt(Moisture * 100) + "% • "+RequiredAction+" rồi [E]";
+            ? "Vùng đất chưa mở • [N] Mua đất khi đủ cấp" : State == PlotState.Untilled ? "Đất trống • chọn Cuốc rồi [Chuột trái]" :
+            State == PlotState.Tilled ? "Đất đã cày • chọn Hạt giống rồi [Chuột trái]" :
+            State == PlotState.Ready ? Crop.displayName + " chín • chọn Liềm rồi [Chuột trái]" :
+            Crop.displayName + " • " + Mathf.FloorToInt(Growth * 100) + "% • Nước " + Mathf.CeilToInt(Moisture * 100) + "% • "+RequiredAction+" rồi [Chuột trái]";
         public string InteractionHint => Description;
         public bool CanInteract(FarmPlayer player) => true;
         public void Interact(PlayerInteraction actor)
@@ -29,12 +29,12 @@ namespace NongTrai
         public string Work(CropDefinition selected, out int harvested)
         {
             harvested = 0;
-            if (State == PlotState.Untilled) { State = PlotState.Tilled; Refresh(); return "Đã cày đất. Nhấn E lần nữa để gieo " + selected.displayName; }
+            if (State == PlotState.Untilled) { State = PlotState.Tilled; Refresh(); return "Đã cày đất. Nhấn chuột trái lần nữa để gieo " + selected.displayName; }
             if (State == PlotState.Tilled)
             {
                 Crop = selected; State = PlotState.Growing; Growth = 0; Moisture = 0;
                 fruit = Material(Crop.fruitColor); Refresh();
-                return "Đã gieo " + Crop.displayName + ". Chọn [6] Bình tưới rồi nhấn E; tưới giúp cây lớn nhanh.";
+                return "Đã gieo " + Crop.displayName + ". Chọn Bình tưới rồi nhấn chuột trái; tưới giúp cây lớn nhanh.";
             }
             if (State == PlotState.Growing) { Moisture = 1; Refresh(); return "Đã tưới đầy nước cho " + Crop.displayName; }
             harvested = Crop.yield; string result = "Thu hoạch +" + harvested + " " + Crop.displayName;
@@ -58,6 +58,14 @@ namespace NongTrai
             if(State!=PlotState.Growing || amount<=0) return;
             Moisture=Mathf.Clamp01(Moisture+amount);
             Highlight(false);
+        }
+        public bool ApplyFertilizer()
+        {
+            if(State!=PlotState.Growing)return false;
+            Moisture=Mathf.Min(1,Moisture+.35f);
+            Growth=Mathf.Min(1,Growth+.12f);
+            if(Growth>=1)State=PlotState.Ready;
+            Refresh();return true;
         }
         public void Restore(PlotState state,CropDefinition crop,float growth,float moisture)
         {

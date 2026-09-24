@@ -7,6 +7,7 @@ namespace NongTrai
     {
         public int blueprints,lastMinigameDay,listingItem=-1,listingReward;
         public float listingSeconds;public int[] affinity,lastTalkDay;public bool[] friends;
+        public Vector3 farmPosition,explorePosition;public bool hasFarmPosition,hasExplorePosition;
     }
     public sealed class IslandManager : MonoBehaviour
     {
@@ -14,6 +15,9 @@ namespace NongTrai
         public FarmHud hud;public FarmShop shop;public FarmInventory inventory;public FarmExpansion progress;public FarmPlayer player;
         public int Blueprints { get; private set; }
         public GameObject MapPanel { get; private set; }
+        Vector3 farmPosition,explorePosition;bool hasFarmPosition,hasExplorePosition;
+        public Vector3 FarmPosition=>hasFarmPosition?farmPosition:FarmArrival;
+        public Vector3 ExplorePosition=>hasExplorePosition?explorePosition:ExploreArrival;
         public static readonly Vector3 FarmArrival=new Vector3(0,.4f,14);
         public static readonly Vector3 ExploreArrival=new Vector3(200,1000.4f,-20);
         void Awake()=>Instance=this;
@@ -33,15 +37,23 @@ namespace NongTrai
         public bool Travel(int index)
         {
             if(index<0||index>1)return false;
-            hud.Resume();player.Teleport(index==0?FarmArrival:ExploreArrival);
-            hud.Notify(index==0?"Nông trại • B túi đồ • M chế biến • E tương tác":"Khám phá • Giữ chuột trái để đào • G xây • Tab về nông trại");return true;
+            bool exploring=player.transform.position.y>500;
+            if(exploring){explorePosition=player.transform.position;hasExplorePosition=true;}
+            else{farmPosition=player.transform.position;hasFarmPosition=true;}
+            hud.Resume();player.Teleport(index==0?FarmPosition:ExplorePosition);
+            hud.Notify(index==0?"Nông trại • B túi đồ • M chế biến • chuột trái tương tác":"Khám phá • Giữ chuột trái để đào • G xây • Tab về nông trại");return true;
         }
         public void UnlockMiningBlueprint()
         { if(Blueprints>0)return;Blueprints=1;hud.Notify("Đào 30 khối: đã mở bản vẽ lò nung và đèn thủ công!"); }
-        public IslandState Snapshot()=>new IslandState{blueprints=Blueprints,listingItem=-1};
+        public IslandState Snapshot()
+        {if(player.transform.position.y>500){explorePosition=player.transform.position;hasExplorePosition=true;}else{farmPosition=player.transform.position;hasFarmPosition=true;}
+         return new IslandState{blueprints=Blueprints,listingItem=-1,farmPosition=farmPosition,explorePosition=explorePosition,hasFarmPosition=hasFarmPosition,hasExplorePosition=hasExplorePosition};}
         public void Restore(IslandState state)
         {
             Blueprints=state==null?0:Mathf.Max(0,state.blueprints);
+            hasFarmPosition=state!=null&&state.hasFarmPosition;hasExplorePosition=state!=null&&state.hasExplorePosition;
+            farmPosition=hasFarmPosition?state.farmPosition:FarmArrival;
+            explorePosition=hasExplorePosition?state.explorePosition:ExploreArrival;
             if(state!=null&&state.listingSeconds>0&&state.listingItem>=0&&state.listingItem<27)inventory.Add(state.listingItem,1);
         }
     }

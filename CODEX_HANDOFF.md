@@ -1,4 +1,16 @@
-﻿# CẬP NHẬT ƯU TIÊN — SỬA ĐÀO / NHẢY / HƯỚNG DẪN TAB
+# CẬP NHẬT ƯU TIÊN — 24/09/2026: TRẠNG THÁI MÃ MỚI NHẤT
+
+Các mục cũ bên dưới là lịch sử và có thể sai về phiên bản lưu, hotbar hoặc tính năng. Khi mâu thuẫn, kiểm tra code trước.
+
+- FarmSave schema v10 đọc v2–v10. Ghi túi đồ 36 ô, vật phẩm rơi, thú hoang, vị trí nhớ của cả hai map và trạng thái hướng dẫn. Không tự lưu; sáng tạo LV99 dùng bản RAM.
+- PlayerInteraction dùng ray từ dấu + để click trái tương tác trên nông trại; E chỉ là phím tương thích. ExplorationWorld hiển thị dấu + ở cả hai map. IslandManager nhớ và lưu vị trí từng map, Tab trở về đúng chỗ đã rời.
+- FarmCraftOrders có 13 công thức trong Assets/StreamingAssets/crafting.json, danh sách cuộn và icon; hộp thư hai đơn/ngày. FarmShop có ba trang 24 mặt hàng. FarmItemIconLibrary vẽ icon và FarmBuildingSystem có 11 loại khối.
+- FarmNoticeBoard hiển thị sơ đồ 2D, đơn và vật nuôi đói; FarmTutorialCoach có 7 bước, phím H. Bàn chế tạo/hộp thư có nhãn nổi. Phân bón dùng chuột phải lên cây; cám dùng chuột phải lên thú. HeldItemVisual có mô hình nhỏ khi cầm vật phẩm.
+- TimeManager có một ngày 1080 giây/18 phút, tỉ lệ nắng/mưa/sương/bão 67/15/14/4%. Thông số 10 phút trong phần cũ đã lỗi thời.
+- Build release ở Logs/build-release-20260924.log đã thành công; runtime smoke Logs/smoke-release-20260924.log có FARM_CROPS_SMOKE_OK và thoát 0. Build Windows ở Builds/Windows/NongTrai.exe. Các ảnh preview nằm ngoài gói phát hành.
+
+---
+# CẬP NHẬT ƯU TIÊN — SỬA ĐÀO / NHẢY / HƯỚNG DẪN TAB
 
 - ExplorationWorld.UpdateMiningRay dùng mask bỏ layer8 Player và IgnoreTriggers, ray24m từ camera nhưng kiểm tra tầm6m từ player. Sửa ray TPS tự trúng nhân vật và tầm8m tính từ camera cũ quá ngắn. Runtime và smoke dùng chung đường ray/hold .55s; không chỉ test MineCell trực tiếp.
 - Bỏ OnGUI của mining, dùng TMP Canvas: tâm ngắm khi khám phá, tiến độ %, hướng dẫn khối quá xa/khu cổng/tầng đáy. FarmHudV2 thêm nhãn/nút Tab đổi map và nhắc Space.

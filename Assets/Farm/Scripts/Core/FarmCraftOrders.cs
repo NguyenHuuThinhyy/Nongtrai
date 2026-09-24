@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace NongTrai
 {
@@ -64,21 +65,33 @@ namespace NongTrai
         }
         void CreatePanels()
         {
-            CraftPanel=FarmUi.Panel(hud.transform,"Bàn chế tạo",new Vector2(1020,740));
-            FarmUi.TmpLabel(CraftPanel.transform,"BÀN CHẾ TẠO",new Vector2(30,-22),new Vector2(960,55),31);
-            craftStatus=FarmUi.Label(CraftPanel.transform,"",new Vector2(30,-84),new Vector2(960,78),20);
-            for(int i=0;i<Recipes.Length && i<5;i++)
+            CraftPanel=FarmUi.Panel(hud.transform,"Bàn chế tạo",new Vector2(1100,850));
+            FarmUi.TmpLabel(CraftPanel.transform,"BÀN CHẾ TẠO • CHỌN CÔNG THỨC",new Vector2(30,-22),new Vector2(1030,55),31);
+            craftStatus=FarmUi.Label(CraftPanel.transform,"",new Vector2(30,-84),new Vector2(1030,78),20);
+            var viewport=new GameObject("Danh sách công thức",typeof(RectTransform),typeof(Image),typeof(RectMask2D),typeof(ScrollRect));
+            var vr=viewport.GetComponent<RectTransform>();vr.SetParent(CraftPanel.transform,false);vr.anchorMin=vr.anchorMax=vr.pivot=new Vector2(0,1);
+            vr.anchoredPosition=new Vector2(30,-175);vr.sizeDelta=new Vector2(1040,560);
+            viewport.GetComponent<Image>().color=new Color(.08f,.17f,.13f,.7f);
+            var content=new GameObject("Tất cả công thức",typeof(RectTransform));var cr=content.GetComponent<RectTransform>();cr.SetParent(viewport.transform,false);
+            cr.anchorMin=new Vector2(0,1);cr.anchorMax=new Vector2(1,1);cr.pivot=new Vector2(0,1);cr.anchoredPosition=Vector2.zero;
+            cr.sizeDelta=new Vector2(0,Recipes.Length*76+10);
+            var scroll=viewport.GetComponent<ScrollRect>();scroll.content=cr;scroll.viewport=vr;scroll.horizontal=false;scroll.vertical=true;scroll.scrollSensitivity=38;
+            for(int i=0;i<Recipes.Length;i++)
             {
                 int recipe=i;
-                FarmUi.Button(CraftPanel.transform,RecipeLabel(i),new Vector2(30,-185-i*84),new Vector2(960,66),()=>Craft(recipe));
+                var row=FarmUi.Button(content.transform,"",new Vector2(0,-i*76),new Vector2(1020,70),()=>Craft(recipe));
+                row.GetComponentInChildren<Text>().enabled=false;
+                FarmItemIconLibrary.Attach(row.transform,Recipes[i].output,new Vector2(12,-8),new Vector2(55,55));
+                var text=FarmUi.TmpLabel(row.transform,RecipeLabel(i),new Vector2(78,-8),new Vector2(925,60),18);text.alignment=TextAlignmentOptions.MidlineLeft;
             }
-            FarmUi.Button(CraftPanel.transform,"Trở lại game",new Vector2(30,-640),new Vector2(960,55),hud.Resume);
-            FarmUi.Label(CraftPanel.transform,"ESC để đóng",new Vector2(815,-22),new Vector2(160,35),17);
+            FarmUi.Button(CraftPanel.transform,"Trở lại game",new Vector2(30,-770),new Vector2(1040,55),hud.Resume);
+            FarmUi.Label(CraftPanel.transform,"ESC để đóng",new Vector2(900,-22),new Vector2(170,35),17);
             CraftPanel.SetActive(false);
 
             MailPanel=FarmUi.Panel(hud.transform,"Hộp thư giao hàng",new Vector2(1040,760));
             FarmUi.TmpLabel(MailPanel.transform,"HỘP THƯ • ĐƠN HÀNG HÔM NAY",new Vector2(30,-22),new Vector2(980,55),30);
             mailStatus=FarmUi.Label(MailPanel.transform,"",new Vector2(30,-83),new Vector2(980,150),21);
+            FarmItemIconLibrary.Attach(MailPanel.transform,16,new Vector2(920,-176),new Vector2(66,66));
             FarmUi.Button(MailPanel.transform,"Giao đơn 1",new Vector2(30,-265),new Vector2(470,65),()=>Deliver(0));
             FarmUi.Button(MailPanel.transform,"Đổi đơn 1",new Vector2(520,-265),new Vector2(490,65),()=>Reroll(0));
             FarmUi.Button(MailPanel.transform,"Giao đơn 2",new Vector2(30,-350),new Vector2(470,65),()=>Deliver(1));
@@ -98,16 +111,31 @@ namespace NongTrai
         }
         void CreateWorldObjects()
         {
-            var table=GameObject.CreatePrimitive(PrimitiveType.Cube);table.name="Bàn chế tạo - E";
+            var table=GameObject.CreatePrimitive(PrimitiveType.Cube);table.name="Bàn chế tạo - Chuột trái";
             table.transform.position=new Vector3(-4,1,28);table.transform.localScale=new Vector3(3,1.8f,1.6f);
             table.GetComponent<Renderer>().material=Material(new Color(.47f,.29f,.16f));table.AddComponent<CraftingTable>();
-            var mailbox=GameObject.CreatePrimitive(PrimitiveType.Cube);mailbox.name="Hộp thư giao hàng - E";
+            Decorate(table.transform,"Mặt ghép",PrimitiveType.Cube,new Vector3(0,1.02f,0),new Vector3(1,.14f,.8f),new Color(.8f,.57f,.29f));
+            Decorate(table.transform,"Búa",PrimitiveType.Cube,new Vector3(-.24f,1.23f,0),new Vector3(.09f,.4f,.1f),new Color(.75f,.76f,.77f));
+            Decorate(table.transform,"Cuộn bản vẽ",PrimitiveType.Cylinder,new Vector3(.55f,1.18f,0),new Vector3(.16f,.25f,.16f),new Color(.97f,.88f,.58f));
+            FloatingLabel(table.transform,"BÀN CHẾ TẠO",new Vector3(0,2.15f,0));
+            var mailbox=GameObject.CreatePrimitive(PrimitiveType.Cube);mailbox.name="Hộp thư giao hàng - Chuột trái";
             mailbox.transform.position=new Vector3(4,1.35f,28);mailbox.transform.localScale=new Vector3(1.5f,1.2f,1.2f);
             mailbox.GetComponent<Renderer>().material=Material(new Color(.74f,.22f,.18f));mailbox.AddComponent<DeliveryMailbox>();
             var post=GameObject.CreatePrimitive(PrimitiveType.Cube);post.name="Cột hộp thư";post.transform.SetParent(mailbox.transform,false);
             post.transform.localPosition=new Vector3(0,-1.1f,0);post.transform.localScale=new Vector3(.16f,1.5f,.16f);
             Destroy(post.GetComponent<Collider>());post.GetComponent<Renderer>().material=Material(new Color(.42f,.25f,.14f));
+            Decorate(mailbox.transform,"Nắp hộp thư",PrimitiveType.Cube,new Vector3(0,.62f,0),new Vector3(1.2f,.18f,1.05f),new Color(.87f,.3f,.18f));
+            Decorate(mailbox.transform,"Khe bỏ hàng",PrimitiveType.Cube,new Vector3(0,.15f,-.62f),new Vector3(.7f,.09f,.1f),new Color(.1f,.13f,.12f));
+            Decorate(mailbox.transform,"Lá thư",PrimitiveType.Cube,new Vector3(0,.22f,-.66f),new Vector3(.43f,.27f,.04f),new Color(1,.95f,.74f));
+            FloatingLabel(mailbox.transform,"HỘP THƯ • GIAO ĐƠN",new Vector3(0,1.45f,0));
         }
+        static void Decorate(Transform parent,string name,PrimitiveType shape,Vector3 position,Vector3 scale,Color color)
+        {var part=GameObject.CreatePrimitive(shape);part.name=name;part.transform.SetParent(parent,false);part.transform.localPosition=position;part.transform.localScale=scale;
+         Destroy(part.GetComponent<Collider>());part.GetComponent<Renderer>().material=Material(color);}
+        static void FloatingLabel(Transform parent,string value,Vector3 offset)
+        {var label=new GameObject("Nhãn "+value,typeof(TextMeshPro));label.transform.SetParent(parent,false);label.transform.localPosition=offset;label.transform.localScale=Vector3.one*.35f;
+         var text=label.GetComponent<TextMeshPro>();text.font=FarmUi.Font;text.text=value;text.fontSize=4;text.alignment=TextAlignmentOptions.Center;text.color=Color.white;
+         text.outlineColor=Color.black;text.outlineWidth=.25f;text.rectTransform.sizeDelta=new Vector2(12,2);label.AddComponent<FarmWorldBillboard>();}
         static Material Material(Color color)
         { var material=new Material(Shader.Find("Universal Render Pipeline/Lit"));material.color=color;return material; }
         public void OpenCraft()
@@ -145,7 +173,8 @@ namespace NongTrai
             var pool=new List<int>();
             if(craft)
             {
-                for(int i=0;i<Recipes.Length;i++) if(CraftUnlocked(i) && Recipes[i].output<26 && Recipes[i].output!=excluded) pool.Add(Recipes[i].output);
+                for(int i=0;i<Recipes.Length;i++) if(CraftUnlocked(i) && Recipes[i].output!=excluded &&
+                    (Recipes[i].output<20||Recipes[i].output>=32) && CanMake(Recipes[i])) pool.Add(Recipes[i].output);
             }
             else
             {
@@ -166,6 +195,10 @@ namespace NongTrai
             if(item==11) return CompletedOrders>=6;
             return true;
         }
+        bool CanMake(CraftRecipe recipe)
+        {foreach(var input in recipe.inputs)if(input.item==14&&inventory.Count(14)==0&&shop.BoughtTrees==0)return false;
+         foreach(var input in recipe.inputs)if(input.item==15&&(IslandManager.Instance==null||IslandManager.Instance.Blueprints<=0))return false;
+         return true;}
         public bool Deliver(int index)
         {
             if(index<0 || index>=Orders.Length || Orders[index].completed) return false;
@@ -215,7 +248,7 @@ namespace NongTrai
             return result;
         }
         void RefreshCraft()
-        { if(craftStatus!=null) craftStatus.text="Công thức mở: "+(3+(CraftUnlocked(2)?1:0)+(CraftUnlocked(3)?1:0))+"/5 • Bàn chế tạo cần 5 khối gỗ."; }
+        { if(craftStatus!=null){int opened=0;for(int i=0;i<Recipes.Length;i++)if(CraftUnlocked(i))opened++;craftStatus.text="Công thức mở: "+opened+"/"+Recipes.Length+" • Kéo danh sách để xem thêm • Gỗ từ cây táo bằng rìu.";} }
         void RefreshMail()
         {
             if(mailStatus==null || Orders==null || Orders.Length<2) return;
@@ -230,16 +263,20 @@ namespace NongTrai
 
     public sealed class CraftingTable : MonoBehaviour,IInteractable
     {
-        public string InteractionHint => "[E] Mở bàn chế tạo";
+        public string InteractionHint => "[Chuột trái] Mở bàn chế tạo";
         public bool CanInteract(FarmPlayer player) => true;
         public void Interact(PlayerInteraction actor) => FarmCraftOrders.Instance.OpenCraft();
         public void SetHighlighted(bool selected) => InteractionOutline.Set(this,selected);
     }
     public sealed class DeliveryMailbox : MonoBehaviour,IInteractable
     {
-        public string InteractionHint => "[E] Xem và giao đơn hộp thư";
+        public string InteractionHint => "[Chuột trái] Xem và giao đơn hộp thư";
         public bool CanInteract(FarmPlayer player) => true;
         public void Interact(PlayerInteraction actor) => FarmCraftOrders.Instance.OpenMail();
         public void SetHighlighted(bool selected) => InteractionOutline.Set(this,selected);
+    }
+    public sealed class FarmWorldBillboard : MonoBehaviour
+    {
+        void LateUpdate(){if(Camera.main!=null)transform.rotation=Quaternion.LookRotation(transform.position-Camera.main.transform.position);}
     }
 }

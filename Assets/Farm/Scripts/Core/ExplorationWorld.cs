@@ -5,8 +5,11 @@ using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 namespace NongTrai
 {
+    [Serializable] public sealed class SaplingRecord {public Vector3Int cell;public int stage;public float timer;}
+    [Serializable] public sealed class VoxelRecord {public Vector3Int cell;public int type;}
     [Serializable] public sealed class ExplorationState
     {
+        public SaplingRecord[] saplings;public VoxelRecord[] additions;
         public int[] removed; // v7 cell IDs
         public int minedCount,seed,generatorVersion;
         public Vector3Int[] excavated;
@@ -16,13 +19,15 @@ namespace NongTrai
     {
         public static ExplorationWorld Instance {get;private set;}
         public FarmHud hud; public FarmInventory inventory;
-        public const int ChunkSize=16,Height=32;
+        public const int ChunkSize=16,Height=40;
         const int Radius=2;
         public static readonly Vector3 Origin=new Vector3(175.5f,996,-24.5f);
         readonly HashSet<Vector3Int> removed=new HashSet<Vector3Int>();
         readonly Dictionary<Vector2Int,Chunk> chunks=new Dictionary<Vector2Int,Chunk>();
-        TMPro.TMP_Text miningText,reticle;string miningHint="";
-        Material[] materials;float hold;Vector3Int target;bool hasTarget;
+        TMPro.TMP_Text miningText,reticle;
+        UnityEngine.UI.Image breakFill;UnityEngine.GameObject breakBack;string miningHint="";
+        readonly List<SaplingRecord> saplings=new List<SaplingRecord>();readonly Dictionary<Vector3Int,int> additions=new Dictionary<Vector3Int,int>();readonly Dictionary<SaplingRecord,GameObject> sprouts=new Dictionary<SaplingRecord,GameObject>();readonly HashSet<Vector3Int> leavesToCheck=new HashSet<Vector3Int>();float leafClock;
+        Material[] materials;float hold;float breakDuration=1;int entityTarget;Vector3Int target;bool hasTarget;
         public int MinedCount {get;private set;}
         public int Seed {get;private set;}
         public int LoadedChunkCount=>chunks.Count;
@@ -43,7 +48,7 @@ namespace NongTrai
         void Awake()
         {
             Instance=this;
-            var colors=new[]{new Color(.34f,.58f,.22f),new Color(.48f,.33f,.21f),new Color(.45f,.49f,.53f),new Color(.28f,.4f,.49f),new Color(.77f,.66f,.4f),new Color(.85f,.91f,.94f)};
+            var colors=new[]{new Color(.34f,.58f,.22f),new Color(.48f,.33f,.21f),new Color(.45f,.49f,.53f),new Color(.28f,.4f,.49f),new Color(.77f,.66f,.4f),new Color(.85f,.91f,.94f),new Color(.43f,.26f,.12f),new Color(.19f,.46f,.12f)};
             materials=new Material[colors.Length];
             for(int i=0;i<colors.Length;i++){materials[i]=new Material(Shader.Find("Universal Render Pipeline/Lit"));materials[i].color=colors[i];}
             Restore(null);
@@ -51,11 +56,16 @@ namespace NongTrai
         void Start()
         {
             CreateStarterOrchard();
+            gameObject.AddComponent<AdventureWildlife>().world=this;
             miningText=FarmUi.TmpLabel(hud.gameplayChrome.transform,"",Vector2.zero,new Vector2(1000,88),22);
             var r=miningText.rectTransform;r.anchorMin=r.anchorMax=r.pivot=new Vector2(.5f,0);r.anchoredPosition=new Vector2(0,195);
             miningText.alignment=TMPro.TextAlignmentOptions.Center;miningText.raycastTarget=false;
             reticle=FarmUi.TmpLabel(hud.gameplayChrome.transform,"+",Vector2.zero,new Vector2(40,40),28);
-            var aim=reticle.rectTransform;aim.anchorMin=aim.anchorMax=aim.pivot=new Vector2(.5f,.5f);aim.anchoredPosition=Vector2.zero;
+            var aim=reticle.rectTransform;aim.anchorMin=aim.anchorMax=aim.pivot=new Vector2(.5f,.5f);aim.anchoredPosition=new Vector2(0,64.8f);
+            breakBack=FarmUi.Panel(hud.gameplayChrome.transform,"Tiến độ phá",new Vector2(126,12));
+            var br=breakBack.GetComponent<RectTransform>();br.anchorMin=br.anchorMax=br.pivot=new Vector2(.5f,.5f);br.anchoredPosition=new Vector2(0,35);
+            var fill=FarmUi.Panel(breakBack.transform,"Tiến độ",new Vector2(0,8));breakFill=fill.GetComponent<UnityEngine.UI.Image>();breakFill.color=new Color(1,.74f,.18f);
+            var fr=fill.GetComponent<RectTransform>();fr.anchorMin=fr.anchorMax=fr.pivot=new Vector2(0,.5f);fr.anchoredPosition=new Vector2(2,0);
             reticle.alignment=TMPro.TextAlignmentOptions.Center;reticle.raycastTarget=false;
         }
         public void CreateStarterOrchard()
@@ -81,7 +91,16 @@ namespace NongTrai
         int BaseCell(int x,int y,int z)
         {
             if(y<0||y>=Height)return 0;
-            int top=SurfaceHeight(x,z);if(y>=top)return 0;
+            if(additions.TryGetValue(new Vector3Int(x,y,z),out int added))return added;
+            int top=SurfaceHeight(x,z);
+            if(y>=top)
+            {
+                int tx=Mathf.RoundToInt(x/8f)*8,tz=Mathf.RoundToInt(z/8f)*8;
+                if(!(tx>=-4&&tx<52&&tz>=-4&&tz<52)&&Hash(tx,0,tz)%4==0&&BiomeAt(tx,tz)=="Đồng cỏ")
+                {int ground=SurfaceHeight(tx,tz);if(x==tx&&z==tz&&y<ground+4)return 7;
+                 if(Mathf.Abs(x-tx)<=2&&Mathf.Abs(z-tz)<=2&&y>=ground+3&&y<=ground+5)return 8;}
+                return 0;
+            }
             if(y==0)return 3;
             bool core=x>=0&&x<48&&z>=0&&z<48;
             if(core)
@@ -101,7 +120,10 @@ namespace NongTrai
         public int BlockAt(Vector3Int cell)=>removed.Contains(cell)?0:BaseCell(cell.x,cell.y,cell.z);
         public void Restore(ExplorationState state)
         {
-            ClearChunks();removed.Clear();
+            ClearChunks();removed.Clear();additions.Clear();saplings.Clear();leavesToCheck.Clear();
+            foreach(var sprout in sprouts.Values)if(sprout!=null)Destroy(sprout);sprouts.Clear();
+            if(state?.saplings!=null)saplings.AddRange(state.saplings);
+            if(state?.additions!=null)foreach(var v in state.additions)additions[v.cell]=v.type;
             Seed=state!=null&&state.generatorVersion>0?state.seed:Guid.NewGuid().GetHashCode()&int.MaxValue;
             MinedCount=state==null?0:Mathf.Max(0,state.minedCount);
             if(state?.excavated!=null)foreach(var c in state.excavated)if(c.y>0&&c.y<Height)removed.Add(c);
@@ -110,7 +132,7 @@ namespace NongTrai
             EnsureAt(IslandManager.ExploreArrival);
         }
         public ExplorationState Snapshot()
-        {var ids=new Vector3Int[removed.Count];removed.CopyTo(ids);return new ExplorationState{seed=Seed,generatorVersion=1,excavated=ids,minedCount=MinedCount};}
+        {var ids=new Vector3Int[removed.Count];removed.CopyTo(ids);var added=new List<VoxelRecord>();foreach(var pair in additions)added.Add(new VoxelRecord{cell=pair.Key,type=pair.Value});return new ExplorationState{seed=Seed,generatorVersion=1,excavated=ids,minedCount=MinedCount,saplings=saplings.ToArray(),additions=added.ToArray()};}
         public void EnsureAt(Vector3 point)
         {
             if(point.y<500)return;
@@ -138,43 +160,103 @@ namespace NongTrai
             for(int x=0;x<ChunkSize;x++)for(int z=0;z<ChunkSize;z++)for(int y=0;y<Height;y++)
                 c.cells[x,y,z]=BlockAt(new Vector3Int(key.x*ChunkSize+x,y,key.y*ChunkSize+z));
             chunks.Add(key,c);Rebuild(key,c);
+            for(int x=0;x<ChunkSize;x++)for(int y=0;y<Height;y++)for(int z=0;z<ChunkSize;z++)if(c.cells[x,y,z]==8)leavesToCheck.Add(new Vector3Int(key.x*ChunkSize+x,y,key.y*ChunkSize+z));
         }
-        public bool MineCell(Vector3Int c)
+        public bool MineCell(Vector3Int c,bool drop=false,bool yieldItem=true)
         {
             int type=BlockAt(c);if(c.y<=0||Protected(c.x,c.z)||type==0)return false;
-            removed.Add(c);MinedCount++;inventory.Add(type==4?13:type==3?21:25,1);
+            removed.Add(c);MinedCount++;
+            if(yieldItem){int item=type==7?20:type==8?(Hash(c.x,c.y,c.z)%2==0?27:3):type==4?13:type==3?21:25;
+                if(drop)WorldPickup.Spawn(item,1,Origin+(Vector3)c+Vector3.one*.5f);else inventory.Add(item,1);}
             FarmExpansion.Instance?.GainExperience(2);if(MinedCount>=30)IslandManager.Instance?.UnlockMiningBlueprint();
             var key=Key(c.x,c.z);
             if(chunks.TryGetValue(key,out var chunk)){chunk.cells[c.x-key.x*ChunkSize,c.y,c.z-key.y*ChunkSize]=0;Rebuild(key,chunk);}
             foreach(var dir in dirs)
             {var neighbor=Key(c.x+dir.x,c.z+dir.z);if(neighbor!=key&&chunks.TryGetValue(neighbor,out var n))Rebuild(neighbor,n);}
+            if(type==7)for(int x=-3;x<=3;x++)for(int y=-5;y<=5;y++)for(int z=-3;z<=3;z++){var leaf=c+new Vector3Int(x,y,z);if(BlockAt(leaf)==8)leavesToCheck.Add(leaf);}
             return true;
+        }
+        public bool Plant(Vector3Int soil)
+        {
+            int type=BlockAt(soil);if(type!=1&&type!=2&&type!=5)return false;
+            var cell=soil+Vector3Int.up;if(BlockAt(cell)!=0)return false;
+            foreach(var s in saplings)if(Vector3Int.Distance(s.cell,cell)<3)return false;
+            if(!inventory.Remove(27,1))return false;
+            saplings.Add(new SaplingRecord{cell=cell});return true;
+        }
+        void RefreshCells(HashSet<Vector2Int> dirty)
+        {foreach(var key in dirty)if(chunks.TryGetValue(key,out var chunk)){for(int x=0;x<ChunkSize;x++)for(int y=0;y<Height;y++)for(int z=0;z<ChunkSize;z++)chunk.cells[x,y,z]=BlockAt(new Vector3Int(key.x*ChunkSize+x,y,key.y*ChunkSize+z));Rebuild(key,chunk);}}
+        public void AdvanceTrees(float seconds)
+        {
+            var dirty=new HashSet<Vector2Int>();
+            foreach(var s in saplings)
+            {
+                if(s.stage>=3)continue;
+                if(!sprouts.ContainsKey(s)){var go=GameObject.CreatePrimitive(PrimitiveType.Sphere);Destroy(go.GetComponent<Collider>());go.layer=2;go.name="Cây non";sprouts[s]=go;go.GetComponent<Renderer>().material=materials[7];}
+                var visual=sprouts[s];visual.transform.position=Origin+(Vector3)s.cell+new Vector3(.5f,.25f,.5f);visual.transform.localScale=Vector3.one*(.25f+s.stage*.2f);
+                s.timer+=seconds;float hour=TimeManager.Instance.NormalizedTime*24;
+                if(s.timer<10||hour<6||hour>18)continue;s.timer=0;
+                if(UnityEngine.Random.value>.45f)continue;s.stage++;
+                if(s.stage<3)continue;Destroy(visual);sprouts.Remove(s);
+                for(int x=-2;x<=2;x++)for(int y=0;y<=5;y++)for(int z=-2;z<=2;z++)
+                {int type=x==0&&z==0&&y<4?7:y>=3?8:0;if(type==0)continue;var cell=s.cell+new Vector3Int(x,y,z);if(cell.y>=Height)continue;additions[cell]=type;removed.Remove(cell);var key=Key(cell.x,cell.z);dirty.Add(key);foreach(var d in dirs)dirty.Add(Key(cell.x+d.x,cell.z+d.z));}
+            }
+            leafClock+=seconds;if(leafClock>=5)
+            {
+                leafClock=0;
+                foreach(var leaf in leavesToCheck)
+                {
+                    if(BlockAt(leaf)!=8)continue;bool supported=false;
+                    for(int x=-3;x<=3&&!supported;x++)for(int y=-5;y<=5&&!supported;y++)for(int z=-3;z<=3;z++)if(BlockAt(leaf+new Vector3Int(x,y,z))==7){supported=true;break;}
+                    if(!supported){removed.Add(leaf);dirty.Add(Key(leaf.x,leaf.z));foreach(var d in dirs)dirty.Add(Key(leaf.x+d.x,leaf.z+d.z));if(Hash(leaf.x,leaf.y,leaf.z)%4==0)WorldPickup.Spawn(27,1,Origin+(Vector3)leaf);}
+                }
+                leavesToCheck.Clear();
+            }
+            RefreshCells(dirty);
         }
         void Update()
         {
             if(hud==null||hud.player==null)return;
+            if(!hud.player.Paused)AdvanceTrees(Time.deltaTime);
             if(IsExploring)Stream(hud.player.transform.position);
-            if(hud.player.Paused||!IsExploring||FarmBuildingSystem.Instance.IsBuilding){hold=0;return;}
+            if(hud.player.Paused||FarmBuildingSystem.Instance.IsBuilding){hold=0;return;}
             var cam=Camera.main;if(cam==null||Mouse.current==null)return;
-            UpdateMiningRay(new Ray(cam.transform.position,cam.transform.forward),Mouse.current.leftButton.isPressed,Time.deltaTime);
+            UpdateMiningRay(FarmAim.Ray(cam),Mouse.current.leftButton.isPressed,Time.deltaTime);
         }
         public bool UpdateMiningRay(Ray ray,bool pressed,float elapsed)
         {
-            if(hud.player.Paused||!IsExploring||FarmBuildingSystem.Instance.IsBuilding)return false;
+            if(hud.player.Paused||FarmBuildingSystem.Instance.IsBuilding)return false;
             miningHint="Nhìn vào khối đất/đá • Giữ CHUỘT TRÁI để đào • V đổi góc nhìn";
             // The third-person ray must pass through the player's own layer and reach past the camera offset.
-            if(Physics.Raycast(ray,out var hit,24,~(1<<8),QueryTriggerInteraction.Ignore)&&IsTerrain(hit.collider))
+            if(Physics.Raycast(ray,out var hit,24,~(1<<8),QueryTriggerInteraction.Ignore))
+            {
+                var wild=hit.collider.GetComponentInParent<WildAnimal>();
+                if(wild!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
+                {if(entityTarget!=wild.GetInstanceID()){entityTarget=wild.GetInstanceID();hold=0;}breakDuration=.5f;miningHint=wild.Status;hasTarget=true;if(pressed){hold+=elapsed;if(hold>=.5f){wild.Hit();hold=0;}}else hold=0;return false;}
+                var placed=hit.collider.GetComponentInParent<PlacedBlock>();
+                if(placed!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
+                {
+                    if(entityTarget!=placed.GetInstanceID()){entityTarget=placed.GetInstanceID();hold=0;}
+                    int material=placed.type==0?7:placed.type==1||placed.type==4?3:1;
+                    var bag=AdventureBag.Instance;breakDuration=bag.BreakSeconds(material);hasTarget=true;hold=pressed?hold+elapsed:0;
+                    miningHint="Giữ trái: phá khối • "+Mathf.FloorToInt(hold/breakDuration*100)+"%";
+                    if(hold>=breakDuration){hold=0;bool correct=material==1||bag.CorrectTool(material);if(bag.Item>=104)correct&=bag.DamageTool();return FarmBuildingSystem.Instance.BreakPlaced(placed,correct);}return false;
+                }
+            }
+            if(IsExploring&&hit.collider!=null&&IsTerrain(hit.collider))
             {
                 var c=CellAt(hit.point-hit.normal*.02f);
                 if(Vector3.Distance(hit.point,hud.player.transform.position+Vector3.up)>6)
                 {miningHint="Tiến gần khối hơn (tầm đào 6 m tính từ nhân vật)";hold=0;hasTarget=false;return false;}
-                if(!hasTarget||target!=c){target=c;hold=0;hasTarget=true;}
+                if(!hasTarget||target!=c||entityTarget!=0){target=c;hold=0;hasTarget=true;entityTarget=0;}
                 if(c.y<=0||Protected(c.x,c.z))
                 {miningHint=c.y<=0?"Tầng đáy không thể đào":"Khu cổng được bảo vệ • Đi ra ngoài để đào";hold=0;return false;}
-                string name=BlockAt(c)==4?"Quặng":BlockAt(c)==3?"Đá":"Đất";
+                float seconds=AdventureBag.Instance==null?.55f:AdventureBag.Instance.BreakSeconds(BlockAt(c));breakDuration=seconds;
+                string name=BlockAt(c)==7?"Thân gỗ":BlockAt(c)==8?"Lá":BlockAt(c)==4?"Quặng":BlockAt(c)==3?"Đá":"Đất";
                 if(pressed)hold+=Mathf.Max(0,elapsed);else hold=0;
-                miningHint=name+" • Giữ CHUỘT TRÁI: "+Mathf.Min(100,Mathf.FloorToInt(hold/.55f*100))+"%";
-                if(hold>=.55f){hold=0;return MineCell(c);}
+                miningHint=name+" • Giữ CHUỘT TRÁI: "+Mathf.Min(100,Mathf.FloorToInt(hold/seconds*100))+"%";
+                if(hold>=seconds){hold=0;var bag=AdventureBag.Instance;bool correct=bag==null||bag.CorrectTool(BlockAt(c));
+                    bool durable=bag==null||bag.Item<104||bag.DamageTool();return MineCell(c,true,durable&&(BlockAt(c)!=3&&BlockAt(c)!=4&&BlockAt(c)!=7||correct));}
             }
             else{hasTarget=false;hold=0;}
             return false;
@@ -183,11 +265,13 @@ namespace NongTrai
         void LateUpdate()
         {
             if(miningText==null)return;
-            bool visible=IsExploring&&!hud.player.Paused&&!FarmBuildingSystem.Instance.IsBuilding;
-            miningText.gameObject.SetActive(visible);reticle.gameObject.SetActive(visible);
+            bool building=FarmBuildingSystem.Instance.IsBuilding;bool visible=(IsExploring||building||hasTarget)&&!hud.player.Paused;
+            miningText.gameObject.SetActive(visible);reticle.gameObject.SetActive(!hud.player.Paused);
+            breakBack.SetActive(visible&&!building&&hold>0);
+            if(visible)breakFill.rectTransform.sizeDelta=new Vector2(122*Mathf.Clamp01(hold/breakDuration),8);
             if(!visible)return;
             var cell=CellAt(hud.player.transform.position);
-            miningText.text=miningHint+"\n"+BiomeAt(cell.x,cell.z)+" • Seed "+Seed+" • "+cell.x+", "+cell.z;
+            miningText.text=(building?"CHUỘT TRÁI: đặt khối cạnh mặt đang ngắm • Chọn dụng cụ để phá":miningHint)+(IsExploring?"\n"+BiomeAt(cell.x,cell.z)+" • Seed "+Seed+" • "+cell.x+", "+cell.z:"");
             reticle.color=hasTarget?new Color(1,.8f,.2f):Color.white;
         }
         void Rebuild(Vector2Int key,Chunk chunk)

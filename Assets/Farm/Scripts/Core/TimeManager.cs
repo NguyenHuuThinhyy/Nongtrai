@@ -9,7 +9,7 @@ namespace NongTrai
     public sealed class TimeManager : MonoBehaviour
     {
         public static TimeManager Instance { get; private set; }
-        public const float DayLengthSeconds = 600f;
+        public const float DayLengthSeconds = 1080f;
         public FarmPlayer player;
         public FieldManager field;
         public Light sun;
@@ -98,7 +98,7 @@ namespace NongTrai
             FarmCraftOrders.Instance?.OnNewDay(Day);
             var random=new System.Random(Day*7919+Year*373);
             int roll=random.Next(100);
-            SetWeather(roll<54?FarmWeather.Sunny:roll<79?FarmWeather.Rain:roll<91?FarmWeather.Fog:FarmWeather.Storm,true);
+            SetWeather(roll<67?FarmWeather.Sunny:roll<82?FarmWeather.Rain:roll<96?FarmWeather.Fog:FarmWeather.Storm,true);
         }
         public void SetWeather(FarmWeather value,bool triggerPuzzle=false)
         {

@@ -92,6 +92,8 @@ namespace NongTrai
             string path = Path.Combine(Application.dataPath, "../smoke-preview.png");
             yield return new WaitForEndOfFrame();
             Capture(path, hud, Camera.main);
+            if(FarmTutorialCoach.Instance==null)throw new InvalidOperationException("Beginner guide missing.");
+            FarmTutorialCoach.Instance.Restore(true);
             var animals = FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None);
             if (animals.Length != 6) throw new InvalidOperationException("Expected six animals.");
             float[] travelled = new float[animals.Length];
@@ -118,6 +120,7 @@ namespace NongTrai
             if(!player.Paused || !shop.Panel.activeSelf || hud.pausePanel.activeSelf) throw new InvalidOperationException("Shop menu failed.");
             Capture(Path.Combine(folder,"shop-preview.png"),hud,camera);
             shop.ShowPage(1);Capture(Path.Combine(folder,"shop-blocks-preview.png"),hud,camera);
+            shop.ShowPage(2);Capture(Path.Combine(folder,"shop-extra-preview.png"),hud,camera);
             hud.Resume();
             if(shop.Panel.activeSelf) throw new InvalidOperationException("Shop did not close.");
             var inventory=hud.interaction.inventory;
@@ -257,7 +260,15 @@ namespace NongTrai
             water.Open();if(!player.Paused || !water.Panel.activeSelf) throw new InvalidOperationException("Water modal failed to open.");
             hud.Resume();if(water.Panel.activeSelf) throw new InvalidOperationException("Water modal did not close with resume/ESC flow.");
             orders.OpenCraft();if(!player.Paused || !orders.CraftPanel.activeSelf) throw new InvalidOperationException("Craft modal failed to open.");
+            if(orders.Recipes.Length!=13)throw new InvalidOperationException("Expanded JSON crafting book missing.");
+            Capture(Path.Combine(folder,"craft-preview.png"),hud,camera);
             hud.Resume();if(orders.CraftPanel.activeSelf) throw new InvalidOperationException("Craft modal did not close with resume/ESC flow.");
+            var beforeCraftRay=player.transform.position;
+            player.Teleport(new Vector3(-4,.4f,24));Physics.SyncTransforms();
+            Vector3 craftEye=new Vector3(-4,1.6f,24),craftFocus=new Vector3(-4,1,28);
+            if(!hud.interaction.TryLeftInteractRay(new Ray(craftEye,(craftFocus-craftEye).normalized))||!orders.CraftPanel.activeSelf)
+                throw new InvalidOperationException("Farm left-click ray did not open crafting table.");
+            hud.Resume();player.Teleport(beforeCraftRay);
             milkCow=null;
             foreach(var candidate in FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None))
                 if(candidate.species==AnimalSpecies.Cow) { milkCow=candidate;break; }
@@ -312,12 +323,17 @@ namespace NongTrai
                 throw new InvalidOperationException("JSON crafting recipe failed.");
             inventory.Add(20,5);
             if(!orders.Craft(4) || inventory.Count(26)!=1) throw new InvalidOperationException("Crafting table recipe failed.");
+            inventory.Add(20,2);if(!orders.Craft(5)||inventory.Count(28)==0)throw new InvalidOperationException("Decorative wood steps recipe failed.");
+            inventory.Add(3,3);inventory.Add(0,3);int cake=inventory.Count(32);
+            if(!orders.Craft(9)||inventory.Count(32)!=cake+1)throw new InvalidOperationException("Apple cake recipe failed.");
+            inventory.Add(0,2);inventory.Add(2,2);int feed=inventory.Count(34);
+            if(!orders.Craft(11)||inventory.Count(34)!=feed+1)throw new InvalidOperationException("Premium animal feed recipe failed.");
             building.Toggle();
-            if(!building.TryPlaceSelected(new Vector3(28,.5f,-20),0) || inventory.Count(26)!=0 || !building.HasPlacedTable)
+            if(!building.TryPlaceSelected(new Vector3(0,.5f,-35),0) || inventory.Count(26)!=0 || !building.HasPlacedTable)
                 throw new InvalidOperationException("Crafting table placement failed.");
             building.Select(0);
             int woodForBuilding=inventory.Count(20);
-            if(!building.TryPlaceSelected(new Vector3(30,.5f,-20),0) || inventory.Count(20)!=woodForBuilding-1 ||
+            if(!building.TryPlaceSelected(new Vector3(2,.5f,-35),0) || inventory.Count(20)!=woodForBuilding-1 ||
                 building.Snapshot().blocks.Length!=2)
                 throw new InvalidOperationException("Block placement did not consume one block.");
             building.Toggle();
@@ -349,7 +365,7 @@ namespace NongTrai
             var clock=TimeManager.Instance;
             var islands=IslandManager.Instance;
             var disaster=FindFirstObjectByType<DisasterPuzzleManager>();
-            if(clock==null || islands==null || disaster==null || TimeManager.DayLengthSeconds!=600)
+            if(clock==null || islands==null || disaster==null || TimeManager.DayLengthSeconds!=1080)
                 throw new InvalidOperationException("Time, island or disaster manager missing.");
             clock.Restore(28,.80f,FarmWeather.Sunny);
             if(clock.Season!=FarmSeason.Spring || clock.Year!=1)
@@ -376,6 +392,10 @@ namespace NongTrai
             if(progress.LevelCap!=99) throw new InvalidOperationException("Normal level cap failed.");
             if(!islands.Travel(1) || Mathf.Abs(player.transform.position.x-200)>2 || islands.Travel(2) || islands.Travel(3))
                 throw new InvalidOperationException("Two map travel failed.");
+            var rememberedExplore=IslandManager.ExploreArrival+new Vector3(10,0,5);
+            player.Teleport(rememberedExplore);islands.Travel(0);islands.Travel(1);
+            if(Vector3.Distance(player.transform.position,rememberedExplore)>1)throw new InvalidOperationException("Exploration position was not remembered between maps.");
+            player.Teleport(IslandManager.ExploreArrival);
             clock.Restore(clock.Day,.5f,FarmWeather.Sunny);
             camera.transform.position=new Vector3(232,1028,-36);
             camera.transform.LookAt(new Vector3(199,1001,0));
@@ -388,12 +408,12 @@ namespace NongTrai
             var aimed=new Vector3(186,999.98f,-18);
             var rayStart=new Vector3(186,1003,-24);
             var thirdPersonRay=new Ray(rayStart,(aimed-rayStart).normalized);
-            if(exploration.UpdateMiningRay(thirdPersonRay,true,.3f)||!exploration.UpdateMiningRay(thirdPersonRay,true,.3f))
+            if(exploration.UpdateMiningRay(thirdPersonRay,true,.45f)||!exploration.UpdateMiningRay(thirdPersonRay,true,.45f))
                 throw new InvalidOperationException("Third person hold-to-mine ray failed.");
             if(exploration.BlockAt(new Vector3Int(10,3,6))!=0)throw new InvalidOperationException("Aimed surface block was not excavated.");
             exploration.Restore(beforeRay);Physics.SyncTransforms();
             var eye=player.transform.position+Vector3.up*1.65f;
-            if(!exploration.UpdateMiningRay(new Ray(eye,(aimed-eye).normalized),true,.6f))throw new InvalidOperationException("First person hold-to-mine ray failed.");
+            if(!exploration.UpdateMiningRay(new Ray(eye,(aimed-eye).normalized),true,.9f))throw new InvalidOperationException("First person hold-to-mine ray failed.");
             exploration.Restore(beforeRay);islands.Travel(1);
             Debug.Log("FARM_MINING_RAY_OK: first/third person rays, hold duration and terrain mutation.");
             int mined=0;
@@ -445,6 +465,8 @@ namespace NongTrai
             clock.Restore(clock.Day+1,.25f,FarmWeather.Sunny);
             var hotbar=FindFirstObjectByType<FarmHudV2>();hotbar.Select(8);
             if(hotbar.SelectedSlot!=8) throw new InvalidOperationException("Nine slot hotbar failed.");
+            islands.Travel(0);player.Teleport(new Vector3(8,.4f,14));islands.Travel(1);
+            player.Teleport(IslandManager.ExploreArrival);
             save.pathOverride=Path.Combine(Application.temporaryCachePath,"farm-islands-smoke-save.json");
             if(!save.Save()) throw new InvalidOperationException("Island save failed.");
             clock.Restore(1,.25f,FarmWeather.Sunny);player.Teleport(Vector3.zero);
@@ -452,24 +474,29 @@ namespace NongTrai
             if(!save.Load() || exploration.MinedCount!=31 || exploration.MineCell(new Vector3Int(0,2,12)) || clock.Day<=1 || islands.Blueprints!=1 ||
                 Mathf.Abs(player.transform.position.x-200)>2)
                 throw new InvalidOperationException("Time/island save did not restore.");
+            islands.Travel(0);
+            if(Mathf.Abs(player.transform.position.x-8)>1)throw new InvalidOperationException("Saved farm return position was lost.");
+            islands.Travel(1);
+            if(Mathf.Abs(player.transform.position.x-200)>2)throw new InvalidOperationException("Saved exploration return position was lost.");
             string modernSave=File.ReadAllText(save.SavePath);
             player.Teleport(new Vector3(200,.4f,-20));
             if(!save.Save())throw new InvalidOperationException("Migration fixture save failed.");
-            string oldSave=File.ReadAllText(save.SavePath).Replace("\"version\": 8","\"version\": 7");
+            string oldSave=File.ReadAllText(save.SavePath).Replace("\"version\": 10","\"version\": 7");
             File.WriteAllText(save.SavePath,oldSave);
             if(!save.Load()||Mathf.Abs(player.transform.position.y-1000.4f)>1)throw new InvalidOperationException("Legacy player position migration failed.");
             File.WriteAllText(save.SavePath,modernSave);if(!save.Load())throw new InvalidOperationException("Modern restore failed.");
             File.Delete(save.SavePath);
             if(File.Exists(save.SavePath+".bak")) File.Delete(save.SavePath+".bak");
             save.pathOverride=null;
-            Debug.Log("FARM_ISLANDS_TIME_OK: 10-minute day, seasons, rain, storm puzzle, sleep, two portals, voxel mining, level cap, furnace blueprint, hotbar and manual save.");
+            Debug.Log("FARM_ISLANDS_TIME_OK: 18-minute day, seasons, rain, storm puzzle, sleep, two portals with remembered positions, voxel mining, level cap, furnace blueprint, hotbar and manual save.");
+            yield return AdventureChecks.Run(save,player);
             save.pathOverride=Path.Combine(Application.temporaryCachePath,"farm-creative-do-not-save.json");
             if(File.Exists(save.SavePath)) File.Delete(save.SavePath);
             creative.StartCreative();
             if(progress.Level!=99 || progress.LevelCap!=99 || !CreativeModeManager.IsFlying)
                 throw new InvalidOperationException("Creative mode did not enable LV99 and flight.");
             progress.Restore(1,0,1,.25f,null,null);
-            if(!CreativeModeManager.IsCreative || !islands.Travel(1) || Mathf.Abs(player.transform.position.x-200)>2)
+            if(!CreativeModeManager.IsCreative || !islands.Travel(1) || player.transform.position.y<500)
                 throw new InvalidOperationException("Creative LV1 island travel failed.");
             creative.ToggleFlight();if(CreativeModeManager.IsFlying) throw new InvalidOperationException("Creative flight toggle failed.");
             if(save.Save() || File.Exists(save.SavePath)) throw new InvalidOperationException("Creative mode wrote a save file.");

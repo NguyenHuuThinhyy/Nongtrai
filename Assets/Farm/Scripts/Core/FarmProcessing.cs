@@ -43,6 +43,8 @@ namespace NongTrai
                 string label=r.machine+" • "+r.name+" : "+r.inputCount+" "+inventory.Name(r.input)
                     +" → "+r.outputCount+" "+inventory.Name(r.output)+" ("+r.seconds+"s)";
                 recipeButtons[i]=FarmUi.Button(Panel.transform,label,new Vector2(30,-170-i*76),new Vector2(940,62),()=>Enqueue(index)).gameObject;
+                var caption=recipeButtons[i].GetComponentInChildren<Text>();caption.rectTransform.anchoredPosition=new Vector2(78,-5);caption.rectTransform.sizeDelta=new Vector2(845,52);
+                FarmItemIconLibrary.Attach(recipeButtons[i].transform,r.output,new Vector2(10,-5),new Vector2(54,54));
             }
             feedback=FarmUi.Label(Panel.transform,"Nguyên liệu trừ khi xếp hàng; sản phẩm vào túi khi hoàn tất.",new Vector2(30,-615),new Vector2(940,42),19);
             FarmUi.Button(Panel.transform,"Trở lại game",new Vector2(30,-670),new Vector2(940,54),hud.Resume);
@@ -96,7 +98,7 @@ namespace NongTrai
                 var label=labelObject.GetComponent<TextMeshPro>();label.font=FarmUi.Font;label.text=names[i].ToUpper()+"  [E]";
                 label.fontSize=5;label.alignment=TextAlignmentOptions.Center;label.color=Color.white;
                 label.outlineColor=Color.black;label.outlineWidth=.2f;label.rectTransform.sizeDelta=new Vector2(8,1.5f);
-                machine.worldLabel=labelObject.transform;
+                label.text=names[i].ToUpper()+"  [CHUỘT TRÁI]";machine.worldLabel=labelObject.transform;
             }
         }
         static GameObject MachinePart(Transform parent,string name,PrimitiveType type,Vector3 position,Vector3 scale,Color color)

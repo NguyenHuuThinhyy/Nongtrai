@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
@@ -11,10 +11,10 @@ namespace NongTrai
         public FarmHud hud;
         public FieldManager field;
         public FarmShop shop;
-        public int[] AnimalProducts { get; private set; } = new int[23];
+        public int[] AnimalProducts { get; private set; } = new int[32];
         public GameObject Panel { get; private set; }
-        readonly string[] itemNames = { "Lúa mì", "Cà chua", "Đậu nành", "Táo", "Trứng", "Sữa", "Lông cừu", "Thịt heo", "Bột mì", "Bánh mì", "Phô mai", "Nước táo", "Gỗ cũ", "Quặng", "Ván", "Kim loại", "Bó nông sản", "Gói đậu", "Giỏ táo", "Đèn thủ công", "Khối gỗ", "Khối đá", "Khối gạch", "Khối kính", "Khối kim loại", "Khối cỏ", "Bàn chế tạo" };
-        readonly int[] unitPrices = { 8,18,32,15,8,20,25,30,22,65,65,35,12,18,34,50,45,55,95,165,18,14,24,35,55,16,90 };
+        readonly string[] itemNames = { "Lúa mì", "Cà chua", "Đậu nành", "Táo", "Trứng", "Sữa", "Lông cừu", "Thịt heo", "Bột mì", "Bánh mì", "Phô mai", "Nước táo", "Gỗ cũ", "Quặng", "Ván", "Kim loại", "Bó nông sản", "Gói đậu", "Giỏ táo", "Đèn thủ công", "Khối gỗ", "Khối đá", "Khối gạch", "Khối kính", "Khối kim loại", "Khối cỏ", "Bàn chế tạo", "Hạt cây gỗ", "Bậc gỗ", "Đuốc", "Hàng rào", "Ván cầu", "Bánh táo", "Mứt cà chua", "Cám dinh dưỡng", "Phân bón" };
+        readonly int[] unitPrices = { 8,18,32,15,8,20,25,30,22,65,65,35,12,18,34,50,45,55,95,165,18,14,24,35,55,16,90,12,35,55,26,45,65,48,40,25 };
         public int Price(int item) => item>=0 && item<unitPrices.Length?unitPrices[item]:0;
         public string Name(int item) => item>=0 && item<itemNames.Length?itemNames[item]:"?";
         TMP_Text[] amounts;
@@ -54,7 +54,7 @@ namespace NongTrai
                 var picture=new GameObject("Minh họa "+itemNames[i],typeof(RectTransform),typeof(Image));
                 var pr=picture.GetComponent<RectTransform>();pr.SetParent(icon.transform,false);pr.anchorMin=pr.anchorMax=new Vector2(.5f,.5f);
                 pr.pivot=new Vector2(.5f,.5f);pr.anchoredPosition=Vector2.zero;pr.sizeDelta=new Vector2(58,58);
-                var pi=picture.GetComponent<Image>();pi.sprite=FarmItemIconLibrary.Get(i<20?i:10+i);pi.color=Color.white;pi.preserveAspect=true;pi.raycastTarget=false;
+                var pi=picture.GetComponent<Image>();pi.sprite=FarmItemIconLibrary.Get(FarmItemIconLibrary.ForItem(i));pi.color=Color.white;pi.preserveAspect=true;pi.raycastTarget=false;
                 FarmUi.TmpLabel(cell.transform,itemNames[i],new Vector2(88,-12),new Vector2(208,48),23);
                 amounts[i]=FarmUi.TmpLabel(cell.transform,"",new Vector2(88,-62),new Vector2(208,46),19);
                 FarmUi.Button(cell.transform,"Bán 1",new Vector2(10,-118),new Vector2(137,47),()=>Sell(item,1));
@@ -66,6 +66,7 @@ namespace NongTrai
             FarmUi.Button(Panel.transform,"Xây dựng [G]",new Vector2(800,-870),new Vector2(360,54),OpenBuilding);
             Panel.SetActive(false);
             hud.player.PauseChanged += OnPause;
+            gameObject.AddComponent<AdventureBag>().Initialize(this);
         }
         void OnDestroy() { if(hud!=null && hud.player!=null) hud.player.PauseChanged -= OnPause; }
         void OnPause(bool paused) { if (!paused && Panel!=null) Panel.SetActive(false); }
@@ -76,7 +77,7 @@ namespace NongTrai
             hud.pausePanel.SetActive(false);
             if(shop.Panel!=null) shop.Panel.SetActive(false);
             Panel.SetActive(true);
-            Refresh();
+            Refresh();AdventureBag.Instance?.RefreshView();
         }
         public void AddProduct(int kind,int amount)
         {

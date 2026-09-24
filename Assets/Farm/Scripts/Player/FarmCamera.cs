@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using Unity.Cinemachine;
 
 namespace NongTrai
@@ -11,7 +11,7 @@ namespace NongTrai
         public LayerMask obstacleMask = 1;
         public bool FirstPerson { get; private set; }
         public float Yaw { get; private set; }
-        float pitch = 14;
+        float pitch = 28;
         public void ReadLook(Vector2 delta)
         {
             Yaw += delta.x * player.settings.mouseSensitivity;
@@ -25,7 +25,8 @@ namespace NongTrai
         void LateUpdate()
         {
             Quaternion rotation = Quaternion.Euler(pitch, Yaw, 0);
-            Vector3 pivot = player.transform.position + Vector3.up * 1.65f;
+            Vector3 pivot = player.transform.position + Vector3.up * (FirstPerson?1.65f:2.1f);
+            if(!FirstPerson)pivot+=Quaternion.Euler(0,Yaw,0)*Vector3.right*.55f;
             float distance = FirstPerson ? 0 : player.settings.cameraDistance;
             // Chỉ kiểm tra môi trường; layer Player được loại khỏi obstacleMask.
             if (distance > 0 && Physics.SphereCast(pivot, 0.2f, -(rotation * Vector3.forward),

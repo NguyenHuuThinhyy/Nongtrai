@@ -118,10 +118,10 @@ namespace NongTrai
             if(!IsUnlocked(center)) return "Vùng đất chưa mở. Cần LV "+regionLevels[RegionFor(center)]+" và "
                 +regionPrices[RegionFor(center)]+" xu. Nhấn N để mua.";
             int slot=FarmHudV2.Instance==null?0:FarmHudV2.Instance.SelectedSlot;
-            if(center.State==PlotState.Untilled && slot!=4) return "Hãy nhấn [5] chọn Cuốc trước khi cày.";
-            if(center.State==PlotState.Tilled && (slot<0 || slot>2)) return "Hãy nhấn [1], [2] hoặc [3] chọn hạt giống trước khi gieo.";
-            if(center.State==PlotState.Growing && slot!=5) return "Hãy nhấn [6] chọn Bình tưới trước khi tưới.";
-            if(center.State==PlotState.Ready && slot!=6) return "Hãy nhấn [7] chọn Liềm trước khi thu hoạch.";
+            if(center.State==PlotState.Untilled && slot!=4) return "Hãy chọn Cuốc trên hotbar trước khi cày.";
+            if(center.State==PlotState.Tilled && (slot<0 || slot>2)) return "Hãy chọn hạt giống trên hotbar trước khi gieo.";
+            if(center.State==PlotState.Growing && slot!=5) return "Hãy chọn Bình tưới trên hotbar trước khi tưới.";
+            if(center.State==PlotState.Ready && slot!=6) return "Hãy chọn Liềm trên hotbar trước khi thu hoạch.";
             int tool=center.State==PlotState.Untilled?0:center.State==PlotState.Growing?1:center.State==PlotState.Ready?2:-1;
             int range=tool<0?1:ToolRadius(tool);
             var plots=FindObjectsByType<FarmPlot>(FindObjectsSortMode.None);

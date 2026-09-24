@@ -1,78 +1,42 @@
-﻿# Nông Trại – cách chơi bản mở rộng
+# Nông Trại – hướng dẫn chơi
 
-Mở `D:\GAME_NongTrai\Builds\Windows\NongTrai.exe`, giữ nguyên toàn bộ thư mục `Windows` khi chép sang máy khác. Ở menu chính, chọn **Vào nông trại**. Mở Unity Editor nếu muốn sửa game; người chơi trên máy khác không cần cài Unity.
+Mở `D:\GAME_NongTrai\Builds\Windows\NongTrai.exe`, giữ nguyên cả thư mục `Windows` khi chuyển sang máy khác. Chọn **Vào nông trại** trong menu. Không cần cài Unity để chơi bản Windows. Trong game, nhấn **H** để mở hướng dẫn từng bước.
 
-| Phím | Tác dụng |
+| Điều khiển | Tác dụng |
 |---|---|
-| WASD, Shift, Space | Di chuyển, chạy, nhảy cao 1,6 m để qua khối 1 m |
-| Chuột, V | Nhìn, đổi góc nhìn |
-| E | Tương tác với ô đất, hồ, trạm tưới, bàn chế tạo, hộp thư, quầy/máy, vật thể và cửa chuồng |
-| 1, 2, 3 | Chọn lúa mì, cà chua, đậu nành |
-| 5, 6, 7 | Chọn cuốc, bình tưới, liềm trước khi thao tác ruộng |
-| B hoặc I | Mở túi đồ; dùng nút **Mở cửa hàng** trong túi để vào shop |
-| M | Máy chế biến và hàng đợi |
-| N | Cấp độ, mua vùng đất và nâng cấp dụng cụ |
-| P | Quản lý chuồng, mua thức ăn và chuồng mới |
-| Tab | Mở hai bản đồ Nông trại / Khám phá và dịch chuyển |
-| F | Cho vật nuôi đang ngắm ăn |
-| Chuột trái/phải | Nhấc vật nuôi / thả vào đúng chuồng |
-| 8, 9 | Chọn rìu để hạ cây táo lấy khối gỗ / giỏ để hái táo mà vẫn giữ cây |
-| 1–9, cuộn chuột | Chọn nhanh ô hotbar; tên, icon và công dụng hiện ngay phía trên thanh |
-| G hoặc nút Xây dựng trong túi | Bật/tắt xây dựng sau khi có Bàn chế tạo; 1–7 chọn khối, trái đặt, phải tháo, R xoay |
-| Esc | Đóng bảng đang mở hoặc tạm dừng; mở hướng dẫn, chỉnh âm lượng, lưu, tiếp tục hoặc thoát |
-| F8 | Bật/tắt bay trong chế độ sáng tạo; Space lên, X hoặc Ctrl xuống, Shift bay nhanh |
+| WASD / Shift / Space / chuột | Đi / chạy / nhảy / nhìn quanh; V đổi góc nhìn |
+| Dấu + giữa màn hình | Ngắm ô đất, vật thể, máy hoặc khối muốn thao tác |
+| Chuột trái ở nông trại | Cày, gieo, tưới, gặt hoặc mở vật thể đang ngắm; giữ trái để phá khối đã xây |
+| Chuột trái ở Khám phá | Giữ để đào/đánh; chọn khối trong hotbar rồi click để đặt |
+| Chuột phải | Dùng món đang cầm: ăn, gieo cây gỗ, bón phân, cho thú hoang ăn; thả thú đang bế |
+| 1–9 / lăn chuột | Đổi nhanh ô đang cầm trên hotbar |
+| B | Túi đồ 36 ô, hàng 9 ô dưới là hotbar; kéo-thả hoặc Shift+click để chuyển vật phẩm |
+| Tab | Mở hai bản đồ Nông trại / Khám phá; khi quay lại sẽ ở vị trí đã rời đi |
+| F | Cho vật nuôi đang ngắm ăn bằng thức ăn đã mua |
+| G / M / N / P | Bảng xây / chế biến / đất và dụng cụ / chuồng trại |
+| Esc | Tạm dừng, lưu thủ công, chỉnh âm lượng, hướng dẫn và thoát |
+| F8 khi sáng tạo | Bật/tắt bay; Space lên, X xuống, Shift bay nhanh |
 
-## Vòng chơi
+## Mười phút đầu tiên
 
-Ngắm ô đất gần người, chọn đúng ô hotbar rồi nhấn E: **5 cày, 1–3 gieo, 6 tưới, 7 thu hoạch**. Lúa mì/cà chua/đậu nành cần 2/3/5 phút khi được giữ ẩm; lúc khô vẫn lớn ở 20% tốc độ. Bình tưới chứa 8/16/24 nước theo bậc, nạp miễn phí tại hồ. Từ LV2 có thể dùng bảng cạnh hồ để mua trạm tưới cho từng vùng với giá 600/900/1.200/1.500 xu; mỗi trạm chứa 32 nước và có sẵn 8 nước khi mới xây. Trạm phun trong bán kính 6 m khi còn nước, tự tưới các ô khô dưới 20%. Mang nước từ hồ tới trạm và nhấn E để nạp tiếp.
+1. Đến các ô ruộng, chọn **5 Cuốc** rồi ngắm đất và bấm trái. Chọn **1–3 Hạt giống** rồi bấm trái để gieo.
+2. Chọn **6 Bình tưới**, đến hồ và bấm trái để nạp 8 nước. Quay về ruộng, ngắm ô đã gieo và bấm trái để tưới. Cây được giữ ẩm sẽ lớn nhanh; chọn **7 Liềm** để gặt khi chín.
+3. Bấm **B** xem túi, mở cửa hàng để mua hạt, thú, khối xây hoặc vật trang trí. Bảng bên trái cho thấy sơ đồ nông trại, đơn hàng và vật nuôi đói.
+4. Đến **bàn gỗ trước nhà**, bấm trái để chế tạo; đến **hộp thư đỏ**, bấm trái để xem và giao đơn. Các công thức có ảnh, cuộn danh sách để xem đủ 13 món.
+5. Bấm **Tab → Khám phá**, giữ trái để đào lấy tài nguyên. Chọn khối trên hotbar rồi click trái vào mặt khối để đặt. Phím G mở bảng 11 loại khối. Trở về bằng Tab và tiếp tục tại đúng vị trí cũ.
 
-Gói 5 hạt lúa mì/cà chua/đậu nành có giá 20/40/75 xu; sản phẩm bán 8/18/32 xu mỗi đơn vị. Bán sản phẩm trong túi để kiếm xu; thu hoạch, chăm vật nuôi, chế biến và giao đơn cho XP. Nâng cấp **cuốc, bình tưới, liềm** từ đồng lên bạc rồi vàng bằng bảng N: số ô tác động cùng lúc là 1, 3, 5. Bốn vùng ruộng, mỗi vùng 20 ô, mở lần lượt bằng xu khi đạt cấp 1, 2, 4, 6; vùng đầu mở sẵn. Giá mở vùng sau tăng dần: 500, 1.200, 2.400 xu.
+Mỗi ngày game dài **18 phút đời thực**, với 28 ngày mỗi mùa. Thời tiết nắng xuất hiện thường hơn mưa; mưa/bão tưới ruộng. Lúa mì, cà chua và đậu nành cần 2/3/5 phút khi đủ ẩm, khi khô chỉ lớn ở 20% tốc độ. Bình tưới chứa 8/16/24 nước theo bậc; trạm tưới mua từ LV2 và nhận nước mang từ hồ. Phân bón cho cây đang lớn tăng 12% tiến độ và thêm ẩm: đặt món trên hotbar, ngắm ruộng rồi click phải.
 
-Gà, bò, cừu và heo có độ no, độ vui. Một ngày trong game dài **10 phút**; độ no và vui giảm theo thời gian. Ngắm con vật và nhấn F để dùng một thức ăn. Vật nuôi cần đủ no và vui mới tạo sản phẩm. Gà đẻ trứng theo chu kỳ tại ổ, mỗi chuồng gà tối đa 5 con. Bò cho sữa mỗi 45 giây, cừu cho len mỗi 60 giây. Heo cho thịt một lần. Bảng P bán 10 thức ăn giá 50 xu, xây thêm chuồng bò/cừu và nâng cấp chuồng. Nâng cấp chuồng bò, cừu, heo tăng sức chứa; nâng chuồng gà rút ngắn chu kỳ đẻ, vẫn giữ tối đa 5 con. Mở shop từ nút trong túi đồ để mua chuồng gà thứ hai.
+Vật nuôi có độ no và vui; bảng thông báo sẽ báo khi con nào đói. Ngắm thú và bấm F để dùng thức ăn mua ở shop. Cám dinh dưỡng chế tại bàn hoặc mua ở shop: chọn trong hotbar, ngắm thú rồi click phải. Gà cho trứng trong ổ; bò cho sữa, cừu cho len, heo cho thịt. Chuồng riêng có giới hạn sức chứa và nâng cấp. Chuột trái nhấc thú lên tay khi ngắm đúng con, chuột phải thả vào đúng chuồng.
 
-Nhấn M để mở xưởng, hoặc đến máy và nhấn E để chỉ xem công thức của máy đó. Cả sáu máy ở nông trại; xưởng cưa và lò nung nằm phía tây. Máy quay khi đang chế biến. Công thức nằm trong `Assets/StreamingAssets/recipes.json`; mỗi máy có hàng đợi tối đa 5 lượt, nguyên liệu được trừ khi xếp việc và thành phẩm vào túi khi hết thời gian. Giá bán mỗi thành phẩm cao hơn tổng giá nguyên liệu:
+Sáu máy chế biến có công thức trong `Assets/StreamingAssets/recipes.json` và hàng đợi tối đa 5 lượt/máy. Bàn chế tạo đọc `Assets/StreamingAssets/crafting.json`: bó nông sản, gói đậu, giỏ táo, đèn, bàn chế tạo, bậc gỗ, đuốc, hàng rào, ván cầu, bánh táo, mứt, cám và phân bón. Bàn có sẵn trước nhà; có thể chế tạo thêm bàn bằng 5 khối gỗ. Cây táo cho táo khi dùng giỏ (ô 9), hoặc cho 6 khối gỗ khi hạ bằng rìu (ô 8). Hai đơn mỗi ngày ở hộp thư thưởng xu và XP; có thể đổi một đơn sau 5 phút chơi. Tổng 2/4/6 đơn giao sẽ mở bánh mì/phô mai/nước táo.
 
-| Máy | Công thức | Chờ | Giá bán |
-|---|---|---:|---:|
-| Cối xay | 3 lúa mì → 2 bột mì | 25 giây | 44 xu |
-| Lò bánh | 2 bột mì → 1 bánh mì | 35 giây | 65 xu |
-| Thùng ủ | 2 sữa → 1 phô mai | 40 giây | 65 xu |
-| Máy ép | 3 táo → 2 nước táo | 30 giây | 70 xu |
-| Xưởng cưa | 2 khối gỗ → 1 ván | 45 giây | 34 xu |
-| Lò nung | 2 quặng → 1 kim loại | 55 giây | 50 xu |
+Map Khám phá sinh địa hình theo seed khi đi xa và tải từng chunk 16 × 16 m. Có cây gỗ lớn theo giai đoạn, lá, quặng, thú hoang bò/cừu. Dùng đúng công cụ giúp đào nhanh và lấy vật liệu; đồ rơi sẽ bay vào túi nếu còn chỗ. Có thể dùng lúa mì hoặc cám để dụ và cho thú hoang ăn, cho hai con cùng loài ăn gần nhau để sinh sản. Đào 30 khối mở bản vẽ lò nung và đèn. Công trình và địa hình đã đào được lưu khi nhấn **Lưu game**.
 
-Bàn chế tạo cố định và hộp thư nằm trước nhà. Bàn ghép tức thì Bó nông sản, Gói đậu, Giỏ táo, Đèn thủ công và Bàn chế tạo theo `Assets/StreamingAssets/crafting.json`. Hộp thư tạo hai đơn phù hợp tiến độ mỗi ngày; giao đủ một lần nhận 150% giá thường, XP và khối xây. Có thể đổi một đơn sau mỗi 5 phút chơi thực tế; đồng hồ đổi đơn dừng khi game tạm dừng. Hoàn thành tổng 2/4/6 đơn lần lượt mở bánh mì/phô mai/nước táo.
+**Chỉ nút Lưu game trong menu Esc ghi tiến độ.** Thoát không tự lưu. Chế độ sáng tạo dùng bản sao trong bộ nhớ, LV99, bật bay và mở cả hai map; rời chế độ sẽ bỏ toàn bộ thay đổi thử nghiệm. Bản lưu v10 vẫn đọc được v2–v9. Đường dẫn bản lưu Windows: `%USERPROFILE%\AppData\LocalLow\Nong Trai Studio\Nong Trai - First Harvest\farm-manual-save.json`.
 
-Để xây, chọn ô 8 và dùng rìu hạ cây táo lấy **6 khối gỗ**, hoặc mua gỗ ở **trang 2 của shop**. Chọn ô 9 và dùng giỏ nếu chỉ muốn hái **5 táo**, cây vẫn còn. Dùng 5 khối gỗ chế tạo Bàn chế tạo. Nhấn G hoặc nút Xây dựng trong túi, đặt bàn trước rồi chọn các khối gỗ, đá, gạch, kính, kim loại hoặc cỏ. Tất cả sáu loại đều bán trong trang 2; khối đá còn lấy ở mỏ, và đơn giao hàng thưởng khối. Tháo khối bằng chuột phải sẽ trả vật phẩm về túi. Bàn chế tạo đã đặt cũng dùng E để mở công thức. Chế độ sáng tạo vẫn phải có vật liệu, không tạo vật phẩm vô hạn.
-
-## Ngày, mùa, bão và các đảo
-
-Đồng hồ trên HUD hiển thị năm, ngày, giờ, mùa và thời tiết. Mỗi mùa dài 28 ngày; lá và cỏ đổi màu theo mùa. Trời mưa hoặc bão tự tưới ruộng. Khi có bão, trả lời câu hỏi gia cố trong 25 giây: đúng thì không thiệt hại, sai hoặc hết giờ sẽ mất 30–80% nông sản và máy bị chậm. Từ 18:00 đến trước 06:00, vào nhà và nhấn E ở giường để ngủ đến sáng.
-
-Nhấn Tab hoặc dùng cổng để đi giữa **Nông trại** và **Khám phá**, cả hai mở từ đầu. Đã bỏ ba khu chức năng cũ (Trung tâm, Thần bí, Công nghiệp), đấu giá NPC, minigame và cổng giới hạn cấp. Cấp tối đa thường là 99.
-
-Map Khám phá sinh thêm địa hình theo **seed** khi bạn đi xa, theo cả bốn hướng; không còn dừng ở ô 48 × 48 m. Có đồng cỏ, đồi cát, núi tuyết, đá và quặng/hốc ngầm. Khu xuất phát 48 × 48 m được giữ để tương thích bản cũ; phần đất mới bên ngoài thay đổi theo seed. Mỗi thế giới chưa có bản lưu nhận seed ngẫu nhiên. Khi bấm Lưu game, seed được giữ cố định: quay lại vẫn gặp cùng địa hình, các khối đã đào không tự mọc lại.
-
-Nhấn V để dùng góc nhìn thứ nhất, hướng dấu chấm vào đất/đá trong tầm 6 m tính từ nhân vật, giữ chuột trái khoảng 0,55 giây để đào. Đất/cát/tuyết trả khối cỏ, đá trả khối đá, quặng trả nguyên liệu luyện kim. Đào 30 khối mở bản vẽ lò nung và đèn thủ công. HUD hiện phần trăm đào và thông báo khi khối quá xa hoặc thuộc khu bảo vệ. Khu cổng và tầng đáy không đào được. Dùng G để xây bằng vật liệu trong túi, Tab để trở về. Khu vào map có sáu cây táo ban đầu để hái trái hoặc chặt lấy gỗ. Gỗ lấy từ cây táo bằng rìu hoặc mua shop; không có quặng gỗ.
-
-HUD phiêu lưu hiển thị seed, tên địa hình và tọa độ. Game tải từng vùng 16 × 16 m quanh nhân vật, gỡ vùng xa rồi tái tạo khi quay lại; các thay đổi đào và công trình vẫn giữ. Sương xa che ranh giới tải. Đây là thế giới mở rộng theo vùng trên máy chơi đơn, chưa có quái, sinh tồn hay multiplayer; đi quá xa vẫn chịu giới hạn độ chính xác tọa độ của Unity.
-
-Chế tạo bàn từ 5 khối gỗ, bật G và đặt bàn trước để xây các khối khác. Chế độ xây: 1–7/cuộn chuột chọn khối, chuột trái đặt, chuột phải tháo, R xoay, G thoát. Có thể xây ở cả hai map. Các khối đào và công trình chỉ được lưu khi bấm Lưu game.
-
-Bản lưu v8 đọc được bản cũ: giữ công trình nông trại, hoàn vật liệu của công trình ở đảo cũ vào túi, chuyển nhân vật ở đảo cũ về cổng khám phá. Quyền dùng bản vẽ cũ vẫn giữ. Với bản v7, khu khám phá và công trình được chuyển cùng nhau sang vị trí kỹ thuật mới để địa hình mở rộng không đè lên nông trại; giữ các ô đã đào.
-
-Trong menu chính, **Chế độ sáng tạo** đọc một bản sao của bản lưu thủ công, tạm nâng nhân vật lên **LV99**, bật bay ngay và cho đi mọi đảo. F8 bật/tắt bay; WASD di chuyển, Space lên, X hoặc Ctrl xuống và Shift bay nhanh. HUD luôn hiện các phím bay khi đang bay. Chế độ này vẫn giữ va chạm, không cấp tiền/vật phẩm vô hạn, khóa nút Lưu game và bỏ thay đổi khi về menu hoặc thoát. Khi vào lại chế độ thường, cấp độ cũ trong bản lưu được khôi phục.
-
-Trong menu Esc, chỉ nút **Lưu game** ghi bản lưu khi chơi thường. Thoát game không tự lưu. Mở lại game tải bản lưu thủ công gần nhất. Loader vẫn đọc bản lưu v2–v5; bản v6 lưu thêm các khối đã đặt và tự đổi tài nguyên gỗ cũ thành khối gỗ. Đường dẫn lưu trên Windows: `%USERPROFILE%\AppData\LocalLow\Nong Trai Studio\Nong Trai - First Harvest\farm-manual-save.json`.
-
-## Build lại
-
-Đóng Unity Editor đang mở cùng dự án, rồi chạy:
+Để build lại, đóng Unity Editor đang mở cùng dự án rồi chạy:
 
 ```powershell
 & 'D:\Unity\Editors\6000.3.22f1\Editor\Unity.exe' -batchmode -nographics -quit -projectPath 'D:\GAME_NongTrai' -executeMethod NongTrai.Editor.FarmProjectBuilder.BuildWindows -logFile 'D:\GAME_NongTrai\Logs\build.log'
 ```
-
-Lệnh này dựng lại scene và bản Windows. Nếu đã sửa scene trong Editor, hãy giữ bản sao trước khi chạy.
-
-HUD luôn có nhãn **[TAB] ĐỔI BẢN ĐỒ** bên trái, dưới nút túi đồ. Giữ W và nhấn Space để nhảy lên/qua khối.
