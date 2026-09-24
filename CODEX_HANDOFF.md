@@ -7,7 +7,7 @@ Các mục cũ bên dưới là lịch sử và có thể sai về phiên bản 
 - FarmCraftOrders có 15 công thức trong Assets/StreamingAssets/crafting.json, danh sách cuộn và icon; hộp thư năm đơn/ngày với độ khó/thời hạn. FarmShop có ba trang 24 mặt hàng. FarmItemIconLibrary vẽ icon và FarmBuildingSystem có 13 loại khối, gồm rương và đống lửa.
 - FarmNoticeBoard hiển thị sơ đồ tọa độ thu nhỏ và bản đồ E có marker click được cho ruộng, thú đói, đơn đủ hàng, rương và nguy hiểm. FarmStorage tạo nhà kho và rương khám phá rải thưa; AdventureWolves có sói đêm sợ đuốc/đống lửa. FarmAnimal chờ ở ổ khi có sản phẩm, click ổ lấy, click con chỉ bế.
 - TimeManager có một ngày 1080 giây/18 phút, tỉ lệ nắng/mưa/sương/bão 67/15/14/4%. Thông số 10 phút trong phần cũ đã lỗi thời.
-- Build release ở Logs/build-release-20260924.log đã thành công; runtime smoke Logs/smoke-release-20260924.log có FARM_CROPS_SMOKE_OK và thoát 0. Build Windows ở Builds/Windows/NongTrai.exe. Các ảnh preview nằm ngoài gói phát hành.
+- Build release ở Logs/build-release-20260924-final.log đã thành công; runtime smoke Logs/smoke-release-20260924-final.log có FARM_CROPS_SMOKE_OK và thoát 0. Build Windows ở Builds/Windows/NongTrai.exe. Ảnh preview nằm ngoài gói phát hành, trong Logs/Previews-20260924-final.
 
 ---
 # CẬP NHẬT ƯU TIÊN — SỬA ĐÀO / NHẢY / HƯỚNG DẪN TAB
