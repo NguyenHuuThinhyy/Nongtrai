@@ -21,10 +21,13 @@ namespace NongTrai
         { Hunger=Mathf.Clamp(hunger,0,100); Happiness=Mathf.Clamp(happiness,0,100); }
         public bool Feed(FarmShop shop,out string message)
         {
-            if(shop.FeedStock<=0) { message="Hết thức ăn. Mua thêm ở shop."; return false; }
             if(Hunger>=95 && Happiness>=95) { message="Vật nuôi đã no và vui."; return false; }
-            shop.ConsumeFeed(); Hunger=Mathf.Min(100,Hunger+55); Happiness=Mathf.Min(100,Happiness+20);
-            message="Đã cho "+name+" ăn. Đói "+Mathf.RoundToInt(Hunger)+"%, vui "+Mathf.RoundToInt(Happiness)+"%.";
+            int feed=species==AnimalSpecies.Chicken?52:species==AnimalSpecies.Cow?53:species==AnimalSpecies.Sheep?54:55;
+            bool prepared=shop.inventory!=null&&shop.inventory.Remove(feed,1);
+            if(!prepared&&!shop.ConsumeFeed())
+            {message="Thiếu "+(shop.inventory==null?"thức ăn":shop.inventory.Name(feed))+". Chế biến ở cối xay hoặc mua ở shop.";return false;}
+            Hunger=Mathf.Min(100,Hunger+(prepared?70:55)); Happiness=Mathf.Min(100,Happiness+(prepared?28:20));
+            message="Đã cho "+name+" ăn "+(prepared?"thức ăn đúng loài":"thức ăn chung")+". No "+Mathf.RoundToInt(Hunger)+"%, vui "+Mathf.RoundToInt(Happiness)+"%.";
             return true;
         }
         public bool FeedPremium(FarmInventory inventory,out string message)

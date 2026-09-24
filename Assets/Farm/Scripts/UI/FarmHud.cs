@@ -22,7 +22,7 @@ namespace NongTrai
         public Text saveStatus;
         public Button saveButton;
         public GameObject mainMenu,settingsPanel;
-        bool settingsFromMain;
+        bool settingsFromMain,settingsFromGameplay;
         GameObject modalWithClose;
         float remaining;
         IEnumerator Start()
@@ -64,10 +64,22 @@ namespace NongTrai
             slider.onValueChanged.AddListener(value=>{ if(music) FarmAudio.Instance?.SetMusic(value); else FarmAudio.Instance?.SetEffects(value); });
         }
         public void OpenSettings()
-        { settingsFromMain=mainMenu!=null && mainMenu.activeSelf;
-          if(mainMenu!=null) mainMenu.SetActive(false);pausePanel.SetActive(false);settingsPanel.SetActive(true);player.SetPaused(true);pausePanel.SetActive(false); }
+        { settingsFromMain=mainMenu!=null && mainMenu.activeSelf;settingsFromGameplay=!player.Paused;
+          if(mainMenu!=null) mainMenu.SetActive(false);
+          foreach(Transform child in transform)if(child.gameObject!=gameplayChrome&&child.gameObject!=mainMenu&&
+              child.gameObject!=pausePanel&&child.gameObject!=settingsPanel&&child.GetComponent<Image>()!=null)child.gameObject.SetActive(false);
+          pausePanel.SetActive(false);settingsPanel.SetActive(true);player.SetPaused(true);pausePanel.SetActive(false); }
         public void CloseSettings()
-        { settingsPanel.SetActive(false);if(settingsFromMain) mainMenu.SetActive(true);else pausePanel.SetActive(true); }
+        { settingsPanel.SetActive(false);if(settingsFromMain) mainMenu.SetActive(true);else if(settingsFromGameplay)Resume();else pausePanel.SetActive(true); }
+        public void ShowOverlay(GameObject overlay)
+        {
+            if(overlay==null)return;
+            foreach(Transform child in transform)
+                if(child.gameObject!=overlay&&child.gameObject!=gameplayChrome&&child.gameObject!=mainMenu&&
+                    child.gameObject!=settingsPanel&&child.gameObject!=pausePanel&&child.GetComponent<Image>()!=null)
+                    child.gameObject.SetActive(false);
+            player.SetPaused(true);pausePanel.SetActive(false);overlay.SetActive(true);EnsureCloseButton(overlay);
+        }
         public bool HandleEscape()
         { if(settingsPanel!=null && settingsPanel.activeSelf) { CloseSettings();return true; }
           if(AdventureWolves.Instance!=null&&AdventureWolves.Instance.IsAwaitingRespawn)return true;

@@ -55,7 +55,6 @@ namespace NongTrai
         }
         void Start()
         {
-            CreateStarterOrchard();
             gameObject.AddComponent<AdventureWildlife>().world=this;
             miningText=FarmUi.TmpLabel(hud.gameplayChrome.transform,"",Vector2.zero,new Vector2(1000,88),22);
             var r=miningText.rectTransform;r.anchorMin=r.anchorMax=r.pivot=new Vector2(.5f,0);r.anchoredPosition=new Vector2(0,195);
@@ -219,7 +218,8 @@ namespace NongTrai
             if(hud==null||hud.player==null)return;
             if(!hud.player.Paused)AdvanceTrees(Time.deltaTime);
             if(IsExploring)Stream(hud.player.transform.position);
-            if(hud.player.Paused||FarmHud.WorldClickSuppressed||FarmBuildingSystem.Instance.IsBuilding){hold=0;return;}
+            if(hud.player.Paused||FarmHud.WorldClickSuppressed||FarmBuildingSystem.Instance.IsBuilding||
+                FarmWaterSystem.Instance!=null&&(FarmWaterSystem.Instance.PendingPlacement||FarmWaterSystem.Instance.ConsumedFrame==Time.frameCount)){hold=0;return;}
             var cam=Camera.main;if(cam==null||Mouse.current==null)return;
             UpdateMiningRay(FarmAim.Ray(cam),Mouse.current.leftButton.isPressed,Time.deltaTime);
         }

@@ -153,7 +153,7 @@ namespace NongTrai
             else if(type==9){for(int x=-1;x<=1;x+=2)Part(root.transform,"Cọc hàng rào",new Vector3(x*.42f,0,0),new Vector3(.14f,1.1f,.14f),colors[type]);for(int y=-1;y<=1;y+=2)Part(root.transform,"Thanh chắn",new Vector3(0,y*.25f,0),new Vector3(1,.12f,.12f),colors[type]);}
             else if(type==10)Part(root.transform,"Mặt cầu",new Vector3(0,-.38f,0),new Vector3(1.4f,.18f,2),colors[type]);
             else if(type==11)
-            {var chest=FarmChest.Create(position,false,"",chestItems==null?new int[40]:(int[])chestItems.Clone(),chestMutated==null?new int[4]:(int[])chestMutated.Clone());chest.transform.SetParent(root.transform,true);}
+            {var chest=FarmChest.Create(position,false,"",chestItems==null?new int[56]:(int[])chestItems.Clone(),chestMutated==null?new int[7]:(int[])chestMutated.Clone());chest.transform.SetParent(root.transform,true);}
             else if(type==12)
             {
                 root.AddComponent<CampfireCooker>();

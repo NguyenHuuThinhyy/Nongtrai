@@ -193,9 +193,9 @@ namespace NongTrai.Editor
                 var boundary = Box("Map boundary", p, p.x == -49||p.x==89 ? new Vector3(1, 6, 100) : new Vector3(140, 6, 1), grass, environment);
                 boundary.GetComponent<Renderer>().enabled = false;
             }
-            var orchardGate=Box("Cổng vườn LV6",new Vector3(49.8f,1.3f,0),new Vector3(.35f,2.6f,85),wood,environment);
+            var orchardGate=Box("Cổng vườn LV3",new Vector3(49.8f,1.3f,0),new Vector3(.35f,2.6f,85),wood,environment);
             orchardGate.AddComponent<FarmOrchardGate>();
-            Sign(environment,new Vector3(53,0,35),"Vườn cây LV6","Mở vùng đất 4, chọn hạt cây nhặt từ Khám phá và chuột phải trên đất để trồng.");
+            Sign(environment,new Vector3(53,0,35),"Vườn cây LV3","Mở vùng đất 4, chọn hạt cây trong túi và chuột phải trên đất để trồng.");
             Sign(environment, new Vector3(2.6f, 0, 7), "Chào mừng", "Chọn hạt/công cụ bằng 1–9 hoặc lăn chuột. Ngắm ô đất rồi click trái để cày, gieo, tưới, thu hoạch. E mở bản đồ việc.");
             Sign(environment, new Vector3(-5, 0, -3), "Khu canh tác", "Chọn xẻng để xới, hạt để gieo, bình để tưới. Cây chín click trái để hái, không cần liềm.");
             var sun = new GameObject("Sun - fixed morning light").AddComponent<Light>();
@@ -307,15 +307,16 @@ namespace NongTrai.Editor
             var interaction = root.AddComponent<PlayerInteraction>(); interaction.player = player; interaction.viewCamera = camera;
             var field = new GameObject("Field Manager").AddComponent<FieldManager>();
             field.player = player;
-            field.crops = new CropDefinition[3];
-            string[] cropNames = { "Lúa mì", "Cà chua", "Đậu nành" };
-            Color[] colors = { new Color(1, 0.72f, 0.15f), new Color(0.9f, 0.16f, 0.08f), new Color(0.55f, 0.72f, 0.18f) };
-            for (int i = 0; i < 3; i++)
+            field.crops = new CropDefinition[6];
+            string[] cropNames = { "Lúa mì", "Cà chua", "Đậu nành", "Bí ngô", "Dâu ruộng", "Hướng dương" };
+            Color[] colors = { new Color(1, 0.72f, 0.15f), new Color(0.9f, 0.16f, 0.08f), new Color(0.55f, 0.72f, 0.18f),new Color(.97f,.48f,.09f),new Color(.85f,.13f,.25f),new Color(1f,.8f,.13f) };
+            for (int i = 0; i < 6; i++)
             {
                 string path = Root + "Data/Crop" + i + ".asset";
                 var crop = AssetDatabase.LoadAssetAtPath<CropDefinition>(path);
                 if (crop == null) { crop = ScriptableObject.CreateInstance<CropDefinition>(); AssetDatabase.CreateAsset(crop, path); }
-                crop.displayName = cropNames[i]; crop.growthSeconds = new[]{120f,180f,300f}[i]; crop.fruitColor = colors[i];
+                crop.displayName = cropNames[i]; crop.growthSeconds = new[]{120f,180f,300f,420f,540f,720f}[i];
+                crop.yield=new[]{3,3,3,2,2,1}[i];crop.fruitColor = colors[i];
                 EditorUtility.SetDirty(crop); field.crops[i] = crop;
             }
             interaction.field = field;

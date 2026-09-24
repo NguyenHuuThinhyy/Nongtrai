@@ -12,6 +12,7 @@ namespace NongTrai
         public string id,machine,name;
         public int input,inputCount,output,outputCount;
         public float seconds;
+        public CraftIngredient[] inputs;
     }
     [Serializable] public sealed class FarmRecipeBook { public FarmRecipe[] recipes; }
     [Serializable] public sealed class ProcessingRecord { public string recipe; public float remaining; }
@@ -33,21 +34,22 @@ namespace NongTrai
             string path=Path.Combine(Application.streamingAssetsPath,"recipes.json");
             try { Recipes=JsonUtility.FromJson<FarmRecipeBook>(File.ReadAllText(path)).recipes; }
             catch(Exception ex) { Debug.LogError("Không đọc được công thức JSON: "+ex); Recipes=Array.Empty<FarmRecipe>(); }
-            Panel=FarmUi.Panel(hud.transform,"Xưởng chế biến",new Vector2(1000,900));
+            Panel=FarmUi.Panel(hud.transform,"Xưởng chế biến",new Vector2(1020,1015));
             header=FarmUi.Label(Panel.transform,"XƯỞNG CHẾ BIẾN",new Vector2(30,-20),new Vector2(920,50),30);
             status=FarmUi.Label(Panel.transform,"",new Vector2(30,-78),new Vector2(920,75),20);
             recipeButtons=new GameObject[Recipes.Length];
-            for(int i=0;i<Recipes.Length && i<7;i++)
+            for(int i=0;i<Recipes.Length;i++)
             {
                 int index=i; var r=Recipes[i];
-                string label=r.machine+" • "+r.name+" : "+r.inputCount+" "+inventory.Name(r.input)
+                string ingredients=r.inputs!=null&&r.inputs.Length>0?string.Join(" + ",Array.ConvertAll(r.inputs,x=>x.count+" "+inventory.Name(x.item))):r.inputCount+" "+inventory.Name(r.input);
+                string label=r.machine+" • "+r.name+" : "+ingredients
                     +" → "+r.outputCount+" "+inventory.Name(r.output)+" ("+r.seconds+"s)";
-                recipeButtons[i]=FarmUi.Button(Panel.transform,label,new Vector2(30,-170-i*76),new Vector2(940,62),()=>Enqueue(index)).gameObject;
+                recipeButtons[i]=FarmUi.Button(Panel.transform,label,new Vector2(30,-160-i*64),new Vector2(960,56),()=>Enqueue(index)).gameObject;
                 var caption=recipeButtons[i].GetComponentInChildren<Text>();caption.rectTransform.anchoredPosition=new Vector2(78,-5);caption.rectTransform.sizeDelta=new Vector2(845,52);
                 FarmItemIconLibrary.Attach(recipeButtons[i].transform,r.output,new Vector2(10,-5),new Vector2(54,54));
             }
-            feedback=FarmUi.Label(Panel.transform,"Nguyên liệu trừ khi xếp hàng; sản phẩm vào túi khi hoàn tất.",new Vector2(30,-760),new Vector2(940,42),19);
-            FarmUi.Button(Panel.transform,"Trở lại game",new Vector2(30,-815),new Vector2(940,54),hud.Resume);
+            feedback=FarmUi.Label(Panel.transform,"Nguyên liệu trừ khi xếp hàng; sản phẩm vào túi khi hoàn tất.",new Vector2(30,-875),new Vector2(960,40),19);
+            FarmUi.Button(Panel.transform,"Trở lại game",new Vector2(30,-934),new Vector2(960,54),hud.Resume);
             Panel.SetActive(false);hud.player.PauseChanged+=OnPause;
             CreateMachines();
         }
@@ -107,19 +109,28 @@ namespace NongTrai
         public void Open()
         {
             activeMachine=-1;ShowRecipes();
-            hud.player.SetPaused(true);hud.pausePanel.SetActive(false);
-            Panel.SetActive(true);Refresh();
+            hud.ShowOverlay(Panel);Refresh();
         }
         public void OpenForMachine(int index)
         {
             if(index<0||index>=Recipes.Length)return;
-            activeMachine=index;ShowRecipes();hud.player.SetPaused(true);hud.pausePanel.SetActive(false);Panel.SetActive(true);Refresh();
+            activeMachine=index;ShowRecipes();hud.ShowOverlay(Panel);Refresh();
         }
         void ShowRecipes()
         {
             if(header==null)return;
             header.text=activeMachine<0?"XƯỞNG CHẾ BIẾN":Recipes[activeMachine].machine.ToUpper()+" • "+Recipes[activeMachine].name;
-            for(int i=0;i<recipeButtons.Length;i++)if(recipeButtons[i]!=null)recipeButtons[i].SetActive(activeMachine<0||activeMachine==i);
+            int visible=0;
+            for(int i=0;i<recipeButtons.Length;i++)if(recipeButtons[i]!=null)
+            {
+                bool show=activeMachine<0||Recipes[activeMachine].machine==Recipes[i].machine;
+                recipeButtons[i].SetActive(show);
+                if(show)
+                {
+                    recipeButtons[i].GetComponent<RectTransform>().anchoredPosition=new Vector2(30,-160-visible*64);
+                    visible++;
+                }
+            }
         }
         public bool IsBusy(int index)
         { if(Recipes==null||index<0||index>=Recipes.Length)return false;
@@ -134,7 +145,11 @@ namespace NongTrai
             var recipe=Recipes[index];
             int same=0;foreach(var job in queue) if(job.recipe==recipe.id) same++;
             if(same>=5) { Say("Hàng đợi "+recipe.machine+" đã đầy (5 lượt)."); return false; }
-            if(!inventory.Remove(recipe.input,recipe.inputCount))
+            if(recipe.inputs!=null&&recipe.inputs.Length>0)
+            {foreach(var ingredient in recipe.inputs)if(inventory.Count(ingredient.item)<ingredient.count)
+              {Say("Thiếu "+ingredient.count+" "+inventory.Name(ingredient.item)+".");return false;}
+             foreach(var ingredient in recipe.inputs)inventory.Remove(ingredient.item,ingredient.count);}
+            else if(!inventory.Remove(recipe.input,recipe.inputCount))
             { Say("Thiếu "+recipe.inputCount+" "+inventory.Name(recipe.input)+"."); return false; }
             queue.Add(new ProcessingRecord { recipe=recipe.id,remaining=recipe.seconds });
             Say("Đã xếp "+recipe.name+" vào hàng đợi "+recipe.machine+".");
@@ -172,7 +187,7 @@ namespace NongTrai
         {
             if(status==null) return;
             string value=activeMachine<0?"Hàng đợi: "+queue.Count+" công việc":"Máy "+Recipes[activeMachine].machine+" • "+(IsBusy(activeMachine)?"đang hoạt động":"sẵn sàng");
-            foreach(var job in queue)if(activeMachine<0||job.recipe==Recipes[activeMachine].id)
+            foreach(var job in queue)if(activeMachine<0||FindRecipe(job.recipe)?.machine==Recipes[activeMachine].machine)
                 value+=" • "+(FindRecipe(job.recipe)?.name??job.recipe)+" "+Mathf.CeilToInt(job.remaining)+"s";
             status.text=value;
         }

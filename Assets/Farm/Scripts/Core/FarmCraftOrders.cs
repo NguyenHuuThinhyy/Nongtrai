@@ -160,9 +160,9 @@ namespace NongTrai
         static Material Material(Color color)
         { var material=new Material(Shader.Find("Universal Render Pipeline/Lit"));material.color=color;return material; }
         public void OpenCraft()
-        { hud.player.SetPaused(true);hud.pausePanel.SetActive(false);CraftPanel.SetActive(true);RefreshCraft(); }
+        { hud.ShowOverlay(CraftPanel);RefreshCraft(); }
         public void OpenMail()
-        { hud.player.SetPaused(true);hud.pausePanel.SetActive(false);MailPanel.SetActive(true);RefreshMail(); }
+        { hud.ShowOverlay(MailPanel);RefreshMail(); }
         bool CraftUnlocked(int index)
         {
             if(index<2) return true;

@@ -26,7 +26,7 @@ namespace NongTrai
         readonly string[] tools={"Hạt lúa mì","Hạt cà chua","Hạt đậu nành","Thức ăn thú","Xẻng","Bình tưới","Kiếm","Rìu","Giỏ hái","Xẻng cũ","Xẻng cũ"};
         void Awake(){Instance=this;Defaults();}
         void OnDestroy(){if(Instance==this)Instance=null;}
-        void Defaults(){for(int i=0;i<36;i++)Slots[i]=new BagSlot();for(int i=0;i<9;i++)Slots[i]=new BagSlot{item=100+i,count=1,durability=i==7?20:i==4||i==6?100:0};}
+        void Defaults(){for(int i=0;i<36;i++)Slots[i]=new BagSlot();for(int i=0;i<8;i++)Slots[i]=new BagSlot{item=100+i,count=1,durability=i==7?20:i==4||i==6?100:0};}
         public string Name(int id)=>id<0?"Ô trống":id>=100&&id<=110?tools[id-100]:inventory.Name(id);
         public int Icon(int id)=>id>=100?new[]{0,1,2,20,21,22,23,24,25,21,21}[Mathf.Clamp(id-100,0,10)]:FarmItemIconLibrary.ForItem(id);
         public string CountText(int index)
@@ -78,7 +78,7 @@ namespace NongTrai
         public void Sync()
         {
             if(inventory==null)return;
-            for(int id=0;id<40;id++)
+            for(int id=0;id<56;id++)
             {
                 int difference=inventory.Count(id)-Total(id);
                 if(difference>0){int overflow=Insert(id,difference);if(overflow>0){inventory.Remove(id,overflow);WorldPickup.Spawn(id,overflow,inventory.hud.player.transform.position);}}
@@ -121,6 +121,7 @@ namespace NongTrai
           for(int i=0;i<36;i++)
           {if(Slots[i]==null)Slots[i]=new BagSlot();
            if(migrateLegacy&&(Slots[i].item==109||Slots[i].item==110))Slots[i].item=104;
+           if(Slots[i].item==108){Slots[i].item=27;Slots[i].durability=0;}
            if(migrateLegacy&&Slots[i].item==104&&Slots[i].count>0)
            {if(shovelFound){Slots[shovelSlot].durability=Mathf.Max(Slots[shovelSlot].durability,Slots[i].durability);Slots[i]=new BagSlot();}
             else{shovelFound=true;shovelSlot=i;}}
@@ -145,7 +146,7 @@ namespace NongTrai
             if(dragGhost!=null){dragGhost.gameObject.SetActive(held!=null);if(held!=null){dragGhost.sprite=FarmItemIconLibrary.Get(Icon(held.item));RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)inventory.Panel.transform,Mouse.current.position.ReadValue(),null,out var point);dragGhost.rectTransform.anchoredPosition=point;}}
         }
         public bool Eat()
-        {int id=Item;if(!(id>=0&&id<=11&&id!=7||id==32||id==33||id==39)||Satiety>=99)return false;if(!inventory.Remove(id,1))return false;Satiety=Mathf.Min(100,Satiety+(id>=32?40:20));inventory.hud.Notify("Đã ăn "+Name(id)+" • No "+Mathf.RoundToInt(Satiety)+"%");return true;}
+        {int id=Item;if(!(id>=0&&id<=11&&id!=7||id==32||id==33||id==39||id>=46&&id<=48)||Satiety>=99)return false;if(!inventory.Remove(id,1))return false;Satiety=Mathf.Min(100,Satiety+(id==32||id==33||id==39?40:20));inventory.hud.Notify("Đã ăn "+Name(id)+" • No "+Mathf.RoundToInt(Satiety)+"%");return true;}
     }
     public sealed class BagSlotDrag:MonoBehaviour,IBeginDragHandler,IDragHandler,IEndDragHandler,IDropHandler,IPointerClickHandler
     {

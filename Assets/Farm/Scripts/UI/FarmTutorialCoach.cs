@@ -14,8 +14,8 @@ namespace NongTrai
         readonly string[] steps={
             "WASD đi, chuột nhìn quanh, Space nhảy. Dấu + ở giữa màn hình là vị trí tương tác. E mở bản đồ việc cần làm; Esc mở menu.",
             "B mở túi. Kéo vật phẩm vào 9 ô dưới cùng; bấm 1–9 hoặc lăn chuột để đổi nhanh. Tên món đang cầm hiện ở đáy màn hình.",
-            "Chọn ô 5 Xẻng rồi ngắm ô đất, bấm chuột trái. Chọn hạt ô 1–3 để gieo; cây chín chỉ cần click trái để hái.",
-            "Chọn ô 6 Bình tưới, tới hồ nạp nước rồi tưới bằng chuột trái. Nếu thú đói, bản đồ góc phải báo số con; ngắm thú và nhấn F để cho ăn.",
+            "Chọn ô 5 Xẻng rồi ngắm ô đất, bấm chuột trái. Chọn hạt trong hotbar để gieo; cây chín chỉ cần click trái để hái. Hạt cây ăn quả trồng ở vườn từ LV3 bằng chuột phải.",
+            "Chọn ô 6 Bình tưới, tới hồ nạp nước rồi tưới bằng chuột trái. Mua vòi phun ở máy bơm và click đất để đặt; nạp nước cho vòi chạy 30 phút. Thú đói ăn tại máng chung của chuồng.",
             "Ngắm bàn gỗ trước nhà và bấm trái để chế tạo. Ngắm hộp thư đỏ để xem 5 đơn; giao đủ hàng sẽ nhận xu và XP.",
             "Tab mở bản đồ, chọn Khám phá. Giữ trái để đào; chọn khối trong hotbar rồi trái để đặt. G mở bảng xây, B mở túi.",
             "Chỉ nút LƯU GAME trong menu Esc mới ghi tiến độ. Chế độ sáng tạo LV99 dành để thử, rời game sẽ bỏ thay đổi."};
@@ -24,10 +24,14 @@ namespace NongTrai
         public void Initialize(FarmHud hud,Transform parent)
         {
             this.hud=hud;
-            var help=FarmUi.Button(parent,"[H] HƯỚNG DẪN",new Vector2(-24,-515),new Vector2(260,48),Toggle);
-            var hr=help.GetComponent<RectTransform>();hr.anchorMin=hr.anchorMax=hr.pivot=new Vector2(1,1);hr.anchoredPosition=new Vector2(-24,-515);
+            var settings=FarmUi.Button(parent," ",new Vector2(-24,-340),new Vector2(58,58),hud.OpenSettings);
+            var sr=settings.GetComponent<RectTransform>();sr.anchorMin=sr.anchorMax=sr.pivot=new Vector2(1,1);sr.anchoredPosition=new Vector2(-24,-340);
+            FarmItemIconLibrary.Attach(settings.transform,57,new Vector2(8,-8),new Vector2(42,42));
+            var help=FarmUi.Button(parent," ",new Vector2(-90,-340),new Vector2(58,58),Toggle);
+            var hr=help.GetComponent<RectTransform>();hr.anchorMin=hr.anchorMax=hr.pivot=new Vector2(1,1);hr.anchoredPosition=new Vector2(-90,-340);
+            FarmItemIconLibrary.Attach(help.transform,58,new Vector2(8,-8),new Vector2(42,42));
             panel=FarmUi.Panel(parent,"Hướng dẫn từng bước",new Vector2(650,245));
-            var r=panel.GetComponent<RectTransform>();r.anchorMin=r.anchorMax=r.pivot=new Vector2(1,1);r.anchoredPosition=new Vector2(-24,-575);
+            var r=panel.GetComponent<RectTransform>();r.anchorMin=r.anchorMax=r.pivot=new Vector2(1,1);r.anchoredPosition=new Vector2(-24,-410);
             title=FarmUi.TmpLabel(panel.transform,"",new Vector2(20,-14),new Vector2(610,42),24);
             body=FarmUi.TmpLabel(panel.transform,"",new Vector2(20,-68),new Vector2(610,102),20);
             FarmUi.Button(panel.transform,"Tiếp ▶",new Vector2(395,-184),new Vector2(230,48),Next);

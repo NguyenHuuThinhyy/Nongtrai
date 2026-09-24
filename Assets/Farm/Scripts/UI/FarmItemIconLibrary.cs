@@ -7,7 +7,7 @@ namespace NongTrai
     // không phụ thuộc font hay asset bên ngoài.
     public static class FarmItemIconLibrary
     {
-        public static int ForItem(int item)=>item==104?21:item==105?22:item==106?23:item==107?24:item==108?25:item==27?54:item>=28&&item<=37?40+item-28:item==38?55:item==39?56:item>=20&&item<=26?10+item:item;
+        public static int ForItem(int item)=>item==104?21:item==105?22:item==106?23:item==107?24:item==108?25:item==27?54:item>=28&&item<=37?40+item-28:item==38?55:item==39?56:item>=40&&item<=55?73+item-40:item>=20&&item<=26?10+item:item;
         public static UnityEngine.UI.Image Attach(Transform parent,int item,Vector2 position,Vector2 size)
         {
             var go=new GameObject("Minh họa "+item,typeof(RectTransform),typeof(UnityEngine.UI.Image));
@@ -83,6 +83,17 @@ namespace NongTrai
                 case 54: Line(p,32,11,32,40,brown,8);for(int x=19;x<=46;x+=13)Disk(p,x,43,12,green);Disk(p,24,34,4,red);break;
                 case 55: Disk(p,32,31,22,new Color(.75f,.28f,.95f));Disk(p,27,37,11,gold);Disk(p,40,25,9,blue);Disk(p,20,22,5,lightGreen);break;
                 case 56: Oval(p,32,30,22,16,Hex("A44D2C"));Oval(p,31,34,14,8,Hex("DD8745"));break;
+                case 57: Disk(p,32,32,24,gray);Disk(p,32,32,14,dark);Disk(p,32,32,7,gray);for(int a=0;a<8;a++){float t=a*Mathf.PI/4;Disk(p,32+Mathf.RoundToInt(Mathf.Cos(t)*24),32+Mathf.RoundToInt(Mathf.Sin(t)*24),5,gray);}break;
+                case 58: Disk(p,32,32,26,cream);Line(p,24,17,24,48,dark,5);Line(p,40,17,40,48,dark,5);Line(p,24,32,40,32,dark,5);break;
+                case 73: case 74: case 75: Bag(p,id==73?Hex("F3A83D"):id==74?red:gold);Disk(p,32,34,8,green);break;
+                case 76: Disk(p,32,30,22,Hex("EA8931"));Line(p,32,48,32,57,green,5);for(int x=22;x<47;x+=12)Line(p,x,16,x,43,brown,2);break;
+                case 77: for(int x=18;x<50;x+=15)Disk(p,x,31,12,red);Line(p,15,16,48,16,green,4);break;
+                case 78: Disk(p,32,30,18,gold);for(int a=0;a<8;a++){float t=a*Mathf.PI/4;Disk(p,32+Mathf.RoundToInt(Mathf.Cos(t)*20),30+Mathf.RoundToInt(Mathf.Sin(t)*20),8,gold);}Disk(p,32,30,9,brown);break;
+                case 79: Oval(p,32,30,20,25,Hex("ADD35B"));Line(p,32,51,34,59,brown,4);break;
+                case 80: Disk(p,32,31,21,Hex("F69B60"));Disk(p,26,40,7,red);Line(p,32,50,36,57,brown,4);break;
+                case 81: for(int x=20;x<=44;x+=12)for(int y=21;y<=45;y+=12)Disk(p,x,y,9,Hex("5551A7"));break;
+                case 82: case 83: case 84: Bag(p,lightGreen);Disk(p,32,33,8,id==82?Hex("ADD35B"):id==83?Hex("F69B60"):Hex("5551A7"));break;
+                case 85: case 86: case 87: case 88: Bag(p,id==85?gold:id==86?green:id==87?cream:Hex("EA8931"));for(int x=20;x<48;x+=12)Disk(p,x,32,5,brown);break;
                 default: Rect(p,13,13,51,51,dark);break;
             }
         }

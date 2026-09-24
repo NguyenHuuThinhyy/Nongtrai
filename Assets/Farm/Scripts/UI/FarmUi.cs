@@ -50,7 +50,9 @@ namespace NongTrai
             go.GetComponent<Image>().color=new Color(.25f,.39f,.25f);
             var button=go.GetComponent<Button>();button.onClick.AddListener(action);
             var label=Label(go.transform,value,new Vector2(12,-5),size-new Vector2(24,10),21);
-            label.alignment=TextAnchor.MiddleLeft;
+            label.alignment=TextAnchor.MiddleLeft;label.resizeTextForBestFit=true;
+            label.resizeTextMinSize=15;label.resizeTextMaxSize=21;
+            label.horizontalOverflow=HorizontalWrapMode.Wrap;label.verticalOverflow=VerticalWrapMode.Truncate;
             return button;
         }
         static void Place(GameObject go,Transform parent,Vector2 pos,Vector2 size)

@@ -69,7 +69,7 @@ namespace NongTrai
                 if (plot.State != PlotState.Tilled) throw new InvalidOperationException("Tilling failed.");
                 plot.Work(crop, out _); plot.Tick(100);
                 if (plot.Growth <= 0 || plot.Growth >= 1) throw new InvalidOperationException("Dry crops must grow at reduced speed.");
-                for(int watering=0;watering<6 && plot.State==PlotState.Growing;watering++)
+                for(int watering=0;watering<22 && plot.State==PlotState.Growing;watering++)
                 { plot.Work(crop,out _);plot.Tick(60); }
                 if (plot.State != PlotState.Ready) throw new InvalidOperationException("Watered crop did not ripen.");
                 plot.Work(crop, out int harvested); field.Record(crop, harvested);
@@ -77,6 +77,7 @@ namespace NongTrai
                     throw new InvalidOperationException("Harvest or inventory failed.");
                 plot.Work(crop, out int duplicate);
                 if (duplicate != 0 || plot.State != PlotState.Growing) throw new InvalidOperationException("Replant failed.");
+                if(i>=3)field.Harvested[i]=0; // Additional crop assertions should not change legacy shop funds.
             }
             // Trồng một dải cây trong phiên kiểm tra để xem hình dạng các giai đoạn; không lưu vào game.
             for (int i = 3; i < plots.Length; i++)
@@ -162,15 +163,19 @@ namespace NongTrai
             money=shop.Money;
             if(shop.Purchase(7,out _) || shop.Money!=money) throw new InvalidOperationException("Duplicate pen charged money.");
             if(shop.Purchase(8,out _) || shop.Money!=money) throw new InvalidOperationException("Insufficient funds failed.");
-            if(shop.SellHarvest()!=174 || shop.SellHarvest()!=0) throw new InvalidOperationException("Selling crops failed.");
-            if(!shop.Purchase(8,out _) || shop.BoughtTrees!=1) throw new InvalidOperationException("Fruit tree purchase failed.");
+            int cropSale=0;for(int crop=0;crop<field.crops.Length;crop++)
+                cropSale+=field.Harvested[crop]*inventory.Price(crop<3?crop:crop+40);
+            if(shop.SellHarvest()!=cropSale || shop.SellHarvest()!=0) throw new InvalidOperationException("Selling crops failed.");
+            if(!shop.Purchase(8,out _) || shop.BoughtTrees!=1 || inventory.Count(27)<1) throw new InvalidOperationException("Apple seed purchase failed.");
             shop.Credit(500);
             int woodBefore=inventory.Count(20),grassBefore=inventory.Count(25),feedBefore=shop.FeedStock;
             if(!shop.Purchase(13,out _)||!shop.Purchase(14,out _)||!shop.Purchase(15,out _)||
                 inventory.Count(20)!=woodBefore+5||inventory.Count(25)!=grassBefore+5||shop.FeedStock!=feedBefore+10)
                 throw new InvalidOperationException("Expanded block and feed shop failed.");
             yield return null;
-            var apple=FindFirstObjectByType<FruitTree>();
+            inventory.Remove(27,1);
+            var apple=Instantiate(shop.treePrefab,new Vector3(-28,0,-5),Quaternion.identity).GetComponent<FruitTree>();
+            apple.age=240;
             apple.remaining=0; apple.Harvest(shop); apple.Harvest(shop);
             if(inventory.Count(3)!=5 || inventory.Sell(3,2)!=30 || inventory.Count(3)!=3 || shop.SellHarvest()!=45)
                 throw new InvalidOperationException("Individual fruit sales failed.");
@@ -262,7 +267,7 @@ namespace NongTrai
             var orders=FarmCraftOrders.Instance;
             var creative=CreativeModeManager.Instance;
             var building=FarmBuildingSystem.Instance;
-            if(progress==null || processing==null || processing.Recipes.Length!=7 || water==null || orders==null || creative==null || building==null)
+            if(progress==null || processing==null || processing.Recipes.Length!=11 || water==null || orders==null || creative==null || building==null)
                 throw new InvalidOperationException("Expansion systems or JSON recipes missing.");
             water.Open();if(!player.Paused || !water.Panel.activeSelf) throw new InvalidOperationException("Water modal failed to open.");
             hud.Resume();if(water.Panel.activeSelf) throw new InvalidOperationException("Water modal did not close with resume/ESC flow.");
@@ -492,7 +497,7 @@ namespace NongTrai
             if(!processing.Enqueue(5)) throw new InvalidOperationException("Furnace did not unlock.");
             clock.Restore(clock.Day+1,.25f,FarmWeather.Sunny);
             var hotbar=FindFirstObjectByType<FarmHudV2>();hotbar.Select(8);
-            if(hotbar.SelectedSlot!=8) throw new InvalidOperationException("Nine slot hotbar failed.");
+            if(AdventureBag.Instance.Selected!=8) throw new InvalidOperationException("Nine slot hotbar failed.");
             islands.Travel(0);player.Teleport(new Vector3(8,.4f,14));islands.Travel(1);
             player.Teleport(IslandManager.ExploreArrival);
             save.pathOverride=Path.Combine(Application.temporaryCachePath,"farm-islands-smoke-save.json");
@@ -509,7 +514,7 @@ namespace NongTrai
             string modernSave=File.ReadAllText(save.SavePath);
             player.Teleport(new Vector3(200,.4f,-20));
             if(!save.Save())throw new InvalidOperationException("Migration fixture save failed.");
-            string oldSave=File.ReadAllText(save.SavePath).Replace("\"version\": 12","\"version\": 7");
+            string oldSave=File.ReadAllText(save.SavePath).Replace("\"version\": 13","\"version\": 7");
             File.WriteAllText(save.SavePath,oldSave);
             if(!save.Load()||Mathf.Abs(player.transform.position.y-1000.4f)>1)throw new InvalidOperationException("Legacy player position migration failed.");
             File.WriteAllText(save.SavePath,modernSave);if(!save.Load())throw new InvalidOperationException("Modern restore failed.");

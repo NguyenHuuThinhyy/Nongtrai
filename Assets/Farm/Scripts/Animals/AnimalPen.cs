@@ -25,7 +25,33 @@ namespace NongTrai
         public float EggProgress { get; private set; }
         FarmPlayer player;
 
-        void Start() { player = FindFirstObjectByType<FarmPlayer>();CreateRestSpots(); }
+        void Start() { player = FindFirstObjectByType<FarmPlayer>();CreateRestSpots();CreateFeedTrough(); }
+        void CreateFeedTrough()
+        {
+            var trough=GameObject.CreatePrimitive(PrimitiveType.Cube);trough.name="Máng ăn chung • "+FarmBarnMenu.SpeciesName(species);
+            trough.transform.SetParent(transform,false);
+            trough.transform.position=new Vector3(minimum.x+.75f,.35f,(minimum.y+maximum.y)*.5f);
+            trough.transform.localScale=new Vector3(1.5f,.65f,1.25f);
+            var material=new Material(Shader.Find("Universal Render Pipeline/Lit"));material.color=new Color(.53f,.32f,.17f);
+            trough.GetComponent<Renderer>().material=material;trough.AddComponent<FarmFeedTrough>().pen=this;
+            var food=GameObject.CreatePrimitive(PrimitiveType.Cube);food.name="Thức ăn trong máng";food.transform.SetParent(trough.transform,false);
+            food.transform.localPosition=new Vector3(0,.54f,0);food.transform.localScale=new Vector3(.82f,.17f,.72f);
+            Destroy(food.GetComponent<Collider>());var foodMat=new Material(Shader.Find("Universal Render Pipeline/Lit"));foodMat.color=new Color(.85f,.69f,.31f);
+            food.GetComponent<Renderer>().material=foodMat;
+            var label=new GameObject("Nhãn máng ăn",typeof(TMPro.TextMeshPro));label.transform.SetParent(trough.transform,false);
+            label.transform.localPosition=new Vector3(0,1.5f,0);label.transform.localScale=Vector3.one*.24f;
+            var text=label.GetComponent<TMPro.TextMeshPro>();text.font=FarmUi.Font;text.text="MÁNG ĂN";text.fontSize=4;
+            text.alignment=TMPro.TextAlignmentOptions.Center;text.rectTransform.sizeDelta=new Vector2(8,2);label.AddComponent<FarmWorldBillboard>();
+        }
+        public string FeedAll(FarmShop shop)
+        {
+            int fed=0;string missing="";
+            foreach(var animal in FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None))
+                if(animal.pen==this&&(animal.Hunger<95||animal.Happiness<95))
+                    {if(animal.Feed(shop,out var result))fed++;else missing=result;}
+            return fed>0?"Đã cho "+fed+" "+FarmBarnMenu.SpeciesName(species)+" ăn tại máng.":
+                string.IsNullOrEmpty(missing)?"Các con trong chuồng đã no.":missing;
+        }
         public Vector3 RestPointFor(FarmAnimal animal)
         {
             int slot=Mathf.Abs(animal.GetInstanceID())%3;
@@ -97,5 +123,13 @@ namespace NongTrai
         }
         public void RestoreProduction(int eggs,float progress)
         { StoredEggs=Mathf.Clamp(eggs,0,25); EggProgress=Mathf.Clamp(progress,0,30); }
+    }
+    public sealed class FarmFeedTrough:MonoBehaviour,IInteractable
+    {
+        public AnimalPen pen;
+        public string InteractionHint=>"[Chuột trái] Cho cả chuồng "+FarmBarnMenu.SpeciesName(pen.species)+" ăn";
+        public bool CanInteract(FarmPlayer player)=>true;
+        public void Interact(PlayerInteraction actor)=>actor.Say(pen.FeedAll(actor.shop));
+        public void SetHighlighted(bool selected)=>InteractionOutline.Set(this,selected);
     }
 }

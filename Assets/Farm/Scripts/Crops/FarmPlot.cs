@@ -116,7 +116,17 @@ namespace NongTrai
                         var leaf = Part(PrimitiveType.Sphere, p + new Vector3(side * height * 0.22f, height * 0.6f, 0), new Vector3(height * 0.65f, 0.07f, height * 0.25f), green);
                         leaf.localRotation = Quaternion.Euler(0, 25 * z, side * 30);
                     }
-                    if (stage >= 2) Part(PrimitiveType.Sphere, p + Vector3.up * height, new Vector3(0.22f, Crop.displayName == "Lúa mì" ? 0.40f : 0.22f, 0.22f), fruit);
+                    if (stage >= 2)
+                    {
+                        if(Crop.displayName=="Bí ngô")
+                            Part(PrimitiveType.Sphere,p+new Vector3(0,.26f,0),new Vector3(.47f,.31f,.43f),fruit);
+                        else if(Crop.displayName=="Dâu ruộng")
+                        {for(int berry=0;berry<3;berry++)Part(PrimitiveType.Sphere,p+new Vector3((berry-1)*.18f,.20f+berry*.05f,.16f),new Vector3(.13f,.15f,.13f),fruit);}
+                        else if(Crop.displayName=="Hướng dương")
+                        {Part(PrimitiveType.Cylinder,p+new Vector3(0,height*.8f,0),new Vector3(.07f,height*.7f,.07f),stem);
+                         Part(PrimitiveType.Sphere,p+Vector3.up*(height*1.5f),new Vector3(.34f,.34f,.13f),fruit);}
+                        else Part(PrimitiveType.Sphere, p + Vector3.up * height, new Vector3(0.22f, Crop.displayName == "Lúa mì" ? 0.40f : 0.22f, 0.22f), fruit);
+                    }
                 }
         }
         Transform Part(PrimitiveType type, Vector3 p, Vector3 s, Material material)

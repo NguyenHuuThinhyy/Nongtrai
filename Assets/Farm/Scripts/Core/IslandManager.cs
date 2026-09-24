@@ -33,7 +33,7 @@ namespace NongTrai
         }
         void OnDestroy(){if(Instance==this)Instance=null;if(player!=null)player.PauseChanged-=OnPause;}
         void OnPause(bool value){if(!value&&MapPanel!=null)MapPanel.SetActive(false);}
-        public void OpenMap(){player.SetPaused(true);hud.pausePanel.SetActive(false);MapPanel.SetActive(true);}
+        public void OpenMap(){hud.ShowOverlay(MapPanel);}
         public bool Travel(int index)
         {
             if(index<0||index>1)return false;

@@ -27,8 +27,8 @@ namespace NongTrai
             hud = GetComponent<FarmHud>();
             status = FarmUi.TmpLabel(hud.gameplayChrome.transform, "", Vector2.zero, new Vector2(520, 48), 21);
             var rect = status.rectTransform;
-            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0, 1);
-            rect.anchoredPosition = new Vector2(24, -258);
+            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0, 0);
+            rect.anchoredPosition = new Vector2(24, 105);
             status.color = new Color(1, .8f, .62f);
             deathPanel=FarmUi.Panel(hud.transform,"Hồi sinh",new Vector2(760,460));
             FarmUi.TmpLabel(deathPanel.transform,"BẠN ĐÃ KIỆT SỨC",new Vector2(35,-30),new Vector2(690,60),34);

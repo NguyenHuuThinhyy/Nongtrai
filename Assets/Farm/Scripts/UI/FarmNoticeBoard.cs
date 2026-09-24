@@ -65,8 +65,7 @@ namespace NongTrai
             return r;
         }
         void SmallLandmark(string label,Vector3 world,Color color)
-        {var point=MapPoint(world,smallMap,false,Vector3.zero);var pin=Pin(smallMap,label,point,color,9,null);
-         var text=FarmUi.TmpLabel(pin,label,new Vector2(9,0),new Vector2(60,20),10);text.color=Color.white;}
+        {var point=MapPoint(world,smallMap,false,Vector3.zero);Pin(smallMap,label,point,color,9,null);}
         static RectTransform Pin(Transform map,string label,Vector2 at,Color color,float size,UnityEngine.Events.UnityAction click)
         {
             var go=new GameObject(label,typeof(RectTransform),typeof(Image));var r=go.GetComponent<RectTransform>();r.SetParent(map,false);
@@ -97,7 +96,7 @@ namespace NongTrai
         }
         static void DrawFarmGeometry(Transform parent,RectTransform map)
         {
-            MapShape(parent,map,"Khu vườn LV6",new Vector3(68,0,0),29,75,new Color(.52f,.68f,.35f,.8f));
+            MapShape(parent,map,"Khu vườn LV3",new Vector3(68,0,0),29,75,new Color(.52f,.68f,.35f,.8f));
             MapShape(parent,map,"Hồ sâu 1 khối",new Vector3(32,0,-15),13,20,new Color(.23f,.65f,.79f,.9f));
             MapShape(parent,map,"Nhà ở",new Vector3(0,0,28),12,11,new Color(.57f,.29f,.21f,.95f));
             MapShape(parent,map,"Sân trước",new Vector3(0,0,17),17,12,new Color(.80f,.69f,.45f,.8f));
@@ -116,7 +115,7 @@ namespace NongTrai
         public void Open()
         {
             if(hud==null)return;
-            hud.player.SetPaused(true);hud.pausePanel.SetActive(false);large.SetActive(true);
+            hud.ShowOverlay(large);
             Rebuild();
         }
         public void Close()=>hud.Resume();
@@ -135,7 +134,7 @@ namespace NongTrai
                 Landmark(taskPins,bigMap,"BÀN",new Vector3(-4,0,28),new Color(.6f,.39f,.21f),false,center);
                 var pond=FindFirstObjectByType<WaterSource>();if(pond!=null)Landmark(taskPins,bigMap,"HỒ",pond.transform.position,new Color(.2f,.7f,1),false,center);
                 var store=FindFirstObjectByType<FarmStorage>();if(store!=null)Landmark(taskPins,bigMap,"KHO",store.WarehousePosition,new Color(.83f,.65f,.4f),false,center);
-                Landmark(taskPins,bigMap,"VƯỜN LV6",new Vector3(67,0,0),new Color(.55f,.9f,.35f),false,center);
+                Landmark(taskPins,bigMap,"VƯỜN LV3",new Vector3(67,0,0),new Color(.55f,.9f,.35f),false,center);
                 CollectFarmTasks();
             }
             else
@@ -165,8 +164,8 @@ namespace NongTrai
              else if(plot.State==PlotState.Growing&&plot.Moisture<.2f){dry++;dryPos=plot.transform.position;}}
             foreach(var animal in FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None))if(animal.pen!=null&&animal.Hunger<35){hungry++;hungryPos=animal.transform.position;}
             if(ready>0)tasks.Add(new TaskMarker{title=ready+" ô đã chín • click trái để hái",position=readyPos,color=new Color(1,.82f,.24f)});
-            foreach(var tree in FindObjectsByType<FruitTree>(FindObjectsSortMode.None))if(tree.age>=240&&tree.remaining<=0)
-                tasks.Add(new TaskMarker{title="Cây táo đã có quả • click trái để hái",position=tree.transform.position,color=new Color(.95f,.28f,.30f)});
+            foreach(var tree in FindObjectsByType<FruitTree>(FindObjectsSortMode.None))if(tree.transform.position.y<500&&tree.Ready)
+                tasks.Add(new TaskMarker{title=tree.FruitName+" đã chín • click trái để hái",position=tree.transform.position,color=new Color(.95f,.28f,.30f)});
             if(dry>0)tasks.Add(new TaskMarker{title=dry+" ô thiếu nước • nạp bình ở hồ",position=dryPos,color=new Color(.30f,.70f,1)});
             if(hungry>0)tasks.Add(new TaskMarker{title=hungry+" vật nuôi đói • đến chuồng cho ăn",position=hungryPos,color=new Color(1,.43f,.32f)});
             var mail=FarmCraftOrders.Instance;

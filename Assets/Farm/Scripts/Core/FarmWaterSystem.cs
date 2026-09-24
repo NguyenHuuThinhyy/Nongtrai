@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 namespace NongTrai
 {
@@ -9,7 +11,10 @@ namespace NongTrai
         public int canWater;
         public int[] stationWater;
         public bool[] stationBuilt;
+        public PortableSprinklerRecord[] portable;
+        public bool pendingPortable;
     }
+    [Serializable] public sealed class PortableSprinklerRecord {public Vector3 position;public float remaining;}
 
     public sealed class FarmWaterSystem : MonoBehaviour
     {
@@ -25,6 +30,11 @@ namespace NongTrai
         public readonly bool[] StationBuilt=new bool[4];
         readonly int[] prices={600,900,1200,1500};
         readonly IrrigationStation[] stations=new IrrigationStation[4];
+        readonly List<IrrigationStation> portable=new List<IrrigationStation>();
+        public bool PendingPlacement {get;private set;}
+        public int ConsumedFrame {get;private set;}=-1;
+        public int PortableCount=>portable.Count;
+        public const int PortablePrice=350;
         Text status,feedback;
         float tick;
 
@@ -43,13 +53,11 @@ namespace NongTrai
             Panel=FarmUi.Panel(hud.transform,"Quản lý nước",new Vector2(930,720));
             FarmUi.TmpLabel(Panel.transform,"NƯỚC & TRẠM TƯỚI",new Vector2(30,-25),new Vector2(870,55),30);
             status=FarmUi.Label(Panel.transform,"",new Vector2(30,-90),new Vector2(870,100),21);
-            for(int i=0;i<4;i++)
-            {
-                int region=i;
-                FarmUi.Button(Panel.transform,"Xây trạm vùng "+(i+1)+" • "+prices[i]+" xu",
-                    new Vector2(30,-210-i*78),new Vector2(870,62),()=>BuyStation(region));
-            }
-            feedback=FarmUi.Label(Panel.transform,"Nạp bình tại hồ, sau đó E ở trạm để chuyển nước vào bồn.",
+            FarmUi.Button(Panel.transform,"Mua vòi phun di động • 350 xu • đặt ở vị trí bạn chọn",
+                new Vector2(30,-215),new Vector2(870,68),BuyPortable);
+            FarmUi.Label(Panel.transform,"Vòi phun hiển thị vòng tròn bán kính 6 m. Nạp 1 nước từ bình để hoạt động 30 phút chơi thực.\nDùng cho ruộng và cây ăn quả, không yêu cầu cấp độ.",
+                new Vector2(30,-310),new Vector2(870,125),22);
+            feedback=FarmUi.Label(Panel.transform,"Click máy bơm để lấy nước và mua vòi; click vòi đã đặt để nạp lại.",
                 new Vector2(30,-545),new Vector2(870,55),19);
             FarmUi.Button(Panel.transform,"Trở lại game",new Vector2(30,-630),new Vector2(870,55),hud.Resume);
             FarmUi.Label(Panel.transform,"Có thể nhấn ESC để đóng bảng",new Vector2(625,-22),new Vector2(270,36),17);
@@ -106,7 +114,7 @@ namespace NongTrai
         }
         public void Open()
         {
-            hud.player.SetPaused(true);hud.pausePanel.SetActive(false);Panel.SetActive(true);Refresh();
+            hud.ShowOverlay(Panel);Refresh();
         }
         public int RefillCan()
         {
@@ -134,9 +142,41 @@ namespace NongTrai
             int moved=Mathf.Min(CanWater,32-StationWater[region]);
             CanWater-=moved;StationWater[region]+=moved;Refresh();return moved;
         }
+        public void BuyPortable()
+        {
+            if(PendingPlacement){Say("Hãy đặt vòi phun đang mua trước.");return;}
+            if(!shop.TrySpend(PortablePrice)){Say("Cần "+PortablePrice+" xu để mua vòi phun.");return;}
+            PendingPlacement=true;FarmBuildingSystem.Instance?.EquipBlock(-1);hud.Resume();
+            hud.Notify("Vòi phun đã mua. Click mặt đất để đặt ở bất cứ vị trí hợp lệ nào.");
+        }
+        IrrigationStation PlacePortable(Vector3 point,float remaining)
+        {
+            var clone=Instantiate(stations[0].gameObject,point+Vector3.up*1.05f,Quaternion.identity);
+            clone.name="Vòi phun di động";clone.SetActive(true);
+            var result=clone.GetComponent<IrrigationStation>();result.portable=true;result.remainingSeconds=Mathf.Max(0,remaining);
+            portable.Add(result);return result;
+        }
+        public bool TryPlacePortable(Vector3 point)
+        {if(!PendingPlacement)return false;PlacePortable(point,1800);PendingPlacement=false;return true;}
+        public bool RefillPortable(IrrigationStation sprinkler)
+        {
+            if(sprinkler==null||!sprinkler.portable||CanWater<1)return false;
+            CanWater--;sprinkler.remainingSeconds=1800;Refresh();return true;
+        }
         void Update()
         {
             if(hud==null || hud.player.Paused) return;
+            if(PendingPlacement&&Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame&&!FarmHud.WorldClickSuppressed)
+            {
+                ConsumedFrame=Time.frameCount;
+                if(Camera.main!=null&&FarmAim.Hit(Camera.main,out var hit)&&hit.normal.y>.65f&&
+                    Vector3.Distance(hit.point,hud.player.transform.position)<6f)
+                {TryPlacePortable(hit.point);hud.Notify("Đã đặt vòi phun • vòng xanh là vùng tưới. Click vòi để nạp lại sau 30 phút.");}
+                else hud.Notify("Hãy ngắm mặt đất phẳng gần nhân vật để đặt vòi phun.");
+            }
+            for(int i=portable.Count-1;i>=0;i--)
+            {if(portable[i]==null){portable.RemoveAt(i);continue;}
+             portable[i].remainingSeconds=Mathf.Max(0,portable[i].remainingSeconds-Time.deltaTime);}
             tick+=Time.deltaTime;if(tick<1) return;tick=0;
             var plots=FindObjectsByType<FarmPlot>(FindObjectsSortMode.None);
             for(int region=0;region<4;region++)
@@ -150,11 +190,23 @@ namespace NongTrai
                     plot.AddMoisture(.55f);StationWater[region]--;
                 }
             }
+            foreach(var sprinkler in portable)if(sprinkler!=null&&sprinkler.remainingSeconds>0)
+            {
+                foreach(var plot in plots)if(plot.State==PlotState.Growing&&plot.Moisture<.6f&&
+                    Vector3.Distance(plot.transform.position,sprinkler.transform.position)<6.2f)plot.AddMoisture(.35f);
+                foreach(var tree in FindObjectsByType<FruitTree>(FindObjectsSortMode.None))if(
+                    Vector3.Distance(tree.transform.position,sprinkler.transform.position)<6.2f)tree.AdvanceWater(1);
+            }
         }
-        public WaterState Snapshot() => new WaterState { canWater=CanWater,
-            stationWater=(int[])StationWater.Clone(),stationBuilt=(bool[])StationBuilt.Clone() };
+        public WaterState Snapshot()
+        {var records=new List<PortableSprinklerRecord>();foreach(var item in portable)if(item!=null)
+            records.Add(new PortableSprinklerRecord{position=item.transform.position-Vector3.up*1.05f,remaining=item.remainingSeconds});
+         return new WaterState { canWater=CanWater,stationWater=(int[])StationWater.Clone(),
+             stationBuilt=(bool[])StationBuilt.Clone(),portable=records.ToArray(),pendingPortable=PendingPlacement };}
         public void Restore(WaterState state)
         {
+            foreach(var item in portable)if(item!=null){item.gameObject.SetActive(false);Destroy(item.gameObject);}portable.Clear();
+            PendingPlacement=state!=null&&state.pendingPortable;
             CanWater=state==null?0:Mathf.Clamp(state.canWater,0,CanCapacity);
             for(int i=0;i<4;i++)
             {
@@ -162,14 +214,15 @@ namespace NongTrai
                 StationWater[i]=state!=null && state.stationWater!=null && i<state.stationWater.Length?Mathf.Clamp(state.stationWater[i],0,32):0;
                 if(stations[i]!=null) stations[i].gameObject.SetActive(StationBuilt[i]);
             }
+            if(state?.portable!=null)foreach(var item in state.portable)PlacePortable(item.position,item.remaining);
             Refresh();
         }
         void Say(string value) { if(feedback!=null) feedback.text=value;hud.Notify(value);Refresh(); }
         void Refresh()
         {
             if(status==null) return;
-            status.text="Bình: "+CanWater+"/"+CanCapacity+" • Mỗi ô tưới dùng 1 nước.\n"
-                +"Trạm: "+StationWater[0]+"/32 • "+StationWater[1]+"/32 • "+StationWater[2]+"/32 • "+StationWater[3]+"/32";
+            status.text="Bình: "+CanWater+"/"+CanCapacity+" • Vòi di động: "+PortableCount+" • Mua tại đây, đặt không cần LV.\n"
+                +"Trạm cũ: "+StationWater[0]+"/32 • "+StationWater[1]+"/32 • "+StationWater[2]+"/32 • "+StationWater[3]+"/32";
         }
     }
 
@@ -183,21 +236,23 @@ namespace NongTrai
 
     public sealed class WaterSource : MonoBehaviour,IInteractable
     {
-        public string InteractionHint => "[E] Lấy đầy bình nước ở hồ";
+        public string InteractionHint => "[Chuột trái] Bơm nước và mua vòi phun";
         public bool CanInteract(FarmPlayer player) => true;
         public void Interact(PlayerInteraction actor)
         {
             int added=FarmWaterSystem.Instance.RefillCan();
             actor.Say(added>0?"Đã lấy "+added+" nước. Bình đã đầy.":"Bình nước đã đầy.");
             FarmAudio.Instance?.Play(FarmAudio.Cue.Water);
+            FarmWaterSystem.Instance.Open();
         }
         public void SetHighlighted(bool selected) => InteractionOutline.Set(this,selected);
     }
 
     public sealed class IrrigationStation : MonoBehaviour,IInteractable
     {
-        public int region;Transform arms;ParticleSystem spray;LineRenderer range;Transform[] droplets;
-        public string InteractionHint => "[E] Nạp trạm vùng "+(region+1)+" • "+(FarmWaterSystem.Instance==null?0:FarmWaterSystem.Instance.StationWater[region])+"/32 nước • bán kính 6m";
+        public int region;public bool portable;public float remainingSeconds;Transform arms;ParticleSystem spray;LineRenderer range;Transform[] droplets;
+        public string InteractionHint => portable?"[Chuột trái] Vòi phun • còn "+Mathf.CeilToInt(remainingSeconds/60)+" phút • nạp 1 nước để chạy 30 phút":
+            "[Chuột trái] Nạp trạm vùng "+(region+1)+" • "+(FarmWaterSystem.Instance==null?0:FarmWaterSystem.Instance.StationWater[region])+"/32 nước • bán kính 6m";
         public void InitializeVisuals(Transform rotatingArms)
         {
             arms=rotatingArms;
@@ -225,7 +280,7 @@ namespace NongTrai
         }
         void Update()
         {
-            bool active=FarmWaterSystem.Instance!=null&&FarmWaterSystem.Instance.StationWater[region]>0;
+            bool active=portable?remainingSeconds>0:FarmWaterSystem.Instance!=null&&FarmWaterSystem.Instance.StationWater[region]>0;
             if(arms!=null&&active)arms.Rotate(0,42*Time.deltaTime,0,Space.Self);
             if(spray!=null){var emission=spray.emission;emission.enabled=active;}
             if(droplets!=null)for(int i=0;i<droplets.Length;i++)
@@ -240,6 +295,7 @@ namespace NongTrai
         public bool CanInteract(FarmPlayer player) => true;
         public void Interact(PlayerInteraction actor)
         {
+            if(portable){actor.Say(FarmWaterSystem.Instance.RefillPortable(this)?"Đã nạp 1 nước • vòi hoạt động 30 phút chơi thực.":"Bình rỗng. Lấy nước tại hồ.");return;}
             int moved=FarmWaterSystem.Instance.TransferToStation(region);
             actor.Say(moved>0?"Đã nạp "+moved+" nước vào trạm.":"Bình rỗng hoặc bồn trạm đã đầy.");
         }

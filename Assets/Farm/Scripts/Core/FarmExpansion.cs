@@ -22,7 +22,7 @@ namespace NongTrai
         public bool[] UnlockedRegions { get; private set; } = { true, false, false, false };
         public GameObject Panel { get; private set; }
         Text summary, feedback;
-        readonly int[] regionLevels = { 1, 2, 4, 6 };
+        readonly int[] regionLevels = { 1, 2, 3, 3 };
         readonly int[] regionPrices = { 0, 500, 1200, 2400 };
         readonly string[] toolNames = { "Xẻng", "Bình tưới", "Kiếm" };
         readonly string[] tierNames = { "Đồng", "Bạc", "Vàng" };
@@ -68,10 +68,7 @@ namespace NongTrai
         }
         public void Open()
         {
-            hud.player.SetPaused(true); hud.pausePanel.SetActive(false);
-            if(shop.Panel!=null) shop.Panel.SetActive(false);
-            if(inventory.Panel!=null) inventory.Panel.SetActive(false);
-            Panel.SetActive(true); Refresh();
+            hud.ShowOverlay(Panel); Refresh();
         }
         public void Refresh()
         {
@@ -118,8 +115,12 @@ namespace NongTrai
             if(!IsUnlocked(center)) return "Vùng đất chưa mở. Cần LV "+regionLevels[RegionFor(center)]+" và "
                 +regionPrices[RegionFor(center)]+" xu. Nhấn N để mua.";
             int slot=FarmHudV2.Instance==null?0:FarmHudV2.Instance.SelectedSlot;
+            int held=AdventureBag.Instance==null?-1:AdventureBag.Instance.Item;
+            int seedCrop=held>=40&&held<=42?held-37:field.Selected;
             if(center.State==PlotState.Untilled && slot!=4) return "Hãy chọn Xẻng trên hotbar trước khi xới.";
-            if(center.State==PlotState.Tilled && (slot<0 || slot>2)) return "Hãy chọn hạt giống trên hotbar trước khi gieo.";
+            if(center.State==PlotState.Tilled && (slot<0 || slot>2) && !(held>=40&&held<=42)) return "Hãy chọn hạt giống trong hotbar trước khi gieo.";
+            if(center.State==PlotState.Tilled && seedCrop>=3&&Level<seedCrop)
+                return "Giống "+field.crops[seedCrop].displayName+" mở ở LV"+seedCrop+".";
             if(center.State==PlotState.Growing && slot!=5) return "Hãy chọn Bình tưới trên hotbar trước khi tưới.";
             int tool=center.State==PlotState.Untilled?0:center.State==PlotState.Growing?1:-1;
             if(tool==0&&AdventureBag.Instance!=null&&!AdventureBag.Instance.DamageTool())return "Xẻng đã hỏng. Sửa trong túi hoặc mua xẻng mới.";
@@ -133,11 +134,13 @@ namespace NongTrai
                 if(worked>=range) break;
                 if(!IsUnlocked(plot) || plot.State!=center.State ||
                     Vector3.Distance(plot.transform.position,center.transform.position)>4.5f) continue;
-                if(plot.State==PlotState.Tilled && !shop.ConsumeSeed(field.Selected)) break;
+                if(plot.State==PlotState.Tilled && (seedCrop<3?!shop.ConsumeSeed(seedCrop):!inventory.Remove(held,1))) break;
                 if(plot.State==PlotState.Growing && (FarmWaterSystem.Instance==null || !FarmWaterSystem.Instance.Consume(1))) break;
                 CropDefinition crop=plot.Crop;bool mutated=plot.Mutated;
-                plot.Work(field.Current,out int harvest);
-                if(harvest>0) { if(mutated) inventory.AddMutated(Array.IndexOf(field.crops,crop),harvest);else field.Record(crop,harvest); harvestedTotal+=harvest; GainExperience(8); }
+                plot.Work(plot.State==PlotState.Tilled?field.crops[seedCrop]:field.Current,out int harvest);
+                if(harvest>0) { int cropIndex=Array.IndexOf(field.crops,crop);
+                    if(mutated) inventory.AddMutated(cropIndex>=3?cropIndex+1:cropIndex,harvest);
+                    else field.Record(crop,harvest); harvestedTotal+=harvest; GainExperience(8); }
                 worked++;
             }
             if(worked==0) return center.State==PlotState.Tilled?"Hết hạt giống. Nhấn B để mở shop.":

@@ -11,11 +11,12 @@ namespace NongTrai
         public FarmHud hud;
         public FieldManager field;
         public FarmShop shop;
-        public int[] AnimalProducts { get; private set; } = new int[36];
-        public int[] MutatedCrops { get; private set; } = new int[4];
+        public int[] AnimalProducts { get; private set; } = new int[52];
+        public int[] MutatedCrops { get; private set; } = new int[7];
+        static readonly int[] mutantBasePrices={8,18,32,15,55,90,130};
         public GameObject Panel { get; private set; }
-        readonly string[] itemNames = { "Lúa mì", "Cà chua", "Đậu nành", "Táo", "Trứng", "Sữa", "Lông cừu", "Thịt heo", "Bột mì", "Bánh mì", "Phô mai", "Nước táo", "Gỗ cũ", "Quặng", "Ván", "Kim loại", "Bó nông sản", "Gói đậu", "Giỏ táo", "Đèn thủ công", "Khối gỗ", "Khối đá", "Khối gạch", "Khối kính", "Khối kim loại", "Khối cỏ", "Bàn chế tạo", "Hạt cây gỗ", "Bậc gỗ", "Đuốc", "Hàng rào", "Ván cầu", "Bánh táo", "Mứt cà chua", "Cám dinh dưỡng", "Phân bón", "Rương đồ", "Đống lửa", "Nông sản đột biến", "Thịt nướng" };
-        readonly int[] unitPrices = { 8,18,32,15,8,20,25,30,22,65,65,35,12,18,34,50,45,55,95,165,18,14,24,35,55,16,90,12,35,55,26,45,65,48,40,25,95,85,24,65 };
+        readonly string[] itemNames = { "Lúa mì", "Cà chua", "Đậu nành", "Táo", "Trứng", "Sữa", "Lông cừu", "Thịt heo", "Bột mì", "Bánh mì", "Phô mai", "Nước táo", "Gỗ cũ", "Quặng", "Ván", "Kim loại", "Bó nông sản", "Gói đậu", "Giỏ táo", "Đèn thủ công", "Khối gỗ", "Khối đá", "Khối gạch", "Khối kính", "Khối kim loại", "Khối cỏ", "Bàn chế tạo", "Hạt cây táo", "Bậc gỗ", "Đuốc", "Hàng rào", "Ván cầu", "Bánh táo", "Mứt cà chua", "Cám dinh dưỡng", "Phân bón", "Rương đồ", "Đống lửa", "Nông sản đột biến", "Thịt nướng", "Hạt bí ngô", "Hạt dâu ruộng", "Hạt hướng dương", "Bí ngô", "Dâu ruộng", "Hướng dương", "Lê", "Đào", "Việt quất", "Hạt lê", "Hạt đào", "Hạt bụi việt quất", "Thức ăn gà", "Thức ăn bò", "Thức ăn cừu", "Thức ăn heo" };
+        readonly int[] unitPrices = { 8,18,32,15,8,20,25,30,22,65,65,35,12,18,34,50,45,55,95,165,18,14,24,35,55,16,90,12,35,55,26,45,65,48,40,25,95,85,24,65,20,30,45,55,90,130,50,75,45,45,65,40,28,38,42,48 };
         public int Price(int item) => item>=0 && item<unitPrices.Length?unitPrices[item]:0;
         public string Name(int item) => item>=0 && item<itemNames.Length?itemNames[item]:"?";
         TMP_Text[] amounts;
@@ -32,7 +33,7 @@ namespace NongTrai
             var content=new GameObject("Inventory content",typeof(RectTransform));
             var contentRect=content.GetComponent<RectTransform>();contentRect.SetParent(viewport.transform,false);
             contentRect.anchorMin=new Vector2(0,1);contentRect.anchorMax=new Vector2(1,1);contentRect.pivot=new Vector2(0,1);
-            contentRect.anchoredPosition=Vector2.zero;contentRect.sizeDelta=new Vector2(0,1300);
+            contentRect.anchoredPosition=Vector2.zero;contentRect.sizeDelta=new Vector2(0,2600);
             var scroll=viewport.AddComponent<ScrollRect>();scroll.viewport=vr;scroll.content=contentRect;scroll.horizontal=false;scroll.vertical=true;
             scroll.movementType=ScrollRect.MovementType.Clamped;scroll.scrollSensitivity=38;
             status=FarmUi.TmpLabel(Panel.transform,"Di chuột lên vật phẩm để xem mô tả; bán từng loại ở dưới.",
@@ -74,10 +75,7 @@ namespace NongTrai
         void OpenBuilding() { hud.Resume(); FarmBuildingSystem.Instance?.Toggle(); }
         public void Open()
         {
-            hud.player.SetPaused(true);
-            hud.pausePanel.SetActive(false);
-            if(shop.Panel!=null) shop.Panel.SetActive(false);
-            Panel.SetActive(true);
+            hud.ShowOverlay(Panel);
             Refresh();AdventureBag.Instance?.RefreshView();
         }
         public void AddProduct(int kind,int amount)
@@ -86,17 +84,18 @@ namespace NongTrai
             AnimalProducts[kind] += amount;
         }
         public void AddMutated(int crop,int amount)
-        {if(crop<0||crop>=4||amount<=0)return;MutatedCrops[crop]+=amount;AnimalProducts[34]+=amount;Refresh();}
+        {if(crop<0||crop>=7||amount<=0)return;MutatedCrops[crop]+=amount;AnimalProducts[34]+=amount;Refresh();}
         public void MarkMutated(int crop,int amount)
-        {if(crop>=0&&crop<4&&amount>0)MutatedCrops[crop]+=amount;}
+        {if(crop>=0&&crop<7&&amount>0)MutatedCrops[crop]+=amount;}
         public int FirstMutantCrop()
-        {for(int crop=0;crop<4;crop++)if(MutatedCrops[crop]>0)return crop;return -1;}
+        {for(int crop=0;crop<7;crop++)if(MutatedCrops[crop]>0)return crop;return -1;}
         public void RestoreMutated(int[] counts)
-        {System.Array.Clear(MutatedCrops,0,4);if(counts!=null)System.Array.Copy(counts,MutatedCrops,Mathf.Min(4,counts.Length));}
+        {System.Array.Clear(MutatedCrops,0,7);if(counts!=null)System.Array.Copy(counts,MutatedCrops,Mathf.Min(7,counts.Length));}
         public void Add(int item,int amount)
         {
             if(amount<=0) return;
             if(item<3) field.Harvested[item]+=amount;
+            else if(item>=43&&item<=45)field.Harvested[item-40]+=amount;
             else if(item==3) shop.AddFruit(amount);
             else if(item<itemNames.Length) AddProduct(item-4,amount);
             Refresh();
@@ -105,8 +104,9 @@ namespace NongTrai
         {
             if(amount<=0 || Count(item)<amount) return false;
             if(item==38)
-            {int left=amount;for(int crop=0;crop<4&&left>0;crop++){int n=Mathf.Min(left,MutatedCrops[crop]);MutatedCrops[crop]-=n;left-=n;}}
+            {int left=amount;for(int crop=0;crop<7&&left>0;crop++){int n=Mathf.Min(left,MutatedCrops[crop]);MutatedCrops[crop]-=n;left-=n;}}
             if(item<3) field.Harvested[item]-=amount;
+            else if(item>=43&&item<=45)field.Harvested[item-40]-=amount;
             else if(item==3) shop.TakeFruit(amount);
             else AnimalProducts[item-4]-=amount;
             Refresh();return true;
@@ -115,6 +115,7 @@ namespace NongTrai
         {
             if(item<0 || item>=itemNames.Length) return 0;
             if(item<3) return field.Harvested[item];
+            if(item>=43&&item<=45)return field.Harvested[item-40];
             if(item==3) return shop.Fruit;
             return AnimalProducts[item-4];
         }
@@ -126,11 +127,12 @@ namespace NongTrai
             if(item==38)
             {
                 int left=sold;
-                for(int crop=0;crop<4&&left>0;crop++)
-                {int n=Mathf.Min(left,MutatedCrops[crop]);MutatedCrops[crop]-=n;left-=n;earned+=n*unitPrices[crop]*3;}
+                for(int crop=0;crop<7&&left>0;crop++)
+                {int n=Mathf.Min(left,MutatedCrops[crop]);MutatedCrops[crop]-=n;left-=n;earned+=n*mutantBasePrices[crop]*3;}
                 earned+=left*unitPrices[38];
             }
             if(item<3) field.Harvested[item]-=sold;
+            else if(item>=43&&item<=45)field.Harvested[item-40]-=sold;
             else if(item==3) shop.TakeFruit(sold);
             else AnimalProducts[item-4]-=sold;
             if(item!=38)earned=sold*unitPrices[item];
@@ -147,6 +149,7 @@ namespace NongTrai
             int earned=0;
             // Bán nông sản nhanh không được làm mất vật liệu xây, quặng, ván hay bàn chế tạo.
             for(int i=0;i<=11;i++) earned+=Sell(i,int.MaxValue);
+            for(int i=43;i<=48;i++)earned+=Sell(i,int.MaxValue);
             Refresh();
             return earned;
         }

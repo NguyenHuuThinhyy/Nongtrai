@@ -73,8 +73,8 @@ namespace NongTrai
                     {fruitTree.Fertilize(inventory,out string feedback);Say(feedback);return;}
                     if(bag!=null&&bag.Item==27&&ExplorationWorld.Instance.IsExploring)
                     {bool planted=ExplorationWorld.Instance.Plant(ExplorationWorld.Instance.CellAt(useHit.point-useHit.normal*.02f));Say(planted?"Đã gieo cây gỗ. Cây lớn theo từng giai đoạn ban ngày.":"Cần mặt đất trống để trồng cây.");return;}
-                    if(bag!=null&&bag.Item==27&&!ExplorationWorld.Instance.IsExploring)
-                    {FruitTree.TryPlantAt(useHit.point,shop,inventory,out string feedback);Say(feedback);return;}
+                    if(bag!=null&&(bag.Item==27||bag.Item>=49&&bag.Item<=51)&&!ExplorationWorld.Instance.IsExploring)
+                    {FruitTree.TryPlantAt(useHit.point,shop,inventory,out string feedback,bag.Item);Say(feedback);return;}
                 }
                 if(bag!=null&&bag.Eat())return;
                 ScanNearest();if(selected!=null){selected.Interact(this);return;}
@@ -95,6 +95,8 @@ namespace NongTrai
             }
             if(Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame&&!ExplorationWorld.Instance.IsExploring)
                 if(FarmPenPlacement.Instance!=null&&(FarmPenPlacement.Instance.Pending>=0||FarmPenPlacement.Instance.ConsumedFrame==Time.frameCount))return;
+            if(Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame&&FarmWaterSystem.Instance!=null&&
+                (FarmWaterSystem.Instance.PendingPlacement||FarmWaterSystem.Instance.ConsumedFrame==Time.frameCount))return;
             if(Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame&&!ExplorationWorld.Instance.IsExploring)
                 if(TryLeftInteractRay(FarmAim.Ray(viewCamera)))return;
         }

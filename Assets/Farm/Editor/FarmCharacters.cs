@@ -7,15 +7,38 @@ namespace NongTrai.Editor
         { var t=new GameObject(name).transform; t.SetParent(parent,false); t.localPosition=position; return t; }
         static GameObject Soft(string name, Transform parent, Vector3 p, Vector3 s, Material m)
             => Shape(name,PrimitiveType.Sphere,p,s,m,parent,false);
+        static void SmoothTorso(Transform parent,Material shirt,Material denim)
+        {
+            const int sides=24;
+            float[] heights={.61f,.69f,.79f,.91f,1.02f,1.15f,1.29f,1.38f};
+            float[] widths={.21f,.30f,.35f,.37f,.37f,.39f,.32f,.16f};
+            float[] depths={.16f,.22f,.25f,.26f,.25f,.25f,.22f,.14f};
+            var vertices=new Vector3[heights.Length*sides];var uv=new Vector2[vertices.Length];
+            for(int row=0;row<heights.Length;row++)for(int side=0;side<sides;side++)
+            {float a=side*Mathf.PI*2/sides;int index=row*sides+side;
+             vertices[index]=new Vector3(Mathf.Cos(a)*widths[row],heights[row],Mathf.Sin(a)*depths[row]);
+             uv[index]=new Vector2(side/(float)sides,row/(float)(heights.Length-1));}
+            var top=new System.Collections.Generic.List<int>();var bottom=new System.Collections.Generic.List<int>();
+            for(int row=0;row<heights.Length-1;row++)for(int side=0;side<sides;side++)
+            {int a=row*sides+side,b=row*sides+(side+1)%sides,c=(row+1)*sides+side,d=(row+1)*sides+(side+1)%sides;
+             var list=row<4?bottom:top;list.Add(a);list.Add(c);list.Add(b);list.Add(b);list.Add(c);list.Add(d);}
+            var body=new GameObject("Áo quần liền khối",typeof(MeshFilter),typeof(MeshRenderer));body.transform.SetParent(parent,false);
+            var mesh=new Mesh{name="Farmer smooth torso"};mesh.vertices=vertices;mesh.uv=uv;mesh.subMeshCount=2;
+            mesh.SetTriangles(top,0);mesh.SetTriangles(bottom,1);mesh.RecalculateNormals();mesh.RecalculateBounds();
+            if(!UnityEditor.AssetDatabase.IsValidFolder(Root+"Meshes"))UnityEditor.AssetDatabase.CreateFolder("Assets/Farm","Meshes");
+            string meshPath=Root+"Meshes/FarmerTorso.asset";
+            var existing=UnityEditor.AssetDatabase.LoadAssetAtPath<Mesh>(meshPath);
+            if(existing==null)UnityEditor.AssetDatabase.CreateAsset(mesh,meshPath);
+            else{UnityEditor.EditorUtility.CopySerialized(mesh,existing);UnityEngine.Object.DestroyImmediate(mesh);mesh=existing;UnityEditor.EditorUtility.SetDirty(existing);}
+            body.GetComponent<MeshFilter>().sharedMesh=mesh;body.GetComponent<MeshRenderer>().sharedMaterials=new[]{shirt,denim};
+        }
         static void BuildFarmer(Transform visual)
         {
             var denim=Mat("Farmer denim","365F83"); var skin=Mat("Farmer skin","E9B28D");
             var hair=Mat("Hair","493025"); var dark=Mat("Eyes and boots","302B29");
             var shirt=Mat("Farmer shirt","C85849"); var blush=Mat("Cheeks","DB8472");
-            Soft("Shirt",visual,new Vector3(0,1.01f,0),new Vector3(.64f,.67f,.42f),shirt);
-            Soft("Overalls",visual,new Vector3(0,.82f,.035f),new Vector3(.59f,.45f,.45f),denim);
-            Box("Bib",new Vector3(0,1.03f,.205f),new Vector3(.34f,.32f,.055f),denim,visual,false);
-            Box("Pocket",new Vector3(0,.98f,.24f),new Vector3(.18f,.12f,.025f),Mat("Pocket blue","5484A1"),visual,false);
+            SmoothTorso(visual,shirt,denim);
+            Soft("Túi áo cong",visual,new Vector3(0,.95f,.263f),new Vector3(.18f,.10f,.025f),Mat("Pocket blue","5484A1"));
             Soft("Head",visual,new Vector3(0,1.57f,0),new Vector3(.69f,.67f,.61f),skin);
             Soft("Hair cap",visual,new Vector3(0,1.77f,-.035f),new Vector3(.72f,.35f,.62f),hair);
             for(int i=0;i<5;i++) Soft("Fringe",visual,new Vector3(-.25f+i*.12f,1.79f-Mathf.Abs(i-2)*.025f,.24f),new Vector3(.15f,.20f,.14f),hair);
@@ -33,10 +56,10 @@ namespace NongTrai.Editor
                 Soft("Eye pupil",visual,new Vector3(side*.14f,1.61f,.322f),new Vector3(.075f,.115f,.027f),dark);
                 Soft("Eye shine",visual,new Vector3(side*.14f-.014f,1.645f,.337f),new Vector3(.027f,.032f,.012f),cream);
                 Soft("Cheek",visual,new Vector3(side*.23f,1.49f,.255f),new Vector3(.10f,.055f,.045f),blush);
-                Box("Strap",new Vector3(side*.21f,1.14f,.19f),new Vector3(.085f,.39f,.055f),denim,visual,false);
+                Soft("Dây yếm bo tròn",visual,new Vector3(side*.22f,1.15f,.205f),new Vector3(.085f,.34f,.055f),denim);
                 Soft("Brass button",visual,new Vector3(side*.21f,1.07f,.229f),Vector3.one*.055f,gold);
                 var leg=Pivot("Leg pivot",visual,new Vector3(side*.16f,.68f,0)); motion.legs[i]=leg;
-                Shape("Trouser",PrimitiveType.Capsule,new Vector3(0,-.24f,0),new Vector3(.25f,.24f,.26f),denim,leg,false);
+                Shape("Ống quần bo tròn",PrimitiveType.Capsule,new Vector3(0,-.24f,0),new Vector3(.27f,.27f,.27f),denim,leg,false);
                 Soft("Boot",leg,new Vector3(0,-.55f,.07f),new Vector3(.28f,.24f,.43f),dark);
                 var arm=Pivot("Arm pivot",visual,new Vector3(side*.34f,1.22f,0)); motion.arms[i]=arm;
                 Shape("Sleeve",PrimitiveType.Capsule,new Vector3(side*.035f,-.15f,0),new Vector3(.23f,.17f,.24f),shirt,arm,false);

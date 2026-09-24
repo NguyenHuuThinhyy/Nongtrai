@@ -63,8 +63,12 @@ namespace NongTrai
             var emission=rain.emission;emission.rateOverTime=380;
             var velocity=rain.velocityOverLifetime;velocity.enabled=true;velocity.space=ParticleSystemSimulationSpace.World;
             velocity.y=-14;
-            var shader=Shader.Find("Universal Render Pipeline/Particles/Unlit");
-            if(shader!=null) go.GetComponent<ParticleSystemRenderer>().material=new Material(shader);
+            var shader=Shader.Find("Universal Render Pipeline/Unlit");
+            if(shader==null)shader=Shader.Find("Universal Render Pipeline/Lit");
+            if(shader!=null)
+            {var rainMaterial=new Material(shader);rainMaterial.color=new Color(.31f,.69f,1f,.85f);
+             rainMaterial.SetColor("_BaseColor",new Color(.31f,.69f,1f,.85f));
+             go.GetComponent<ParticleSystemRenderer>().material=rainMaterial;}
             rainSound=go.AddComponent<AudioSource>();rainSound.loop=true;rainSound.playOnAwake=false;
             rainSound.clip=RainClip();rainSound.volume=.25f;
             rain.Stop();

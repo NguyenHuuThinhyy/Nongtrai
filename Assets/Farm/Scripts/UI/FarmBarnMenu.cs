@@ -34,9 +34,7 @@ namespace NongTrai
         void OnPause(bool paused) { if(!paused && Panel!=null) Panel.SetActive(false); }
         public void Open()
         {
-            hud.player.SetPaused(true);hud.pausePanel.SetActive(false);
-            if(shop.Panel!=null) shop.Panel.SetActive(false);
-            Panel.SetActive(true);Refresh();
+            hud.ShowOverlay(Panel);Refresh();
         }
         void Refresh()
         {

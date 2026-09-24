@@ -6,6 +6,10 @@
     { "id": "juice", "machine": "Máy ép", "name": "Ép nước táo", "input": 3, "inputCount": 3, "output": 11, "outputCount": 2, "seconds": 30 },
     { "id": "plank", "machine": "Xưởng cưa", "name": "Cưa ván", "input": 20, "inputCount": 2, "output": 14, "outputCount": 1, "seconds": 45 },
     { "id": "metal", "machine": "Lò nung", "name": "Luyện kim", "input": 13, "inputCount": 2, "output": 15, "outputCount": 1, "seconds": 55 },
-    { "id": "compost", "machine": "Máy ủ phân", "name": "Ủ phân bón", "input": 25, "inputCount": 3, "output": 35, "outputCount": 2, "seconds": 30 }
+    { "id": "compost", "machine": "Máy ủ phân", "name": "Ủ phân bón", "input": 25, "inputCount": 3, "output": 35, "outputCount": 2, "seconds": 30 },
+    { "id": "feed_chicken", "machine": "Cối xay", "name": "Thức ăn gà", "inputs": [{"item": 0, "count": 2}], "output": 52, "outputCount": 3, "seconds": 30 },
+    { "id": "feed_cow", "machine": "Cối xay", "name": "Thức ăn bò", "inputs": [{"item": 2, "count": 1}, {"item": 0, "count": 1}], "output": 53, "outputCount": 2, "seconds": 40 },
+    { "id": "feed_sheep", "machine": "Cối xay", "name": "Thức ăn cừu", "inputs": [{"item": 2, "count": 1}, {"item": 1, "count": 1}], "output": 54, "outputCount": 2, "seconds": 45 },
+    { "id": "feed_pig", "machine": "Cối xay", "name": "Thức ăn heo", "inputs": [{"item": 43, "count": 1}, {"item": 2, "count": 1}], "output": 55, "outputCount": 2, "seconds": 55 }
   ]
 }

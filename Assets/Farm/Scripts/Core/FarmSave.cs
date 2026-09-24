@@ -9,12 +9,12 @@ namespace NongTrai
     {
         [Serializable] sealed class PlotRecord { public int id,state,crop; public float growth,moisture;public bool mutated; }
         [Serializable] sealed class AnimalRecord { public int species,pen; public Vector3 position; public float cooldown,hunger,happiness; }
-        [Serializable] sealed class TreeRecord { public Vector3 position; public float remaining,age;public bool planted,mutated; }
+        [Serializable] sealed class TreeRecord { public Vector3 position; public float remaining,age;public bool planted,mutated;public int kind; }
         [Serializable] sealed class PenRecord { public int id,eggs,upgrade,species; public float progress; public bool open,active,placed;public Vector3 position; }
         [Serializable] sealed class ResourceRecord { public int id; public float remaining; }
         [Serializable] sealed class SaveData
         {
-            public int version=12,money,fruit,treeCount,selected,feed,level,xp,day,weather,levelCap;
+            public int version=13,money,fruit,treeCount,selected,feed,level,xp,day,weather,levelCap;
             public float dayTime,musicVolume,effectsVolume,weatherRemaining;
             public bool expanded,tutorialDone;
             public int[] seeds,harvested,products,mutatedCrops;
@@ -94,7 +94,7 @@ namespace NongTrai
                         cooldown=animals[i].ProductCooldown,hunger=animals[i].Hunger,happiness=animals[i].Happiness };
                 var trees=FindObjectsByType<FruitTree>(FindObjectsSortMode.None);
                 data.trees=new TreeRecord[trees.Length];
-                for(int i=0;i<trees.Length;i++) data.trees[i]=new TreeRecord { position=trees[i].transform.position,remaining=trees[i].remaining,age=trees[i].age,planted=trees[i].planted,mutated=trees[i].mutated };
+                for(int i=0;i<trees.Length;i++) data.trees[i]=new TreeRecord { position=trees[i].transform.position,remaining=trees[i].remaining,age=trees[i].age,planted=trees[i].planted,mutated=trees[i].mutated,kind=trees[i].fruitKind };
                 var pens=FindObjectsByType<AnimalPen>(FindObjectsInactive.Include,FindObjectsSortMode.None);
                 data.pens=new PenRecord[pens.Length];
                 for(int i=0;i<pens.Length;i++)
@@ -121,8 +121,8 @@ namespace NongTrai
             try
             {
                 var data=JsonUtility.FromJson<SaveData>(File.ReadAllText(SavePath));
-                if(data==null || data.version<2 || data.version>12 || data.seeds==null || data.seeds.Length!=3 ||
-                    data.harvested==null || data.harvested.Length!=3 || data.products==null || data.products.Length<4)
+                if(data==null || data.version<2 || data.version>13 || data.seeds==null || data.seeds.Length!=3 ||
+                    data.harvested==null || data.harvested.Length<3 || data.products==null || data.products.Length<4)
                     throw new InvalidDataException("Phiên bản dữ liệu lưu không phù hợp.");
                 if(data.version<8)
                 {
@@ -133,7 +133,8 @@ namespace NongTrai
                 }
                 shop.RestoreState(data.money,data.fruit,data.expanded,data.treeCount,data.version>=3?data.feed:15);
                 Array.Copy(data.seeds,shop.Seeds,3);
-                Array.Copy(data.harvested,field.Harvested,3);
+                Array.Clear(field.Harvested,0,field.Harvested.Length);
+                Array.Copy(data.harvested,field.Harvested,Mathf.Min(data.harvested.Length,field.Harvested.Length));
                 Array.Clear(inventory.AnimalProducts,0,inventory.AnimalProducts.Length);
                 Array.Copy(data.products,inventory.AnimalProducts,Mathf.Min(data.products.Length,inventory.AnimalProducts.Length));
                 inventory.RestoreMutated(data.version>=12?data.mutatedCrops:null);
@@ -183,9 +184,9 @@ namespace NongTrai
                 }
                 foreach(var tree in FindObjectsByType<FruitTree>(FindObjectsSortMode.None)) Destroy(tree.gameObject);
                 if(data.trees!=null) foreach(var item in data.trees)
-                {var tree=Instantiate(shop.treePrefab,item.position,Quaternion.identity).GetComponent<FruitTree>();tree.remaining=item.remaining;
-                 tree.planted=data.version>=12&&item.planted;tree.age=tree.planted?item.age:240;tree.mutated=data.version>=12&&item.mutated;}
-                if(data.version<7) ExplorationWorld.Instance?.CreateStarterOrchard();
+                {if(item.position.y>500)continue;var tree=Instantiate(shop.treePrefab,item.position,Quaternion.identity).GetComponent<FruitTree>();tree.remaining=item.remaining;
+                 tree.fruitKind=data.version>=13?Mathf.Clamp(item.kind,0,3):0;
+                 tree.planted=data.version>=12&&item.planted;tree.age=tree.planted?item.age:tree.GrowthSeconds;tree.mutated=data.version>=12&&item.mutated;}
                 FarmDecorTree.RestoreCuts(data.version>=12?data.cutDecorTrees:null);
                 if(data.version>=4)
                 {

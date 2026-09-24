@@ -26,9 +26,9 @@ namespace NongTrai
         public GameObject Panel { get; private set; }
         FarmPenPlacement penPlacement;
         Text balance, feedback, pageLabel;GameObject[] offers;int currentPage;
-        readonly int[] prices={20,40,75,220,120,150,60,400,150,60,100,120,180,110,55,50,45,65,80,70,100,60,45,95,120,95,140,125,700,550,650,500};
-        readonly string[] names={"5 hạt lúa mì","5 hạt cà chua","5 hạt đậu nành","Bò","Heo","Cừu","Gà","Chuồng gà thứ hai (5 chỗ)","Cây táo","5 khối đá","5 khối gạch","3 khối kính","3 khối kim loại","5 khối gỗ","5 khối cỏ","10 thức ăn","1 hạt cây gỗ","2 bậc gỗ","1 đuốc","3 hàng rào","2 ván cầu","2 cám dinh dưỡng","3 phân bón","1 bánh táo","3 thịt sống","Xẻng mới (100 bền)","Kiếm mới (100 bền)","Rìu mới (20 bền)","Chuồng bò tự đặt","Chuồng heo tự đặt","Chuồng cừu tự đặt","Chuồng gà tự đặt"};
-        readonly int[] icons={0,1,2,50,51,52,53,42,54,31,32,33,34,30,35,17,54,40,41,42,43,46,47,44,7,21,23,24,42,42,42,42};
+        readonly int[] prices={20,40,75,220,120,150,60,400,150,60,100,120,180,110,55,50,45,65,80,70,100,60,45,95,120,95,140,125,700,550,650,500,75,110,160,100,140,90,70,95};
+        readonly string[] names={"5 hạt lúa mì","5 hạt cà chua","5 hạt đậu nành","Bò","Heo","Cừu","Gà","Chuồng gà thứ hai (5 chỗ)","Hạt cây táo","5 khối đá","5 khối gạch","3 khối kính","3 khối kim loại","5 khối gỗ","5 khối cỏ","10 thức ăn","1 hạt cây táo","2 bậc gỗ","1 đuốc","3 hàng rào","2 ván cầu","2 cám dinh dưỡng","3 phân bón","1 bánh táo","3 thịt sống","Xẻng mới (100 bền)","Kiếm mới (100 bền)","Rìu mới (20 bền)","Chuồng bò tự đặt","Chuồng heo tự đặt","Chuồng cừu tự đặt","Chuồng gà tự đặt","3 hạt bí ngô • LV3","3 hạt dâu • LV4","3 hạt hướng dương • LV5","Hạt cây lê • LV4","Hạt cây đào • LV5","Hạt bụi việt quất • LV3","2 thức ăn gà","2 thức ăn bò"};
+        readonly int[] icons={0,1,2,50,51,52,53,42,54,31,32,33,34,30,35,17,54,40,41,42,43,46,47,44,7,21,23,24,42,42,42,42,73,74,75,82,83,84,85,86};
         void Start()
         {
             penPlacement=gameObject.AddComponent<FarmPenPlacement>();penPlacement.shop=this;
@@ -41,19 +41,19 @@ namespace NongTrai
                 offers[i]=Button(names[i]+" — "+prices[i]+" xu",new Vector2(35+(slot%2)*475,-105-(slot/2)*82),()=>Buy(item));
                 FarmItemIconLibrary.Attach(offers[i].transform,icons[i],new Vector2(10,-10),new Vector2(54,54)); }
             pageLabel=Label("",new Vector2(35,-480),new Vector2(920,42),22);
-            Button("◀ Trang trước",new Vector2(35,-545),()=>ShowPage((currentPage+3)%4));
-            Button("Trang sau ▶",new Vector2(510,-545),()=>ShowPage((currentPage+1)%4));
+            Button("◀ Trang trước",new Vector2(35,-545),()=>ShowPage((currentPage+4)%5));
+            Button("Trang sau ▶",new Vector2(510,-545),()=>ShowPage((currentPage+1)%5));
             Button("Bán toàn bộ nông sản",new Vector2(510,-755),Sell);
             Button("Xem túi đồ",new Vector2(510,-845),inventory.Open);
             Button("Quản lý chuồng",new Vector2(35,-755),barn.Open);
             Button("Trở lại game",new Vector2(35,-845),hud.Resume);
-            feedback=Label("Cuộn qua ba trang • Chế tạo món nâng cao ở bàn trước nhà.",new Vector2(35,-640),new Vector2(920,48),19);
+            feedback=Label("Có 5 trang • Hạt cây nằm trong túi, đặt ở vườn phía đông.",new Vector2(35,-640),new Vector2(920,48),19);
             ShowPage(0);
             Panel.SetActive(false); hud.player.PauseChanged+=OnPause;
         }
         void OnDestroy() { if(hud!=null && hud.player!=null) hud.player.PauseChanged-=OnPause; }
         void OnPause(bool paused) { if(!paused && Panel!=null) Panel.SetActive(false); }
-        public void Open() { hud.player.SetPaused(true); hud.pausePanel.SetActive(false); if(inventory.Panel!=null) inventory.Panel.SetActive(false); Panel.SetActive(true); Refresh(); }
+        public void Open() { hud.ShowOverlay(Panel); Refresh(); }
         public bool ConsumeSeed(int index) { if(Seeds[index]<=0) return false; Seeds[index]--; return true; }
         public void AddFruit(int amount) => Fruit+=amount;
         public void TakeFruit(int amount) => Fruit=Mathf.Max(0,Fruit-amount);
@@ -82,10 +82,11 @@ namespace NongTrai
                 { result="Chuồng "+(item==6?"gà":"loại này")+" đã đầy."; return false; }
             }
             if(item==7 && Expanded) { result="Bạn đã sở hữu chuồng thứ hai."; return false; }
-            if(item==8 && BoughtTrees>=6) { result="Vườn đã đủ 6 cây."; return false; }
+            if(item>=32&&item<=37&&FarmExpansion.Instance!=null&&FarmExpansion.Instance.Level<new[]{3,4,5,4,5,3}[item-32])
+            {result="Cần lên cấp để mở giống cây này.";return false;}
             if(item>=25&&item<=27&&AdventureBag.Instance.Space(item==25?104:item==26?106:107)<1)
             {result="Túi đã đầy, cần một ô trống để mua dụng cụ.";return false;}
-            if(item>=28&&penPlacement.Pending>=0){result="Hãy đặt chuồng đang mua trước.";return false;}
+            if(item>=28&&item<=31&&penPlacement.Pending>=0){result="Hãy đặt chuồng đang mua trước.";return false;}
             if(item<=2) Seeds[item]+=5;
             else if(item<=6)
             {
@@ -94,7 +95,7 @@ namespace NongTrai
                 go.GetComponent<FarmAnimal>().AssignPen(destination);
             }
             else if(item==7) { extraPen.SetActive(true); Expanded=true; }
-            else if(item==8) { Instantiate(treePrefab,new Vector3(-28-(BoughtTrees%2)*5,0,-5-(BoughtTrees/2)*6),Quaternion.identity); BoughtTrees++; }
+            else if(item==8) { inventory.Add(27,1); BoughtTrees++; }
             else if(item<=14)
             {
                 int pack=item-9;int[] blockItems={21,22,23,24,20,25};int[] amounts={5,5,3,3,5,5};
@@ -105,15 +106,18 @@ namespace NongTrai
             {int[] goods={27,28,29,30,31,34,35,32};int[] quantity={1,2,1,3,2,2,3,1};inventory.Add(goods[item-16],quantity[item-16]);}
             else if(item==24)inventory.Add(7,3);
             else if(item<=27)AdventureBag.Instance.Pickup(item==25?104:item==26?106:107,1);
-            else penPlacement.Begin((AnimalSpecies)(item-28));
+            else if(item<=31)penPlacement.Begin((AnimalSpecies)(item-28));
+            else if(item<=34)inventory.Add(40+item-32,3);
+            else if(item<=37)inventory.Add(49+item-35,1);
+            else inventory.Add(52+item-38,2);
             Money-=prices[item]; result="Đã mua "+names[item]+".";
-            if(item>=28)result+=" Click đất trống trong vùng đã mở để đặt chuồng.";
+            if(item>=28&&item<=31)result+=" Click đất trống trong vùng đã mở để đặt chuồng.";
             FarmAudio.Instance?.Play(FarmAudio.Cue.Buy);return true;
         }
         void Buy(int item) { Purchase(item,out string message); feedback.text=message; Refresh(); }
         public void ShowPage(int page)
-        { currentPage=Mathf.Clamp(page,0,3);
-          pageLabel.text=new[]{"TRANG 1/4 • HẠT GIỐNG VÀ VẬT NUÔI","TRANG 2/4 • CÂY, KHỐI XÂY VÀ THỨC ĂN","TRANG 3/4 • TRANG TRÍ, THỨC ĂN VÀ PHÂN BÓN","TRANG 4/4 • THỊT, DỤNG CỤ VÀ CHUỒNG TỰ ĐẶT"}[currentPage];
+        { currentPage=Mathf.Clamp(page,0,4);
+          pageLabel.text=new[]{"TRANG 1/5 • HẠT GIỐNG VÀ VẬT NUÔI","TRANG 2/5 • CÂY, KHỐI XÂY VÀ THỨC ĂN","TRANG 3/5 • TRANG TRÍ, THỨC ĂN VÀ PHÂN BÓN","TRANG 4/5 • THỊT, DỤNG CỤ VÀ CHUỒNG TỰ ĐẶT","TRANG 5/5 • GIỐNG CÂY THEO CẤP VÀ THỨC ĂN THÚ"}[currentPage];
           for(int i=0;i<offers.Length;i++) offers[i].SetActive(i/8==currentPage); }
         public void TreeCut() => BoughtTrees=Mathf.Max(0,BoughtTrees-1);
         public int SellHarvest() => inventory.SellAll();
@@ -131,7 +135,8 @@ namespace NongTrai
             var child=new GameObject("Text",typeof(RectTransform),typeof(Text));var rect=child.GetComponent<RectTransform>();rect.SetParent(go.transform,false);
             rect.anchorMin=rect.anchorMax=rect.pivot=new Vector2(0,1);rect.anchoredPosition=new Vector2(72,-20);rect.sizeDelta=new Vector2(360,45);
             var label=child.GetComponent<Text>();label.font=Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");label.text=text;label.fontSize=22;
-            label.color=Color.white;label.raycastTarget=false;return go;
+            label.color=Color.white;label.raycastTarget=false;label.resizeTextForBestFit=true;label.resizeTextMinSize=15;label.resizeTextMaxSize=21;
+            label.horizontalOverflow=HorizontalWrapMode.Wrap;label.verticalOverflow=VerticalWrapMode.Truncate;return go;
         }
     }
     public sealed class FarmPenPlacement:MonoBehaviour

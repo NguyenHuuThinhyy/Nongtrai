@@ -21,11 +21,11 @@ namespace NongTrai
         float displayedMoney;
         int selectedSlot;
         public int SelectedSlot => AdventureBag.Instance==null?selectedSlot:AdventureBag.Instance.LegacySlot;
-        readonly string[] names={"Lúa mì","Cà chua","Đậu nành","Thức ăn","Xẻng","Bình tưới","Kiếm","Rìu","Giỏ hái"};
-        readonly int[] iconIds={0,1,2,20,21,22,23,24,25};
+        readonly string[] names={"Lúa mì","Cà chua","Đậu nành","Thức ăn","Xẻng","Bình tưới","Kiếm","Rìu","Vật phẩm"};
+        readonly int[] iconIds={0,1,2,20,21,22,23,24,20};
         readonly string[] actions={"Gieo hạt vào đất đã cày","Gieo hạt vào đất đã cày","Gieo hạt vào đất đã cày",
             "Cho vật nuôi ăn bằng F","Xới đất bằng chuột trái","Tưới cây bằng chuột trái","Đánh quái bằng chuột trái",
-            "Chặt cây táo lấy khối gỗ","Hái táo mà giữ nguyên cây"};
+            "Chặt cây lấy gỗ","Chọn vật phẩm trong túi"};
         static readonly Key[] digitKeys={Key.Digit1,Key.Digit2,Key.Digit3,Key.Digit4,Key.Digit5,
             Key.Digit6,Key.Digit7,Key.Digit8,Key.Digit9};
         void Start()
@@ -49,17 +49,16 @@ namespace NongTrai
             var map=CreatePanel(root.transform,"Tab • Đổi bản đồ",new Vector2(24,-260),new Vector2(280,58),new Vector2(0,1));
             map.AddComponent<Button>().onClick.AddListener(()=>IslandManager.Instance.OpenMap());
             FarmUi.TmpLabel(map.transform,"[TAB]  ĐỔI BẢN ĐỒ",new Vector2(14,-12),new Vector2(255,36),22);
-            FarmUi.TmpLabel(root.transform,"SPACE: NHẢY QUA KHỐI",new Vector2(24,-324),new Vector2(330,35),20);
             var right=CreatePanel(root.transform,"Thông tin nông trại",new Vector2(-24,-24),new Vector2(490,106),new Vector2(1,1));
             coinText=FarmUi.TmpLabel(right.transform,"",new Vector2(12,-8),new Vector2(465,35),23);
             environmentText=FarmUi.TmpLabel(right.transform,"",new Vector2(12,-48),new Vector2(465,50),16);
-            var survival=CreatePanel(root.transform,"Máu và độ no",new Vector2(24,-338),new Vector2(460,98),new Vector2(0,1));
-            survivalText=FarmUi.TmpLabel(survival.transform,"",new Vector2(14,-7),new Vector2(430,36),22);
-            var healthBack=CreatePanel(survival.transform,"Nền máu",new Vector2(14,-59),new Vector2(200,20),new Vector2(0,1));
-            healthFill=CreatePanel(healthBack.transform,"Thanh máu",Vector2.zero,new Vector2(198,18),new Vector2(0,1)).GetComponent<Image>();
+            var survival=CreatePanel(root.transform,"Máu và độ no",new Vector2(24,18),new Vector2(250,72),new Vector2(0,0));
+            survivalText=FarmUi.TmpLabel(survival.transform,"",new Vector2(9,-5),new Vector2(232,29),17);
+            var healthBack=CreatePanel(survival.transform,"Nền máu",new Vector2(9,-45),new Vector2(107,14),new Vector2(0,1));
+            healthFill=CreatePanel(healthBack.transform,"Thanh máu",Vector2.zero,new Vector2(105,12),new Vector2(0,1)).GetComponent<Image>();
             healthFill.color=new Color(.86f,.22f,.24f);
-            var hungerBack=CreatePanel(survival.transform,"Nền độ no",new Vector2(236,-59),new Vector2(200,20),new Vector2(0,1));
-            hungerFill=CreatePanel(hungerBack.transform,"Thanh no",Vector2.zero,new Vector2(198,18),new Vector2(0,1)).GetComponent<Image>();
+            var hungerBack=CreatePanel(survival.transform,"Nền độ no",new Vector2(133,-45),new Vector2(107,14),new Vector2(0,1));
+            hungerFill=CreatePanel(hungerBack.transform,"Thanh no",Vector2.zero,new Vector2(105,12),new Vector2(0,1)).GetComponent<Image>();
             hungerFill.color=new Color(.96f,.71f,.28f);
             tooltip=FarmUi.TmpLabel(root.transform,"",new Vector2(0,125),new Vector2(810,54),23);
             var tipRect=tooltip.rectTransform;tipRect.anchorMin=tipRect.anchorMax=new Vector2(.5f,0);
@@ -114,16 +113,19 @@ namespace NongTrai
             bool farm=hud.player.transform.position.y<500;
             string action;
             if(bag.HoldingBlock)action="Chuột trái: đặt khối cạnh mặt đang ngắm";
+            else if(farm&&bag.Item>=40&&bag.Item<=42)action="Chuột trái: gieo trên ô đã xới";
+            else if(farm&&bag.Item>=49&&bag.Item<=51)action="Chuột phải vào đất vườn: trồng cây";
+            else if(bag.Item>=52&&bag.Item<=55)action="Đến máng ăn chuồng và click để cho cả chuồng ăn";
             else if(farm&&bag.LegacySlot>=0&&bag.LegacySlot<=2)action="Chuột trái: gieo lên ô đã cày";
             else if(farm&&bag.LegacySlot==4)action="Chuột trái: xới đất";
             else if(farm&&bag.LegacySlot==5)action="Chuột trái: tưới đất đã gieo";
             else if(farm&&bag.LegacySlot==6)action="Chuột trái: đánh quái (cây chín hái tay)";
             else if(farm&&bag.LegacySlot==7)action="Chuột trái: hạ cây táo lấy gỗ";
-            else if(farm&&bag.LegacySlot==8)action="Chuột trái: hái táo, giữ nguyên cây";
+            else if(farm&&bag.LegacySlot==8)action="Chọn hạt cây, thức ăn hoặc khối từ túi";
             else if(bag.Item==34)action="Chuột phải vào vật nuôi: cho ăn";
             else if(bag.Item==35)action="Chuột phải vào cây: bón phân";
             else if(bag.Item==27)action="Chuột phải vào đất trống: trồng cây";
-            else if(bag.Item>=0&&bag.Item<=11||bag.Item==32||bag.Item==33)action="Chuột phải: ăn";
+            else if(bag.Item>=0&&bag.Item<=11||bag.Item==32||bag.Item==33||bag.Item==39||bag.Item>=46&&bag.Item<=48)action="Chuột phải: ăn";
             else action=farm?"Ngắm vật thể • chuột trái tương tác":"Giữ trái: đào/đánh • chuột phải: dùng";
             tooltip.text="["+(selectedSlot+1)+"] "+bag.Name(bag.Item)+" • "+action;
         }
@@ -155,8 +157,8 @@ namespace NongTrai
             float health=AdventureWolves.Instance==null?100:AdventureWolves.Instance.Health;
             float hunger=AdventureBag.Instance==null?100:AdventureBag.Instance.Satiety;
             if(survivalText!=null)survivalText.text="MÁU "+Mathf.CeilToInt(health)+"   NO "+Mathf.CeilToInt(hunger);
-            if(healthFill!=null)healthFill.rectTransform.sizeDelta=new Vector2(198*Mathf.Clamp01(health/100),18);
-            if(hungerFill!=null)hungerFill.rectTransform.sizeDelta=new Vector2(198*Mathf.Clamp01(hunger/100),18);
+            if(healthFill!=null)healthFill.rectTransform.sizeDelta=new Vector2(105*Mathf.Clamp01(health/100),12);
+            if(hungerFill!=null)hungerFill.rectTransform.sizeDelta=new Vector2(105*Mathf.Clamp01(hunger/100),12);
             creativeControls.text=CreativeModeManager.IsCreative?
                 (CreativeModeManager.IsFlying?"ĐANG BAY • WASD di chuyển • SPACE lên • X xuống • SHIFT nhanh • F8 tắt bay":"SÁNG TẠO • F8 bật bay • [G] Xây dựng"):
                 "[E] Bản đồ việc • [B] Túi đồ • [G] Xây dựng • Lăn chuột đổi vật phẩm";

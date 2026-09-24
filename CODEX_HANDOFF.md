@@ -1,12 +1,13 @@
-# CẬP NHẬT ƯU TIÊN — 24/09/2026: BẢN v12 ĐÃ KIỂM TRA
+# CẬP NHẬT ƯU TIÊN — 24/09/2026: BẢN v13 ĐÃ KIỂM TRA
 
 Các mục cũ bên dưới là lịch sử và có thể sai về phiên bản lưu, hotbar hoặc tính năng. Khi mâu thuẫn, kiểm tra code trước.
 
-- FarmSave ghi schema v12 và đọc v2–v11. Dữ liệu mới gồm cây/ruộng đột biến, vườn LV6, chuồng tự đặt, sản phẩm đột biến theo giống, thịt đang nướng, thời lượng mưa, túi/kho/rương, máu/đói và đơn hàng. Công cụ cuốc/cuốc chim bản cũ chuyển thành xẻng. Chỉ nút Lưu game mới ghi bản lưu; sáng tạo LV99 bỏ thay đổi khi thoát.
+- FarmSave ghi schema v13 và đọc v2–v12. Dữ liệu mới gồm cây/ruộng đột biến, vườn LV3, loài cây ăn quả và bụi, vòi phun di động, chuồng tự đặt, sản phẩm đột biến theo giống, thịt đang nướng, thời lượng mưa, túi/kho/rương, máu/đói và đơn hàng. Công cụ cuốc/cuốc chim bản cũ chuyển thành xẻng. Chỉ nút Lưu game mới ghi bản lưu; sáng tạo LV99 bỏ thay đổi khi thoát.
 - Hai map là Nông trại và Khám phá. Bấm E mở bản đồ nhiệm vụ tương tác đúng map; Tab đổi map và nhớ vị trí. Bấm chuột trái hái nông sản/táo không cần liềm; xẻng xới đất/đào, kiếm đánh, rìu chặt cây nhanh, phá khối luôn làm rơi đồ.
-- Có 18 công thức JSON tại `Assets/StreamingAssets/crafting.json`, bảy máy chế biến tại `Assets/StreamingAssets/recipes.json` gồm máy ủ phân, 40 mã hàng 0–39, cửa hàng bốn trang 32 mặt hàng, năm đơn/ngày; đơn đã giao ẩn đến ngày kế tiếp. Kho/rương kéo-thả với túi đồ; lưới kho hiện phân theo mã hàng.
-- Minimap đã thu nhỏ ở góc phải; các bảng có nút X và đóng bằng ESC/click ngoài; nhân vật có máu/đói ở cả hai map, hai lựa chọn hồi sinh. Vật nuôi sẵn sản phẩm có thể click con hoặc chuồng để thu; thú hoang tái sinh có giới hạn.
-- Một ngày vẫn 1080 giây/18 phút; mưa/bão tối đa 270 giây thực (6 giờ game). Bản build Windows thành công trong `Logs/build-v12-verified.log`; smoke `Logs/smoke-v12-verified.log` thoát 0 với `FARM_V12_OK` và `FARM_CROPS_SMOKE_OK`. Xem `README.md` và `CHOI_GAME.md` cho hướng dẫn hiện hành.
+- Có 18 công thức JSON tại `Assets/StreamingAssets/crafting.json`, 11 công thức chế biến tại `Assets/StreamingAssets/recipes.json` chạy trên bảy máy gồm máy ủ phân, 56 mã hàng 0–55, cửa hàng năm trang 40 mặt hàng, năm đơn/ngày; đơn đã giao ẩn đến ngày kế tiếp. Kho/rương kéo-thả với túi đồ; lưới kho hiện phân theo mã hàng. Bốn công thức mới tạo thức ăn riêng cho gà/bò/cừu/heo, mỗi chuồng có một máng chung.
+- Minimap đã thu nhỏ ở góc phải; thanh máu/đói gọn ở góc trái dưới, góc phải có nút cài đặt và H tròn nhỏ. Các bảng có nút X và đóng bằng ESC/click ngoài; mở bảng mới đóng bảng cũ. Nhân vật có máu/đói ở cả hai map, hai lựa chọn hồi sinh. Vật nuôi sẵn sản phẩm có thể click con hoặc chuồng để thu; thú hoang tái sinh có giới hạn.
+- Hạt táo/lê/đào/việt quất mua vào túi; dùng ở vùng vườn LV3+, cây lớn theo giai đoạn và tưới giúp tăng tốc, click trái hái không cần giỏ. Map khám phá không còn cây táo tròn được sinh sẵn hoặc đọc từ save cũ. Mưa dùng vật liệu URP màu xanh. Vòi phun mua tại bơm nước, đặt tự do không cần LV, phủ bán kính 6m, cần nạp một nước để chạy 30 phút chơi.
+- Một ngày vẫn 1080 giây/18 phút; mưa/bão tối đa 270 giây thực (6 giờ game). Bản build Windows v13 thành công trong `Logs/build-v13-final.log`; smoke `Logs/smoke-v13-final.log` thoát 0 với `FARM_V13_OK` và `FARM_CROPS_SMOKE_OK`. Xem `README.md` và `CHOI_GAME.md` cho hướng dẫn hiện hành. Các mục bên dưới chỉ là lịch sử, có thể đã lỗi thời.
 
 ---
 # CẬP NHẬT ƯU TIÊN — SỬA ĐÀO / NHẢY / HƯỚNG DẪN TAB
