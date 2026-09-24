@@ -1,4 +1,16 @@
-# CẬP NHẬT ƯU TIÊN — 24/09/2026: BẢN v13 ĐÃ KIỂM TRA
+# CẬP NHẬT ƯU TIÊN — 24/09/2026: BẢN v14 ĐÃ KIỂM TRA
+
+Đây là ghi chú ưu tiên mới nhất; các mục v13 và cũ hơn bên dưới là lịch sử. Khi có mâu thuẫn, kiểm tra source và `README.md` trước.
+
+- Save schema v14 đọc v2–v13, thêm nhiệm vụ bản đồ tuần tự, giới hạn mua mỗi ngày và các mã hàng 56–62 (vòi phun, thịt bò/cừu/gà sống/chín). Unity 6000.3.22f1 đã build Windows thành công trong `Logs/build-v14-release.log`; smoke 1280×720 thoát 0 trong `Logs/smoke-v14-release.log`, kết thúc `FARM_V14_OK` và `FARM_CROPS_SMOKE_OK`.
+- Shop còn bốn trang, không bán khối xây hay thức ăn thú; hạt ruộng và cây giống mua không giới hạn, các món còn lại 1 lần/ngày. Đồng hồ ngày chạy khi đang mở shop để đếm ngược tiếp tục. Bảng chuồng dẫn sang cối xay để chế biến thức ăn theo loài. Phím G mở xây dựng đã bỏ; dùng B → Xây dựng. Lăn chuột đổi hotbar nhạy hơn.
+- Vòi phun mua tại bơm nước nay vào túi (item 56), chọn trong hotbar rồi click đất để đặt; click phải vào vòi đã đặt để thu về túi nếu còn chỗ. Vườn cây phía đông chỉ cần LV3, không cần vùng đất 4. Túi có chọn số lượng bán bằng +/−/Hết. Hướng dẫn tự ẩn sau 10 giây, H mở lại.
+- Khám phá giới hạn sáu thú hoang hoạt động, có bò/heo/cừu/gà và thịt sống theo loài; cừu thêm len. Thịt sống phải nướng tại đống lửa để ăn. Ban ngày có tối đa hai cáo/rắn chỉ tấn công khi nhìn thấy phía trước; đêm sói 160 máu, kiếm thường 7 đòn, lao nhanh và cú cắn có phản hồi đẩy/hiệu ứng. Khối đã đặt và phần thân gỗ phía trên có xử lý rơi khi mất đỡ.
+- Nhân vật và dụng cụ được chỉnh lại bằng mesh/primitive dựng trong project; hình dáng hiện vẫn mang phong cách 3D cách điệu, **chưa phải model người thật có rig và animation chuyên nghiệp**. Đây là giới hạn hình ảnh còn lại cần asset/model mới nếu tiếp tục nâng cấp.
+
+---
+
+# CẬP NHẬT CŨ — BẢN v13
 
 Các mục cũ bên dưới là lịch sử và có thể sai về phiên bản lưu, hotbar hoặc tính năng. Khi mâu thuẫn, kiểm tra code trước.
 

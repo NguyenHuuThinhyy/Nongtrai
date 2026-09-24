@@ -116,6 +116,8 @@ namespace NongTrai
             else if(farm&&bag.Item>=40&&bag.Item<=42)action="Chuột trái: gieo trên ô đã xới";
             else if(farm&&bag.Item>=49&&bag.Item<=51)action="Chuột phải vào đất vườn: trồng cây";
             else if(bag.Item>=52&&bag.Item<=55)action="Đến máng ăn chuồng và click để cho cả chuồng ăn";
+            else if(bag.Item==56)action="Chuột trái vào đất: đặt vòi phun; chuột phải vào vòi đã đặt: thu lại";
+            else if(bag.Item==7||bag.Item>=57&&bag.Item<=59)action="Thịt sống • click vào đống lửa để nướng trước khi ăn";
             else if(farm&&bag.LegacySlot>=0&&bag.LegacySlot<=2)action="Chuột trái: gieo lên ô đã cày";
             else if(farm&&bag.LegacySlot==4)action="Chuột trái: xới đất";
             else if(farm&&bag.LegacySlot==5)action="Chuột trái: tưới đất đã gieo";
@@ -125,7 +127,7 @@ namespace NongTrai
             else if(bag.Item==34)action="Chuột phải vào vật nuôi: cho ăn";
             else if(bag.Item==35)action="Chuột phải vào cây: bón phân";
             else if(bag.Item==27)action="Chuột phải vào đất trống: trồng cây";
-            else if(bag.Item>=0&&bag.Item<=11||bag.Item==32||bag.Item==33||bag.Item==39||bag.Item>=46&&bag.Item<=48)action="Chuột phải: ăn";
+            else if(bag.Item>=0&&bag.Item<=3||bag.Item>=9&&bag.Item<=11||bag.Item==32||bag.Item==33||bag.Item==39||bag.Item>=43&&bag.Item<=48||bag.Item>=60&&bag.Item<=62)action="Chuột phải: ăn";
             else action=farm?"Ngắm vật thể • chuột trái tương tác":"Giữ trái: đào/đánh • chuột phải: dùng";
             tooltip.text="["+(selectedSlot+1)+"] "+bag.Name(bag.Item)+" • "+action;
         }
@@ -145,7 +147,7 @@ namespace NongTrai
             if(Mouse.current!=null&&!building)
             {
                 float wheel=Mouse.current.scroll.ReadValue().y;
-                if(Mathf.Abs(wheel)>1) Select((selectedSlot+(wheel<0?1:8))%9);
+                if(Mathf.Abs(wheel)>.05f) Select(((AdventureBag.Instance==null?selectedSlot:AdventureBag.Instance.Selected)+(wheel<0?1:8))%9);
             }
             displayedMoney=Mathf.MoveTowards(displayedMoney,shop.Money,Time.deltaTime*Mathf.Max(50,Mathf.Abs(shop.Money-displayedMoney)*3));
             coinText.text="XU  "+Mathf.RoundToInt(displayedMoney)+" xu";
@@ -160,8 +162,8 @@ namespace NongTrai
             if(healthFill!=null)healthFill.rectTransform.sizeDelta=new Vector2(105*Mathf.Clamp01(health/100),12);
             if(hungerFill!=null)hungerFill.rectTransform.sizeDelta=new Vector2(105*Mathf.Clamp01(hunger/100),12);
             creativeControls.text=CreativeModeManager.IsCreative?
-                (CreativeModeManager.IsFlying?"ĐANG BAY • WASD di chuyển • SPACE lên • X xuống • SHIFT nhanh • F8 tắt bay":"SÁNG TẠO • F8 bật bay • [G] Xây dựng"):
-                "[E] Bản đồ việc • [B] Túi đồ • [G] Xây dựng • Lăn chuột đổi vật phẩm";
+                (CreativeModeManager.IsFlying?"ĐANG BAY • WASD di chuyển • SPACE lên • X xuống • SHIFT nhanh • F8 tắt bay":"SÁNG TẠO • F8 bật bay • [B] Túi đồ/Xây dựng"):
+                "[E] Bản đồ việc • [TAB] Đổi map • [B] Túi đồ/Xây dựng • Lăn chuột đổi vật phẩm";
             var bag=AdventureBag.Instance;
             if(bag!=null)
             {

@@ -57,6 +57,8 @@ namespace NongTrai
                 var bag=AdventureBag.Instance;
                 if(FarmAim.Hit(viewCamera,out var useHit)&&Vector3.Distance(useHit.point,player.transform.position)<6)
                 {
+                    var sprinkler=useHit.collider.GetComponentInParent<IrrigationStation>();
+                    if(sprinkler!=null&&sprinkler.portable){Say(FarmWaterSystem.Instance.DismantlePortable(sprinkler)?"Đã thu vòi phun vào túi; có thể đặt lại.":"Không thể thu vòi phun.");return;}
                     var wild=useHit.collider.GetComponentInParent<WildAnimal>();if(wild!=null){wild.Feed();return;}
                     var chest=useHit.collider.GetComponentInParent<FarmChest>();if(chest!=null){chest.Interact(this);return;}
                     var farmAnimal=useHit.collider.GetComponentInParent<FarmAnimal>();

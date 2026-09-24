@@ -84,17 +84,19 @@ namespace NongTrai
         }
         void Update()
         {
-            if(player==null || player.Paused) return;
-            float fraction=Time.deltaTime/DayLengthSeconds;
+            bool shopping=player!=null&&player.Paused&&FarmShop.ClockRunningInShop&&Application.isFocused;
+            if(player==null || player.Paused&&!shopping) return;
+            float elapsed=shopping?Time.unscaledDeltaTime:Time.deltaTime;
+            float fraction=elapsed/DayLengthSeconds;
             NormalizedTime+=fraction;
             if(WeatherRemaining>0)
-            {WeatherRemaining=Mathf.Max(0,WeatherRemaining-Time.deltaTime);if(WeatherRemaining<=0&&(Weather==FarmWeather.Rain||Weather==FarmWeather.Storm))SetWeather(FarmWeather.Sunny);}
-            foreach(var animal in FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None)) animal.AdvanceCare(fraction);
+            {WeatherRemaining=Mathf.Max(0,WeatherRemaining-elapsed);if(WeatherRemaining<=0&&(Weather==FarmWeather.Rain||Weather==FarmWeather.Storm))SetWeather(FarmWeather.Sunny);}
+            if(!shopping)foreach(var animal in FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None)) animal.AdvanceCare(fraction);
             if(NormalizedTime>=1f) { NormalizedTime-=1f;NewDay(); }
             if(Weather==FarmWeather.Rain || Weather==FarmWeather.Storm)
             {
                 rain.transform.position=player.transform.position+Vector3.up*10;
-                rainTick+=Time.deltaTime;
+                rainTick+=elapsed;
                 if(rainTick>=1f) { WaterFields(.045f*rainTick);rainTick=0; }
             }
             ApplyLighting();

@@ -12,6 +12,8 @@ namespace NongTrai
         public bool FirstPerson { get; private set; }
         public float Yaw { get; private set; }
         float pitch = 28;
+        float shakeRemaining;
+        public void Shake(float seconds)=>shakeRemaining=Mathf.Max(shakeRemaining,seconds);
         public void ReadLook(Vector2 delta)
         {
             Yaw += delta.x * player.settings.mouseSensitivity;
@@ -32,7 +34,10 @@ namespace NongTrai
             if (distance > 0 && Physics.SphereCast(pivot, 0.2f, -(rotation * Vector3.forward),
                 out RaycastHit hit, distance, obstacleMask, QueryTriggerInteraction.Ignore))
                 distance = Mathf.Max(0, hit.distance - 0.1f);
-            virtualCamera.transform.SetPositionAndRotation(pivot - rotation * Vector3.forward * distance, rotation);
+            Vector3 point=pivot - rotation * Vector3.forward * distance;
+            if(shakeRemaining>0){shakeRemaining=Mathf.Max(0,shakeRemaining-Time.deltaTime);
+                point+=Random.insideUnitSphere*shakeRemaining*.16f;}
+            virtualCamera.transform.SetPositionAndRotation(point, rotation);
         }
     }
 }

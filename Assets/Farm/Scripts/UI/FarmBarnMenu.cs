@@ -18,7 +18,7 @@ namespace NongTrai
             Panel=FarmUi.Panel(hud.transform,"Quản lý chăn nuôi",new Vector2(1020,780));
             FarmUi.Label(Panel.transform,"CHĂN NUÔI",new Vector2(30,-20),new Vector2(960,50),30);
             status=FarmUi.Label(Panel.transform,"",new Vector2(30,-72),new Vector2(960,110),19);
-            FarmUi.Button(Panel.transform,"Mua 10 thức ăn • 50 xu",new Vector2(30,-190),new Vector2(960,55),BuyFeed);
+            FarmUi.Button(Panel.transform,"Mở cối xay • chế biến thức ăn theo từng loài",new Vector2(30,-190),new Vector2(960,55),()=>FarmProcessing.Instance?.OpenForMachine(0));
             FarmUi.Button(Panel.transform,"Xây chuồng bò thứ hai • 550 xu",new Vector2(30,-255),new Vector2(960,55),()=>BuyExtra(extraCow,550));
             FarmUi.Button(Panel.transform,"Xây chuồng cừu thứ hai • 450 xu",new Vector2(30,-320),new Vector2(960,55),()=>BuyExtra(extraSheep,450));
             for(int i=0;i<4;i++)
@@ -39,17 +39,12 @@ namespace NongTrai
         void Refresh()
         {
             if(status==null) return;
-            string value="Thức ăn: "+shop.FeedStock+" • Mỗi ngày thú đói dần; chăm đủ mới cho sản phẩm.\n";
+            string value="Thức ăn tự chế biến: Gà "+shop.inventory.Count(52)+" • Bò "+shop.inventory.Count(53)+" • Cừu "+shop.inventory.Count(54)+" • Heo "+shop.inventory.Count(55)+".\n";
             foreach(var pen in shop.speciesPens)
                 value+=SpeciesName(pen.species)+" "+pen.AnimalCount()+"/"+pen.capacity+" cấp "+(pen.UpgradeLevel+1)+" • ";
             status.text=value;
         }
         void Say(string value) { feedback.text=value;hud.Notify(value);Refresh(); }
-        void BuyFeed()
-        {
-            if(!shop.TrySpend(50)) { Say("Không đủ 50 xu.");return; }
-            shop.AddFeed(10);Say("Đã mua 10 thức ăn.");FarmAudio.Instance?.Play(FarmAudio.Cue.Buy);
-        }
         void BuyExtra(AnimalPen pen,int price)
         {
             if(pen.gameObject.activeSelf) { Say("Bạn đã có chuồng này.");return; }

@@ -6,6 +6,8 @@ namespace NongTrai
 {
     public sealed class FarmShop : MonoBehaviour
     {
+        public static FarmShop Instance {get;private set;}
+        public static bool ClockRunningInShop=>Instance!=null&&Instance.Panel!=null&&Instance.Panel.activeSelf;
         public FarmHud hud;
         public GameObject[] animalPrefabs;
         public GameObject treePrefab, extraPen;
@@ -16,7 +18,7 @@ namespace NongTrai
         public int Money { get; private set; }=1000;
         public int Fruit { get; private set; }
         public int[] Seeds { get; private set; }=new int[]{5,5,5};
-        public int FeedStock { get; private set; }=15;
+        public int FeedStock { get; private set; }
         public void AddFeed(int count) => FeedStock=Mathf.Max(0,FeedStock+count);
         public bool ConsumeFeed() { if(FeedStock<=0) return false;FeedStock--;return true; }
         public bool TrySpend(int cost) { if(cost<0 || Money<cost) return false;Money-=cost;return true; }
@@ -25,10 +27,19 @@ namespace NongTrai
         public int AnimalCount => FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None).Length;
         public GameObject Panel { get; private set; }
         FarmPenPlacement penPlacement;
-        Text balance, feedback, pageLabel;GameObject[] offers;int currentPage;
+        Text balance, feedback, pageLabel,limitLabel;GameObject[] offers;Text[] offerLabels;int[] offerPages;int currentPage;
+        readonly int[] purchasedToday=new int[40];int purchaseDay=1;
+        public int[] PurchaseCounts => (int[])purchasedToday.Clone();
+        public int PurchaseDay => purchaseDay;
+        static bool Unlimited(int item)=>item<=2||item==8||item==16||item>=32&&item<=37;
+        static bool SoldHere(int item)=>item>=0&&item<40&&!(item>=9&&item<=15||item==17||item>=19&&item<=21||item==23||item>=38);
+        void CheckDay(){int day=TimeManager.Instance==null?1:TimeManager.Instance.Day;if(day==purchaseDay)return;purchaseDay=day;System.Array.Clear(purchasedToday,0,purchasedToday.Length);}
+        public void RestorePurchaseLimits(int day,int[] counts)
+        {purchaseDay=Mathf.Max(1,day);System.Array.Clear(purchasedToday,0,purchasedToday.Length);if(counts!=null)System.Array.Copy(counts,purchasedToday,Mathf.Min(counts.Length,purchasedToday.Length));CheckDay();}
         readonly int[] prices={20,40,75,220,120,150,60,400,150,60,100,120,180,110,55,50,45,65,80,70,100,60,45,95,120,95,140,125,700,550,650,500,75,110,160,100,140,90,70,95};
         readonly string[] names={"5 hạt lúa mì","5 hạt cà chua","5 hạt đậu nành","Bò","Heo","Cừu","Gà","Chuồng gà thứ hai (5 chỗ)","Hạt cây táo","5 khối đá","5 khối gạch","3 khối kính","3 khối kim loại","5 khối gỗ","5 khối cỏ","10 thức ăn","1 hạt cây táo","2 bậc gỗ","1 đuốc","3 hàng rào","2 ván cầu","2 cám dinh dưỡng","3 phân bón","1 bánh táo","3 thịt sống","Xẻng mới (100 bền)","Kiếm mới (100 bền)","Rìu mới (20 bền)","Chuồng bò tự đặt","Chuồng heo tự đặt","Chuồng cừu tự đặt","Chuồng gà tự đặt","3 hạt bí ngô • LV3","3 hạt dâu • LV4","3 hạt hướng dương • LV5","Hạt cây lê • LV4","Hạt cây đào • LV5","Hạt bụi việt quất • LV3","2 thức ăn gà","2 thức ăn bò"};
-        readonly int[] icons={0,1,2,50,51,52,53,42,54,31,32,33,34,30,35,17,54,40,41,42,43,46,47,44,7,21,23,24,42,42,42,42,73,74,75,82,83,84,85,86};
+        readonly int[] icons={0,1,2,50,51,52,53,99,54,31,32,33,34,30,35,17,54,40,41,42,43,46,47,44,7,21,23,24,96,97,98,99,73,74,75,82,83,84,85,86};
+        void Awake(){Instance=this;}
         void Start()
         {
             penPlacement=gameObject.AddComponent<FarmPenPlacement>();penPlacement.shop=this;
@@ -36,22 +47,25 @@ namespace NongTrai
             var rect=Panel.GetComponent<RectTransform>(); rect.SetParent(hud.transform,false); rect.anchorMin=rect.anchorMax=rect.pivot=new Vector2(.5f,.5f); rect.sizeDelta=new Vector2(1000,1000);
             Panel.GetComponent<Image>().color=new Color(.07f,.14f,.11f,.99f);
             balance=Label("",new Vector2(35,-25),new Vector2(920,70),26);
-            offers=new GameObject[names.Length];
-            for(int i=0;i<names.Length;i++) { int item=i,slot=i%8;
+            offers=new GameObject[names.Length];offerLabels=new Text[names.Length];offerPages=new int[names.Length];int visible=0;
+            for(int i=0;i<names.Length;i++) { if(!SoldHere(i))continue;int item=i,slot=visible%8;offerPages[i]=visible/8;visible++;
                 offers[i]=Button(names[i]+" — "+prices[i]+" xu",new Vector2(35+(slot%2)*475,-105-(slot/2)*82),()=>Buy(item));
-                FarmItemIconLibrary.Attach(offers[i].transform,icons[i],new Vector2(10,-10),new Vector2(54,54)); }
+                offerLabels[i]=offers[i].GetComponentInChildren<Text>();
+                var picture=FarmItemIconLibrary.Attach(offers[i].transform,0,new Vector2(10,-10),new Vector2(54,54));
+                picture.sprite=FarmItemIconLibrary.Get(icons[i]); }
             pageLabel=Label("",new Vector2(35,-480),new Vector2(920,42),22);
-            Button("◀ Trang trước",new Vector2(35,-545),()=>ShowPage((currentPage+4)%5));
-            Button("Trang sau ▶",new Vector2(510,-545),()=>ShowPage((currentPage+1)%5));
+            Button("◀ Trang trước",new Vector2(35,-545),()=>ShowPage((currentPage+3)%4));
+            Button("Trang sau ▶",new Vector2(510,-545),()=>ShowPage((currentPage+1)%4));
             Button("Bán toàn bộ nông sản",new Vector2(510,-755),Sell);
             Button("Xem túi đồ",new Vector2(510,-845),inventory.Open);
             Button("Quản lý chuồng",new Vector2(35,-755),barn.Open);
             Button("Trở lại game",new Vector2(35,-845),hud.Resume);
-            feedback=Label("Có 5 trang • Hạt cây nằm trong túi, đặt ở vườn phía đông.",new Vector2(35,-640),new Vector2(920,48),19);
+            feedback=Label("Thức ăn và khối xây phải chế tạo/thu thập. Hạt giống mua không giới hạn.",new Vector2(35,-625),new Vector2(920,45),19);
+            limitLabel=Label("",new Vector2(35,-675),new Vector2(920,55),19);
             ShowPage(0);
             Panel.SetActive(false); hud.player.PauseChanged+=OnPause;
         }
-        void OnDestroy() { if(hud!=null && hud.player!=null) hud.player.PauseChanged-=OnPause; }
+        void OnDestroy() { if(Instance==this)Instance=null;if(hud!=null && hud.player!=null) hud.player.PauseChanged-=OnPause; }
         void OnPause(bool paused) { if(!paused && Panel!=null) Panel.SetActive(false); }
         public void Open() { hud.ShowOverlay(Panel); Refresh(); }
         public bool ConsumeSeed(int index) { if(Seeds[index]<=0) return false; Seeds[index]--; return true; }
@@ -64,6 +78,9 @@ namespace NongTrai
         {
             result="";
             if(item<0 || item>=prices.Length) { result="Mặt hàng không hợp lệ."; return false; }
+            if(!SoldHere(item)){result="Món này chỉ có thể chế tạo hoặc thu thập, không bán ở cửa hàng.";return false;}
+            CheckDay();
+            if(!Unlimited(item)&&purchasedToday[item]>=1){result="Đã mua món này hôm nay. Hãy chờ sang ngày mới.";return false;}
             if(Money<prices[item]) { result="Không đủ xu. Bán nông sản để kiếm thêm."; return false; }
             AnimalPen destination=null;
             if(item>=3 && item<=6)
@@ -110,19 +127,26 @@ namespace NongTrai
             else if(item<=34)inventory.Add(40+item-32,3);
             else if(item<=37)inventory.Add(49+item-35,1);
             else inventory.Add(52+item-38,2);
-            Money-=prices[item]; result="Đã mua "+names[item]+".";
+            Money-=prices[item];if(!Unlimited(item))purchasedToday[item]++; result="Đã mua "+names[item]+".";
             if(item>=28&&item<=31)result+=" Click đất trống trong vùng đã mở để đặt chuồng.";
             FarmAudio.Instance?.Play(FarmAudio.Cue.Buy);return true;
         }
         void Buy(int item) { Purchase(item,out string message); feedback.text=message; Refresh(); }
         public void ShowPage(int page)
-        { currentPage=Mathf.Clamp(page,0,4);
-          pageLabel.text=new[]{"TRANG 1/5 • HẠT GIỐNG VÀ VẬT NUÔI","TRANG 2/5 • CÂY, KHỐI XÂY VÀ THỨC ĂN","TRANG 3/5 • TRANG TRÍ, THỨC ĂN VÀ PHÂN BÓN","TRANG 4/5 • THỊT, DỤNG CỤ VÀ CHUỒNG TỰ ĐẶT","TRANG 5/5 • GIỐNG CÂY THEO CẤP VÀ THỨC ĂN THÚ"}[currentPage];
-          for(int i=0;i<offers.Length;i++) offers[i].SetActive(i/8==currentPage); }
+        { currentPage=Mathf.Clamp(page,0,3);
+          pageLabel.text="TRANG "+(currentPage+1)+"/4 • CHỌN MÓN ĐỂ XEM GIÁ VÀ GIỚI HẠN";
+          for(int i=0;i<offers.Length;i++)if(offers[i]!=null)offers[i].SetActive(offerPages[i]==currentPage);RefreshOffers(); }
         public void TreeCut() => BoughtTrees=Mathf.Max(0,BoughtTrees-1);
         public int SellHarvest() => inventory.SellAll();
         void Sell() { feedback.text="Đã bán nông sản: +"+SellHarvest()+" xu."; Refresh(); }
-        void Refresh() { balance.text="CỬA HÀNG NÔNG TRẠI     "+Money+" xu\nBò "+speciesPens[0].AnimalCount()+"/4 • Heo "+speciesPens[1].AnimalCount()+"/4 • Cừu "+speciesPens[2].AnimalCount()+"/4 • Gà "+speciesPens[3].AnimalCount()+"/5"+(Expanded?" (+chuồng gà 2)":""); }
+        void Update(){if(Panel!=null&&Panel.activeSelf)RefreshOffers();}
+        void RefreshOffers()
+        {if(offerLabels==null)return;CheckDay();int left=TimeManager.Instance==null?0:Mathf.CeilToInt((1-TimeManager.Instance.NormalizedTime)*TimeManager.DayLengthSeconds);
+         int minute=left/60,second=left%60;
+         if(limitLabel!=null)limitLabel.text="Mỗi món khác hạt/cây giống: 1 lần/ngày • Mở mua tiếp sau "+minute.ToString("00")+":"+second.ToString("00")+" (giờ chơi).";
+         for(int i=0;i<offerLabels.Length;i++)if(offerLabels[i]!=null)
+         {offerLabels[i].text=names[i]+" — "+prices[i]+" xu"+(!Unlimited(i)&&purchasedToday[i]>0?" • HẾT LƯỢT":"");offers[i].GetComponent<Button>().interactable=Unlimited(i)||purchasedToday[i]==0;}}
+        void Refresh() { balance.text="CỬA HÀNG NÔNG TRẠI     "+Money+" xu\nBò "+speciesPens[0].AnimalCount()+"/4 • Heo "+speciesPens[1].AnimalCount()+"/4 • Cừu "+speciesPens[2].AnimalCount()+"/4 • Gà "+speciesPens[3].AnimalCount()+"/5"+(Expanded?" (+chuồng gà 2)":"");RefreshOffers(); }
         Text Label(string text,Vector2 p,Vector2 size,int fontSize)
         {
             var go=new GameObject("Label",typeof(RectTransform),typeof(Text)); Place(go,p,size);

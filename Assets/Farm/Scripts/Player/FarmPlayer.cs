@@ -15,6 +15,7 @@ namespace NongTrai
         Vector3 spawn;
         Vector3 safePoint;
         float groundedGrace,jumpBuffer;
+        Vector3 impactVelocity;
         public event System.Action<bool> PauseChanged;
 
         void Awake()
@@ -37,7 +38,10 @@ namespace NongTrai
         void OnApplicationFocus(bool focus) { if (!focus) SetPaused(true); }
         void OnDisable() { Cursor.lockState = CursorLockMode.None; Cursor.visible = true; }
         public void Teleport(Vector3 position)
-        { ExplorationWorld.Instance?.EnsureAt(position);controller.enabled=false;transform.position=position;verticalSpeed=0;controller.enabled=true;safePoint=IslandSafePoint(position); }
+        { ExplorationWorld.Instance?.EnsureAt(position);controller.enabled=false;transform.position=position;verticalSpeed=0;impactVelocity=Vector3.zero;controller.enabled=true;safePoint=IslandSafePoint(position); }
+        public void ApplyImpact(Vector3 away,float strength=3.2f)
+        {away.y=0;if(away.sqrMagnitude<.01f)away=-transform.forward;
+         impactVelocity=away.normalized*strength;verticalSpeed=Mathf.Max(verticalSpeed,2.8f);cameraRig?.Shake(.18f);}
 
         static Vector3 IslandSafePoint(Vector3 position)
         {
@@ -81,8 +85,9 @@ namespace NongTrai
             if(flying && Input.Run.IsPressed()) speed*=2;
             if(!flying&&transform.position.y<.15f&&transform.position.x>25.5f&&transform.position.x<38.5f&&transform.position.z>-25&&transform.position.z<-5)
                 speed*=.48f;
-            controller.Move((move * speed
+            controller.Move((move * speed+impactVelocity
                 + Vector3.up * verticalSpeed*(flying?speed:1)) * Time.deltaTime);
+            impactVelocity=Vector3.MoveTowards(impactVelocity,Vector3.zero,Time.deltaTime*14);
             if (move.sqrMagnitude > 0.01f)
                 visual.rotation = Quaternion.Slerp(visual.rotation, Quaternion.LookRotation(move), 14 * Time.deltaTime);
             // Điểm phục hồi nếu nhân vật lọt khỏi địa hình do chỉnh sửa scene.

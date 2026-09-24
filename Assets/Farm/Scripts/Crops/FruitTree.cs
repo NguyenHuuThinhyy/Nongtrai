@@ -95,8 +95,8 @@ namespace NongTrai
         public void SetHighlighted(bool selected) => InteractionOutline.Set(this,selected);
         public static bool TryPlantAt(Vector3 point,FarmShop shop,FarmInventory inventory,out string message,int seedItem=27)
         {
-            if(FarmExpansion.Instance==null||FarmExpansion.Instance.Level<3||!FarmExpansion.Instance.UnlockedRegions[3])
-            {message="Khu vườn phía đông cần LV3 và vùng đất 4 đã mở.";return false;}
+            if(FarmExpansion.Instance==null||FarmExpansion.Instance.Level<3)
+            {message="Khu vườn phía đông mở khi đạt LV3.";return false;}
             if(point.x<54||point.x>82||point.z<-32||point.z>34)
             {message="Chỉ trồng hạt cây ở khu vườn phía đông (X 54–82).";return false;}
             foreach(var tree in FindObjectsByType<FruitTree>(FindObjectsSortMode.None))

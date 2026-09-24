@@ -195,7 +195,7 @@ namespace NongTrai.Editor
             }
             var orchardGate=Box("Cổng vườn LV3",new Vector3(49.8f,1.3f,0),new Vector3(.35f,2.6f,85),wood,environment);
             orchardGate.AddComponent<FarmOrchardGate>();
-            Sign(environment,new Vector3(53,0,35),"Vườn cây LV3","Mở vùng đất 4, chọn hạt cây trong túi và chuột phải trên đất để trồng.");
+            Sign(environment,new Vector3(53,0,35),"Vườn cây LV3","Đạt LV3, chọn hạt cây trong túi và chuột phải trên đất để trồng.");
             Sign(environment, new Vector3(2.6f, 0, 7), "Chào mừng", "Chọn hạt/công cụ bằng 1–9 hoặc lăn chuột. Ngắm ô đất rồi click trái để cày, gieo, tưới, thu hoạch. E mở bản đồ việc.");
             Sign(environment, new Vector3(-5, 0, -3), "Khu canh tác", "Chọn xẻng để xới, hạt để gieo, bình để tưới. Cây chín click trái để hái, không cần liềm.");
             var sun = new GameObject("Sun - fixed morning light").AddComponent<Light>();
@@ -346,7 +346,7 @@ namespace NongTrai.Editor
             Button(hud.pausePanel.transform,"Thoát game",new Vector2(35,-415),hud.Quit);
             hud.saveStatus=Label(hud.pausePanel.transform,"Chỉ lưu khi nhấn Lưu game.",new Vector2(35,-505),new Vector2(520,38),19,Color.white);
             hud.instructions=Panel(hud.pausePanel.transform,"Instructions",new Vector2(595,-35),new Vector2(665,510),new Color(.15f,.25f,.19f,1));
-            Label(hud.instructions.transform,"HƯỚNG DẪN\n\nWASD đi • Shift chạy • Space nhảy\nChuột nhìn • V đổi góc nhìn • E bản đồ việc\n1–3 Hạt • 5 Xẻng xới/đào • 6 Tưới • 7 Kiếm\nCây chín click trái để hái tay • 8 Rìu đốn nhanh\nB Túi đồ rồi chọn Shop • M Máy chế biến\nG xây dựng • Trái đặt/giữ phá • R xoay\nF cho thú ăn • Tab Đổi map • P Chuồng\nThịt sống + đống lửa: click để nướng 10 giây\nX hoặc Esc đóng bảng • Sáng tạo F8 bay\nMáu cạn: chọn trả 100 xu hoặc rơi 3 món\n\nThoát không tự lưu. Nhấn Lưu game để lưu.",new Vector2(25,-25),new Vector2(615,470),19,Color.white);
+            Label(hud.instructions.transform,"HƯỚNG DẪN\n\nWASD đi • Shift chạy • Space nhảy\nChuột nhìn • V đổi góc nhìn • E bản đồ nhiệm vụ\n1–3 Hạt • 5 Xẻng xới/đào • 6 Tưới • 7 Kiếm\nCây chín click trái để hái tay • 8 Rìu đốn nhanh\nB Túi đồ rồi chọn Shop/Xây dựng • M Máy chế biến\nTrái đặt/giữ phá • R xoay • Tab Đổi map\nF cho thú ăn • Click máng để cho cả chuồng ăn\nThịt sống + đống lửa: click để nướng 10 giây\nX hoặc Esc đóng bảng • Sáng tạo F8 bay\nMáu cạn: chọn trả 100 xu hoặc rơi 3 món\n\nThoát không tự lưu. Nhấn Lưu game để lưu.",new Vector2(25,-25),new Vector2(615,470),19,Color.white);
             Button(hud.pausePanel.transform,"Cài đặt âm lượng",new Vector2(560,-415),hud.OpenSettings);
             Button(hud.pausePanel.transform,"Về menu chính",new Vector2(560,-315),hud.ReturnToMain);
             hud.instructions.SetActive(false);

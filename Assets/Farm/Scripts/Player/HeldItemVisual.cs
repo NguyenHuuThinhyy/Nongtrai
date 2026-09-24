@@ -8,7 +8,11 @@ namespace NongTrai
         void Start()
         {
             holder=new GameObject("Vật phẩm nhỏ trên tay").transform;holder.SetParent(transform,false);
-            holder.localPosition=new Vector3(.53f,.78f,.30f);holder.localRotation=Quaternion.Euler(-12,0,-18);
+            var animator=player==null?GetComponentInChildren<FarmerAnimation>():player.visual.GetComponent<FarmerAnimation>();
+            var hand=animator!=null&&animator.arms!=null&&animator.arms.Length>1?animator.arms[1]:null;
+            if(hand!=null)holder.SetParent(hand,false);
+            holder.localPosition=hand!=null?new Vector3(.04f,-.58f,.13f):new Vector3(.53f,.78f,.30f);
+            holder.localRotation=Quaternion.Euler(0,0,-12);
         }
         void Update()
         {
@@ -28,6 +32,12 @@ namespace NongTrai
             {
                 int item=current-200;
                 if(item==27){Part(PrimitiveType.Cylinder,Vector3.zero,new Vector3(.04f,.22f,.04f),brown);Part(PrimitiveType.Sphere,Vector3.up*.18f,Vector3.one*.16f,Color.green);return;}
+                if(item==56)
+                {Part(PrimitiveType.Cylinder,Vector3.zero,new Vector3(.11f,.08f,.11f),blue);
+                 Part(PrimitiveType.Cylinder,Vector3.up*.18f,new Vector3(.035f,.18f,.035f),metal);
+                 Part(PrimitiveType.Cube,Vector3.up*.34f,new Vector3(.34f,.035f,.055f),blue);return;}
+                if(item>=57&&item<=62)
+                {Part(PrimitiveType.Sphere,Vector3.zero,new Vector3(.23f,.15f,.18f),item<60?new Color(.74f,.19f,.18f):new Color(.69f,.39f,.18f));return;}
                 Color food=item==1||item==33?new Color(.9f,.22f,.15f):item==2||item==34?new Color(.47f,.73f,.25f):item==3||item==32?new Color(.96f,.7f,.24f):new Color(.75f,.6f,.36f);
                 if(item<=11||item>=32){Part(PrimitiveType.Sphere,Vector3.zero,Vector3.one*.19f,food);return;}
                 Part(PrimitiveType.Cube,Vector3.zero,new Vector3(.22f,.18f,.20f),item==15?metal:brown);return;
@@ -37,11 +47,14 @@ namespace NongTrai
             if(current==3){Part(PrimitiveType.Cube,Vector3.zero,new Vector3(.22f,.28f,.14f),brown);return;}
             if(current>=4&&current<=10&&current!=8)
             {
-                var handle=Part(PrimitiveType.Cylinder,Vector3.zero,new Vector3(.045f,.34f,.045f),brown);handle.localRotation=Quaternion.Euler(0,0,25);
-                if(current==4)Part(PrimitiveType.Cube,new Vector3(.13f,.27f,0),new Vector3(.22f,.06f,.12f),metal);
+                var handle=Part(PrimitiveType.Cylinder,new Vector3(0,.18f,0),new Vector3(.055f,.34f,.055f),brown);
+                if(current==4){Part(PrimitiveType.Cube,new Vector3(0,.49f,0),new Vector3(.37f,.07f,.17f),metal);
+                    Part(PrimitiveType.Cube,new Vector3(0,.55f,0),new Vector3(.26f,.08f,.13f),metal);}
                 if(current==5){Part(PrimitiveType.Cube,new Vector3(.05f,.06f,0),new Vector3(.24f,.18f,.14f),blue);Part(PrimitiveType.Cylinder,new Vector3(.20f,.08f,0),new Vector3(.04f,.16f,.04f),blue).localRotation=Quaternion.Euler(0,0,75);}
-                if(current==6)Part(PrimitiveType.Cube,new Vector3(.14f,.28f,0),new Vector3(.06f,.28f,.12f),metal);
-                if(current==7)Part(PrimitiveType.Cube,new Vector3(.15f,.27f,0),new Vector3(.12f,.23f,.07f),metal);
+                if(current==6){Part(PrimitiveType.Cube,new Vector3(0,.47f,0),new Vector3(.085f,.50f,.10f),metal);
+                    Part(PrimitiveType.Cylinder,new Vector3(0,.18f,0),new Vector3(.18f,.035f,.18f),new Color(.91f,.72f,.30f));}
+                if(current==7){Part(PrimitiveType.Cube,new Vector3(.16f,.52f,0),new Vector3(.34f,.24f,.09f),metal);
+                    Part(PrimitiveType.Cube,new Vector3(.31f,.43f,0),new Vector3(.07f,.27f,.09f),metal);}
                 if(current==9)Part(PrimitiveType.Cube,new Vector3(.06f,.27f,0),new Vector3(.34f,.065f,.08f),metal);
                 if(current==10)Part(PrimitiveType.Cube,new Vector3(.05f,.27f,0),new Vector3(.18f,.25f,.05f),metal);
                 return;

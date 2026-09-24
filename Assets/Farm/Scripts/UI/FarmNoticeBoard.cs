@@ -15,6 +15,17 @@ namespace NongTrai
         GameObject compact,large;
         RectTransform smallMap,bigMap,smallMarker,bigMarker;
         TextMeshProUGUI summary,taskDetails,heading;
+        Button claimQuestButton;
+        int questStage;
+        static readonly int[] questItems={0,4,1,13,9,3,39};
+        static readonly int[] questAmounts={3,2,4,5,2,3,2};
+        public int QuestStage=>questStage;
+        int QuestItem=>questItems[questStage%questItems.Length];
+        int QuestNeed=>questAmounts[questStage%questAmounts.Length]+questStage/questItems.Length*2;
+        int QuestReward=>90+questStage*35;
+        int QuestXp=>25+questStage*9;
+        int QuestHave=>hud==null?0:hud.interaction.inventory.Count(QuestItem);
+        public void RestoreQuest(int stage){questStage=Mathf.Max(0,stage);if(IsOpen)Rebuild();}
         Transform taskRows,taskPins;
         float refreshAt;
         int lastHungry;
@@ -49,7 +60,8 @@ namespace NongTrai
             bigMarker=Pin(bigMap,"Bạn",new Vector2(0,0),new Color(1,.9f,.2f),22,null);
             taskRows=new GameObject("Danh sách việc",typeof(RectTransform)).transform;taskRows.SetParent(large.transform,false);
             var rows=(RectTransform)taskRows;rows.anchorMin=rows.anchorMax=rows.pivot=new Vector2(0,1);rows.anchoredPosition=new Vector2(835,-138);rows.sizeDelta=new Vector2(420,495);
-            taskDetails=FarmUi.TmpLabel(large.transform,"",new Vector2(835,-645),new Vector2(420,115),20);
+            taskDetails=FarmUi.TmpLabel(large.transform,"",new Vector2(835,-630),new Vector2(420,105),19);
+            claimQuestButton=FarmUi.Button(large.transform,"GIAO NHIỆM VỤ • NHẬN THƯỞNG",new Vector2(835,-737),new Vector2(420,48),()=>{ClaimQuest();});
             FarmUi.Button(large.transform,"ĐÓNG BẢN ĐỒ [E]",new Vector2(835,-790),new Vector2(420,55),Close);
             large.SetActive(false);hud.player.PauseChanged+=OnPause;
         }
@@ -126,6 +138,8 @@ namespace NongTrai
             foreach(Transform child in taskPins)Destroy(child.gameObject);
             foreach(Transform child in taskRows)Destroy(child.gameObject);
             tasks.Clear();
+            tasks.Add(new TaskMarker{title="NHIỆM VỤ "+(questStage+1)+" • "+hud.interaction.inventory.Name(QuestItem)+" "+QuestHave+"/"+QuestNeed,
+                position=QuestPosition(explore),color=new Color(1,.9f,.32f)});
             if(!explore)
             {
                 DrawFarmGeometry(taskPins,bigMap);
@@ -155,6 +169,21 @@ namespace NongTrai
             }
             SelectTask(count>0?0:-1);
         }
+        Vector3 QuestPosition(bool exploring)
+        {if(exploring)return hud.player.transform.position;
+         switch(QuestItem){case 4:return new Vector3(25,0,16);case 13:return new Vector3(24,0,-5);
+          case 9:return new Vector3(-14,0,12);case 3:return new Vector3(68,0,5);
+          case 39:return new Vector3(-4,0,28);default:return new Vector3(-20,0,-15);}}
+        public bool ClaimQuest()
+        {var inventory=hud.interaction.inventory;
+         if(!inventory.Remove(QuestItem,QuestNeed)){hud.Notify("Chưa đủ "+inventory.Name(QuestItem)+" để giao nhiệm vụ.");RefreshQuest();return false;}
+         int reward=QuestReward,xp=QuestXp;hud.interaction.shop.Credit(reward);FarmExpansion.Instance?.GainExperience(xp);
+         FarmEffects.Burst(hud.player.transform.position+Vector3.up*2,"+"+reward+" xu • +"+xp+" XP",Color.yellow);
+         questStage++;hud.Notify("Nhiệm vụ hoàn thành! Nhiệm vụ tiếp theo khó hơn đã xuất hiện.");if(IsOpen)Rebuild();return true;}
+        void RefreshQuest()
+        {if(claimQuestButton!=null)claimQuestButton.interactable=QuestHave>=QuestNeed;
+         if(taskDetails!=null)taskDetails.text="NHIỆM VỤ "+(questStage+1)+": Giao "+QuestNeed+" "+hud.interaction.inventory.Name(QuestItem)+" ("+QuestHave+"/"+QuestNeed+")\n"
+            +"Thưởng "+QuestReward+" xu + "+QuestXp+" XP • xong mới mở nhiệm vụ sau.";}
         void CollectFarmTasks()
         {
             int ready=0,dry=0,hungry=0;
@@ -175,7 +204,7 @@ namespace NongTrai
             if(tasks.Count==0)tasks.Add(new TaskMarker{title="Chưa có việc khẩn • xem 5 đơn tại hộp thư",position=new Vector3(4,0,28),color=new Color(.9f,.7f,.3f)});
         }
         void SelectTask(int index)
-        {taskDetails.text=index<0||index>=tasks.Count?"Không có việc cần làm trong vùng này.":tasks[index].title+"\nVị trí X "+Mathf.RoundToInt(tasks[index].position.x)+" • Z "+Mathf.RoundToInt(tasks[index].position.z);}
+        {RefreshQuest();if(index>=0&&index<tasks.Count&&index>0)taskDetails.text+="\nVị trí X "+Mathf.RoundToInt(tasks[index].position.x)+" • Z "+Mathf.RoundToInt(tasks[index].position.z);}
         void Update()
         {
             if(hud==null||compact==null)return;
@@ -188,7 +217,7 @@ namespace NongTrai
             foreach(var plot in FindObjectsByType<FarmPlot>(FindObjectsSortMode.None))if(plot.State==PlotState.Ready)ready++;
             var mail=FarmCraftOrders.Instance;int deliverable=0;
             if(mail!=null)foreach(var order in mail.Orders)if(!order.completed&&mail.inventory.Count(order.item)>=order.count)deliverable++;
-            summary.text="VIỆC CẦN LÀM\n"+ready+" ô chín\n"+hungry+" thú đói\n"+deliverable+"/5 đơn đủ hàng\nBấm E xem vị trí";
+            summary.text="VIỆC CẦN LÀM\n"+ready+" ô chín\n"+hungry+" thú đói\nNV "+(questStage+1)+": "+QuestHave+"/"+QuestNeed+"\nBấm E xem vị trí";
             if(hungry>0&&lastHungry==0&&!hud.player.Paused)hud.Notify("Có "+hungry+" vật nuôi đói! Đến chuồng và nhấn F để cho ăn.");
             lastHungry=hungry;
         }

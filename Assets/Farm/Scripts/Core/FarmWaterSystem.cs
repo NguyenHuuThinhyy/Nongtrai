@@ -13,6 +13,7 @@ namespace NongTrai
         public bool[] stationBuilt;
         public PortableSprinklerRecord[] portable;
         public bool pendingPortable;
+        public int lastPortablePurchaseDay;
     }
     [Serializable] public sealed class PortableSprinklerRecord {public Vector3 position;public float remaining;}
 
@@ -31,10 +32,11 @@ namespace NongTrai
         readonly int[] prices={600,900,1200,1500};
         readonly IrrigationStation[] stations=new IrrigationStation[4];
         readonly List<IrrigationStation> portable=new List<IrrigationStation>();
-        public bool PendingPlacement {get;private set;}
+        public bool PendingPlacement => AdventureBag.Instance!=null&&AdventureBag.Instance.Item==56&&shop.inventory.Count(56)>0;
         public int ConsumedFrame {get;private set;}=-1;
         public int PortableCount=>portable.Count;
         public const int PortablePrice=350;
+        int lastPortablePurchaseDay;
         Text status,feedback;
         float tick;
 
@@ -53,11 +55,11 @@ namespace NongTrai
             Panel=FarmUi.Panel(hud.transform,"Quản lý nước",new Vector2(930,720));
             FarmUi.TmpLabel(Panel.transform,"NƯỚC & TRẠM TƯỚI",new Vector2(30,-25),new Vector2(870,55),30);
             status=FarmUi.Label(Panel.transform,"",new Vector2(30,-90),new Vector2(870,100),21);
-            FarmUi.Button(Panel.transform,"Mua vòi phun di động • 350 xu • đặt ở vị trí bạn chọn",
+            FarmUi.Button(Panel.transform,"Mua vòi phun di động • 350 xu • nhận vào túi (1/ngày)",
                 new Vector2(30,-215),new Vector2(870,68),BuyPortable);
             FarmUi.Label(Panel.transform,"Vòi phun hiển thị vòng tròn bán kính 6 m. Nạp 1 nước từ bình để hoạt động 30 phút chơi thực.\nDùng cho ruộng và cây ăn quả, không yêu cầu cấp độ.",
                 new Vector2(30,-310),new Vector2(870,125),22);
-            feedback=FarmUi.Label(Panel.transform,"Click máy bơm để lấy nước và mua vòi; click vòi đã đặt để nạp lại.",
+            feedback=FarmUi.Label(Panel.transform,"Mua vòi vào túi, chọn trên hotbar rồi click đất để đặt; click trái vòi để nạp, chuột phải để thu lại.",
                 new Vector2(30,-545),new Vector2(870,55),19);
             FarmUi.Button(Panel.transform,"Trở lại game",new Vector2(30,-630),new Vector2(870,55),hud.Resume);
             FarmUi.Label(Panel.transform,"Có thể nhấn ESC để đóng bảng",new Vector2(625,-22),new Vector2(270,36),17);
@@ -144,10 +146,11 @@ namespace NongTrai
         }
         public void BuyPortable()
         {
-            if(PendingPlacement){Say("Hãy đặt vòi phun đang mua trước.");return;}
+            int day=TimeManager.Instance==null?1:TimeManager.Instance.Day;
+            if(lastPortablePurchaseDay==day){Say("Hôm nay đã mua vòi phun. Chờ sang ngày mới để mua tiếp.");return;}
+            if(AdventureBag.Instance!=null&&AdventureBag.Instance.Space(56)<1){Say("Túi đã đầy, cần chỗ cho vòi phun.");return;}
             if(!shop.TrySpend(PortablePrice)){Say("Cần "+PortablePrice+" xu để mua vòi phun.");return;}
-            PendingPlacement=true;FarmBuildingSystem.Instance?.EquipBlock(-1);hud.Resume();
-            hud.Notify("Vòi phun đã mua. Click mặt đất để đặt ở bất cứ vị trí hợp lệ nào.");
+            lastPortablePurchaseDay=day;shop.inventory.Add(56,1);Say("Vòi phun đã vào túi. Kéo lên hotbar, chọn rồi click mặt đất khi muốn đặt.");
         }
         IrrigationStation PlacePortable(Vector3 point,float remaining)
         {
@@ -157,7 +160,10 @@ namespace NongTrai
             portable.Add(result);return result;
         }
         public bool TryPlacePortable(Vector3 point)
-        {if(!PendingPlacement)return false;PlacePortable(point,1800);PendingPlacement=false;return true;}
+        {if(shop.inventory.Count(56)<1||!shop.inventory.Remove(56,1))return false;PlacePortable(point,1800);return true;}
+        public bool DismantlePortable(IrrigationStation sprinkler)
+        {if(sprinkler==null||!sprinkler.portable||AdventureBag.Instance!=null&&AdventureBag.Instance.Space(56)<1||!portable.Remove(sprinkler))return false;
+         shop.inventory.Add(56,1);sprinkler.gameObject.SetActive(false);Destroy(sprinkler.gameObject);Refresh();return true;}
         public bool RefillPortable(IrrigationStation sprinkler)
         {
             if(sprinkler==null||!sprinkler.portable||CanWater<1)return false;
@@ -171,7 +177,7 @@ namespace NongTrai
                 ConsumedFrame=Time.frameCount;
                 if(Camera.main!=null&&FarmAim.Hit(Camera.main,out var hit)&&hit.normal.y>.65f&&
                     Vector3.Distance(hit.point,hud.player.transform.position)<6f)
-                {TryPlacePortable(hit.point);hud.Notify("Đã đặt vòi phun • vòng xanh là vùng tưới. Click vòi để nạp lại sau 30 phút.");}
+                {if(TryPlacePortable(hit.point))hud.Notify("Đã đặt vòi phun • vòng xanh là vùng tưới. Click trái để nạp, chuột phải để thu lại.");}
                 else hud.Notify("Hãy ngắm mặt đất phẳng gần nhân vật để đặt vòi phun.");
             }
             for(int i=portable.Count-1;i>=0;i--)
@@ -202,11 +208,12 @@ namespace NongTrai
         {var records=new List<PortableSprinklerRecord>();foreach(var item in portable)if(item!=null)
             records.Add(new PortableSprinklerRecord{position=item.transform.position-Vector3.up*1.05f,remaining=item.remainingSeconds});
          return new WaterState { canWater=CanWater,stationWater=(int[])StationWater.Clone(),
-             stationBuilt=(bool[])StationBuilt.Clone(),portable=records.ToArray(),pendingPortable=PendingPlacement };}
+             stationBuilt=(bool[])StationBuilt.Clone(),portable=records.ToArray(),pendingPortable=false,lastPortablePurchaseDay=lastPortablePurchaseDay };}
         public void Restore(WaterState state)
         {
             foreach(var item in portable)if(item!=null){item.gameObject.SetActive(false);Destroy(item.gameObject);}portable.Clear();
-            PendingPlacement=state!=null&&state.pendingPortable;
+            lastPortablePurchaseDay=state==null?0:state.lastPortablePurchaseDay;
+            if(state!=null&&state.pendingPortable&&shop.inventory.Count(56)==0)shop.inventory.Add(56,1);
             CanWater=state==null?0:Mathf.Clamp(state.canWater,0,CanCapacity);
             for(int i=0;i<4;i++)
             {

@@ -25,7 +25,7 @@ namespace NongTrai
             int feed=species==AnimalSpecies.Chicken?52:species==AnimalSpecies.Cow?53:species==AnimalSpecies.Sheep?54:55;
             bool prepared=shop.inventory!=null&&shop.inventory.Remove(feed,1);
             if(!prepared&&!shop.ConsumeFeed())
-            {message="Thiếu "+(shop.inventory==null?"thức ăn":shop.inventory.Name(feed))+". Chế biến ở cối xay hoặc mua ở shop.";return false;}
+            {message="Thiếu "+(shop.inventory==null?"thức ăn":shop.inventory.Name(feed))+". Hãy chế biến ở cối xay.";return false;}
             Hunger=Mathf.Min(100,Hunger+(prepared?70:55)); Happiness=Mathf.Min(100,Happiness+(prepared?28:20));
             message="Đã cho "+name+" ăn "+(prepared?"thức ăn đúng loài":"thức ăn chung")+". No "+Mathf.RoundToInt(Hunger)+"%, vui "+Mathf.RoundToInt(Happiness)+"%.";
             return true;

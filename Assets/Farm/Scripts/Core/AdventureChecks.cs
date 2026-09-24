@@ -25,13 +25,20 @@ namespace NongTrai
             Physics.SyncTransforms();if(building.TryPlaceSelected(place,0)||building.TryPlaceSelected(player.transform.position+Vector3.up*.5f,0))throw new Exception("Placement overlap accepted");
             PlacedBlock block=null;foreach(var b in UnityEngine.Object.FindObjectsByType<PlacedBlock>(FindObjectsSortMode.None))if(Vector3.Distance(b.transform.position,place)<.1f)block=b;
             if(!building.BreakPlaced(block,true)||WorldPickup.Snapshot().Length==0)throw new Exception("Placed block destruction did not drop loot");
+            Vector3 high=place+Vector3.up*4;
+            if(!building.TryPlaceSelected(high,0))throw new Exception("Elevated block placement failed");
+            PlacedBlock falling=null;foreach(var b in UnityEngine.Object.FindObjectsByType<PlacedBlock>(FindObjectsSortMode.None))if(Vector3.Distance(b.transform.position,high)<.1f)falling=b;
+            float fallStart=falling.transform.position.y,fallDeadline=Time.time+.5f;
+            while(Time.time<fallDeadline){player.SetPaused(false);yield return null;}
+            if(falling.transform.position.y>=fallStart-.25f)throw new Exception("Unsupported placed block did not fall");
+            building.BreakPlaced(falling,true);
             bag.Slots[0]=new BagSlot{item=104,count=1,durability=2};bag.Select(0);
             if(bag.BreakSeconds(3)>=2||!bag.DamageTool()||!bag.DamageTool()||bag.DamageTool())throw new Exception("Tool hardness/durability failed");
             inv.Add(27,1);var soil=new Vector3Int(15,3,6);if(!world.Plant(soil))throw new Exception("Sapling planting failed");
             var random=UnityEngine.Random.state;UnityEngine.Random.InitState(813);TimeManager.Instance.Restore(2,.5f,FarmWeather.Sunny);
             for(int i=0;i<100;i++)world.AdvanceTrees(10);UnityEngine.Random.state=random;
             if(world.BlockAt(soil+Vector3Int.up)!=7)throw new Exception("Sapling stages did not produce wood trunk");
-            for(int y=1;y<=4;y++)world.MineCell(soil+Vector3Int.up*y,true,true);world.AdvanceTrees(6);
+            for(int n=0;n<5;n++)world.MineCell(soil+Vector3Int.up,true,true);world.AdvanceTrees(6);
             if(world.BlockAt(soil+new Vector3Int(2,5,2))!=0)throw new Exception("Unsupported leaves failed to decay");
             var wildlife=AdventureWildlife.Instance;
             wildlife.Restore(new WildlifeState{animals=new[]{new WildRecord{id="test-a",species=0,position=new Vector3(188,1000.1f,-20)},new WildRecord{id="test-b",species=0,position=new Vector3(190,1000.1f,-20)}}});

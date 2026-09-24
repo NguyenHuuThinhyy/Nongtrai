@@ -11,12 +11,13 @@ namespace NongTrai
         public FarmHud hud;
         public FieldManager field;
         public FarmShop shop;
-        public int[] AnimalProducts { get; private set; } = new int[52];
+        public const int ItemCount=63;
+        public int[] AnimalProducts { get; private set; } = new int[ItemCount-4];
         public int[] MutatedCrops { get; private set; } = new int[7];
         static readonly int[] mutantBasePrices={8,18,32,15,55,90,130};
         public GameObject Panel { get; private set; }
-        readonly string[] itemNames = { "Lúa mì", "Cà chua", "Đậu nành", "Táo", "Trứng", "Sữa", "Lông cừu", "Thịt heo", "Bột mì", "Bánh mì", "Phô mai", "Nước táo", "Gỗ cũ", "Quặng", "Ván", "Kim loại", "Bó nông sản", "Gói đậu", "Giỏ táo", "Đèn thủ công", "Khối gỗ", "Khối đá", "Khối gạch", "Khối kính", "Khối kim loại", "Khối cỏ", "Bàn chế tạo", "Hạt cây táo", "Bậc gỗ", "Đuốc", "Hàng rào", "Ván cầu", "Bánh táo", "Mứt cà chua", "Cám dinh dưỡng", "Phân bón", "Rương đồ", "Đống lửa", "Nông sản đột biến", "Thịt nướng", "Hạt bí ngô", "Hạt dâu ruộng", "Hạt hướng dương", "Bí ngô", "Dâu ruộng", "Hướng dương", "Lê", "Đào", "Việt quất", "Hạt lê", "Hạt đào", "Hạt bụi việt quất", "Thức ăn gà", "Thức ăn bò", "Thức ăn cừu", "Thức ăn heo" };
-        readonly int[] unitPrices = { 8,18,32,15,8,20,25,30,22,65,65,35,12,18,34,50,45,55,95,165,18,14,24,35,55,16,90,12,35,55,26,45,65,48,40,25,95,85,24,65,20,30,45,55,90,130,50,75,45,45,65,40,28,38,42,48 };
+        readonly string[] itemNames = { "Lúa mì", "Cà chua", "Đậu nành", "Táo", "Trứng", "Sữa", "Lông cừu", "Thịt heo sống", "Bột mì", "Bánh mì", "Phô mai", "Nước táo", "Gỗ cũ", "Quặng", "Ván", "Kim loại", "Bó nông sản", "Gói đậu", "Giỏ táo", "Đèn thủ công", "Khối gỗ", "Khối đá", "Khối gạch", "Khối kính", "Khối kim loại", "Khối cỏ", "Bàn chế tạo", "Hạt cây táo", "Bậc gỗ", "Đuốc", "Hàng rào", "Ván cầu", "Bánh táo", "Mứt cà chua", "Cám dinh dưỡng", "Phân bón", "Rương đồ", "Đống lửa", "Nông sản đột biến", "Thịt heo nướng", "Hạt bí ngô", "Hạt dâu ruộng", "Hạt hướng dương", "Bí ngô", "Dâu ruộng", "Hướng dương", "Lê", "Đào", "Việt quất", "Hạt lê", "Hạt đào", "Hạt bụi việt quất", "Thức ăn gà", "Thức ăn bò", "Thức ăn cừu", "Thức ăn heo", "Vòi phun di động", "Thịt bò sống", "Thịt cừu sống", "Thịt gà sống", "Thịt bò nướng", "Thịt cừu nướng", "Thịt gà nướng" };
+        readonly int[] unitPrices = { 8,18,32,15,8,20,25,30,22,65,65,35,12,18,34,50,45,55,95,165,18,14,24,35,55,16,90,12,35,55,26,45,65,48,40,25,95,85,24,65,20,30,45,55,90,130,50,75,45,45,65,40,28,38,42,48,350,45,38,25,95,85,60 };
         public int Price(int item) => item>=0 && item<unitPrices.Length?unitPrices[item]:0;
         public string Name(int item) => item>=0 && item<itemNames.Length?itemNames[item]:"?";
         TMP_Text[] amounts;
@@ -33,7 +34,7 @@ namespace NongTrai
             var content=new GameObject("Inventory content",typeof(RectTransform));
             var contentRect=content.GetComponent<RectTransform>();contentRect.SetParent(viewport.transform,false);
             contentRect.anchorMin=new Vector2(0,1);contentRect.anchorMax=new Vector2(1,1);contentRect.pivot=new Vector2(0,1);
-            contentRect.anchoredPosition=Vector2.zero;contentRect.sizeDelta=new Vector2(0,2600);
+            contentRect.anchoredPosition=Vector2.zero;contentRect.sizeDelta=new Vector2(0,3000);
             var scroll=viewport.AddComponent<ScrollRect>();scroll.viewport=vr;scroll.content=contentRect;scroll.horizontal=false;scroll.vertical=true;
             scroll.movementType=ScrollRect.MovementType.Clamped;scroll.scrollSensitivity=38;
             status=FarmUi.TmpLabel(Panel.transform,"Di chuột lên vật phẩm để xem mô tả; bán từng loại ở dưới.",
@@ -65,7 +66,7 @@ namespace NongTrai
             }
             FarmUi.Button(Panel.transform,"Trở lại game",new Vector2(30,-870),new Vector2(360,54),hud.Resume);
             FarmUi.Button(Panel.transform,"Mở cửa hàng",new Vector2(400,-870),new Vector2(390,54),shop.Open);
-            FarmUi.Button(Panel.transform,"Xây dựng [G]",new Vector2(800,-870),new Vector2(360,54),OpenBuilding);
+            FarmUi.Button(Panel.transform,"Xây dựng",new Vector2(800,-870),new Vector2(360,54),OpenBuilding);
             Panel.SetActive(false);
             hud.player.PauseChanged += OnPause;
             gameObject.AddComponent<AdventureBag>().Initialize(this);

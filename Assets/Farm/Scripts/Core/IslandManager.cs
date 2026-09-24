@@ -41,7 +41,7 @@ namespace NongTrai
             if(exploring){explorePosition=player.transform.position;hasExplorePosition=true;}
             else{farmPosition=player.transform.position;hasFarmPosition=true;}
             hud.Resume();player.Teleport(index==0?FarmPosition:ExplorePosition);
-            hud.Notify(index==0?"Nông trại • B túi đồ • M chế biến • chuột trái tương tác":"Khám phá • Giữ chuột trái để đào • G xây • Tab về nông trại");return true;
+            hud.Notify(index==0?"Nông trại • B túi đồ • M chế biến • chuột trái tương tác":"Khám phá • Giữ chuột trái để đào • B túi đồ/Xây dựng • Tab về nông trại");return true;
         }
         public void UnlockMiningBlueprint()
         { if(Blueprints>0)return;Blueprints=1;hud.Notify("Đào 30 khối: đã mở bản vẽ lò nung và đèn thủ công!"); }

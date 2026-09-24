@@ -26,6 +26,11 @@ namespace NongTrai
             string baseline=File.ReadAllText(save.SavePath);
             try
             {
+                save.shop.Credit(200);
+                if(!save.shop.Purchase(18,out _)||save.shop.Purchase(18,out _))
+                    throw new Exception("One torch purchase per day was not enforced");
+                clock.Restore(clock.Day+1,.25f,FarmWeather.Sunny);
+                if(!save.shop.Purchase(18,out _))throw new Exception("Torch did not become available next day");
                 var plot=UnityEngine.Object.FindFirstObjectByType<FarmPlot>();
                 plot.Restore(PlotState.Ready,save.field.crops[1],1,.7f,true);
                 inventory.AddMutated(1,2);
@@ -37,8 +42,8 @@ namespace NongTrai
                 if(inventory.Sell(38,2)!=108||save.shop.Money!=money+108)
                     throw new Exception("Mutated tomato did not sell for three times 18 xu");
 
-                save.expansion.Restore(6,0,clock.Day,.25f,save.expansion.ToolTiers,
-                    new[]{true,true,true,true},99);
+                save.expansion.Restore(3,0,clock.Day,.25f,save.expansion.ToolTiers,
+                    new[]{true,true,true,false},99);
                 clock.Restore(clock.Day,.25f,FarmWeather.Rain,120);
                 var extraPlot=Array.Find(UnityEngine.Object.FindObjectsByType<FarmPlot>(FindObjectsSortMode.None),x=>x.id==1);
                 extraPlot.Restore(PlotState.Tilled,null,0,0);
@@ -48,7 +53,9 @@ namespace NongTrai
                     throw new Exception("Extra LV crop did not consume its hotbar seed");
                 inventory.Add(27,1);
                 if(!FruitTree.TryPlantAt(new Vector3(78,0,30),save.shop,inventory,out var reason))
-                    throw new Exception("LV6 exploration sapling could not be planted: "+reason);
+                    throw new Exception("LV3 orchard seed should not need land region 4: "+reason);
+                save.expansion.Restore(4,0,clock.Day,.25f,save.expansion.ToolTiers,
+                    new[]{true,true,true,false},99);
                 inventory.Add(49,1);
                 if(!FruitTree.TryPlantAt(new Vector3(68,0,20),save.shop,inventory,out reason,49))
                     throw new Exception("Pear tree seed failed: "+reason);
@@ -60,6 +67,7 @@ namespace NongTrai
                 if(inventory.Count(46)!=pears+5)throw new Exception("Pear harvest failed");
                 save.shop.Credit(FarmWaterSystem.PortablePrice);
                 water.BuyPortable();
+                if(inventory.Count(56)<1)throw new Exception("Sprinkler purchase did not enter the bag");
                 if(!water.TryPlacePortable(new Vector3(65,0,12))||water.PortableCount<1)
                     throw new Exception("Portable sprinkler purchase/placement failed");
                 water.RefillCan();
@@ -68,6 +76,8 @@ namespace NongTrai
                     if(station.portable)sprinkler=station;
                 if(sprinkler==null||!water.RefillPortable(sprinkler)||sprinkler.remainingSeconds<1799)
                     throw new Exception("Portable sprinkler refill failed");
+                if(!water.DismantlePortable(sprinkler)||inventory.Count(56)<1||!water.TryPlacePortable(new Vector3(65,0,12)))
+                    throw new Exception("Sprinkler could not be collected and placed again");
                 processing.Restore(null);inventory.Add(0,2);
                 if(!processing.Enqueue(7))throw new Exception("Chicken-feed processing recipe failed");
                 int chickenFeed=inventory.Count(52);processing.Advance(31);
@@ -79,12 +89,25 @@ namespace NongTrai
                 save.shop.Open();orders.OpenMail();
                 if(save.shop.Panel.activeSelf||!orders.MailPanel.activeSelf||!save.shop.hud.CloseOverlay())
                     throw new Exception("Modal panels overlapped or could not close");
+                inventory.Add(57,1);bag.Slots[8]=new BagSlot{item=57,count=1};bag.Select(8);
+                var fire=new GameObject("Smoke cooking fire").AddComponent<CampfireCooker>();
+                fire.Interact(save.shop.hud.interaction);
+                if(!fire.Cooking||fire.OutputItem!=60||inventory.Count(57)!=0)
+                    throw new Exception("Raw beef was not accepted by the campfire");
+                fire.Restore(true,.01f,60);player.SetPaused(false);yield return null;yield return null;
+                if(inventory.Count(60)<1)throw new Exception("Campfire did not produce cooked beef");
+                UnityEngine.Object.Destroy(fire.gameObject);
+                var board=FarmNoticeBoard.Instance;board.RestoreQuest(0);inventory.Add(0,3);
+                int questMoney=save.shop.Money;
+                if(!board.ClaimQuest()||board.QuestStage!=1||save.shop.Money<=questMoney)
+                    throw new Exception("Progressive map quest did not pay coins and unlock the next step");
                 var pen=placement.Create(AnimalSpecies.Chicken,new Vector3(75,0,-30),-1);
                 int penId=pen.id;
+                orders.OnNewDay(clock.Day);
                 orders.Orders[0].completed=true;
                 if(!save.Save())throw new Exception("v12 changed save failed");
                 string payload=File.ReadAllText(save.SavePath);
-                if(!payload.Contains("\"version\": 13")||!payload.Contains("\"mutated\": true")||
+                if(!payload.Contains("\"version\": 14")||!payload.Contains("\"mutated\": true")||
                     !payload.Contains("\"weatherRemaining\""))
                     throw new Exception("v12 save fields missing");
                 plot.Restore(PlotState.Untilled,null,0,0);
@@ -103,7 +126,7 @@ namespace NongTrai
                  if(tree.fruitKind==1&&Vector3.Distance(tree.transform.position,new Vector3(68,0,20))<2)foundPear=true;}
                 foreach(var item in UnityEngine.Object.FindObjectsByType<AnimalPen>(FindObjectsSortMode.None))
                     if(item.id==penId&&item.species==AnimalSpecies.Chicken)foundPen=true;
-                if(!foundTree||!foundPear||!foundPen||water.PortableCount<1||extraPlot.Crop!=save.field.crops[3])
+                if(!foundTree||!foundPear||!foundPen||water.PortableCount<1||extraPlot.Crop!=save.field.crops[3]||FarmNoticeBoard.Instance.QuestStage!=1||save.shop.PurchaseCounts[18]!=1)
                     throw new Exception("v13 trees, crop, pen or sprinkler were lost");
                 orders.OnNewDay(clock.Day+1);
                 foreach(var order in orders.Orders)if(order.completed)
@@ -132,7 +155,7 @@ namespace NongTrai
                 wolves.Damage(200,"smoke damage");wolves.Respawn(true);
                 if(wolves.Health!=100||save.shop.Money!=beforePay-100)
                     throw new Exception("Pay-100 respawn failed");
-                Debug.Log("FARM_V13_OK: mutated crops x3, warehouse, new crop and pear tree, portable sprinkler, chicken feed, modal isolation, placed pen, completed orders, legacy tools and respawn.");
+                Debug.Log("FARM_V14_OK: LV3 orchard, bag sprinkler/replacement, progressive quest, animal feed, save migration and respawn.");
             }
             finally
             {

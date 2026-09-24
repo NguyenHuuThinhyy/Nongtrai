@@ -13,6 +13,7 @@ namespace NongTrai
         public float Health { get; private set; } = 100;
         public bool IsAwaitingRespawn=>deathPanel!=null&&deathPanel.activeSelf;
         readonly List<NightWolf> wolves = new List<NightWolf>();
+        readonly List<DayPredator> daytime = new List<DayPredator>();
         FarmHud hud;
         TMP_Text status;
         float spawnTimer;
@@ -59,6 +60,9 @@ namespace NongTrai
             {starvationTimer+=Time.deltaTime;if(starvationTimer>=5){starvationTimer-=5;Damage(2,"Đói cạn: -2 máu. Hãy ăn thức ăn chín.");}}
             else starvationTimer=0;
             for (int i = wolves.Count - 1; i >= 0; i--) if (wolves[i] == null) wolves.RemoveAt(i);
+            for(int i=daytime.Count-1;i>=0;i--)if(daytime[i]==null)daytime.RemoveAt(i);
+            if(!night&&exploring)SpawnDayPredator();
+            else if(daytime.Count>0){foreach(var enemy in daytime)if(enemy!=null)Destroy(enemy.gameObject);daytime.Clear();}
             if (!night)
             {
                 if (wolves.Count > 0) { foreach (var wolf in wolves) if (wolf != null) { if (exploring) wolf.Retreat(); else Destroy(wolf.gameObject); } wolves.Clear(); if (exploring) hud.Notify("Trời sáng: sói đang rút về hang."); }
@@ -82,9 +86,26 @@ namespace NongTrai
                 wolves.Add(NightWolf.Create(point, this)); break;
             }
         }
-        public void Bite()
+        float daylightSpawnTimer;
+        void SpawnDayPredator()
+        {
+            daylightSpawnTimer+=Time.deltaTime;if(daylightSpawnTimer<22||daytime.Count>=2)return;daylightSpawnTimer=0;
+            var world=ExplorationWorld.Instance;var player=hud.player.transform;var cell=world.CellAt(player.position);
+            bool cave=cell.y<world.SurfaceHeight(cell.x,cell.z)-2;
+            if(!cave&&world.BiomeAt(cell.x,cell.z)!="Đồng cỏ")return;
+            for(int attempt=0;attempt<8;attempt++)
+            {float angle=Random.Range(0,Mathf.PI*2);var candidate=player.position+new Vector3(Mathf.Cos(angle),0,Mathf.Sin(angle))*Random.Range(10,16);
+             var at=world.CellAt(candidate);if(!cave&&world.BiomeAt(at.x,at.z)!="Đồng cỏ")continue;
+             float y=cave?player.position.y+2:ExplorationWorld.Origin.y+world.SurfaceHeight(at.x,at.z)+4;
+             if(!Physics.Raycast(new Vector3(candidate.x,y,candidate.z),Vector3.down,out var hit,cave?5:7,1,QueryTriggerInteraction.Ignore))continue;
+             if(Mathf.Abs(hit.point.y-player.position.y)>3)continue;
+             daytime.Add(DayPredator.Create(hit.point+Vector3.up*.1f,this,cave));break;}
+        }
+        public void Bite(Vector3 attacker)
         {
             if (IsSafe(hud.player.transform.position)) return;
+            hud.player.ApplyImpact(hud.player.transform.position-attacker);
+            FarmEffects.Burst(hud.player.transform.position+Vector3.up*1.3f,"-12 máu",new Color(.67f,.30f,.91f));
             Damage(12,"Sói cắn! -12 máu. Hãy chạy tới đuốc hoặc đống lửa.");
         }
         public void Damage(float amount,string message)
@@ -124,11 +145,56 @@ namespace NongTrai
         }
     }
 
+    // A small, capped daytime threat. Foxes patrol meadows; snakes wait inside excavated caves.
+    public sealed class DayPredator:MonoBehaviour
+    {
+        AdventureWolves owner;CharacterController body;bool snake;float health=55,gravity,attackCooldown,alert,roam;Vector3 target,knockback;
+        public static DayPredator Create(Vector3 point,AdventureWolves manager,bool isSnake)
+        {var root=new GameObject(isSnake?"Rắn hang động":"Cáo đồng cỏ",typeof(CharacterController),typeof(DayPredator));root.transform.position=point;
+         var enemy=root.GetComponent<DayPredator>();enemy.owner=manager;enemy.snake=isSnake;enemy.body=root.GetComponent<CharacterController>();
+         enemy.body.height=isSnake?.55f:.85f;enemy.body.radius=.35f;enemy.body.center=Vector3.up*(isSnake?.28f:.43f);enemy.body.stepOffset=.3f;
+         Color coat=isSnake?new Color(.25f,.56f,.28f):new Color(.85f,.38f,.18f);
+         Part(root.transform,"Thân",new Vector3(0,isSnake?.25f:.43f,0),new Vector3(isSnake?.46f:.70f,isSnake?.33f:.50f,isSnake?1.3f:.95f),coat);
+         Part(root.transform,"Đầu",new Vector3(0,isSnake?.27f:.63f,isSnake?.58f:.49f),new Vector3(.45f,.39f,.43f),coat);
+         for(int side=-1;side<=1;side+=2)
+         {Part(root.transform,"Mắt",new Vector3(side*.15f,isSnake?.36f:.71f,isSnake?.77f:.75f),Vector3.one*.07f,Color.yellow);
+          if(!isSnake){Part(root.transform,"Tai",new Vector3(side*.23f,.90f,.50f),new Vector3(.17f,.30f,.15f),coat);
+           Part(root.transform,"Chân",new Vector3(side*.25f,.22f,0),new Vector3(.17f,.42f,.19f),new Color(.36f,.24f,.19f));}}
+         enemy.target=point;return enemy;}
+        static void Part(Transform parent,string name,Vector3 pos,Vector3 scale,Color color)
+        {var go=GameObject.CreatePrimitive(PrimitiveType.Sphere);go.name=name;go.transform.SetParent(parent,false);go.transform.localPosition=pos;go.transform.localScale=scale;
+         Destroy(go.GetComponent<Collider>());var material=new Material(Shader.Find("Universal Render Pipeline/Lit"));material.color=color;go.GetComponent<Renderer>().material=material;}
+        public void Hit(Vector3 attacker)
+        {var bag=AdventureBag.Instance;int tool=bag==null?-1:bag.Item;if((tool==104||tool==106||tool==107)&&!bag.DamageTool())return;
+         health-=tool==106?24:tool==107?16:6;knockback=transform.position-attacker;knockback.y=0;knockback=knockback.normalized*3;
+         alert=8;if(health<=0){FarmExpansion.Instance?.GainExperience(12);FarmEffects.Burst(transform.position+Vector3.up,"+12 XP",Color.yellow);Destroy(gameObject);}}
+        void Update()
+        {if(owner==null||TimeManager.Instance.player.Paused)return;var player=TimeManager.Instance.player.transform;
+         Vector3 delta=player.position-transform.position;delta.y=0;float distance=delta.magnitude;
+         if(distance>36||owner.IsNight||!ExplorationWorld.Instance.IsExploring){Destroy(gameObject);return;}
+         attackCooldown=Mathf.Max(0,attackCooldown-Time.deltaTime);alert=Mathf.Max(0,alert-Time.deltaTime);
+         if(distance<9&&Vector3.Dot(transform.forward,delta.normalized)>.62f)
+         {var eye=transform.position+Vector3.up*.5f;var toward=(player.position+Vector3.up-eye);
+          if(Physics.Raycast(eye,toward.normalized,out var hit,toward.magnitude+1,~0,QueryTriggerInteraction.Ignore)&&hit.collider.GetComponentInParent<FarmPlayer>()!=null)alert=6;}
+         if(alert>0)target=player.position;else{roam-=Time.deltaTime;if(roam<=0){target=transform.position+new Vector3(Random.Range(-3f,3f),0,Random.Range(-3f,3f));roam=Random.Range(2f,5f);}}
+         Vector3 move=target-transform.position;move.y=0;move=move.sqrMagnitude>.2f?move.normalized:Vector3.zero;
+         if(move.sqrMagnitude>.01f)transform.rotation=Quaternion.Slerp(transform.rotation,Quaternion.LookRotation(move),Time.deltaTime*6);
+         gravity=body.isGrounded?-.8f:Mathf.Max(-20,gravity-24*Time.deltaTime);
+         body.Move((move*(alert>0?(snake?3.4f:4.5f):1.0f)+knockback+Vector3.up*gravity)*Time.deltaTime);
+         knockback=Vector3.MoveTowards(knockback,Vector3.zero,Time.deltaTime*9);
+         if(alert>0&&distance<1.5f&&attackCooldown<=0)
+         {attackCooldown=2;owner.Damage(snake?10:8,(snake?"Rắn cắn":"Cáo cắn")+"! Hãy lùi lại và dùng kiếm.");
+          TimeManager.Instance.player.ApplyImpact(player.position-transform.position,2.5f);
+          FarmEffects.Burst(player.position+Vector3.up*1.2f,"BỊ CẮN",new Color(.67f,.3f,.9f));}
+        }
+    }
+
     public sealed class NightWolf : MonoBehaviour
     {
         AdventureWolves pack;
         CharacterController controller;
-        float gravity, biteTimer,health=45;
+        const float MaxHealth=160;
+        float gravity, biteTimer,health=MaxHealth;
         Vector3 knockback;
         Transform healthCanvas;
         Image healthFill;
@@ -182,7 +248,7 @@ namespace NongTrai
         void Update()
         {
             if (pack == null || TimeManager.Instance.player.Paused) return;
-            if(healthCanvas!=null&&Camera.main!=null){healthCanvas.rotation=Camera.main.transform.rotation;healthFill.rectTransform.sizeDelta=new Vector2(96*Mathf.Clamp01(health/45),8);}
+            if(healthCanvas!=null&&Camera.main!=null){healthCanvas.rotation=Camera.main.transform.rotation;healthFill.rectTransform.sizeDelta=new Vector2(96*Mathf.Clamp01(health/MaxHealth),8);}
             var player = TimeManager.Instance.player.transform;
             var delta = player.position - transform.position; delta.y = 0;
             if(retreating)
@@ -203,11 +269,12 @@ namespace NongTrai
             if (delta.magnitude < 1.6f && !afraid)
             {
                 biteTimer -= Time.deltaTime;
-                if (biteTimer <= 0) { biteTimer = 2.2f; pack.Bite(); }
+                if (biteTimer <= 0) { biteTimer = 2.2f; pack.Bite(transform.position); }
             }
             if (direction.sqrMagnitude > .01f) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 5);
             gravity = controller.isGrounded ? -.8f : Mathf.Max(-20, gravity - 25 * Time.deltaTime);
-            var collision=controller.Move((direction * (afraid ? 4.2f : 2.2f) + knockback + Vector3.up * gravity) * Time.deltaTime);
+            float chaseSpeed=afraid?4.2f:delta.magnitude<7?6.8f:2.7f;
+            var collision=controller.Move((direction * chaseSpeed + knockback + Vector3.up * gravity) * Time.deltaTime);
             knockback=Vector3.MoveTowards(knockback,Vector3.zero,Time.deltaTime*8);
             if((collision&CollisionFlags.Sides)!=0&&controller.isGrounded)gravity=5.2f;
         }

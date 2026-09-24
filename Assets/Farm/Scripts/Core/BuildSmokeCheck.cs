@@ -155,7 +155,11 @@ namespace NongTrai
             for(int i=0;i<5;i++) if(!shop.ConsumeSeed(0)) throw new InvalidOperationException("Seed use failed.");
             if(shop.ConsumeSeed(0)) throw new InvalidOperationException("Seed inventory went negative.");
             if(!shop.Purchase(0,out _) || shop.Seeds[0]!=5 || shop.Money!=980) throw new InvalidOperationException("Seed purchase failed.");
-            if(!shop.Purchase(3,out _) || !shop.Purchase(4,out _) || !shop.Purchase(4,out _)) throw new InvalidOperationException("Animal purchase failed.");
+            if(!shop.Purchase(3,out _) || !shop.Purchase(4,out _)) throw new InvalidOperationException("Animal purchase failed.");
+            int dailyMoney=shop.Money;
+            if(shop.Purchase(4,out _)||shop.Money!=dailyMoney)throw new InvalidOperationException("Daily purchase limit failed.");
+            TimeManager.Instance.Restore(TimeManager.Instance.Day+1,.25f,FarmWeather.Sunny);
+            if(!shop.Purchase(4,out _))throw new InvalidOperationException("Next-day animal purchase failed.");
             if(shop.speciesPens[0].AnimalCount()!=2 || shop.speciesPens[1].AnimalCount()!=4) throw new InvalidOperationException("Species pens mismatched.");
             int money=shop.Money;
             if(shop.Purchase(4,out _) || shop.Money!=money) throw new InvalidOperationException("Pig pen capacity failed.");
@@ -169,9 +173,9 @@ namespace NongTrai
             if(!shop.Purchase(8,out _) || shop.BoughtTrees!=1 || inventory.Count(27)<1) throw new InvalidOperationException("Apple seed purchase failed.");
             shop.Credit(500);
             int woodBefore=inventory.Count(20),grassBefore=inventory.Count(25),feedBefore=shop.FeedStock;
-            if(!shop.Purchase(13,out _)||!shop.Purchase(14,out _)||!shop.Purchase(15,out _)||
-                inventory.Count(20)!=woodBefore+5||inventory.Count(25)!=grassBefore+5||shop.FeedStock!=feedBefore+10)
-                throw new InvalidOperationException("Expanded block and feed shop failed.");
+            if(shop.Purchase(13,out _)||shop.Purchase(14,out _)||shop.Purchase(15,out _)||
+                inventory.Count(20)!=woodBefore||inventory.Count(25)!=grassBefore||shop.FeedStock!=feedBefore)
+                throw new InvalidOperationException("Blocks and animal feed must be crafted or gathered.");
             yield return null;
             inventory.Remove(27,1);
             var apple=Instantiate(shop.treePrefab,new Vector3(-28,0,-5),Quaternion.identity).GetComponent<FruitTree>();
@@ -179,7 +183,7 @@ namespace NongTrai
             apple.remaining=0; apple.Harvest(shop); apple.Harvest(shop);
             if(inventory.Count(3)!=5 || inventory.Sell(3,2)!=30 || inventory.Count(3)!=3 || shop.SellHarvest()!=45)
                 throw new InvalidOperationException("Individual fruit sales failed.");
-            if(inventory.Count(20)!=woodBefore+5 || inventory.Count(25)!=grassBefore+5)
+            if(inventory.Count(20)!=woodBefore || inventory.Count(25)!=grassBefore)
                 throw new InvalidOperationException("Sell all crops must preserve building blocks.");
             var cow=FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None);
             FarmAnimal milkCow=null, sheep=null, pig=null, chicken=null;
@@ -207,10 +211,12 @@ namespace NongTrai
             yield return null;
             if(inventory.Count(7)!=6 || shop.speciesPens[1].AnimalCount()!=3) throw new InvalidOperationException("Meat/slaughter failed.");
             shop.Credit(500);
-            for(int i=0;i<3;i++) if(!shop.Purchase(6,out _)) throw new InvalidOperationException("Buying chicken up to five failed.");
+            for(int i=0;i<3;i++){TimeManager.Instance.Restore(TimeManager.Instance.Day+1,.25f,FarmWeather.Sunny);
+                if(!shop.Purchase(6,out _)) throw new InvalidOperationException("Buying chicken up to five failed.");}
             money=shop.Money;
             if(shop.speciesPens[3].AnimalCount()!=5)
                 throw new InvalidOperationException("Five chicken limit failed.");
+            TimeManager.Instance.Restore(TimeManager.Instance.Day+1,.25f,FarmWeather.Sunny);
             if(!shop.Purchase(6,out _) || shop.extraChickenPen.AnimalCount()!=1)
                 throw new InvalidOperationException("Second chicken pen assignment failed.");
             if(inventory.Sell(4,1)!=8 || inventory.Count(4)!=previousEggs+1 || inventory.Sell(7,int.MaxValue)!=180)
@@ -344,6 +350,7 @@ namespace NongTrai
             if(!building.TryPlaceSelected(new Vector3(0,.5f,-35),0) || inventory.Count(26)!=0 || !building.HasPlacedTable)
                 throw new InvalidOperationException("Crafting table placement failed.");
             building.Select(0);
+            inventory.Add(20,1);
             int woodForBuilding=inventory.Count(20);
             if(!building.TryPlaceSelected(new Vector3(2,.5f,-35),0) || inventory.Count(20)!=woodForBuilding-1 ||
                 building.Snapshot().blocks.Length!=2)
@@ -514,7 +521,7 @@ namespace NongTrai
             string modernSave=File.ReadAllText(save.SavePath);
             player.Teleport(new Vector3(200,.4f,-20));
             if(!save.Save())throw new InvalidOperationException("Migration fixture save failed.");
-            string oldSave=File.ReadAllText(save.SavePath).Replace("\"version\": 13","\"version\": 7");
+            string oldSave=File.ReadAllText(save.SavePath).Replace("\"version\": 14","\"version\": 7");
             File.WriteAllText(save.SavePath,oldSave);
             if(!save.Load()||Mathf.Abs(player.transform.position.y-1000.4f)>1)throw new InvalidOperationException("Legacy player position migration failed.");
             File.WriteAllText(save.SavePath,modernSave);if(!save.Load())throw new InvalidOperationException("Modern restore failed.");

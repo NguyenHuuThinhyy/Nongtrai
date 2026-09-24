@@ -173,6 +173,14 @@ namespace NongTrai
             foreach(var dir in dirs)
             {var neighbor=Key(c.x+dir.x,c.z+dir.z);if(neighbor!=key&&chunks.TryGetValue(neighbor,out var n))Rebuild(neighbor,n);}
             if(type==7)for(int x=-3;x<=3;x++)for(int y=-5;y<=5;y++)for(int z=-3;z<=3;z++){var leaf=c+new Vector3Int(x,y,z);if(BlockAt(leaf)==8)leavesToCheck.Add(leaf);}
+            if(type==7)
+            {
+                var fallingDirty=new HashSet<Vector2Int>();
+                var hanging=new List<Vector3Int>();for(int y=c.y+1;y<Height&&BlockAt(new Vector3Int(c.x,y,c.z))==7;y++)hanging.Add(new Vector3Int(c.x,y,c.z));
+                foreach(var old in hanging)
+                {removed.Add(old);additions.Remove(old);var next=old+Vector3Int.down;removed.Remove(next);additions[next]=7;fallingDirty.Add(Key(old.x,old.z));}
+                if(hanging.Count>0)RefreshCells(fallingDirty);
+            }
             return true;
         }
         public bool Plant(Vector3Int soil)
@@ -234,6 +242,10 @@ namespace NongTrai
                 if(wolf!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
                 {miningHint="Sói đêm • Chuột trái: đánh từng đòn";hasTarget=true;hold=0;
                  if(Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame)wolf.Hit(hud.player.transform.position);return false;}
+                var predator=hit.collider.GetComponentInParent<DayPredator>();
+                if(predator!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
+                {miningHint=predator.name+" • Chuột trái: đánh từng đòn";hasTarget=true;hold=0;
+                 if(Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame)predator.Hit(hud.player.transform.position);return false;}
                 var wild=hit.collider.GetComponentInParent<WildAnimal>();
                 if(wild!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
                 {entityTarget=wild.GetInstanceID();hold=0;breakDuration=.35f;miningHint=wild.Status;hasTarget=true;

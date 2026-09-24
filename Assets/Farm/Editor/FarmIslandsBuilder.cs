@@ -7,7 +7,7 @@ namespace NongTrai.Editor
         {
             Portal(parent,new Vector3(0,1.5f,17),1,"Khám phá",metal);
             Portal(parent,new Vector3(200,1001.5f,-23),0,"Nông trại",gold);
-            Sign(parent,new Vector3(204,1000,-20),"KHÁM PHÁ","Giữ chuột trái đào khối. G xây dựng, Tab về nông trại. Đào 30 khối mở lò nung.");
+            Sign(parent,new Vector3(204,1000,-20),"KHÁM PHÁ","Giữ chuột trái đào khối. B mở túi rồi chọn Xây dựng. Tab về nông trại. Đào 30 khối mở lò nung.");
             Sign(parent,new Vector3(-4,0,15),"NÔNG TRẠI","Trồng cây, chăm thú, chế biến và giao hàng. B mở túi/shop; Tab sang khám phá.");
         }
         static void Portal(Transform parent,Vector3 point,int destination,string label,Material material)

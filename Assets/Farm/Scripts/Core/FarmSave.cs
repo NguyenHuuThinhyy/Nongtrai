@@ -14,7 +14,8 @@ namespace NongTrai
         [Serializable] sealed class ResourceRecord { public int id; public float remaining; }
         [Serializable] sealed class SaveData
         {
-            public int version=13,money,fruit,treeCount,selected,feed,level,xp,day,weather,levelCap;
+            public int version=14,money,fruit,treeCount,selected,feed,level,xp,day,weather,levelCap,shopPurchaseDay,questStage;
+            public int[] shopPurchases;
             public float dayTime,musicVolume,effectsVolume,weatherRemaining;
             public bool expanded,tutorialDone;
             public int[] seeds,harvested,products,mutatedCrops;
@@ -65,6 +66,7 @@ namespace NongTrai
             {
                 var data=new SaveData { money=shop.Money,fruit=shop.Fruit,expanded=shop.Expanded,
                     treeCount=shop.BoughtTrees,selected=field.Selected,tutorialDone=FarmTutorialCoach.Instance!=null&&FarmTutorialCoach.Instance.Completed,
+                    shopPurchaseDay=shop.PurchaseDay,shopPurchases=shop.PurchaseCounts,questStage=FarmNoticeBoard.Instance==null?0:FarmNoticeBoard.Instance.QuestStage,
                     seeds=(int[])shop.Seeds.Clone(),harvested=(int[])field.Harvested.Clone(),
                     products=(int[])inventory.AnimalProducts.Clone(),mutatedCrops=(int[])inventory.MutatedCrops.Clone(),feed=shop.FeedStock,
                     level=expansion.Level,xp=expansion.Experience,levelCap=expansion.LevelCap,
@@ -121,7 +123,7 @@ namespace NongTrai
             try
             {
                 var data=JsonUtility.FromJson<SaveData>(File.ReadAllText(SavePath));
-                if(data==null || data.version<2 || data.version>13 || data.seeds==null || data.seeds.Length!=3 ||
+                if(data==null || data.version<2 || data.version>14 || data.seeds==null || data.seeds.Length!=3 ||
                     data.harvested==null || data.harvested.Length<3 || data.products==null || data.products.Length<4)
                     throw new InvalidDataException("Phiên bản dữ liệu lưu không phù hợp.");
                 if(data.version<8)
@@ -132,6 +134,7 @@ namespace NongTrai
                     if(data.building?.blocks!=null)foreach(var block in data.building.blocks)if(block.position.x>100)block.position+=Vector3.up*1000;
                 }
                 shop.RestoreState(data.money,data.fruit,data.expanded,data.treeCount,data.version>=3?data.feed:15);
+                FarmNoticeBoard.Instance?.RestoreQuest(data.version>=14?data.questStage:0);
                 Array.Copy(data.seeds,shop.Seeds,3);
                 Array.Clear(field.Harvested,0,field.Harvested.Length);
                 Array.Copy(data.harvested,field.Harvested,Mathf.Min(data.harvested.Length,field.Harvested.Length));
@@ -153,6 +156,7 @@ namespace NongTrai
                     if(data.version>=4) islands.Restore(data.island);
                     FarmAudio.Instance.SetMusic(data.musicVolume);FarmAudio.Instance.SetEffects(data.effectsVolume);
                 }
+                shop.RestorePurchaseLimits(data.version>=14?data.shopPurchaseDay:TimeManager.Instance.Day,data.version>=14?data.shopPurchases:null);
                 FarmTutorialCoach.Instance?.Restore(data.version>=10&&data.tutorialDone);
                 field.Select(data.selected);
                 foreach(var oldPen in FindObjectsByType<AnimalPen>(FindObjectsSortMode.None))

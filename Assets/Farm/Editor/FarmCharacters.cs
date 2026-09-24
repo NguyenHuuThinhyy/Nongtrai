@@ -39,31 +39,33 @@ namespace NongTrai.Editor
             var shirt=Mat("Farmer shirt","C85849"); var blush=Mat("Cheeks","DB8472");
             SmoothTorso(visual,shirt,denim);
             Soft("Túi áo cong",visual,new Vector3(0,.95f,.263f),new Vector3(.18f,.10f,.025f),Mat("Pocket blue","5484A1"));
-            Soft("Head",visual,new Vector3(0,1.57f,0),new Vector3(.69f,.67f,.61f),skin);
-            Soft("Hair cap",visual,new Vector3(0,1.77f,-.035f),new Vector3(.72f,.35f,.62f),hair);
-            for(int i=0;i<5;i++) Soft("Fringe",visual,new Vector3(-.25f+i*.12f,1.79f-Mathf.Abs(i-2)*.025f,.24f),new Vector3(.15f,.20f,.14f),hair);
-            Soft("Nose",visual,new Vector3(0,1.52f,.31f),new Vector3(.105f,.09f,.10f),skin);
-            Soft("Smile",visual,new Vector3(0,1.42f,.294f),new Vector3(.13f,.035f,.027f),hair);
-            Shape("Hat brim",PrimitiveType.Cylinder,new Vector3(0,1.93f,-.015f),new Vector3(.97f,.035f,.88f),gold,visual,false);
-            Soft("Hat crown",visual,new Vector3(0,2.02f,-.015f),new Vector3(.65f,.32f,.60f),gold);
-            Shape("Hat band",PrimitiveType.Cylinder,new Vector3(0,1.96f,-.015f),new Vector3(.66f,.035f,.61f),hair,visual,false);
+            Shape("Cổ",PrimitiveType.Capsule,new Vector3(0,1.36f,0),new Vector3(.18f,.15f,.18f),skin,visual,false);
+            Soft("Đầu cân đối",visual,new Vector3(0,1.59f,0),new Vector3(.46f,.50f,.43f),skin);
+            Soft("Tóc ôm đầu",visual,new Vector3(0,1.78f,-.025f),new Vector3(.48f,.18f,.44f),hair);
+            for(int i=0;i<4;i++) Soft("Lọn tóc",visual,new Vector3(-.16f+i*.105f,1.78f,.18f),new Vector3(.10f,.09f,.10f),hair);
+            Soft("Mũi",visual,new Vector3(0,1.53f,.23f),new Vector3(.055f,.08f,.06f),skin);
+            Soft("Miệng",visual,new Vector3(0,1.46f,.206f),new Vector3(.075f,.018f,.015f),hair);
+            Shape("Vành mũ",PrimitiveType.Cylinder,new Vector3(0,1.90f,-.015f),new Vector3(.64f,.025f,.59f),gold,visual,false);
+            Soft("Chóp mũ",visual,new Vector3(0,1.98f,-.015f),new Vector3(.48f,.22f,.43f),gold);
+            Shape("Dây mũ",PrimitiveType.Cylinder,new Vector3(0,1.94f,-.015f),new Vector3(.49f,.025f,.44f),hair,visual,false);
             var motion=visual.gameObject.AddComponent<FarmerAnimation>(); motion.arms=new Transform[2]; motion.legs=new Transform[2];
             for(int i=0;i<2;i++)
             {
                 int side=i==0?-1:1;
-                Soft("Ear",visual,new Vector3(side*.34f,1.55f,0),new Vector3(.14f,.19f,.14f),skin);
-                Soft("Eye white",visual,new Vector3(side*.14f,1.61f,.285f),new Vector3(.15f,.18f,.07f),cream);
-                Soft("Eye pupil",visual,new Vector3(side*.14f,1.61f,.322f),new Vector3(.075f,.115f,.027f),dark);
-                Soft("Eye shine",visual,new Vector3(side*.14f-.014f,1.645f,.337f),new Vector3(.027f,.032f,.012f),cream);
-                Soft("Cheek",visual,new Vector3(side*.23f,1.49f,.255f),new Vector3(.10f,.055f,.045f),blush);
+                Soft("Tai",visual,new Vector3(side*.235f,1.57f,0),new Vector3(.08f,.12f,.09f),skin);
+                Soft("Mắt",visual,new Vector3(side*.105f,1.62f,.207f),new Vector3(.052f,.055f,.025f),cream);
+                Soft("Tròng mắt",visual,new Vector3(side*.105f,1.62f,.224f),new Vector3(.026f,.035f,.016f),dark);
+                Soft("Lông mày",visual,new Vector3(side*.105f,1.69f,.196f),new Vector3(.079f,.02f,.015f),hair);
+                Soft("Má",visual,new Vector3(side*.16f,1.51f,.188f),new Vector3(.045f,.02f,.018f),blush);
                 Soft("Dây yếm bo tròn",visual,new Vector3(side*.22f,1.15f,.205f),new Vector3(.085f,.34f,.055f),denim);
                 Soft("Brass button",visual,new Vector3(side*.21f,1.07f,.229f),Vector3.one*.055f,gold);
                 var leg=Pivot("Leg pivot",visual,new Vector3(side*.16f,.68f,0)); motion.legs[i]=leg;
-                Shape("Ống quần bo tròn",PrimitiveType.Capsule,new Vector3(0,-.24f,0),new Vector3(.27f,.27f,.27f),denim,leg,false);
-                Soft("Boot",leg,new Vector3(0,-.55f,.07f),new Vector3(.28f,.24f,.43f),dark);
+                Shape("Ống quần",PrimitiveType.Capsule,new Vector3(0,-.25f,0),new Vector3(.23f,.29f,.23f),denim,leg,false);
+                Soft("Giày",leg,new Vector3(0,-.57f,.08f),new Vector3(.25f,.18f,.36f),dark);
                 var arm=Pivot("Arm pivot",visual,new Vector3(side*.34f,1.22f,0)); motion.arms[i]=arm;
-                Shape("Sleeve",PrimitiveType.Capsule,new Vector3(side*.035f,-.15f,0),new Vector3(.23f,.17f,.24f),shirt,arm,false);
-                Soft("Hand",arm,new Vector3(side*.04f,-.39f,0),new Vector3(.19f,.23f,.20f),skin);
+                Shape("Tay áo",PrimitiveType.Capsule,new Vector3(side*.035f,-.19f,0),new Vector3(.19f,.25f,.19f),shirt,arm,false);
+                Shape("Cẳng tay",PrimitiveType.Capsule,new Vector3(side*.04f,-.40f,0),new Vector3(.12f,.18f,.13f),skin,arm,false);
+                Soft("Bàn tay",arm,new Vector3(side*.04f,-.55f,0),new Vector3(.14f,.14f,.15f),skin);
             }
         }
         static void BuildAnimals()

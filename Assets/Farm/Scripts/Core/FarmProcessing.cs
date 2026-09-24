@@ -221,6 +221,8 @@ namespace NongTrai
         void Update()
         { if(rotor!=null&&processing!=null&&processing.IsBusy(recipeIndex)&&!processing.hud.player.Paused)
               rotor.Rotate(0,180*Time.deltaTime,0,Space.Self);
-          if(worldLabel!=null&&Camera.main!=null)worldLabel.rotation=Quaternion.LookRotation(worldLabel.position-Camera.main.transform.position); }
+          if(worldLabel!=null&&Camera.main!=null)
+          {worldLabel.gameObject.SetActive(Vector3.Distance(worldLabel.position,Camera.main.transform.position)<6);
+           if(worldLabel.gameObject.activeSelf)worldLabel.rotation=Quaternion.LookRotation(worldLabel.position-Camera.main.transform.position);} }
     }
 }

@@ -78,7 +78,9 @@ namespace NongTrai
                 if(child.gameObject!=overlay&&child.gameObject!=gameplayChrome&&child.gameObject!=mainMenu&&
                     child.gameObject!=settingsPanel&&child.gameObject!=pausePanel&&child.GetComponent<Image>()!=null)
                     child.gameObject.SetActive(false);
-            player.SetPaused(true);pausePanel.SetActive(false);overlay.SetActive(true);EnsureCloseButton(overlay);
+            player.SetPaused(true);
+            pausePanel.SetActive(false);if(mainMenu!=null)mainMenu.SetActive(false);if(settingsPanel!=null)settingsPanel.SetActive(false);
+            overlay.SetActive(true);overlay.transform.SetAsLastSibling();EnsureCloseButton(overlay);
         }
         public bool HandleEscape()
         { if(settingsPanel!=null && settingsPanel.activeSelf) { CloseSettings();return true; }
@@ -153,7 +155,7 @@ namespace NongTrai
                 var progress=FarmExpansion.Instance;
                 farmingStatus.text = shop.Money+" xu  •  "+(progress==null?"":("LV "+progress.Level+" Ngày "+progress.Day+" • "))
                     +field.Current.displayName+": "+shop.Seeds[field.Selected]+" hạt\nThức ăn: "+shop.FeedStock
-                    +" • B Túi  G Xây  M Chế biến  N Đất  P Chuồng";
+                    +" • B Túi/Xây dựng  M Chế biến  N Đất  P Chuồng";
             }
             if (remaining > 0) { remaining -= Time.deltaTime; if (remaining <= 0) toast.text = ""; }
         }

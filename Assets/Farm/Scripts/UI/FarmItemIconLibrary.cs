@@ -7,7 +7,7 @@ namespace NongTrai
     // không phụ thuộc font hay asset bên ngoài.
     public static class FarmItemIconLibrary
     {
-        public static int ForItem(int item)=>item==104?21:item==105?22:item==106?23:item==107?24:item==108?25:item==27?54:item>=28&&item<=37?40+item-28:item==38?55:item==39?56:item>=40&&item<=55?73+item-40:item>=20&&item<=26?10+item:item;
+        public static int ForItem(int item)=>item==104?21:item==105?22:item==106?23:item==107?24:item==108?25:item==26?100:item==27?54:item>=28&&item<=37?40+item-28:item==38?55:item==39?56:item>=40&&item<=55?73+item-40:item>=56&&item<=62?89+item-56:item>=20&&item<=25?10+item:item;
         public static UnityEngine.UI.Image Attach(Transform parent,int item,Vector2 position,Vector2 size)
         {
             var go=new GameObject("Minh họa "+item,typeof(RectTransform),typeof(UnityEngine.UI.Image));
@@ -94,6 +94,15 @@ namespace NongTrai
                 case 81: for(int x=20;x<=44;x+=12)for(int y=21;y<=45;y+=12)Disk(p,x,y,9,Hex("5551A7"));break;
                 case 82: case 83: case 84: Bag(p,lightGreen);Disk(p,32,33,8,id==82?Hex("ADD35B"):id==83?Hex("F69B60"):Hex("5551A7"));break;
                 case 85: case 86: case 87: case 88: Bag(p,id==85?gold:id==86?green:id==87?cream:Hex("EA8931"));for(int x=20;x<48;x+=12)Disk(p,x,32,5,brown);break;
+                case 89: Rect(p,28,13,36,45,gray);Rect(p,17,43,47,48,blue);Disk(p,32,16,9,blue);Arc(p,32,18,17,blue);break;
+                case 90: case 91: case 92: Oval(p,32,28,23,15,id==90?Hex("9C3938"):id==91?Hex("B85D50"):Hex("D99177"));
+                    Oval(p,34,32,13,7,red);Disk(p,19,37,4,cream);break;
+                case 93: case 94: case 95: Oval(p,32,28,23,15,id==93?Hex("9A4D28"):id==94?Hex("AD6935"):Hex("C98442"));
+                    Oval(p,31,33,13,7,gold);for(int i=0;i<3;i++)Disk(p,16+i*14,49,3,cream);break;
+                case 96: case 97: case 98: case 99: Draw(50+id-96,p);Line(p,7,12,57,12,brown,5);
+                    for(int x=12;x<=55;x+=14)Line(p,x,9,x,31,brown,4);break;
+                case 100: Rect(p,9,23,55,33,brown);for(int x=15;x<=49;x+=33)Rect(p,x,10,x+5,23,brown);
+                    Line(p,13,42,50,42,cream,5);Line(p,22,34,22,52,gray,4);break;
                 default: Rect(p,13,13,51,51,dark);break;
             }
         }

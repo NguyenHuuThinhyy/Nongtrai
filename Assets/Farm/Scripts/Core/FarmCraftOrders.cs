@@ -328,6 +328,10 @@ namespace NongTrai
     }
     public sealed class FarmWorldBillboard : MonoBehaviour
     {
-        void LateUpdate(){if(Camera.main!=null)transform.rotation=Quaternion.LookRotation(transform.position-Camera.main.transform.position);}
+        Renderer caption;
+        void Awake()=>caption=GetComponent<Renderer>();
+        void LateUpdate(){if(Camera.main==null)return;float distance=Vector3.Distance(transform.position,Camera.main.transform.position);
+            if(caption!=null)caption.enabled=distance<12;
+            if(distance<12)transform.rotation=Quaternion.LookRotation(transform.position-Camera.main.transform.position);}
     }
 }
