@@ -1,4 +1,14 @@
-# CẬP NHẬT ƯU TIÊN — 24/09/2026: BẢN v14 ĐÃ KIỂM TRA
+# CẬP NHẬT ƯU TIÊN — 25/09/2026: BẢN v15
+
+Ưu tiên code hiện tại, `README.md` và `CHOI_GAME.md` trước các ghi chú v14 trở xuống.
+
+- Save schema v15 đọc v2–v14. `FarmWaterSystem` lưu nước trong bình đang dùng, tối đa hai bình dự trữ (ba bình mang theo), nước máy bơm và tiến độ hút nước. Bơm tạo một bình sau mỗi 600 giây chơi, có thể giữ tối đa ba bình. Click máy bơm lấy nước; bảng quản lý cạnh máy mở menu mua vòi. Bình tưới trên hotbar hiển thị số nước thay vì độ bền.
+- Bơm và trạm tưới có hạt nước xanh nhìn thấy trong game. Nhân vật đã chỉnh tỷ lệ thân, tay và chân nhưng vẫn là model Unity dựng bằng primitive, chưa phải nhân vật 3D rig chuyên nghiệp. HUD đã chuyển gợi ý E/Tab/B về bên trái, tránh giữa màn hình.
+- Cáo/rắn ban ngày có thanh máu trên đầu, mở rộng góc phát hiện; đòn cắn gây sát thương và đẩy người chơi nhẹ, sau đó lùi lại. Khi độ no trên 70, người chơi hồi 2 máu mỗi 5 giây chơi. Smoke test v15 gồm nước bơm, sức chứa bình, hồi máu, thanh máu quái và chuyển bản lưu cũ. Chỉ lưu thủ công, chế độ sáng tạo không ghi file lưu.
+
+---
+
+# CẬP NHẬT CŨ — 24/09/2026: BẢN v14 ĐÃ KIỂM TRA
 
 Đây là ghi chú ưu tiên mới nhất; các mục v13 và cũ hơn bên dưới là lịch sử. Khi có mâu thuẫn, kiểm tra source và `README.md` trước.
 

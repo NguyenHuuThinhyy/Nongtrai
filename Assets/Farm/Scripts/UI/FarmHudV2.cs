@@ -64,9 +64,10 @@ namespace NongTrai
             var tipRect=tooltip.rectTransform;tipRect.anchorMin=tipRect.anchorMax=new Vector2(.5f,0);
             tipRect.pivot=new Vector2(.5f,0);tipRect.anchoredPosition=new Vector2(0,130);
             tooltip.alignment=TextAlignmentOptions.Center;
-            creativeControls=FarmUi.TmpLabel(root.transform,"",new Vector2(0,-24),new Vector2(920,48),21);
-            var cc=creativeControls.rectTransform;cc.anchorMin=cc.anchorMax=new Vector2(.5f,1);cc.pivot=new Vector2(.5f,1);cc.anchoredPosition=new Vector2(0,-185);
-            creativeControls.alignment=TextAlignmentOptions.Center;
+            creativeControls=FarmUi.TmpLabel(root.transform,"",new Vector2(24,-328),new Vector2(365,76),17);
+            var cc=creativeControls.rectTransform;cc.anchorMin=cc.anchorMax=new Vector2(0,1);cc.pivot=new Vector2(0,1);cc.anchoredPosition=new Vector2(24,-328);
+            creativeControls.alignment=TextAlignmentOptions.TopLeft;
+            creativeControls.outlineColor=Color.black;creativeControls.outlineWidth=.2f;
             itemImages=new Image[9];slots=new Image[9];counts=new TextMeshProUGUI[9];
             for(int i=0;i<9;i++)
             {
@@ -162,8 +163,8 @@ namespace NongTrai
             if(healthFill!=null)healthFill.rectTransform.sizeDelta=new Vector2(105*Mathf.Clamp01(health/100),12);
             if(hungerFill!=null)hungerFill.rectTransform.sizeDelta=new Vector2(105*Mathf.Clamp01(hunger/100),12);
             creativeControls.text=CreativeModeManager.IsCreative?
-                (CreativeModeManager.IsFlying?"ĐANG BAY • WASD di chuyển • SPACE lên • X xuống • SHIFT nhanh • F8 tắt bay":"SÁNG TẠO • F8 bật bay • [B] Túi đồ/Xây dựng"):
-                "[E] Bản đồ việc • [TAB] Đổi map • [B] Túi đồ/Xây dựng • Lăn chuột đổi vật phẩm";
+                (CreativeModeManager.IsFlying?"ĐANG BAY • Space lên, X xuống\nShift nhanh • F8 tắt bay":"SÁNG TẠO • F8 bật bay\nB: túi đồ và xây dựng"):
+                "E: bản đồ việc • TAB: đổi map\nB: túi/xây • lăn chuột: chọn";
             var bag=AdventureBag.Instance;
             if(bag!=null)
             {

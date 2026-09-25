@@ -14,6 +14,8 @@ namespace NongTrai
         public PortableSprinklerRecord[] portable;
         public bool pendingPortable;
         public int lastPortablePurchaseDay;
+        public int spareCans,pumpStock;
+        public float pumpProgress;
     }
     [Serializable] public sealed class PortableSprinklerRecord {public Vector3 position;public float remaining;}
 
@@ -26,6 +28,13 @@ namespace NongTrai
         public FieldManager field;
         public int CanWater { get; private set; }
         public int CanCapacity => expansion==null?8:new[]{8,16,24}[Mathf.Clamp(expansion.ToolTiers[1],0,2)];
+        public const int MaxCarriedCans=3;
+        public const float PumpIntervalSeconds=600f;
+        public int SpareCans {get;private set;}
+        public int CarriedCans=>SpareCans+(CanWater>0?1:0);
+        public int PumpStock {get;private set;}=1;
+        public float PumpProgress {get;private set;}
+        public float PumpRemaining=>PumpStock>=3?0:Mathf.Max(0,PumpIntervalSeconds-PumpProgress);
         public GameObject Panel { get; private set; }
         public readonly int[] StationWater=new int[4];
         public readonly bool[] StationBuilt=new bool[4];
@@ -57,7 +66,7 @@ namespace NongTrai
             status=FarmUi.Label(Panel.transform,"",new Vector2(30,-90),new Vector2(870,100),21);
             FarmUi.Button(Panel.transform,"Mua vòi phun di động • 350 xu • nhận vào túi (1/ngày)",
                 new Vector2(30,-215),new Vector2(870,68),BuyPortable);
-            FarmUi.Label(Panel.transform,"Vòi phun hiển thị vòng tròn bán kính 6 m. Nạp 1 nước từ bình để hoạt động 30 phút chơi thực.\nDùng cho ruộng và cây ăn quả, không yêu cầu cấp độ.",
+            FarmUi.Label(Panel.transform,"Click máy bơm để lấy một bình nước; máy hút thêm 1 bình mỗi 10 phút chơi, chứa tối đa 3. Bạn mang tối đa 3 bình.\nVòi phun tưới trong bán kính 6 m, nạp 1 nước để chạy 30 phút.",
                 new Vector2(30,-310),new Vector2(870,125),22);
             feedback=FarmUi.Label(Panel.transform,"Mua vòi vào túi, chọn trên hotbar rồi click đất để đặt; click trái vòi để nạp, chuột phải để thu lại.",
                 new Vector2(30,-545),new Vector2(870,55),19);
@@ -96,12 +105,27 @@ namespace NongTrai
         void CreateWaterSource()
         {
             var source=new GameObject("Máy bơm lấy nước hồ - E");source.transform.position=new Vector3(27.5f,.75f,-11);
-            var sourceCollider=source.AddComponent<CapsuleCollider>();sourceCollider.center=new Vector3(0,.55f,0);sourceCollider.radius=.65f;sourceCollider.height=2.5f;
+            var sourceCollider=source.AddComponent<CapsuleCollider>();sourceCollider.center=new Vector3(0,.55f,0);sourceCollider.radius=1.1f;sourceCollider.height=2.5f;
             RuntimePart(source.transform,"Chân bơm",PrimitiveType.Cylinder,new Vector3(0,-.45f,0),new Vector3(.68f,.18f,.68f),new Color(.24f,.42f,.48f));
             RuntimePart(source.transform,"Thân bơm",PrimitiveType.Cylinder,new Vector3(0,.38f,0),new Vector3(.40f,.85f,.40f),new Color(.30f,.62f,.72f));
             RuntimePart(source.transform,"Đầu bơm",PrimitiveType.Sphere,new Vector3(0,1.18f,0),new Vector3(.46f,.28f,.46f),new Color(.55f,.83f,.92f));
             RuntimePart(source.transform,"Vòi bơm",PrimitiveType.Cube,new Vector3(.52f,.82f,0),new Vector3(.72f,.13f,.18f),new Color(.66f,.72f,.73f));
             RuntimePart(source.transform,"Miệng vòi",PrimitiveType.Cylinder,new Vector3(.88f,.68f,0),new Vector3(.16f,.25f,.16f),new Color(.35f,.70f,.84f));
+            var stream=new GameObject("Dòng hạt nước xanh từ vòi bơm");stream.transform.SetParent(source.transform,false);
+            stream.transform.localPosition=new Vector3(.91f,.54f,0);
+            var particles=stream.AddComponent<ParticleSystem>();var main=particles.main;
+            main.startLifetime=.65f;main.startSpeed=.35f;main.startSize=.09f;main.maxParticles=180;
+            main.startColor=new Color(.24f,.75f,1,1);main.gravityModifier=.35f;
+            var emission=particles.emission;emission.rateOverTime=85;
+            var shape=particles.shape;shape.shapeType=ParticleSystemShapeType.Cone;shape.angle=8;shape.radius=.045f;
+            stream.transform.localRotation=Quaternion.Euler(115,0,0);
+            var visual=source.AddComponent<WaterPumpVisual>();visual.particles=particles;
+            var renderer=particles.GetComponent<ParticleSystemRenderer>();
+            var droplet=GameObject.CreatePrimitive(PrimitiveType.Sphere);renderer.renderMode=ParticleSystemRenderMode.Mesh;
+            renderer.mesh=droplet.GetComponent<MeshFilter>().sharedMesh;Destroy(droplet);
+            var waterShader=Shader.Find("Universal Render Pipeline/Unlit");if(waterShader==null)waterShader=Shader.Find("Universal Render Pipeline/Lit");
+            var streamMaterial=new Material(waterShader);streamMaterial.color=new Color(.16f,.70f,1);
+            renderer.material=streamMaterial;
             var handle=RuntimePart(source.transform,"Tay bơm",PrimitiveType.Cube,new Vector3(-.10f,1.52f,0),new Vector3(.12f,.70f,.14f),new Color(.76f,.53f,.25f));
             handle.transform.localRotation=Quaternion.Euler(0,0,-58);
             RuntimePart(source.transform,"Xô nước",PrimitiveType.Cylinder,new Vector3(1.05f,-.33f,0),new Vector3(.38f,.42f,.38f),new Color(.28f,.62f,.82f));
@@ -120,13 +144,31 @@ namespace NongTrai
         }
         public int RefillCan()
         {
-            int added=CanCapacity-CanWater;CanWater=CanCapacity;Refresh();return added;
+            // A saved game can have only spare cans and an empty active can.
+            // Move one spare into the active slot before checking the carry limit.
+            LoadSpareIfEmpty();
+            if(PumpStock<=0||CarriedCans>=MaxCarriedCans&&CanWater>=CanCapacity)return 0;
+            int added;
+            if(CanWater<CanCapacity){added=CanCapacity-CanWater;CanWater=CanCapacity;}
+            else {added=CanCapacity;SpareCans++;}
+            PumpStock--;Refresh();return added;
+        }
+        void LoadSpareIfEmpty()
+        {if(CanWater<=0&&SpareCans>0){SpareCans--;CanWater=CanCapacity;}}
+        public void AdvancePump(float seconds)
+        {
+            if(seconds<=0||PumpStock>=3)return;
+            PumpProgress+=seconds;
+            while(PumpProgress>=PumpIntervalSeconds&&PumpStock<3)
+            {PumpProgress-=PumpIntervalSeconds;PumpStock++;Refresh();}
+            if(PumpStock>=3)PumpProgress=0;
         }
         public bool Consume(int amount)
         {
             if(amount<=0) return true;
+            LoadSpareIfEmpty();
             if(CanWater<amount) return false;
-            CanWater-=amount;Refresh();return true;
+            CanWater-=amount;LoadSpareIfEmpty();Refresh();return true;
         }
         public bool BuyStation(int region)
         {
@@ -141,8 +183,9 @@ namespace NongTrai
         public int TransferToStation(int region)
         {
             if(region<0 || region>=4 || !StationBuilt[region]) return 0;
+            LoadSpareIfEmpty();
             int moved=Mathf.Min(CanWater,32-StationWater[region]);
-            CanWater-=moved;StationWater[region]+=moved;Refresh();return moved;
+            CanWater-=moved;StationWater[region]+=moved;LoadSpareIfEmpty();Refresh();return moved;
         }
         public void BuyPortable()
         {
@@ -166,12 +209,14 @@ namespace NongTrai
          shop.inventory.Add(56,1);sprinkler.gameObject.SetActive(false);Destroy(sprinkler.gameObject);Refresh();return true;}
         public bool RefillPortable(IrrigationStation sprinkler)
         {
-            if(sprinkler==null||!sprinkler.portable||CanWater<1)return false;
-            CanWater--;sprinkler.remainingSeconds=1800;Refresh();return true;
+            if(sprinkler==null||!sprinkler.portable||!Consume(1))return false;
+            sprinkler.remainingSeconds=1800;Refresh();return true;
         }
         void Update()
         {
             if(hud==null || hud.player.Paused) return;
+            AdvancePump(Time.deltaTime);
+            if(Panel!=null&&Panel.activeSelf&&Time.frameCount%30==0)Refresh();
             if(PendingPlacement&&Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame&&!FarmHud.WorldClickSuppressed)
             {
                 ConsumedFrame=Time.frameCount;
@@ -208,13 +253,17 @@ namespace NongTrai
         {var records=new List<PortableSprinklerRecord>();foreach(var item in portable)if(item!=null)
             records.Add(new PortableSprinklerRecord{position=item.transform.position-Vector3.up*1.05f,remaining=item.remainingSeconds});
          return new WaterState { canWater=CanWater,stationWater=(int[])StationWater.Clone(),
-             stationBuilt=(bool[])StationBuilt.Clone(),portable=records.ToArray(),pendingPortable=false,lastPortablePurchaseDay=lastPortablePurchaseDay };}
-        public void Restore(WaterState state)
+             stationBuilt=(bool[])StationBuilt.Clone(),portable=records.ToArray(),pendingPortable=false,lastPortablePurchaseDay=lastPortablePurchaseDay,
+             spareCans=SpareCans,pumpStock=PumpStock,pumpProgress=PumpProgress };}
+        public void Restore(WaterState state,bool legacy=false)
         {
             foreach(var item in portable)if(item!=null){item.gameObject.SetActive(false);Destroy(item.gameObject);}portable.Clear();
             lastPortablePurchaseDay=state==null?0:state.lastPortablePurchaseDay;
             if(state!=null&&state.pendingPortable&&shop.inventory.Count(56)==0)shop.inventory.Add(56,1);
             CanWater=state==null?0:Mathf.Clamp(state.canWater,0,CanCapacity);
+            SpareCans=legacy||state==null?0:Mathf.Clamp(state.spareCans,0,MaxCarriedCans-(CanWater>0?1:0));
+            PumpStock=legacy||state==null?1:Mathf.Clamp(state.pumpStock,0,3);
+            PumpProgress=legacy||state==null?0:Mathf.Clamp(state.pumpProgress,0,PumpIntervalSeconds);
             for(int i=0;i<4;i++)
             {
                 StationBuilt[i]=state!=null && state.stationBuilt!=null && i<state.stationBuilt.Length && state.stationBuilt[i];
@@ -228,14 +277,15 @@ namespace NongTrai
         void Refresh()
         {
             if(status==null) return;
-            status.text="Bình: "+CanWater+"/"+CanCapacity+" • Vòi di động: "+PortableCount+" • Mua tại đây, đặt không cần LV.\n"
+            status.text="Bình đang dùng: "+CanWater+"/"+CanCapacity+" nước • Mang "+CarriedCans+"/3 bình • Máy bơm "+PumpStock+"/3 bình\n"
+                +(PumpStock>=3?"Máy bơm đã đầy":"Hút thêm sau "+Mathf.CeilToInt(PumpRemaining/60)+" phút chơi")+" • Vòi di động: "+PortableCount+"\n"
                 +"Trạm cũ: "+StationWater[0]+"/32 • "+StationWater[1]+"/32 • "+StationWater[2]+"/32 • "+StationWater[3]+"/32";
         }
     }
 
     public sealed class WaterManagementBoard : MonoBehaviour,IInteractable
     {
-        public string InteractionHint => "[E] Quản lý và xây trạm tưới";
+        public string InteractionHint => "[Chuột trái] Quản lý nước và mua vòi phun";
         public bool CanInteract(FarmPlayer player) => true;
         public void Interact(PlayerInteraction actor) => FarmWaterSystem.Instance.Open();
         public void SetHighlighted(bool selected) => InteractionOutline.Set(this,selected);
@@ -243,16 +293,41 @@ namespace NongTrai
 
     public sealed class WaterSource : MonoBehaviour,IInteractable
     {
-        public string InteractionHint => "[Chuột trái] Bơm nước và mua vòi phun";
+        public string InteractionHint => "[Chuột trái] Lấy 1 bình nước • máy có "+(FarmWaterSystem.Instance==null?0:FarmWaterSystem.Instance.PumpStock)+" bình";
         public bool CanInteract(FarmPlayer player) => true;
         public void Interact(PlayerInteraction actor)
         {
             int added=FarmWaterSystem.Instance.RefillCan();
-            actor.Say(added>0?"Đã lấy "+added+" nước. Bình đã đầy.":"Bình nước đã đầy.");
-            FarmAudio.Instance?.Play(FarmAudio.Cue.Water);
-            FarmWaterSystem.Instance.Open();
+            var water=FarmWaterSystem.Instance;
+            actor.Say(added>0?"Đã lấy 1 bình ("+added+" nước) • mang "+water.CarriedCans+"/3 bình.":
+                water.PumpStock<=0?"Máy chưa hút đủ nước. Bình mới sau "+Mathf.CeilToInt(water.PumpRemaining/60)+" phút chơi.":
+                "Đã mang đủ 3 bình hoặc bình đang dùng đã đầy.");
+            if(added>0)FarmAudio.Instance?.Play(FarmAudio.Cue.Water);
         }
         public void SetHighlighted(bool selected) => InteractionOutline.Set(this,selected);
+    }
+
+    public sealed class WaterPumpVisual : MonoBehaviour
+    {
+        public ParticleSystem particles;
+        readonly Transform[] beads=new Transform[10];
+        void Start()
+        {
+            var material=new Material(Shader.Find("Universal Render Pipeline/Lit"));material.color=new Color(.12f,.70f,1f);
+            for(int i=0;i<beads.Length;i++)
+            {var drop=GameObject.CreatePrimitive(PrimitiveType.Sphere);drop.name="Hạt nước vòi "+i;drop.transform.SetParent(transform,false);
+             drop.transform.localScale=Vector3.one*.11f;Destroy(drop.GetComponent<Collider>());
+             drop.GetComponent<Renderer>().material=material;beads[i]=drop.transform;}
+        }
+        void Update()
+        {
+            bool flowing=FarmWaterSystem.Instance!=null&&FarmWaterSystem.Instance.PumpStock>0;
+            if(particles!=null){var emission=particles.emission;emission.rateOverTime=flowing?85:18;}
+            for(int i=0;i<beads.Length;i++)if(beads[i]!=null)
+            {float t=Mathf.Repeat(Time.time*1.8f+i/(float)beads.Length,1);
+             beads[i].localPosition=new Vector3(.91f+.13f*t,.54f-.73f*t,.045f*Mathf.Sin(i*3.2f+Time.time*4));
+             beads[i].localScale=Vector3.one*(flowing?.12f:.065f);}
+        }
     }
 
     public sealed class IrrigationStation : MonoBehaviour,IInteractable
@@ -289,7 +364,9 @@ namespace NongTrai
         {
             bool active=portable?remainingSeconds>0:FarmWaterSystem.Instance!=null&&FarmWaterSystem.Instance.StationWater[region]>0;
             if(arms!=null&&active)arms.Rotate(0,42*Time.deltaTime,0,Space.Self);
-            if(spray!=null){var emission=spray.emission;emission.enabled=active;}
+            if(spray!=null)
+            {var emission=spray.emission;emission.enabled=active;
+             if(active&&!spray.isPlaying)spray.Play();else if(!active&&spray.isPlaying)spray.Stop(true,ParticleSystemStopBehavior.StopEmittingAndClear);}
             if(droplets!=null)for(int i=0;i<droplets.Length;i++)
             {
                 droplets[i].gameObject.SetActive(active);if(!active)continue;

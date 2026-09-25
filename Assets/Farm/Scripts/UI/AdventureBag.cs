@@ -30,7 +30,9 @@ namespace NongTrai
         public string Name(int id)=>id<0?"Ô trống":id>=100&&id<=110?tools[id-100]:inventory.Name(id);
         public int Icon(int id)=>id>=100?new[]{0,1,2,20,21,22,23,24,25,21,21}[Mathf.Clamp(id-100,0,10)]:FarmItemIconLibrary.ForItem(id);
         public string CountText(int index)
-        {var s=Slots[index];if(s.item>=100&&s.item<=102)return inventory.shop.Seeds[s.item-100].ToString();if(s.item==103)return inventory.shop.FeedStock.ToString();return s.item>=104?"ĐB "+s.durability:s.count.ToString();}
+        {var s=Slots[index];if(s.item>=100&&s.item<=102)return inventory.shop.Seeds[s.item-100].ToString();if(s.item==103)return inventory.shop.FeedStock.ToString();
+         if(s.item==105){var water=FarmWaterSystem.Instance;return water==null?"0 nước":water.CanWater+"/"+water.CanCapacity;}
+         return s.item>=104?"ĐB "+s.durability:s.count.ToString();}
         public void Initialize(FarmInventory source)
         {
             inventory=source;

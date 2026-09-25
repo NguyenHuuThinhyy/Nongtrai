@@ -70,7 +70,7 @@ namespace NongTrai
                 if(inventory.Count(56)<1)throw new Exception("Sprinkler purchase did not enter the bag");
                 if(!water.TryPlacePortable(new Vector3(65,0,12))||water.PortableCount<1)
                     throw new Exception("Portable sprinkler purchase/placement failed");
-                water.RefillCan();
+                water.AdvancePump(600);water.RefillCan();
                 IrrigationStation sprinkler=null;
                 foreach(var station in UnityEngine.Object.FindObjectsByType<IrrigationStation>(FindObjectsSortMode.None))
                     if(station.portable)sprinkler=station;
@@ -107,7 +107,7 @@ namespace NongTrai
                 orders.Orders[0].completed=true;
                 if(!save.Save())throw new Exception("v12 changed save failed");
                 string payload=File.ReadAllText(save.SavePath);
-                if(!payload.Contains("\"version\": 14")||!payload.Contains("\"mutated\": true")||
+                if(!payload.Contains("\"version\": 15")||!payload.Contains("\"mutated\": true")||
                     !payload.Contains("\"weatherRemaining\""))
                     throw new Exception("v12 save fields missing");
                 plot.Restore(PlotState.Untilled,null,0,0);
@@ -155,7 +155,15 @@ namespace NongTrai
                 wolves.Damage(200,"smoke damage");wolves.Respawn(true);
                 if(wolves.Health!=100||save.shop.Money!=beforePay-100)
                     throw new Exception("Pay-100 respawn failed");
-                Debug.Log("FARM_V14_OK: LV3 orchard, bag sprinkler/replacement, progressive quest, animal feed, save migration and respawn.");
+                wolves.Damage(10,"smoke damage");float beforeHeal=wolves.Health;
+                wolves.AdvanceRecovery(5.1f,70);
+                if(wolves.Health!=beforeHeal)throw new Exception("Health regenerated at 70 satiety instead of above 70");
+                wolves.AdvanceRecovery(5.1f,75);
+                if(wolves.Health<=beforeHeal)throw new Exception("High satiety did not regenerate health");
+                var fox=DayPredator.Create(player.transform.position+Vector3.forward*3,wolves,false);
+                if(!fox.HasHealthBar||fox.Health<50)throw new Exception("Daytime fox health bar missing");
+                UnityEngine.Object.Destroy(fox.gameObject);
+                Debug.Log("FARM_V15_OK: timed pump stock, three carried cans, LV3 orchard, sprinkler, quest, feed, migration and respawn.");
             }
             finally
             {

@@ -324,10 +324,27 @@ namespace NongTrai
                 throw new InvalidOperationException("Level gated land purchase failed.");
             if(!progress.UpgradeTool(0) || progress.ToolRadius(0)!=3)
                 throw new InvalidOperationException("Tool upgrade failed.");
-            if(water.RefillCan()!=water.CanCapacity || !water.Consume(1) || water.CanWater!=water.CanCapacity-1)
-                throw new InvalidOperationException("Finite watering can failed.");
+            water.Restore(new WaterState{pumpStock=1});
+            if(water.RefillCan()!=water.CanCapacity || water.PumpStock!=0 || !water.Consume(1) || water.CanWater!=water.CanCapacity-1 || water.RefillCan()!=0)
+                throw new InvalidOperationException("Finite pump stock or watering can failed.");
+            water.AdvancePump(599);
+            if(water.PumpStock!=0)throw new InvalidOperationException("Pump produced water before ten minutes.");
+            water.AdvancePump(1);
+            if(water.PumpStock!=1||water.RefillCan()!=1)throw new InvalidOperationException("Pump did not refill a partial can after ten minutes.");
+            water.AdvancePump(1800);
+            if(water.PumpStock!=3||water.RefillCan()!=water.CanCapacity||water.CarriedCans!=2)
+                throw new InvalidOperationException("Three-can carry or pump buffer failed.");
+            var pumpSnapshot=water.Snapshot();
+            water.Restore(new WaterState{pumpStock=1,spareCans=3,canWater=0});
+            if(water.RefillCan()!=0||water.CarriedCans!=3)
+                throw new InvalidOperationException("Full carry of saved spare cans accepted a fourth can.");
+            water.Restore(pumpSnapshot);
+            if(FindFirstObjectByType<WaterPumpVisual>()==null)
+                throw new InvalidOperationException("Visible pump water stream was not created.");
+            camera.transform.position=new Vector3(31,3.2f,-16);
+            camera.transform.LookAt(new Vector3(28.5f,1.1f,-11));
+            Capture(Path.Combine(folder,"water-pump-preview.png"),hud,camera);
             if(!water.BuyStation(0)||water.StationWater[0]!=8) throw new InvalidOperationException("Irrigation station initial charge failed.");
-            water.RefillCan();
             if(water.TransferToStation(0)<=0 || water.StationWater[0]<=0)
                 throw new InvalidOperationException("Irrigation station transfer failed.");
             var irrigation=FindFirstObjectByType<IrrigationStation>();
@@ -521,7 +538,7 @@ namespace NongTrai
             string modernSave=File.ReadAllText(save.SavePath);
             player.Teleport(new Vector3(200,.4f,-20));
             if(!save.Save())throw new InvalidOperationException("Migration fixture save failed.");
-            string oldSave=File.ReadAllText(save.SavePath).Replace("\"version\": 14","\"version\": 7");
+            string oldSave=File.ReadAllText(save.SavePath).Replace("\"version\": 15","\"version\": 7");
             File.WriteAllText(save.SavePath,oldSave);
             if(!save.Load()||Mathf.Abs(player.transform.position.y-1000.4f)>1)throw new InvalidOperationException("Legacy player position migration failed.");
             File.WriteAllText(save.SavePath,modernSave);if(!save.Load())throw new InvalidOperationException("Modern restore failed.");

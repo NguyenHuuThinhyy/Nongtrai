@@ -14,7 +14,7 @@ namespace NongTrai
         [Serializable] sealed class ResourceRecord { public int id; public float remaining; }
         [Serializable] sealed class SaveData
         {
-            public int version=14,money,fruit,treeCount,selected,feed,level,xp,day,weather,levelCap,shopPurchaseDay,questStage;
+            public int version=15,money,fruit,treeCount,selected,feed,level,xp,day,weather,levelCap,shopPurchaseDay,questStage;
             public int[] shopPurchases;
             public float dayTime,musicVolume,effectsVolume,weatherRemaining;
             public bool expanded,tutorialDone;
@@ -123,7 +123,7 @@ namespace NongTrai
             try
             {
                 var data=JsonUtility.FromJson<SaveData>(File.ReadAllText(SavePath));
-                if(data==null || data.version<2 || data.version>14 || data.seeds==null || data.seeds.Length!=3 ||
+                if(data==null || data.version<2 || data.version>15 || data.seeds==null || data.seeds.Length!=3 ||
                     data.harvested==null || data.harvested.Length<3 || data.products==null || data.products.Length<4)
                     throw new InvalidDataException("Phiên bản dữ liệu lưu không phù hợp.");
                 if(data.version<8)
@@ -200,7 +200,7 @@ namespace NongTrai
                     ExplorationWorld.Instance?.Restore(data.exploration);
                     player.Teleport(data.version<7 && data.playerPosition.x>100?IslandManager.ExploreArrival:data.playerPosition);
                 }
-                if(water!=null) water.Restore(data.version>=5?data.water:null);
+                if(water!=null) water.Restore(data.version>=5?data.water:null,data.version<15);
                 if(orders!=null) orders.Restore(data.version>=5?data.orders:null,data.version<5);
                 if(data.version<7 && data.building?.blocks!=null)
                 {

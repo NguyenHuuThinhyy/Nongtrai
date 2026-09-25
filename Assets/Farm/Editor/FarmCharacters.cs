@@ -10,9 +10,9 @@ namespace NongTrai.Editor
         static void SmoothTorso(Transform parent,Material shirt,Material denim)
         {
             const int sides=24;
-            float[] heights={.61f,.69f,.79f,.91f,1.02f,1.15f,1.29f,1.38f};
-            float[] widths={.21f,.30f,.35f,.37f,.37f,.39f,.32f,.16f};
-            float[] depths={.16f,.22f,.25f,.26f,.25f,.25f,.22f,.14f};
+            float[] heights={.70f,.78f,.86f,.97f,1.08f,1.20f,1.31f,1.41f};
+            float[] widths={.18f,.25f,.28f,.30f,.32f,.34f,.31f,.16f};
+            float[] depths={.15f,.19f,.21f,.22f,.22f,.22f,.19f,.13f};
             var vertices=new Vector3[heights.Length*sides];var uv=new Vector2[vertices.Length];
             for(int row=0;row<heights.Length;row++)for(int side=0;side<sides;side++)
             {float a=side*Mathf.PI*2/sides;int index=row*sides+side;
@@ -59,10 +59,10 @@ namespace NongTrai.Editor
                 Soft("Má",visual,new Vector3(side*.16f,1.51f,.188f),new Vector3(.045f,.02f,.018f),blush);
                 Soft("Dây yếm bo tròn",visual,new Vector3(side*.22f,1.15f,.205f),new Vector3(.085f,.34f,.055f),denim);
                 Soft("Brass button",visual,new Vector3(side*.21f,1.07f,.229f),Vector3.one*.055f,gold);
-                var leg=Pivot("Leg pivot",visual,new Vector3(side*.16f,.68f,0)); motion.legs[i]=leg;
-                Shape("Ống quần",PrimitiveType.Capsule,new Vector3(0,-.25f,0),new Vector3(.23f,.29f,.23f),denim,leg,false);
-                Soft("Giày",leg,new Vector3(0,-.57f,.08f),new Vector3(.25f,.18f,.36f),dark);
-                var arm=Pivot("Arm pivot",visual,new Vector3(side*.34f,1.22f,0)); motion.arms[i]=arm;
+                var leg=Pivot("Leg pivot",visual,new Vector3(side*.145f,.76f,0)); motion.legs[i]=leg;
+                Shape("Ống quần",PrimitiveType.Capsule,new Vector3(0,-.32f,0),new Vector3(.20f,.36f,.20f),denim,leg,false);
+                Soft("Giày",leg,new Vector3(0,-.65f,.08f),new Vector3(.23f,.17f,.32f),dark);
+                var arm=Pivot("Arm pivot",visual,new Vector3(side*.32f,1.26f,0)); motion.arms[i]=arm;
                 Shape("Tay áo",PrimitiveType.Capsule,new Vector3(side*.035f,-.19f,0),new Vector3(.19f,.25f,.19f),shirt,arm,false);
                 Shape("Cẳng tay",PrimitiveType.Capsule,new Vector3(side*.04f,-.40f,0),new Vector3(.12f,.18f,.13f),skin,arm,false);
                 Soft("Bàn tay",arm,new Vector3(side*.04f,-.55f,0),new Vector3(.14f,.14f,.15f),skin);

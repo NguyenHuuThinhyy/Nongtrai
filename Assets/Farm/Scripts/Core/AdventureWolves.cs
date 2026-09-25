@@ -18,6 +18,7 @@ namespace NongTrai
         TMP_Text status;
         float spawnTimer;
         float starvationTimer;
+        float healingTimer;
         GameObject deathPanel;
         TMP_Text deathText;
         Button payButton;
@@ -56,9 +57,7 @@ namespace NongTrai
             status.gameObject.SetActive(exploring);
             if (exploring) status.text = night ? "Sói ra khỏi hang • Đuốc/đống lửa bảo vệ" : "Sói về hang khi trời sáng";
             var bag=AdventureBag.Instance;
-            if(bag!=null&&bag.Satiety<=0)
-            {starvationTimer+=Time.deltaTime;if(starvationTimer>=5){starvationTimer-=5;Damage(2,"Đói cạn: -2 máu. Hãy ăn thức ăn chín.");}}
-            else starvationTimer=0;
+            AdvanceRecovery(Time.deltaTime,bag==null?100:bag.Satiety);
             for (int i = wolves.Count - 1; i >= 0; i--) if (wolves[i] == null) wolves.RemoveAt(i);
             for(int i=daytime.Count-1;i>=0;i--)if(daytime[i]==null)daytime.RemoveAt(i);
             if(!night&&exploring)SpawnDayPredator();
@@ -111,11 +110,25 @@ namespace NongTrai
         public void Damage(float amount,string message)
         {
             if(IsAwaitingRespawn||Health<=0)return;
+            healingTimer=0;
             Health=Mathf.Max(0,Health-Mathf.Max(0,amount));hud.Notify(message);
             if(Health>0)return;
             hud.player.SetPaused(true);hud.pausePanel.SetActive(false);
             deathPanel.SetActive(true);payButton.interactable=hud.interaction.shop.Money>=100;
             deathText.text="Chọn cách hồi sinh. Bạn có "+hud.interaction.shop.Money+" xu.\nTrả xu để giữ đồ hoặc rơi tối đa 3 món tại nơi ngã xuống.";
+        }
+        public void AdvanceRecovery(float seconds,float satiety)
+        {
+            if(seconds<=0||IsAwaitingRespawn)return;
+            if(satiety<=0)
+            {healingTimer=0;starvationTimer+=seconds;
+             while(starvationTimer>=5){starvationTimer-=5;Damage(2,"Đói cạn: -2 máu. Hãy ăn thức ăn chín.");}}
+            else
+            {starvationTimer=0;
+             if(satiety>70&&Health<100)
+             {healingTimer+=seconds;
+              while(healingTimer>=5&&Health<100){healingTimer-=5;Health=Mathf.Min(100,Health+2);}}
+             else healingTimer=0;}
         }
         public void Respawn(bool pay)
         {
@@ -148,7 +161,11 @@ namespace NongTrai
     // A small, capped daytime threat. Foxes patrol meadows; snakes wait inside excavated caves.
     public sealed class DayPredator:MonoBehaviour
     {
-        AdventureWolves owner;CharacterController body;bool snake;float health=55,gravity,attackCooldown,alert,roam;Vector3 target,knockback;
+        const float MaxHealth=55;
+        AdventureWolves owner;CharacterController body;bool snake;float health=MaxHealth,gravity,attackCooldown,alert,roam,retreatTimer;Vector3 target,knockback;
+        Transform healthCanvas;Image healthFill;
+        public float Health=>health;
+        public bool HasHealthBar=>healthFill!=null;
         public static DayPredator Create(Vector3 point,AdventureWolves manager,bool isSnake)
         {var root=new GameObject(isSnake?"Rắn hang động":"Cáo đồng cỏ",typeof(CharacterController),typeof(DayPredator));root.transform.position=point;
          var enemy=root.GetComponent<DayPredator>();enemy.owner=manager;enemy.snake=isSnake;enemy.body=root.GetComponent<CharacterController>();
@@ -160,6 +177,14 @@ namespace NongTrai
          {Part(root.transform,"Mắt",new Vector3(side*.15f,isSnake?.36f:.71f,isSnake?.77f:.75f),Vector3.one*.07f,Color.yellow);
           if(!isSnake){Part(root.transform,"Tai",new Vector3(side*.23f,.90f,.50f),new Vector3(.17f,.30f,.15f),coat);
            Part(root.transform,"Chân",new Vector3(side*.25f,.22f,0),new Vector3(.17f,.42f,.19f),new Color(.36f,.24f,.19f));}}
+         var canvas=new GameObject(isSnake?"Máu rắn":"Máu cáo",typeof(RectTransform),typeof(Canvas));
+         canvas.GetComponent<Canvas>().renderMode=RenderMode.WorldSpace;
+         enemy.healthCanvas=canvas.transform;enemy.healthCanvas.SetParent(root.transform,false);
+         enemy.healthCanvas.localPosition=Vector3.up*(isSnake?1.05f:1.35f);enemy.healthCanvas.localScale=Vector3.one*.01f;
+         var back=FarmUi.Panel(enemy.healthCanvas,"Nền máu",new Vector2(100,12));
+         var fill=FarmUi.Panel(back.transform,"Máu còn",new Vector2(96,8));enemy.healthFill=fill.GetComponent<Image>();
+         enemy.healthFill.color=isSnake?new Color(.72f,.25f,.3f):new Color(.92f,.3f,.25f);
+         var fr=fill.GetComponent<RectTransform>();fr.anchorMin=fr.anchorMax=fr.pivot=new Vector2(0,.5f);fr.anchoredPosition=new Vector2(2,0);
          enemy.target=point;return enemy;}
         static void Part(Transform parent,string name,Vector3 pos,Vector3 scale,Color color)
         {var go=GameObject.CreatePrimitive(PrimitiveType.Sphere);go.name=name;go.transform.SetParent(parent,false);go.transform.localPosition=pos;go.transform.localScale=scale;
@@ -170,21 +195,29 @@ namespace NongTrai
          alert=8;if(health<=0){FarmExpansion.Instance?.GainExperience(12);FarmEffects.Burst(transform.position+Vector3.up,"+12 XP",Color.yellow);Destroy(gameObject);}}
         void Update()
         {if(owner==null||TimeManager.Instance.player.Paused)return;var player=TimeManager.Instance.player.transform;
+         if(healthCanvas!=null&&Camera.main!=null)
+         {healthCanvas.rotation=Camera.main.transform.rotation;
+          healthCanvas.gameObject.SetActive(Vector3.Distance(transform.position,player.position)<18);
+          healthFill.rectTransform.sizeDelta=new Vector2(96*Mathf.Clamp01(health/MaxHealth),8);}
          Vector3 delta=player.position-transform.position;delta.y=0;float distance=delta.magnitude;
          if(distance>36||owner.IsNight||!ExplorationWorld.Instance.IsExploring){Destroy(gameObject);return;}
          attackCooldown=Mathf.Max(0,attackCooldown-Time.deltaTime);alert=Mathf.Max(0,alert-Time.deltaTime);
-         if(distance<9&&Vector3.Dot(transform.forward,delta.normalized)>.62f)
-         {var eye=transform.position+Vector3.up*.5f;var toward=(player.position+Vector3.up-eye);
-          if(Physics.Raycast(eye,toward.normalized,out var hit,toward.magnitude+1,~0,QueryTriggerInteraction.Ignore)&&hit.collider.GetComponentInParent<FarmPlayer>()!=null)alert=6;}
-         if(alert>0)target=player.position;else{roam-=Time.deltaTime;if(roam<=0){target=transform.position+new Vector3(Random.Range(-3f,3f),0,Random.Range(-3f,3f));roam=Random.Range(2f,5f);}}
+         if(distance<10&&Vector3.Dot(transform.forward,delta.normalized)>.42f)
+         {var eye=transform.position+Vector3.up*(snake?.38f:.65f);var toward=player.position+Vector3.up*.9f-eye;
+          if(Physics.Raycast(eye,toward.normalized,out var hit,toward.magnitude+1,~0,QueryTriggerInteraction.Ignore)&&hit.collider.GetComponentInParent<FarmPlayer>()!=null)alert=8;}
+         if(retreatTimer>0){retreatTimer=Mathf.Max(0,retreatTimer-Time.deltaTime);target=transform.position-delta.normalized*2.8f;}
+         else if(alert>0)target=player.position;
+         else{roam-=Time.deltaTime;if(roam<=0){target=transform.position+new Vector3(Random.Range(-3f,3f),0,Random.Range(-3f,3f));roam=Random.Range(2f,5f);}}
          Vector3 move=target-transform.position;move.y=0;move=move.sqrMagnitude>.2f?move.normalized:Vector3.zero;
          if(move.sqrMagnitude>.01f)transform.rotation=Quaternion.Slerp(transform.rotation,Quaternion.LookRotation(move),Time.deltaTime*6);
          gravity=body.isGrounded?-.8f:Mathf.Max(-20,gravity-24*Time.deltaTime);
-         body.Move((move*(alert>0?(snake?3.4f:4.5f):1.0f)+knockback+Vector3.up*gravity)*Time.deltaTime);
+         body.Move((move*(retreatTimer>0?3.4f:alert>0?(snake?3.8f:5.2f):1.0f)+knockback+Vector3.up*gravity)*Time.deltaTime);
          knockback=Vector3.MoveTowards(knockback,Vector3.zero,Time.deltaTime*9);
-         if(alert>0&&distance<1.5f&&attackCooldown<=0)
-         {attackCooldown=2;owner.Damage(snake?10:8,(snake?"Rắn cắn":"Cáo cắn")+"! Hãy lùi lại và dùng kiếm.");
-          TimeManager.Instance.player.ApplyImpact(player.position-transform.position,2.5f);
+         delta=player.position-transform.position;delta.y=0;
+         if(alert>0&&retreatTimer<=0&&delta.magnitude<1.85f&&attackCooldown<=0)
+         {attackCooldown=2.2f;retreatTimer=.65f;
+          owner.Damage(snake?10:8,(snake?"Rắn cắn":"Cáo cắn")+"! Hãy lùi lại và dùng kiếm.");
+          TimeManager.Instance.player.ApplyImpact(delta,2.6f);
           FarmEffects.Burst(player.position+Vector3.up*1.2f,"BỊ CẮN",new Color(.67f,.3f,.9f));}
         }
     }
