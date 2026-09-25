@@ -350,6 +350,8 @@ namespace NongTrai
             var irrigation=FindFirstObjectByType<IrrigationStation>();
             if(irrigation==null) throw new InvalidOperationException("Built irrigation station visual missing.");
             player.SetPaused(false);yield return new WaitForSeconds(.6f);
+            if(!irrigation.WaterVisualsActive)
+                throw new InvalidOperationException("Active sprinkler range or water spray is invisible.");
             camera.transform.position=irrigation.transform.position+new Vector3(7,4.5f,-7);
             camera.transform.LookAt(irrigation.transform.position+Vector3.up*.7f);
             Capture(Path.Combine(folder,"irrigation-preview.png"),hud,camera);

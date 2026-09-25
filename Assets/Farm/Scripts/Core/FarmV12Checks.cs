@@ -82,7 +82,7 @@ namespace NongTrai
                 if(!processing.Enqueue(7))throw new Exception("Chicken-feed processing recipe failed");
                 int chickenFeed=inventory.Count(52);processing.Advance(31);
                 if(inventory.Count(52)!=chickenFeed+3)throw new Exception("Chicken feed output failed");
-                var chicken=Array.Find(UnityEngine.Object.FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None),x=>x.species==AnimalSpecies.Chicken);
+                var chicken=Array.Find(UnityEngine.Object.FindObjectsByType<FarmAnimal>(FindObjectsSortMode.None),x=>x.pen==save.shop.speciesPens[3]);
                 if(chicken!=null){chicken.RestoreCare(0,20);int before=inventory.Count(52);
                     save.shop.speciesPens[3].FeedAll(save.shop);
                     if(chicken.Hunger<=0||inventory.Count(52)>=before)throw new Exception("Shared feed trough failed");}

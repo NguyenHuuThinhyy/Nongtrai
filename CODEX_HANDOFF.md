@@ -4,6 +4,7 @@
 
 - Save schema v15 đọc v2–v14. `FarmWaterSystem` lưu nước trong bình đang dùng, tối đa hai bình dự trữ (ba bình mang theo), nước máy bơm và tiến độ hút nước. Bơm tạo một bình sau mỗi 600 giây chơi, có thể giữ tối đa ba bình. Click máy bơm lấy nước; bảng quản lý cạnh máy mở menu mua vòi. Bình tưới trên hotbar hiển thị số nước thay vì độ bền.
 - Bơm và trạm tưới có hạt nước xanh nhìn thấy trong game. Nhân vật đã chỉnh tỷ lệ thân, tay và chân nhưng vẫn là model Unity dựng bằng primitive, chưa phải nhân vật 3D rig chuyên nghiệp. HUD đã chuyển gợi ý E/Tab/B về bên trái, tránh giữa màn hình.
+- Sửa tiếp vùng tưới: vòng bán kính 6m được nâng lên trên mặt ruộng, có 36 mốc xanh dọc biên; khi trạm/vòi hoạt động, bốn tia và 48 giọt nước xanh phun từ tay quay xuống ruộng. Smoke kiểm tra vòng, particle và giọt đang hoạt động; `Builds/Windows/irrigation-preview.png` là ảnh kiểm tra trực quan.
 - Cáo/rắn ban ngày có thanh máu trên đầu, mở rộng góc phát hiện; đòn cắn gây sát thương và đẩy người chơi nhẹ, sau đó lùi lại. Khi độ no trên 70, người chơi hồi 2 máu mỗi 5 giây chơi. Smoke test v15 gồm nước bơm, sức chứa bình, hồi máu, thanh máu quái và chuyển bản lưu cũ. Chỉ lưu thủ công, chế độ sáng tạo không ghi file lưu.
 
 ---

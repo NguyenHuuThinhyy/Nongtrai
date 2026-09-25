@@ -332,17 +332,42 @@ namespace NongTrai
 
     public sealed class IrrigationStation : MonoBehaviour,IInteractable
     {
-        public int region;public bool portable;public float remainingSeconds;Transform arms;ParticleSystem spray;LineRenderer range;Transform[] droplets;
+        public int region;public bool portable;public float remainingSeconds;Transform arms;ParticleSystem spray;LineRenderer range;LineRenderer[] jets;Transform[] droplets;
+        public bool WaterVisualsActive => range!=null&&range.enabled&&spray!=null&&spray.isPlaying&&droplets!=null&&droplets[0]!=null&&droplets[0].gameObject.activeSelf;
         public string InteractionHint => portable?"[Chuột trái] Vòi phun • còn "+Mathf.CeilToInt(remainingSeconds/60)+" phút • nạp 1 nước để chạy 30 phút":
             "[Chuột trái] Nạp trạm vùng "+(region+1)+" • "+(FarmWaterSystem.Instance==null?0:FarmWaterSystem.Instance.StationWater[region])+"/32 nước • bán kính 6m";
         public void InitializeVisuals(Transform rotatingArms)
         {
             arms=rotatingArms;
-            var ring=new GameObject("Vùng tưới 6 mét");ring.transform.SetParent(transform,false);ring.transform.localPosition=new Vector3(0,-1.02f,0);
-            range=ring.AddComponent<LineRenderer>();range.useWorldSpace=false;range.loop=true;range.positionCount=72;range.widthMultiplier=.055f;
-            range.startColor=range.endColor=new Color(.18f,.75f,1,.82f);range.material=new Material(Shader.Find("Universal Render Pipeline/Lit"));
-            range.material.color=new Color(.18f,.75f,1,.82f);
-            for(int i=0;i<72;i++){float a=i*Mathf.PI*2/72;range.SetPosition(i,new Vector3(Mathf.Cos(a)*6,.04f,Mathf.Sin(a)*6));}
+            var waterShader=Shader.Find("Universal Render Pipeline/Unlit");
+            if(waterShader==null)waterShader=Shader.Find("Universal Render Pipeline/Lit");
+            var waterMaterial=new Material(waterShader);waterMaterial.color=new Color(.10f,.82f,1f);
+            // The ring must sit above the top of the farm plots, not inside their soil mesh.
+            var ring=new GameObject("Vùng tưới 6 mét");ring.transform.SetParent(transform,false);ring.transform.localPosition=new Vector3(0,-.70f,0);
+            range=ring.AddComponent<LineRenderer>();range.useWorldSpace=false;range.loop=true;range.positionCount=96;range.widthMultiplier=.16f;
+            range.startColor=range.endColor=new Color(.15f,1f,1f);range.material=waterMaterial;
+            for(int i=0;i<96;i++){float a=i*Mathf.PI*2/96;range.SetPosition(i,new Vector3(Mathf.Cos(a)*6,0,Mathf.Sin(a)*6));}
+            // Lit terrain can make a thin LineRenderer look grey. Blue 3D markers
+            // keep the exact six-metre boundary readable at every time of day.
+            for(int i=0;i<36;i++)
+            {
+                float angle=i*Mathf.PI*2/36;
+                var marker=GameObject.CreatePrimitive(PrimitiveType.Sphere);marker.name="Mốc vùng tưới "+(i+1);
+                marker.transform.SetParent(ring.transform,false);
+                marker.transform.localPosition=new Vector3(Mathf.Cos(angle)*6,.02f,Mathf.Sin(angle)*6);
+                marker.transform.localScale=Vector3.one*(i%9==0?.22f:.14f);
+                Destroy(marker.GetComponent<Collider>());marker.GetComponent<Renderer>().material=waterMaterial;
+            }
+            jets=new LineRenderer[4];
+            for(int i=0;i<jets.Length;i++)
+            {
+                var jetObject=new GameObject("Tia nước "+(i+1));jetObject.transform.SetParent(arms,false);
+                var jet=jetObject.AddComponent<LineRenderer>();jet.useWorldSpace=false;jet.positionCount=2;
+                jet.startWidth=.11f;jet.endWidth=.035f;jet.startColor=jet.endColor=new Color(.15f,1f,1f);jet.material=waterMaterial;
+                var direction=new Vector3(Mathf.Cos(i*Mathf.PI*.5f),0,Mathf.Sin(i*Mathf.PI*.5f));
+                jet.SetPosition(0,direction*1.2f);jet.SetPosition(1,direction*5.4f+Vector3.down*2.55f);
+                jets[i]=jet;
+            }
             var particles=new GameObject("Hạt phun nước");particles.transform.SetParent(arms,false);particles.transform.localPosition=Vector3.zero;
             spray=particles.AddComponent<ParticleSystem>();var main=spray.main;main.startLifetime=1.45f;main.startSpeed=5.2f;main.startSize=.11f;
             main.startColor=new Color(.35f,.78f,1,.82f);main.gravityModifier=.7f;main.maxParticles=260;
@@ -351,29 +376,30 @@ namespace NongTrai
             var renderer=spray.GetComponent<ParticleSystemRenderer>();var material=new Material(Shader.Find("Universal Render Pipeline/Lit"));material.color=new Color(.25f,.72f,1,.9f);renderer.material=material;
             var sphere=GameObject.CreatePrimitive(PrimitiveType.Sphere);renderer.renderMode=ParticleSystemRenderMode.Mesh;
             renderer.mesh=sphere.GetComponent<MeshFilter>().sharedMesh;Destroy(sphere);
-            droplets=new Transform[16];
+            droplets=new Transform[48];
             for(int i=0;i<droplets.Length;i++)
             {
-                var drop=GameObject.CreatePrimitive(PrimitiveType.Sphere);drop.name="Giọt nước "+(i+1);drop.transform.SetParent(transform,false);
-                drop.transform.localScale=Vector3.one*.13f;Destroy(drop.GetComponent<Collider>());
-                var dropMaterial=new Material(Shader.Find("Universal Render Pipeline/Lit"));dropMaterial.color=new Color(.12f,.68f,1);
-                drop.GetComponent<Renderer>().material=dropMaterial;drop.SetActive(false);droplets[i]=drop.transform;
+                var drop=GameObject.CreatePrimitive(PrimitiveType.Sphere);drop.name="Giọt nước "+(i+1);drop.transform.SetParent(arms,false);
+                drop.transform.localScale=Vector3.one*.18f;Destroy(drop.GetComponent<Collider>());
+                drop.GetComponent<Renderer>().material=waterMaterial;drop.SetActive(false);droplets[i]=drop.transform;
             }
         }
         void Update()
         {
             bool active=portable?remainingSeconds>0:FarmWaterSystem.Instance!=null&&FarmWaterSystem.Instance.StationWater[region]>0;
             if(arms!=null&&active)arms.Rotate(0,42*Time.deltaTime,0,Space.Self);
+            if(range!=null)range.enabled=true;
+            if(jets!=null)foreach(var jet in jets)if(jet!=null)jet.enabled=active;
             if(spray!=null)
             {var emission=spray.emission;emission.enabled=active;
              if(active&&!spray.isPlaying)spray.Play();else if(!active&&spray.isPlaying)spray.Stop(true,ParticleSystemStopBehavior.StopEmittingAndClear);}
             if(droplets!=null)for(int i=0;i<droplets.Length;i++)
             {
                 droplets[i].gameObject.SetActive(active);if(!active)continue;
-                float phase=Mathf.Repeat(Time.time*1.15f+i/(float)droplets.Length,1);
-                float angle=i*Mathf.PI*2/droplets.Length+Time.time*.73f;
-                float radius=1.25f+phase*3.9f;
-                droplets[i].localPosition=new Vector3(Mathf.Cos(angle)*radius,2.05f+.25f-phase*phase*2.25f,Mathf.Sin(angle)*radius);
+                float phase=Mathf.Repeat(Time.time*1.2f+(i%12)/12f+(i/12)*.07f,1);
+                float angle=(i/12)*Mathf.PI*.5f;
+                float radius=1.2f+phase*4.2f;
+                droplets[i].localPosition=new Vector3(Mathf.Cos(angle)*radius,-2.55f*phase*phase,Mathf.Sin(angle)*radius);
             }
         }
         public bool CanInteract(FarmPlayer player) => true;
