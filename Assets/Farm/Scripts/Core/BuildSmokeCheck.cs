@@ -355,6 +355,9 @@ namespace NongTrai
             camera.transform.position=irrigation.transform.position+new Vector3(7,4.5f,-7);
             camera.transform.LookAt(irrigation.transform.position+Vector3.up*.7f);
             Capture(Path.Combine(folder,"irrigation-preview.png"),hud,camera);
+            camera.transform.position=irrigation.transform.position+new Vector3(0,2.3f,-10);
+            camera.transform.LookAt(irrigation.transform.position+Vector3.up*.85f);
+            Capture(Path.Combine(folder,"irrigation-eye-preview.png"),hud,camera);
             int bundles=inventory.Count(16);inventory.Add(0,2);inventory.Add(1,1);
             if(!orders.Craft(0) || inventory.Count(16)!=bundles+1)
                 throw new InvalidOperationException("JSON crafting recipe failed.");
