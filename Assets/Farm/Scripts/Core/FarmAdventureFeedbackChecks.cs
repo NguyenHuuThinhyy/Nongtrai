@@ -92,7 +92,8 @@ namespace NongTrai
             chest.guard=FarmChestGuard.Create(chest,record);var guard=chest.guard;Check(guard.MaxHealth==1400&&chest.Guarded,"Chest guardian missing");
             FarmStorage.Instance.Open(chest);Check(!player.Paused,"Guarded chest opened before combat");
             guard.HitRanged(player.transform.position,1401);Check(record.guardDefeated&&!chest.Guarded,"Guardian defeat not recorded");
-            FarmStorage.Instance.Open(chest);Check(FarmStorage.Instance.AnswerQuiz(FarmStorage.Instance.QuizCorrectChoice),"Quiz did not unlock after guardian defeated");
+            FarmStorage.Instance.Open(chest);Check(FarmStorage.Instance.Panel.activeSelf,"Chest did not open after guardian defeated");
+            hud.Resume();chest.BreakExploration();Check(!chest.gameObject.activeSelf,"Defeated guardian chest could not be broken");
             yield return null;
             TimeManager.Instance.Restore(1,.42f,FarmWeather.Sunny);
             var camera=new GameObject("Adventure evidence camera",typeof(Camera)).GetComponent<Camera>();camera.farClipPlane=500;
@@ -103,7 +104,7 @@ namespace NongTrai
             player.Teleport(ExplorationWorld.Origin+new Vector3(-36,5,0));water.Rebuild();camera.transform.position=ExplorationWorld.Origin+new Vector3(-20,15,12);camera.transform.LookAt(ExplorationWorld.Origin+new Vector3(-36,4,0));
             FarmActionFeedback.Emit(ExplorationWorld.Origin+new Vector3(-33,5,0),new Color(.3f,.8f,1),30);yield return new WaitForSeconds(.1f);
             FarmNewFeaturesChecks.Capture(hud,camera,"water-feedback-preview.png");forge.Open();FarmNewFeaturesChecks.Capture(hud,camera,"forge-feedback-preview.png");Object.Destroy(camera.gameObject);
-            Debug.Log("FARM_FEEDBACK_GUARDS_OK: chest locked by guardian, tier HP, persisted defeat flag, quiz drops rewards; four guardian visuals captured.");
+            Debug.Log("FARM_FEEDBACK_GUARDS_OK: chest locked by guardian, tier HP, persisted defeat flag, direct open/break rewards; four guardian visuals captured.");
 
             File.WriteAllText(save.SavePath+".bak","backup");Check(File.Exists(save.SavePath)&&save.ArchiveForNewGame()&&!File.Exists(save.SavePath)&&!File.Exists(save.SavePath+".bak"),"New game did not archive active save");
             Check(Directory.GetFiles(Path.GetDirectoryName(save.SavePath),Path.GetFileName(save.SavePath)+".before-new-game-*").Length>=2,"Old save backup missing");

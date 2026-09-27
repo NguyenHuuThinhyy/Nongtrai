@@ -2,11 +2,13 @@
 
 Game nông trại Unity cho Windows. Trồng cây bằng chuột trái, chăm vật nuôi, chế biến/chế tạo theo JSON, giao đơn tại hộp thư, mở đất, nâng cấp dụng cụ và khám phá địa hình khối sinh liên tục theo seed. Có túi đồ 36 ô dùng chung hotbar 9 ô, minh họa vật phẩm, bản đồ nông trại 2D và thông báo vật nuôi đói. Cả hai map nhớ vị trí khi chuyển qua lại. Khi chết: trả 100 xu để hồi sinh tại chỗ, giữ đồ; lựa chọn miễn phí về cổng và rơi tối đa 3 món. Một ngày game dài 18 phút, có bốn mùa, thời tiết, ngủ qua đêm và câu đố ứng phó bão. Menu chính có chế độ sáng tạo LV99 để bay và kiểm thử mà không sửa bản lưu chơi thường.
 
+**Rương mới:** chuột phải mở thẳng bảng đồ; bấm từng món, Shift + click cả chồng hoặc **Lấy tất cả**. Giữ trái để đập vỡ và thả phần đồ còn lại. Không có câu hỏi; vẫn cần hạ quái canh.
+
 **CombatComfort:** hồi sinh tại chỗ giá 100 xu; bọt biển đầy hong 10 giây ở đống lửa; kiếm có vòng ngắm rỗng với hỗ trợ đánh hơi lệch tâm, giữ tầm đánh và chặn bởi tường.
 
-**Gói mới:** `DongGoi/NongTrai-Windows-CombatComfort-20260927.zip` và `DongGoi/NongTrai-Unity-CombatComfort-20260927.zip`. Báo cáo: [BAO_CAO_COMBAT_COMFORT.md](BAO_CAO_COMBAT_COMFORT.md). Gói Systems được giữ dự phòng trong Recovery; các bản Windows cũ hơn đã dọn.
+**Gói mới:** `DongGoi/NongTrai-Windows-ChestLoot-20260927.zip` và `DongGoi/NongTrai-Unity-ChestLoot-20260927.zip`. Báo cáo: [BAO_CAO_CHEST_LOOT.md](BAO_CAO_CHEST_LOOT.md). Gói trước được giữ dự phòng trong Recovery; runtime đang dùng là Windows-ChestLoot.
 
-**Chơi ngay:** mở `D:\GAME_NongTrai\Builds\Windows-CombatComfort\NongTrai.exe`; giữ nguyên cả thư mục `Windows-CombatComfort` khi sao chép sang máy khác. Không cần cài Unity để chạy bản Windows. Xem [CHOI_GAME.md](CHOI_GAME.md) để biết điều khiển và vòng chơi.
+**Chơi ngay:** mở `D:\GAME_NongTrai\Builds\Windows-ChestLoot\NongTrai.exe`; giữ nguyên cả thư mục `Windows-ChestLoot` khi sao chép sang máy khác. Không cần cài Unity để chạy bản Windows. Xem [CHOI_GAME.md](CHOI_GAME.md) để biết điều khiển và vòng chơi.
 
 **Bản Systems:** một xô nước dùng **chuột trái**: rỗng → múc hồ/sông, đầy → đặt nước → rỗng. Shop bán bọt biển hút nước trong 1 ô xung quanh rồi đầy. Hạt hết tự biến mất; bán được tất cả đồ trong túi. Thuê vòi tự tưới 350 xu/ngày, tối đa 3/ngày (LV3/5/7 mở 4/5/6), không nạp nước. Rương boss có bí pha lê và dâu hoàng kim. Quái nhảy qua khối cao 1 ô, thanh máu có số rõ hơn. © HThinh.yy ở góc màn hình.
 
@@ -21,7 +23,7 @@ Nhân vật hiện dùng Kenney Mini Characters biến thể `character-male-e.f
 Để build bản Windows đang dùng, đóng Editor đang mở cùng dự án rồi chạy. Lệnh này dùng scene hiện tại và không gọi builder dựng lại:
 
 ```powershell
-$env:FARM_BUILD_OUTPUT='Builds/Windows-CombatComfort'
+$env:FARM_BUILD_OUTPUT='Builds/Windows-ChestLoot'
 & 'D:\Unity\Editors\6000.3.22f1\Editor\Unity.exe' -batchmode -nographics -quit -projectPath 'D:\GAME_NongTrai' -executeMethod NongTrai.Editor.FarmProjectBuilder.BuildWindowsCurrentScene -logFile 'D:\GAME_NongTrai\Logs\build.log'
 ```
 
@@ -37,7 +39,7 @@ Cầm TNT, ngắm mặt đất/khối trong tầm 6 m ở Khám phá, bấm trá
 - Múc nước bằng **bình rỗng**, một lần bấm phải = một bình. Bình đầy đặt nguồn nước và trả vỏ rỗng; bình tưới có thể múc trực tiếp. Nước tự nhiên lan vào bờ đào trống; có hạt nước và lực nhảy khỏi nước.
 - Động tác cuốc/đánh/đặt và vệt dụng cụ; chém mặc định hồi 0,3 giây. Quái không cắn xuyên vách/từ tầng khác.
 - Rèn từng chiếc kiếm/rìu/cung; đổi chỉ số tốn 1 đá + 80 xu. Kiếm LV5 thêm 12 sát thương và hút 3 HP/đòn trúng. Bán/bỏ vũ khí tại túi đồ.
-- Rương tự sinh giảm tần suất từ 1/9 xuống 1/24 chunk, tối đa 2 rương hoạt động gần người chơi. Sói/rắn/gấu/golem canh bốn bậc, bậc cao thưởng tốt hơn; hạ quái rồi giải đố.
+- Rương tự sinh giảm tần suất từ 1/9 xuống 1/24 chunk, tối đa 2 rương hoạt động gần người chơi. Sói/rắn/gấu/golem canh bốn bậc, bậc cao thưởng tốt hơn; hạ quái rồi mở lấy đồ hoặc đập rương.
 - Map mới dùng generator 5, có hồ và nhánh sông theo seed trong vùng hoang dã. Save cũ giữ generator cũ để bảo toàn địa hình đã chơi. Chọn **Chơi lại từ đầu** để tạo map mới.
 - Đổi map vẫn nhớ vị trí; chỉ chết mới về cổng hồi sinh.
 
@@ -63,7 +65,7 @@ Cầm TNT, ngắm mặt đất/khối trong tầm 6 m ở Khám phá, bấm trá
 - **Map khám phá:** hồ tại ô (56,18), tế đàn phẳng tại (88,24), làng tại (24,76), hố sâu tại (-18,35); tọa độ hiện dưới HUD. Golem mặt đất chủ động đánh trong phạm vi tế đàn; boss hang vẫn ở (72,72). Bản lưu cũ lên generator 4, giữ các ô đã đào/đặt; địa hình vùng địa danh thay đổi theo bản mới.
 - Cầm bình nước, chuột phải vào đất/hố trong map khám phá để đổ. Nước rơi xuống rồi lan ngang tối đa 7 ô; đặt khối chiếm ô sẽ đẩy nước khỏi ô đó. Nguồn được lưu, dòng chảy dựng lại. Ở nông trại bình này bổ sung 8 nước bình tưới.
 - Than xuất hiện trong tầng đá. Lò bánh/lò nung dùng gỗ (30 giây) hoặc than (120 giây), nạp trong UI máy hoặc tự lấy nhiên liệu khi có việc. Máy khác giữ cách chạy cũ. TNT: cầm TNT bấm trái/phải đặt trong Khám phá; cầm đuốc bấm vào TNT để châm. Nhấp nháy đủ 5 lần mới nổ, đào phạm vi nhỏ và có thể gây sát thương người chơi.
-- Rương đặt lưu đồ độc lập. Rương câu đố: đúng thả đồ, sai mất rương, chỉ một lần trả lời.
+- Rương đặt lưu đồ độc lập. Rương khám phá mở trực tiếp, giữ trái đập vỡ sẽ rơi đồ; không còn câu hỏi.
 
 Bản demo Runner dùng nông dân hiện có; chưa có chọn giới tính, cửa hàng skin hoặc power-up cánh/nhảy đôi. Nhà làng, chướng ngại và Golem dùng mesh đơn giản dựng trong Unity. Nước là mô phỏng ô có giới hạn, chưa có bơi/dòng chảy đẩy vật thể. Không tải thêm asset ngoài các gói CC0 đã ghi nguồn.
 
@@ -82,7 +84,7 @@ git pull --ff-only origin main
 
 Unity Hub → Add project from disk → **thư mục vừa clone** (thư mục chứa Assets/Packages/ProjectSettings). Dùng Unity 6000.3.22f1, mở Assets/Farm/Scenes/Farm.unity. Chờ Unity tự tạo Library và tải Packages. Không chạy CreateScene hoặc RebuildSceneAndBuildWindows vì sẽ ghi đè scene/prefab đã nâng cấp.
 
-Build bằng `NongTrai.Editor.FarmProjectBuilder.BuildWindowsCurrentScene`, biến `FARM_BUILD_OUTPUT=Builds/Windows-CombatComfort`; dùng đường dẫn Unity.exe trên máy của bạn và `-projectPath` trỏ vào thư mục clone. Git chứa source, asset/model cùng giấy phép, cấu hình, meta, tài liệu và smoke checks; Library/Temp/Logs/Builds/DongGoi/Recovery không đưa lên Git. Bản ZIP Windows/Unity được đóng gói riêng tại máy bàn giao.
+Build bằng `NongTrai.Editor.FarmProjectBuilder.BuildWindowsCurrentScene`, biến `FARM_BUILD_OUTPUT=Builds/Windows-ChestLoot`; dùng đường dẫn Unity.exe trên máy của bạn và `-projectPath` trỏ vào thư mục clone. Git chứa source, asset/model cùng giấy phép, cấu hình, meta, tài liệu và smoke checks; Library/Temp/Logs/Builds/DongGoi/Recovery không đưa lên Git. Bản ZIP Windows/Unity được đóng gói riêng tại máy bàn giao.
 
 Xem CODEX_HANDOFF.md trước khi sửa; chạy game build với `-farmSmokeCheck -farmArtCheck` để kiểm tra toàn bộ, hoặc thêm `-farmSystemsOnly` để kiểm tra riêng các hệ thống mới. Kiểm thử dùng save tạm. Quyền sở hữu mã/thiết kế gốc: [COPYRIGHT.md](COPYRIGHT.md); giữ giấy phép asset của bên thứ ba.
 
@@ -90,5 +92,5 @@ Xem CODEX_HANDOFF.md trước khi sửa; chạy game build với `-farmSmokeChec
 
 - Git chứa toàn bộ `Assets` (kèm `.meta` và giấy phép), `Packages`, `ProjectSettings` và tài liệu. Các file này đủ để Unity mở dự án sau khi clone.
 - `Library`, `Temp`, `Obj`, `Logs`, cấu hình IDE cá nhân và dữ liệu debug do Unity tạo được bỏ qua trong Git. Unity tự tạo lại cache khi mở dự án; lần mở đầu có thể lâu hơn.
-- `Builds`, `DongGoi`, `Recovery` là dữ liệu bàn giao/khôi phục trên máy, không đưa vào source Git. Bản chạy mới nhất ở `Builds/Windows-CombatComfort`; giữ cả thư mục khi sao chép.
+- `Builds`, `DongGoi`, `Recovery` là dữ liệu bàn giao/khôi phục trên máy, không đưa vào source Git. Bản chạy mới nhất ở `Builds/Windows-ChestLoot`; giữ cả thư mục khi sao chép.
 - Giữ bản sao source trước khi sửa scene. Chỉ dọn bản build cũ sau khi đã phân biệt với bản mới đang chạy; không xóa asset, `.meta`, script tương thích save hoặc giấy phép chỉ vì không thấy dùng trong scene.

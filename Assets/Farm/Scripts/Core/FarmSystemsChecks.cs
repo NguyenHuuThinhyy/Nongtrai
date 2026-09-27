@@ -120,14 +120,25 @@ namespace NongTrai
             yield return new WaitForSeconds(1.3f);
             var chest=Array.Find(Object.FindObjectsByType<FarmChest>(FindObjectsSortMode.None),c=>c.key=="boss:systems");
             Check(chest!=null&&chest.items[74]==2&&chest.items[75]==1,"Boss chest rare seeds missing");
-            FarmStorage.Instance.Open(chest);Check(FarmStorage.Instance.AnswerQuiz(FarmStorage.Instance.QuizCorrectChoice),"Boss chest quiz failed");
-            Check(Array.Exists(WorldPickup.Snapshot(),d=>d.item==74)&&Array.Exists(WorldPickup.Snapshot(),d=>d.item==75),"Rare seeds not dropped");
+            FarmStorage.Instance.Open(chest);Check(FarmStorage.Instance.Panel.activeSelf&&chest.gameObject.activeSelf,"Boss chest did not open directly");
+            Check(FarmStorage.Instance.Transfer(74,1,false)&&chest.items[74]==1,"Boss chest withdrawal failed");
+            Check(save.Save()&&save.Load(),"Partly looted boss chest save/load failed");hud.Resume();yield return new WaitForSeconds(1.2f);
+            chest=Array.Find(Object.FindObjectsByType<FarmChest>(FindObjectsSortMode.None),c=>c.key=="boss:systems");
+            Check(chest!=null&&chest.items[74]==1&&chest.items[75]==1,"Boss chest contents duplicated or lost on load");
+            // Unload the chunk and return without saving; withdrawals must survive streaming too.
+            FarmStorage.Instance.Open(chest);Check(FarmStorage.Instance.Transfer(68,1,false),"Boss stone withdrawal failed");hud.Resume();
+            player.Teleport(ground+Vector3.right*75);yield return new WaitForSeconds(1.2f);
+            player.Teleport(ground+Vector3.right*3+Vector3.up*.1f);yield return new WaitForSeconds(1.2f);
+            chest=Array.Find(Object.FindObjectsByType<FarmChest>(FindObjectsSortMode.None),c=>c.key=="boss:systems");
+            Check(chest!=null&&chest.items[68]==2,"Chest items reset after leaving and returning");
+            chest.BreakExploration();
+            Check(Array.Exists(WorldPickup.Snapshot(),d=>d.item==74)&&Array.Exists(WorldPickup.Snapshot(),d=>d.item==75),"Breaking boss chest did not drop remaining rare seeds");
             inventory.Add(74,1);Equip(bag,74);plot.Restore(PlotState.Tilled,null,0,0);progress.Work(plot);
             Check(plot.Crop==hud.interaction.field.crops[6],"Exploration seed cannot be planted");
             plot.Restore(PlotState.Ready,hud.interaction.field.crops[6],1,1);int fruit=inventory.Count(76);progress.Work(plot);
             Check(inventory.Count(76)==fruit+3,"Special crop harvest missing");
             Check(!Array.Exists(FarmCraftOrders.Instance.Recipes,r=>r.output==74||r.output==75||r.output==64||r.output==71),"Rare seeds/bottles craftable");
-            Debug.Log("FARM_SYSTEMS_BOSS_LOOT_OK: persistent boss reward chest, quiz drops special seeds, planting and harvest.");
+            Debug.Log("FARM_SYSTEMS_BOSS_LOOT_OK: direct boss chest access, partial withdrawal, save-load and streaming, breaking drops remaining seeds, planting and harvest.");
 
             AdventureWolves.Instance.RestoreHealth(100);
             player.Teleport(new Vector3(0,.1f,-26));hud.Resume();yield return new WaitForSeconds(.3f);

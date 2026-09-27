@@ -342,7 +342,7 @@ namespace NongTrai
                 {
                     if(entityTarget!=chest.GetInstanceID()){entityTarget=chest.GetInstanceID();hold=0;}
                     breakDuration=.8f;hasTarget=true;hold=pressed?hold+elapsed:0;
-                    miningHint=chest.unlocked?"Rương ẩn • Chuột phải mở • Giữ trái phá: "+Mathf.Min(100,Mathf.FloorToInt(hold/.8f*100))+"%":"Rương khóa • Chuột phải trả lời câu hỏi để mở";
+                    miningHint=chest.Guarded?"Hạ quái canh trước khi mở hoặc đập rương":"Rương • Chuột phải lấy đồ • Giữ trái đập vỡ: "+Mathf.Min(100,Mathf.FloorToInt(hold/.8f*100))+"%";
                     if(hold>=.8f){hold=0;chest.BreakExploration();return true;}return false;
                 }
                 var placed=hit.collider.GetComponentInParent<PlacedBlock>();

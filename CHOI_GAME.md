@@ -1,10 +1,13 @@
-# Bản cập nhật CombatComfort — 27/09/2026
+# Bản cập nhật ChestLoot — 27/09/2026
+
+- **Rương:** chuột phải mở thẳng bảng đồ, không giải câu hỏi. Click một món để lấy 1, Shift + click lấy cả chồng, hoặc bấm **LẤY TẤT CẢ**. Túi đầy thì phần còn lại nằm trong rương. Giữ chuột trái 0,8 giây để đập vỡ rương khám phá, thả toàn bộ đồ còn lại và vật phẩm rương. Rương có quái canh cần hạ quái trước. Đồ đã lấy không xuất hiện lại khi rời vùng hoặc lưu/tải.
+
 
 - **Hồi sinh tại chỗ:** trả 100 xu, hồi đầy máu và giữ đồ ngay nơi ngã xuống. Không đủ xu thì nút bị khóa. Lựa chọn miễn phí vẫn về cổng và rơi tối đa 3 món.
 - **Hong bọt biển:** đặt bọt biển đầy cách đống lửa tối đa 2 m, không có tường chắn, chờ 10 giây. Hoặc cầm bọt biển đầy rồi chuột phải vào đống lửa để hong từng chiếc trong 10 giây. Thu bọt biển khô để hút nước lần nữa. Hong khối đặt cạnh lửa bắt đầu lại nếu rời xa lửa hoặc tải game; bọt biển đang xử lý trong đống lửa lưu tiến độ như nướng thịt.
 - **Ngắm kiếm:** cầm kiếm hiện vòng tròn viền rõ, giữa trong suốt; vàng khi bắt được mục tiêu. Quái hơi lệch tâm trong vòng vẫn đánh được. Không tăng tầm đánh, không xuyên tường, giữ hồi chiêu 0,3 giây. Đổi dụng cụ trở lại dấu +.
 
-Chạy `Builds/Windows-CombatComfort/NongTrai.exe` hoặc giải nén gói Windows CombatComfort mới nhất.
+Chạy `Builds/Windows-ChestLoot/NongTrai.exe` hoặc giải nén gói Windows ChestLoot mới nhất.
 
 
 ## TNT: đặt trước, châm sau
@@ -22,13 +25,13 @@ Chạy `Builds/Windows-CombatComfort/NongTrai.exe` hoặc giải nén gói Windo
 - **Bọt biển:** shop trang 4, 80 xu/khối. Chọn trên hotbar, trái để đặt cạnh nước. Hút nước trong khối 3×3×3 (1 ô mỗi hướng) rồi chuyển **đầy**, không hút lần nữa. Đổi sang dụng cụ khác rồi **phải vào bọt biển** để thu vào túi; có thể bán khô/đầy. Nguồn bị hút mất thì phần dòng chảy từ nguồn đó cũng rút. Đặt nước mới gần vùng đã hút sẽ cho nước lan trở lại.
 - **Vòi tự tưới:** máy bơm/bảng quản lý nước → thuê 350 xu, nhận vào túi; chọn rồi trái lên đất để đặt. Tự tưới bán kính 6 m trong **1 ngày game** từ khi đặt, không nạp nước. Hết hạn tự thu hồi; ngủ qua ngày cũng tính vào hạn thuê. Thuê tối đa **3/ngày**, LV3/5/7 tăng lên **4/5/6**. Phải vào vòi để thu hồi sớm và kết thúc lượt thuê, không hoàn vật phẩm/lượt/xu.
 - **Dọn túi:** hạt dùng hết tự mất ô; mua lại sẽ vào ô trống. Mọi vật phẩm, hạt và dụng cụ đều bán được. Nút **BÁN TẤT CẢ ĐỒ TRONG TÚI** bán cả dụng cụ; xô/xẻng/kiếm/rìu có thể mua lại. Nút bán nông sản tại shop vẫn chỉ bán nông sản.
-- **Hạt khám phá:** hạ Golem hang/tế đàn để xuất hiện rương thưởng, hoặc mở rương do Golem bậc 4 canh. Trả lời đúng nhận **2 hạt bí pha lê + 1 hạt dâu hoàng kim**; sai vẫn mất rương. Không bán hạt này tại shop, không có công thức chế tạo. Gieo trên đất đã cày, chăm tưới rồi thu hoạch/bán.
+- **Hạt khám phá:** hạ Golem hang/tế đàn để xuất hiện rương thưởng, hoặc mở rương do Golem bậc 4 canh. Mở hoặc đập rương để nhận **2 hạt bí pha lê + 1 hạt dâu hoàng kim**. Không bán hạt này tại shop, không có công thức chế tạo. Gieo trên đất đã cày, chăm tưới rồi thu hoạch/bán.
 - **Quái và thanh máu:** Golem, quái canh rương, sói/cáo/rắn có thể nhảy qua vật cản cao 1 ô khi đủ khoảng trống. Thanh máu quái hiện tên và HP/tối đa; thanh máu người chơi lớn hơn ở góc trái dưới.
 - **Save cũ:** các bình phụ64/71 được bỏ và hoàn theo giá bán (28/12 xu), giữ/cấp một xô mặc định nếu có bình cũ; còn nước thì xô đầy. Save21 giữ bọt biển đầy/vùng đã hút, vòi và lượt thuê trong ngày, nguồn nước và hạt đặc biệt.
 - **Chém:** bấm hoặc giữ trái, hồi chiêu gốc 0,3 giây. Cuốc/đánh/đặt có quơ tay, vệt dụng cụ và hạt thao tác.
 - **Rèn:** chọn đúng chiếc kiếm/rìu/cung trong lưới túi. RÈN tăng LV; ĐỔI CHỈ SỐ tốn 1 đá + 80 xu, đổi cả ba chỉ số: +1–12 sát thương, 3–18% chí mạng, 0–20% tốc đánh (cung: tốc kéo). Chí mạng gây 150% sát thương. Kiếm LV5 thêm +12 sát thương và hút 3 máu mỗi đòn trúng.
 - **Bán/bỏ kiếm, rìu, cung:** mở túi bằng I/B, bấm chọn ô rồi Bán số lượng hoặc Bỏ vật phẩm đã chọn. Chỉ số không chuyển sang vũ khí khác.
-- **Rương hiếm:** hạ quái canh trước khi trả lời câu hỏi. Sói → rắn → gấu → golem có sức mạnh/phần thưởng tăng theo bậc; đúng thì đồ rơi, sai mất rương.
+- **Rương hiếm:** hạ quái canh trước khi mở hoặc đập rương. Sói → rắn → gấu → golem có sức mạnh/phần thưởng tăng theo bậc; mở để chọn đồ cần lấy hoặc đập vỡ cho đồ rơi ra.
 - **Chơi lại từ đầu:** Esc → Chơi lại từ đầu → xác nhận. Bắt đầu LV1 với map/túi mới; bản lưu cũ được cất dự phòng, không lưu phiên hiện tại. Hủy thì tiếp tục đúng vị trí/cấp độ.
 - **Lưu và mở lại game thông thường:** vẫn dùng bản lưu thủ công. Save cũ giữ địa hình cũ; sông/hồ theo seed mới có trong map tạo mới. Đổi map nhớ vị trí; hồi sinh miễn phí về cổng đã đặt hoặc cổng gốc; trả 100 xu thì hồi sinh tại chỗ.
 
@@ -113,7 +116,7 @@ Thanh máu và độ no xuất hiện ở cả hai bản đồ. Đói cạn sẽ
 
 **Chỉ nút Lưu game trong menu Esc ghi tiến độ.** Thoát không tự lưu. Chế độ sáng tạo dùng bản sao trong bộ nhớ, LV99, bật bay và mở cả hai map; rời chế độ sẽ bỏ toàn bộ thay đổi thử nghiệm. Bản lưu v21 đọc được v2–v20, giữ nguồn nước, bọt biển, vòi/lượt thuê, hạt đặc biệt, rương boss và chỉ số riêng của vũ khí. Đường dẫn bản lưu Windows: `%USERPROFILE%\AppData\LocalLow\Nong Trai Studio\Nong Trai - First Harvest\farm-manual-save.json`.
 
-Rương khám phá có câu hỏi về kỹ năng nông trại: chuột phải mở câu hỏi, trả lời đúng thì rương rơi vật phẩm và biến mất; trả lời sai thì rương biến mất không rơi đồ. Mỗi rương chỉ có một lượt trả lời. Rương do người chơi tự đặt mở trực tiếp để cất/lấy đồ. Map ngoài vùng khởi đầu có các hang rộng ở sâu dưới đất. Sau khi đào 30 khối, đến vùng quanh ô (72,72) của map Khám phá rồi đào xuống hang để gặp **Golem hang sâu**; thắng nhận 10 quặng, 3 kim loại và 80 XP. Boss chỉ xuất hiện một lần cho mỗi bản lưu.
+Rương khám phá mở trực tiếp bằng chuột phải để lấy đồ. Giữ trái đập vỡ sẽ thả phần đồ còn lại, không cần từng mở trước đó. Rương do người chơi tự đặt mở trực tiếp để cất/lấy đồ. Map ngoài vùng khởi đầu có các hang rộng ở sâu dưới đất. Sau khi đào 30 khối, đến vùng quanh ô (72,72) của map Khám phá rồi đào xuống hang để gặp **Golem hang sâu**; thắng nhận 10 quặng, 3 kim loại và 80 XP. Boss chỉ xuất hiện một lần cho mỗi bản lưu.
 
 ## Giao hàng 3D
 

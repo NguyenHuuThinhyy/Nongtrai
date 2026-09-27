@@ -1,3 +1,15 @@
+# Bản hiện tại — ChestLoot / HThinh.yy — 27/09/2026
+
+Rương bỏ câu đố theo yêu cầu mới nhất. Runtime `Builds/Windows-ChestLoot/NongTrai.exe`; backup `Recovery/Before-ChestLoot-20260927/UnitySource.zip`. Đọc CHOI_GAME.md và BAO_CAO_CHEST_LOOT.md; các quy tắc câu đố rương trong mục lịch sử dưới đây đã bị thay thế.
+
+- FarmStorage xóa quizPanel, nội dung câu hỏi và AnswerQuiz. Open chặn quái canh, sau đó mở Panel trực tiếp. TakeAll dùng Transfer với giới hạn túi; giữ đồ chưa lấy. UI đủ 78 loại, không chồng nút cuối.
+- RememberChest đồng bộ mảng đồ/mutated/unlocked sau chuyển đồ, Snapshot và trước khi unload. Restore đóng panel và bỏ tham chiếu rương cũ. BreakExploration bỏ kiểm tra unlocked, rơi đồ còn lại + item36, chặn gọi lặp sau SetActive(false). ChestBroken đánh dấu key đã phá và đóng panel nếu đang xem.
+- Save21 giữ tương thích unlocked cũ; quái canh, thưởng boss/hạt và các câu hỏi ngoài rương giữ nguyên. BuildSmokeCheck, FarmAdventureFeedbackChecks, FarmSystemsChecks chuyển sang kiểm mở trực tiếp, lấy một/tất cả, phá chưa mở, không thả trùng, lưu/tải và rời vùng không nhân đồ.
+
+Build Windows OK100987215/169 file; full smoke/art exit0 tại Logs/smoke-chest-loot-final.log; startup responsive8s không exception. Đã xem ảnh bảng rương; scene hash không đổi. Chi tiết BAO_CAO_CHEST_LOOT.md.
+
+## Lịch sử trước ChestLoot
+
 # Bản hiện tại — CombatComfort / HThinh.yy — 27/09/2026
 
 Runtime `Builds/Windows-CombatComfort/NongTrai.exe`; source backup `Recovery/Before-CombatComfort-20260927/UnitySource.zip`. Không chạy CreateScene, scene hash không đổi. Xem BAO_CAO_COMBAT_COMFORT.md và CHOI_GAME.md trước các mục lịch sử bên dưới.

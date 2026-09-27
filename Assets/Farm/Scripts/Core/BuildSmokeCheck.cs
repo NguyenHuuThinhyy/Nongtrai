@@ -431,16 +431,23 @@ namespace NongTrai
             store.Open();int stored=store.Warehouse[0];inventory.Add(0,3);
             if(!store.Transfer(0,3,true)||store.Warehouse[0]!=stored+3||!store.Transfer(0,3,false)||store.Warehouse[0]!=stored)
                 throw new InvalidOperationException("Warehouse transfer failed.");
-            var testChest=FarmChest.Create(new Vector3(5,1,-35),true,"smoke-wrong",new int[38]);
+            var testChest=FarmChest.Create(new Vector3(5,1,-35),true,"smoke-open",new int[38]);
             testChest.items[20]=3;
             int dropsBefore=WorldPickup.Snapshot().Length;
             store.Open(testChest);
-            if(store.AnswerQuiz((store.QuizCorrectChoice+1)%3)||testChest.gameObject.activeSelf||WorldPickup.Snapshot().Length!=dropsBefore)
-                throw new InvalidOperationException("Wrong chest answer did not remove chest without loot.");
-            var rewardChest=FarmChest.Create(new Vector3(7,1,-35),true,"smoke-correct",new int[FarmInventory.ItemCount]);
-            rewardChest.items[20]=3;store.Open(rewardChest);
-            if(!store.AnswerQuiz(store.QuizCorrectChoice)||rewardChest.gameObject.activeSelf||WorldPickup.Snapshot().Length<=dropsBefore)
-                throw new InvalidOperationException("Correct chest answer did not drop loot and remove chest.");
+            Capture(Path.Combine(folder,"chest-direct-loot-preview.png"),hud,camera);
+            int chestWoodBefore=inventory.Count(20);
+            if(!store.Panel.activeSelf||!testChest.gameObject.activeSelf||!store.Transfer(20,1,false)||testChest.items[20]!=2||inventory.Count(20)!=chestWoodBefore+1||WorldPickup.Snapshot().Length!=dropsBefore)
+                throw new InvalidOperationException("Chest did not open directly for taking items.");
+            hud.Resume();store.Open(testChest);store.TakeAll();
+            if(testChest.items[20]!=0||inventory.Count(20)!=chestWoodBefore+3)throw new InvalidOperationException("Take all did not preserve the partially looted chest.");
+            hud.Resume();testChest.BreakExploration();
+            var rewardChest=FarmChest.Create(new Vector3(7,1,-35),true,"smoke-break",new int[FarmInventory.ItemCount]);
+            rewardChest.items[20]=3;dropsBefore=WorldPickup.Snapshot().Length;rewardChest.BreakExploration();
+            int dropsAfter=WorldPickup.Snapshot().Length;rewardChest.BreakExploration();
+            if(rewardChest.gameObject.activeSelf||dropsAfter<=dropsBefore||WorldPickup.Snapshot().Length!=dropsAfter)
+                throw new InvalidOperationException("Breaking unopened chest lost or duplicated loot.");
+            Debug.Log("FARM_CHEST_DIRECT_OK: open, take one/all, reopen partial chest, break unopened chest, no duplicate drops.");
             if(!orders.Reroll(0) || orders.RerollRemaining<=0)
                 throw new InvalidOperationException("Order reroll cooldown failed.");
             for(int i=0;i<orders.Orders.Length;i++)
