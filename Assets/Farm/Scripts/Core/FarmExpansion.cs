@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -44,6 +44,7 @@ namespace NongTrai
             }
             for(int i=0;i<3;i++)
             {
+                if(i==1){FarmUi.Label(Panel.transform,"Xô chỉ rỗng/đầy • LV3/5/7 tăng lượt thuê vòi tự tưới",new Vector2(30,-482),new Vector2(950,55),20);continue;}
                 int tool=i;
                 FarmUi.Button(Panel.transform,"Nâng "+toolNames[i]+" • bạc 300 xu / vàng 750 xu",
                     new Vector2(30,-415-i*67),new Vector2(950,55),()=>UpgradeTool(tool));
@@ -76,7 +77,8 @@ namespace NongTrai
             string regions="";
             for(int i=0;i<4;i++) regions+=(i>0?" • ":"")+"V"+(i+1)+":"+(UnlockedRegions[i]?"mở":"khóa");
             summary.text="Ngày "+Day+" • LV "+Level+"/"+LevelCap+" ("+Experience+"/"+ExperienceNeeded+" XP) • "+shop.Money+" xu\n"
-                +regions+"\nXẻng "+tierNames[ToolTiers[0]]+" • Tưới "+tierNames[ToolTiers[1]]+" • Kiếm "+tierNames[ToolTiers[2]];
+                +regions+"\nXẻng "+tierNames[ToolTiers[0]]+" • Tưới "+tierNames[ToolTiers[1]]+" • Kiếm "+tierNames[ToolTiers[2]]
+                +" • Rèn LV"+(FarmForge.Instance==null?0:FarmForge.Instance.SwordLevel);
         }
         public bool BuyRegion(int region)
         {
@@ -116,10 +118,10 @@ namespace NongTrai
                 +regionPrices[RegionFor(center)]+" xu. Nhấn N để mua.";
             int slot=FarmHudV2.Instance==null?0:FarmHudV2.Instance.SelectedSlot;
             int held=AdventureBag.Instance==null?-1:AdventureBag.Instance.Item;
-            int seedCrop=held>=40&&held<=42?held-37:field.Selected;
+            int seedCrop=held>=74&&held<=75?held-68:held>=40&&held<=42?held-37:field.Selected;
             if(center.State==PlotState.Untilled && slot!=4) return "Hãy chọn Xẻng trên hotbar trước khi xới.";
-            if(center.State==PlotState.Tilled && (slot<0 || slot>2) && !(held>=40&&held<=42)) return "Hãy chọn hạt giống trong hotbar trước khi gieo.";
-            if(center.State==PlotState.Tilled && seedCrop>=3&&Level<seedCrop)
+            if(center.State==PlotState.Tilled && (slot<0 || slot>2) && !(held>=40&&held<=42||held>=74&&held<=75)) return "Hãy chọn hạt giống trong hotbar trước khi gieo.";
+            if(center.State==PlotState.Tilled && seedCrop>=3&&seedCrop<6&&Level<seedCrop)
                 return "Giống "+field.crops[seedCrop].displayName+" mở ở LV"+seedCrop+".";
             if(center.State==PlotState.Growing && slot!=5) return "Hãy chọn Bình tưới trên hotbar trước khi tưới.";
             int tool=center.State==PlotState.Untilled?0:center.State==PlotState.Growing?1:-1;
@@ -147,6 +149,7 @@ namespace NongTrai
                 center.State==PlotState.Growing?"Bình đã hết nước. Đến hồ và click trái để lấy nước.":"Chưa thể thao tác.";
             var cue=tool==0?FarmAudio.Cue.Hoe:tool==1?FarmAudio.Cue.Water:tool==2?FarmAudio.Cue.Harvest:FarmAudio.Cue.Buy;
             FarmAudio.Instance?.Play(cue);
+            if(tool==1)FarmActionFeedback.Emit(center.transform.position+Vector3.up*.55f,new Color(.3f,.78f,1),30);
             if(harvestedTotal>0) FarmEffects.Burst(center.transform.position+Vector3.up*.4f,"+"+harvestedTotal+" nông sản",new Color(1,.87f,.28f));
             return (tool==0?"Đã cày ":tool==1?"Đã tưới ":harvestedTotal>0?"Thu hoạch +"+harvestedTotal+" từ ":"Đã gieo ")+worked+" ô.";
         }

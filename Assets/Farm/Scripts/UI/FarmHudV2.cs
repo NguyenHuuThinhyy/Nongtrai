@@ -1,4 +1,5 @@
-﻿using TMPro;
+// Copyright (c) HThinh.yy.
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -21,10 +22,10 @@ namespace NongTrai
         float displayedMoney;
         int selectedSlot;
         public int SelectedSlot => AdventureBag.Instance==null?selectedSlot:AdventureBag.Instance.LegacySlot;
-        readonly string[] names={"Lúa mì","Cà chua","Đậu nành","Thức ăn","Xẻng","Bình tưới","Kiếm","Rìu","Vật phẩm"};
+        readonly string[] names={"Lúa mì","Cà chua","Đậu nành","Thức ăn","Xẻng","Xô nước","Kiếm","Rìu","Vật phẩm"};
         readonly int[] iconIds={0,1,2,20,21,22,23,24,20};
         readonly string[] actions={"Gieo hạt vào đất đã cày","Gieo hạt vào đất đã cày","Gieo hạt vào đất đã cày",
-            "Cho vật nuôi ăn bằng F","Xới đất bằng chuột trái","Tưới cây bằng chuột trái","Đánh quái bằng chuột trái",
+            "Cho vật nuôi ăn bằng F","Xới đất bằng chuột trái","Trái: múc khi rỗng / đặt khi đầy","Đánh quái bằng chuột trái",
             "Chặt cây lấy gỗ","Chọn vật phẩm trong túi"};
         static readonly Key[] digitKeys={Key.Digit1,Key.Digit2,Key.Digit3,Key.Digit4,Key.Digit5,
             Key.Digit6,Key.Digit7,Key.Digit8,Key.Digit9};
@@ -52,13 +53,13 @@ namespace NongTrai
             var right=CreatePanel(root.transform,"Thông tin nông trại",new Vector2(-24,-24),new Vector2(490,106),new Vector2(1,1));
             coinText=FarmUi.TmpLabel(right.transform,"",new Vector2(12,-8),new Vector2(465,35),23);
             environmentText=FarmUi.TmpLabel(right.transform,"",new Vector2(12,-48),new Vector2(465,50),16);
-            var survival=CreatePanel(root.transform,"Máu và độ no",new Vector2(24,18),new Vector2(250,72),new Vector2(0,0));
-            survivalText=FarmUi.TmpLabel(survival.transform,"",new Vector2(9,-5),new Vector2(232,29),17);
-            var healthBack=CreatePanel(survival.transform,"Nền máu",new Vector2(9,-45),new Vector2(107,14),new Vector2(0,1));
-            healthFill=CreatePanel(healthBack.transform,"Thanh máu",Vector2.zero,new Vector2(105,12),new Vector2(0,1)).GetComponent<Image>();
+            var survival=CreatePanel(root.transform,"Máu và độ no",new Vector2(24,18),new Vector2(370,98),new Vector2(0,0));
+            survivalText=FarmUi.TmpLabel(survival.transform,"",new Vector2(9,-5),new Vector2(350,35),22);
+            var healthBack=CreatePanel(survival.transform,"Nền máu",new Vector2(9,-45),new Vector2(169,26),new Vector2(0,1));
+            healthFill=CreatePanel(healthBack.transform,"Thanh máu",Vector2.zero,new Vector2(165,22),new Vector2(0,1)).GetComponent<Image>();
             healthFill.color=new Color(.86f,.22f,.24f);
-            var hungerBack=CreatePanel(survival.transform,"Nền độ no",new Vector2(133,-45),new Vector2(107,14),new Vector2(0,1));
-            hungerFill=CreatePanel(hungerBack.transform,"Thanh no",Vector2.zero,new Vector2(105,12),new Vector2(0,1)).GetComponent<Image>();
+            var hungerBack=CreatePanel(survival.transform,"Nền độ no",new Vector2(190,-45),new Vector2(169,26),new Vector2(0,1));
+            hungerFill=CreatePanel(hungerBack.transform,"Thanh no",Vector2.zero,new Vector2(165,22),new Vector2(0,1)).GetComponent<Image>();
             hungerFill.color=new Color(.96f,.71f,.28f);
             tooltip=FarmUi.TmpLabel(root.transform,"",new Vector2(0,125),new Vector2(810,54),23);
             var tipRect=tooltip.rectTransform;tipRect.anchorMin=tipRect.anchorMax=new Vector2(.5f,0);
@@ -84,6 +85,9 @@ namespace NongTrai
                 counts[i].alignment=TextAlignmentOptions.Right;
                 tile.AddComponent<FarmTooltipTrigger>().Initialize(this,names[i]);
             }
+            var copyright=FarmUi.TmpLabel(hud.transform,"© HThinh.yy",Vector2.zero,new Vector2(230,30),16);
+            copyright.rectTransform.anchorMin=copyright.rectTransform.anchorMax=copyright.rectTransform.pivot=new Vector2(1,0);
+            copyright.rectTransform.anchoredPosition=new Vector2(-16,8);copyright.alignment=TextAlignmentOptions.Right;copyright.raycastTarget=false;
             displayedMoney=shop.Money;Select(0);
             hud.gameObject.AddComponent<FarmStorage>();
             hud.gameObject.AddComponent<AdventureWolves>();
@@ -159,9 +163,9 @@ namespace NongTrai
             if(CreativeModeManager.IsCreative) environmentText.text+=" • SÁNG TẠO"+(CreativeModeManager.IsFlying?" • ĐANG BAY":"");
             float health=AdventureWolves.Instance==null?100:AdventureWolves.Instance.Health;
             float hunger=AdventureBag.Instance==null?100:AdventureBag.Instance.Satiety;
-            if(survivalText!=null)survivalText.text="MÁU "+Mathf.CeilToInt(health)+"   NO "+Mathf.CeilToInt(hunger);
-            if(healthFill!=null)healthFill.rectTransform.sizeDelta=new Vector2(105*Mathf.Clamp01(health/100),12);
-            if(hungerFill!=null)hungerFill.rectTransform.sizeDelta=new Vector2(105*Mathf.Clamp01(hunger/100),12);
+            if(survivalText!=null)survivalText.text="MÁU "+Mathf.CeilToInt(health)+"/100    NO "+Mathf.CeilToInt(hunger)+"%";
+            if(healthFill!=null)healthFill.rectTransform.sizeDelta=new Vector2(165*Mathf.Clamp01(health/100),22);
+            if(hungerFill!=null)hungerFill.rectTransform.sizeDelta=new Vector2(165*Mathf.Clamp01(hunger/100),22);
             creativeControls.text=CreativeModeManager.IsCreative?
                 (CreativeModeManager.IsFlying?"ĐANG BAY • Space lên, X xuống\nShift nhanh • F8 tắt bay":"SÁNG TẠO • F8 bật bay\nB: túi đồ và xây dựng"):
                 "E: bản đồ việc • TAB: đổi map\nB: túi/xây • lăn chuột: chọn";

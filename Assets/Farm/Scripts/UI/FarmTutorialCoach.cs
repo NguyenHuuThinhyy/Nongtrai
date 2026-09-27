@@ -15,7 +15,7 @@ namespace NongTrai
             "WASD đi, chuột nhìn quanh, Space nhảy. Dấu + ở giữa màn hình là vị trí tương tác. E mở bản đồ việc cần làm; Esc mở menu.",
             "B mở túi. Kéo vật phẩm vào 9 ô dưới cùng; bấm 1–9 hoặc lăn chuột để đổi nhanh. Tên món đang cầm hiện ở đáy màn hình.",
             "Chọn ô 5 Xẻng rồi ngắm ô đất, bấm chuột trái. Chọn hạt trong hotbar để gieo; cây chín chỉ cần click trái để hái. Hạt cây ăn quả trồng ở vườn từ LV3 bằng chuột phải.",
-            "Chọn ô 6 Bình tưới, tới hồ nạp nước rồi tưới bằng chuột trái. Mua vòi phun ở máy bơm và click đất để đặt; nạp nước cho vòi chạy 30 phút. Thú đói ăn tại máng chung của chuồng.",
+            "Chọn ô 6 Xô nước: chuột trái vào mặt hồ khi rỗng để múc, chuột trái vào đất khi đầy để đặt nước. Thuê vòi tự tưới tại máy bơm: 3/ngày, LV3/5/7 mở thêm. Bọt biển ở shop hút nước quanh 1 ô rồi đầy.",
             "Ngắm bàn gỗ trước nhà và bấm trái để chế tạo. Ngắm hộp thư đỏ để xem 5 đơn; giao đủ hàng sẽ nhận xu và XP.",
             "Tab mở bản đồ, chọn Khám phá. Giữ trái để đào; chọn khối trong hotbar rồi trái để đặt. Mở túi B và chọn Xây dựng để xem các khối.",
             "Chỉ nút LƯU GAME trong menu Esc mới ghi tiến độ. Chế độ sáng tạo LV99 dành để thử, rời game sẽ bỏ thay đổi."};

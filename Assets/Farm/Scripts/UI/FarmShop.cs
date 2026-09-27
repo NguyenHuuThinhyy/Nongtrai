@@ -28,17 +28,17 @@ namespace NongTrai
         public GameObject Panel { get; private set; }
         FarmPenPlacement penPlacement;
         Text balance, feedback, pageLabel,limitLabel;GameObject[] offers;Text[] offerLabels;int[] offerPages;int currentPage;
-        readonly int[] purchasedToday=new int[40];int purchaseDay=1;
+        readonly int[] purchasedToday=new int[42];int purchaseDay=1;
         public int[] PurchaseCounts => (int[])purchasedToday.Clone();
         public int PurchaseDay => purchaseDay;
-        static bool Unlimited(int item)=>item<=2||item==8||item==16||item>=32&&item<=37;
-        static bool SoldHere(int item)=>item>=0&&item<40&&!(item>=9&&item<=15||item==17||item>=19&&item<=21||item==23||item>=38);
+        static bool Unlimited(int item)=>item>=40||item<=2||item==8||item==16||item>=32&&item<=37;
+        static bool SoldHere(int item)=>item>=40&&item<=41||item>=0&&item<40&&!(item>=9&&item<=15||item==17||item>=19&&item<=21||item==23||item>=38);
         void CheckDay(){int day=TimeManager.Instance==null?1:TimeManager.Instance.Day;if(day==purchaseDay)return;purchaseDay=day;System.Array.Clear(purchasedToday,0,purchasedToday.Length);}
         public void RestorePurchaseLimits(int day,int[] counts)
         {purchaseDay=Mathf.Max(1,day);System.Array.Clear(purchasedToday,0,purchasedToday.Length);if(counts!=null)System.Array.Copy(counts,purchasedToday,Mathf.Min(counts.Length,purchasedToday.Length));CheckDay();}
-        readonly int[] prices={20,40,75,220,120,150,60,400,150,60,100,120,180,110,55,50,45,65,80,70,100,60,45,95,120,95,140,125,700,550,650,500,75,110,160,100,140,90,70,95};
-        readonly string[] names={"5 hạt lúa mì","5 hạt cà chua","5 hạt đậu nành","Bò","Heo","Cừu","Gà","Chuồng gà thứ hai (5 chỗ)","Hạt cây táo","5 khối đá","5 khối gạch","3 khối kính","3 khối kim loại","5 khối gỗ","5 khối cỏ","10 thức ăn","1 hạt cây táo","2 bậc gỗ","1 đuốc","3 hàng rào","2 ván cầu","2 cám dinh dưỡng","3 phân bón","1 bánh táo","3 thịt sống","Xẻng mới (100 bền)","Kiếm mới (100 bền)","Rìu mới (20 bền)","Chuồng bò tự đặt","Chuồng heo tự đặt","Chuồng cừu tự đặt","Chuồng gà tự đặt","3 hạt bí ngô • LV3","3 hạt dâu • LV4","3 hạt hướng dương • LV5","Hạt cây lê • LV4","Hạt cây đào • LV5","Hạt bụi việt quất • LV3","2 thức ăn gà","2 thức ăn bò"};
-        readonly int[] icons={0,1,2,50,51,52,53,99,54,31,32,33,34,30,35,17,54,40,41,42,43,46,47,44,7,21,23,24,96,97,98,99,73,74,75,82,83,84,85,86};
+        readonly int[] prices={20,40,75,220,120,150,60,400,150,60,100,120,180,110,55,50,45,65,80,70,100,60,45,95,120,95,140,125,700,550,650,500,75,110,160,100,140,90,70,95,80,50};
+        readonly string[] names={"5 hạt lúa mì","5 hạt cà chua","5 hạt đậu nành","Bò","Heo","Cừu","Gà","Chuồng gà thứ hai (5 chỗ)","Hạt cây táo","5 khối đá","5 khối gạch","3 khối kính","3 khối kim loại","5 khối gỗ","5 khối cỏ","10 thức ăn","1 hạt cây táo","2 bậc gỗ","1 đuốc","3 hàng rào","2 ván cầu","2 cám dinh dưỡng","3 phân bón","1 bánh táo","3 thịt sống","Xẻng mới (100 bền)","Kiếm mới (100 bền)","Rìu mới (20 bền)","Chuồng bò tự đặt","Chuồng heo tự đặt","Chuồng cừu tự đặt","Chuồng gà tự đặt","3 hạt bí ngô • LV3","3 hạt dâu • LV4","3 hạt hướng dương • LV5","Hạt cây lê • LV4","Hạt cây đào • LV5","Hạt bụi việt quất • LV3","2 thức ăn gà","2 thức ăn bò","Bọt biển khô • hút bán kính 1 ô","Xô nước rỗng"};
+        readonly int[] icons={0,1,2,50,51,52,53,99,54,31,32,33,34,30,35,17,54,40,41,42,43,46,47,44,7,21,23,24,96,97,98,99,73,74,75,82,83,84,85,86,35,22};
         void Awake(){Instance=this;}
         void Start()
         {
@@ -104,6 +104,8 @@ namespace NongTrai
             if(item>=25&&item<=27&&AdventureBag.Instance.Space(item==25?104:item==26?106:107)<1)
             {result="Túi đã đầy, cần một ô trống để mua dụng cụ.";return false;}
             if(item>=28&&item<=31&&penPlacement.Pending>=0){result="Hãy đặt chuồng đang mua trước.";return false;}
+            if(item>=40&&AdventureBag.Instance.Space(item==40?72:105)<1){result="Túi đầy, hãy bán bớt đồ.";return false;}
+            if(item==41&&System.Array.Exists(AdventureBag.Instance.Slots,s=>s.item==105&&s.count>0)){result="Bạn đã có xô nước.";return false;}
             if(item<=2) Seeds[item]+=5;
             else if(item<=6)
             {
@@ -126,6 +128,8 @@ namespace NongTrai
             else if(item<=31)penPlacement.Begin((AnimalSpecies)(item-28));
             else if(item<=34)inventory.Add(40+item-32,3);
             else if(item<=37)inventory.Add(49+item-35,1);
+            else if(item==40)inventory.Add(72,1);
+            else if(item==41)AdventureBag.Instance.Pickup(105,1);
             else inventory.Add(52+item-38,2);
             Money-=prices[item];if(!Unlimited(item))purchasedToday[item]++; result="Đã mua "+names[item]+".";
             if(item>=28&&item<=31)result+=" Click đất trống trong vùng đã mở để đặt chuồng.";

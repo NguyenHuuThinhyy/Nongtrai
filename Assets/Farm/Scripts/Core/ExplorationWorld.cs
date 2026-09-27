@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,6 +12,7 @@ namespace NongTrai
         public SaplingRecord[] saplings;public VoxelRecord[] additions;
         public int[] removed; // v7 cell IDs
         public int minedCount,seed,generatorVersion;
+        public bool bossDefeated,surfaceBossDefeated;
         public Vector3Int[] excavated;
     }
     [DefaultExecutionOrder(-100)]
@@ -30,6 +31,10 @@ namespace NongTrai
         Material[] materials;float hold;float breakDuration=1;int entityTarget;Vector3Int target;bool hasTarget;
         public int MinedCount {get;private set;}
         public int Seed {get;private set;}
+        public int GeneratorVersion {get;private set;}=5;
+        public bool BossDefeated {get;private set;}
+        CaveBoss boss;
+        public bool SurfaceBossDefeated {get;private set;}
         public int LoadedChunkCount=>chunks.Count;
         public bool IsExploring=>hud!=null&&hud.player!=null&&hud.player.transform.position.y>500;
         sealed class Chunk
@@ -48,7 +53,7 @@ namespace NongTrai
         void Awake()
         {
             Instance=this;
-            var colors=new[]{new Color(.34f,.58f,.22f),new Color(.48f,.33f,.21f),new Color(.45f,.49f,.53f),new Color(.28f,.4f,.49f),new Color(.77f,.66f,.4f),new Color(.85f,.91f,.94f),new Color(.43f,.26f,.12f),new Color(.19f,.46f,.12f)};
+            var colors=new[]{new Color(.34f,.58f,.22f),new Color(.48f,.33f,.21f),new Color(.45f,.49f,.53f),new Color(.28f,.4f,.49f),new Color(.77f,.66f,.4f),new Color(.85f,.91f,.94f),new Color(.43f,.26f,.12f),new Color(.19f,.46f,.12f),new Color(.13f,.15f,.17f)};
             materials=new Material[colors.Length];
             for(int i=0;i<colors.Length;i++){materials[i]=new Material(Shader.Find("Universal Render Pipeline/Lit"));materials[i].color=colors[i];}
             Restore(null);
@@ -56,11 +61,12 @@ namespace NongTrai
         void Start()
         {
             gameObject.AddComponent<AdventureWildlife>().world=this;
+            gameObject.AddComponent<FarmVoxelWater>();gameObject.AddComponent<ExplorationLandmarks>();
             miningText=FarmUi.TmpLabel(hud.gameplayChrome.transform,"",Vector2.zero,new Vector2(1000,88),22);
             var r=miningText.rectTransform;r.anchorMin=r.anchorMax=r.pivot=new Vector2(.5f,0);r.anchoredPosition=new Vector2(0,195);
             miningText.alignment=TMPro.TextAlignmentOptions.Center;miningText.raycastTarget=false;
             reticle=FarmUi.TmpLabel(hud.gameplayChrome.transform,"+",Vector2.zero,new Vector2(40,40),28);
-            var aim=reticle.rectTransform;aim.anchorMin=aim.anchorMax=aim.pivot=new Vector2(.5f,.5f);aim.anchoredPosition=new Vector2(0,64.8f);
+            var aim=reticle.rectTransform;aim.anchorMin=aim.anchorMax=aim.pivot=new Vector2(.5f,.5f);aim.anchoredPosition=Vector2.zero;
             breakBack=FarmUi.Panel(hud.gameplayChrome.transform,"Tiến độ phá",new Vector2(126,12));
             var br=breakBack.GetComponent<RectTransform>();br.anchorMin=br.anchorMax=br.pivot=new Vector2(.5f,.5f);br.anchoredPosition=new Vector2(0,35);
             var fill=FarmUi.Panel(breakBack.transform,"Tiến độ",new Vector2(0,8));breakFill=fill.GetComponent<UnityEngine.UI.Image>();breakFill.color=new Color(1,.74f,.18f);
@@ -79,14 +85,45 @@ namespace NongTrai
         float Noise(int x,int z,float scale,int salt)=>Mathf.PerlinNoise((x+Seed%10007+salt)*scale,(z+Seed/10007%10007+salt)*scale);
         public int SurfaceHeight(int x,int z)
         {
+            if(GeneratorVersion>=4)
+            {
+                float shore=z-(-64+6*Mathf.Sin(x*.025f));
+                if(shore<0)return Mathf.Clamp(1+Mathf.FloorToInt((shore+24)/9),1,3);
+                if(shore<8)return 4+Mathf.FloorToInt(shore*.5f);
+                float river=Mathf.Abs(x-(-36+8*Mathf.Sin(z*.032f)));
+                if(river<9)return 2+Mathf.Max(0,Mathf.FloorToInt(river)-3);
+            }
+            if(GeneratorVersion>=3)
+            {
+                if(Mathf.Abs(x-88)<=15&&Mathf.Abs(z-24)<=15)return 12;
+                if(Mathf.Abs(x-24)<=12&&Mathf.Abs(z-76)<=12)return 10;
+                float lake=Vector2.Distance(new Vector2(x,z),new Vector2(56,18));if(lake<9)return 4+Mathf.Clamp(Mathf.FloorToInt(lake)-4,0,5);
+                float pit=Vector2.Distance(new Vector2(x,z),new Vector2(-18,35));if(pit<6)return 2+Mathf.FloorToInt(pit*.6f);
+            }
             // Preserve the original farm-adjacent expedition area, including old saved edits.
             if(x>=0&&x<48&&z>=0&&z<48)return z<10?4:4+Mathf.FloorToInt(Mathf.PerlinNoise(x*.085f+13,z*.085f+7)*7);
+            if(GeneratorVersion>=5){float water=WildWaterDistance(x,z);if(water<8)return 2+Mathf.Max(0,Mathf.FloorToInt(water)-2);}
             float biome=Noise(x,z,.006f,100);
             float hill=Noise(x,z,.026f,29);
             return Mathf.Clamp(4+Mathf.FloorToInt(hill*(biome>.6f?22:biome<.35f?8:13)),4,28);
         }
         public string BiomeAt(int x,int z)
-        {float b=Noise(x,z,.006f,100);return b>.6f?"Núi tuyết":b<.35f?"Đồi cát":"Đồng cỏ";}
+        {if(GeneratorVersion>=5&&NaturalWaterAt(x,z)&&z>=-56)return "Sông hồ hoang dã";if(GeneratorVersion>=4&&z<-56)return "Biển và bãi cát";if(GeneratorVersion>=4&&Mathf.Abs(x-(-36+8*Mathf.Sin(z*.032f)))<9)return "Sông đồng quê";float b=Noise(x,z,.006f,100);return b>.6f?"Núi tuyết":b<.35f?"Đồi cát":"Đồng cỏ";}
+        readonly Dictionary<Vector2Int,float> waterTerrainCache=new Dictionary<Vector2Int,float>();
+        float WildWaterDistance(int x,int z)
+        {
+            if(x>-65&&x<125&&z>-90&&z<110)return 100;
+            var key=new Vector2Int(x,z);if(waterTerrainCache.TryGetValue(key,out float cached))return cached;
+            int rx=Mathf.FloorToInt(x/128f),rz=Mathf.FloorToInt(z/128f);float best=100;
+            for(int dx=-1;dx<=1;dx++)for(int dz=-1;dz<=1;dz++)
+            {int gx=rx+dx,gz=rz+dz;uint hash=Hash(gx,197,gz);if(hash%3==0)continue;
+             float px=gx*128+24+hash%80,pz=gz*128+24+(hash>>8)%80;
+             float radius=5+(hash>>16)%12;best=Mathf.Min(best,Vector2.Distance(new Vector2(x,z),new Vector2(px,pz))-radius+3);}
+            // Meandering tributaries, phase and spacing vary with the world seed.
+            float lane=Mathf.Repeat(x+Seed%151+18*Mathf.Sin((z+Seed%97)*.021f),192);
+            best=Mathf.Min(best,Mathf.Min(lane,192-lane));if(waterTerrainCache.Count>65536)waterTerrainCache.Clear();waterTerrainCache[key]=best;return best;
+        }
+        public bool NaturalWaterAt(int x,int z)=>GeneratorVersion>=4&&SurfaceHeight(x,z)<=4&&(z<-56||Mathf.Abs(x-(-36+8*Mathf.Sin(z*.032f)))<6||GeneratorVersion>=5&&WildWaterDistance(x,z)<6);
         int BaseCell(int x,int y,int z)
         {
             if(y<0||y>=Height)return 0;
@@ -94,6 +131,9 @@ namespace NongTrai
             int top=SurfaceHeight(x,z);
             if(y>=top)
             {
+                if(GeneratorVersion>=5&&WildWaterDistance(x,z)<8)return 0;
+                if(GeneratorVersion>=4&&(z<-56||Mathf.Abs(x-(-36+8*Mathf.Sin(z*.032f)))<10))return 0;
+                if(GeneratorVersion>=3&&(Mathf.Abs(x-88)<=17&&Mathf.Abs(z-24)<=17||Mathf.Abs(x-24)<=14&&Mathf.Abs(z-76)<=14||Vector2.Distance(new Vector2(x,z),new Vector2(56,18))<10))return 0;
                 int tx=Mathf.RoundToInt(x/8f)*8,tz=Mathf.RoundToInt(z/8f)*8;
                 if(!(tx>=-4&&tx<52&&tz>=-4&&tz<52)&&Hash(tx,0,tz)%4==0&&BiomeAt(tx,tz)=="Đồng cỏ")
                 {int ground=SurfaceHeight(tx,tz);if(x==tx&&z==tz&&y<ground+4)return 7;
@@ -102,15 +142,24 @@ namespace NongTrai
             }
             if(y==0)return 3;
             bool core=x>=0&&x<48&&z>=0&&z<48;
+            // A fixed deep chamber houses the exploration boss. Its roof and floor remain mineable voxels.
+            float bossDistance=(x-72)*(x-72)+(z-72)*(z-72);
+            if(bossDistance<100&&y<=3)return 3;
+            if(bossDistance<100&&y>=4&&y<=9)return 0;
             if(core)
             {
                 bool cave=z>19&&y<5&&Mathf.PerlinNoise(x*.19f+31,z*.19f)>.58f;
                 if(cave)return 0;
-                return x<15&&z>12||y<top-3?((x*17+y*13+z*7)%19==0?4:3):y==top-1?1:2;
+                return x<15&&z>12||y<top-3?(Hash(x,y,z)%61==0?9:Hash(x,y,z)%83==0?4:3):y==top-1?1:2;
             }
+            if(GeneratorVersion>=2&&y>2&&y<top-3)
+            {float broad=Noise(x+y*2,z-y*2,.034f,709);
+             float depth=Mathf.Clamp01((top-y-2)/8f);
+             if(broad>.58f-depth*.045f)return 0;}
             float caveNoise=Noise(x+y*11,z-y*7,.085f,223);
             if(y>1&&y<top-2&&caveNoise>.68f)return 0;
-            if(y<top-3)return Hash(x,y,z)%23==0?4:3;
+            if(y<top-3)return Hash(x,y,z)%61==0?9:Hash(x,y,z)%83==0?4:3;
+            if(GeneratorVersion>=4&&z<-56)return 5;
             float biome=Noise(x,z,.006f,100);
             if(biome<.35f)return 5;
             return y==top-1?(biome>.6f?6:1):2;
@@ -119,11 +168,16 @@ namespace NongTrai
         public int BlockAt(Vector3Int cell)=>removed.Contains(cell)?0:BaseCell(cell.x,cell.y,cell.z);
         public void Restore(ExplorationState state)
         {
+            FarmTnt.ClearAll();waterTerrainCache.Clear();
+            if(boss!=null){boss.gameObject.SetActive(false);Destroy(boss.gameObject);boss=null;}
             ClearChunks();removed.Clear();additions.Clear();saplings.Clear();leavesToCheck.Clear();
             foreach(var sprout in sprouts.Values)if(sprout!=null)Destroy(sprout);sprouts.Clear();
             if(state?.saplings!=null)saplings.AddRange(state.saplings);
             if(state?.additions!=null)foreach(var v in state.additions)additions[v.cell]=v.type;
             Seed=state!=null&&state.generatorVersion>0?state.seed:Guid.NewGuid().GetHashCode()&int.MaxValue;
+            GeneratorVersion=state!=null&&state.generatorVersion>0?state.generatorVersion:5;
+            BossDefeated=state!=null&&state.bossDefeated;SurfaceBossDefeated=state!=null&&state.surfaceBossDefeated;
+            GetComponent<ExplorationLandmarks>()?.ResetWorld();FarmVoxelWater.Instance?.Dirty();
             MinedCount=state==null?0:Mathf.Max(0,state.minedCount);
             if(state?.excavated!=null)foreach(var c in state.excavated)if(c.y>0&&c.y<Height)removed.Add(c);
             if(state?.removed!=null)foreach(int id in state.removed)
@@ -131,7 +185,13 @@ namespace NongTrai
             EnsureAt(IslandManager.ExploreArrival);
         }
         public ExplorationState Snapshot()
-        {var ids=new Vector3Int[removed.Count];removed.CopyTo(ids);var added=new List<VoxelRecord>();foreach(var pair in additions)added.Add(new VoxelRecord{cell=pair.Key,type=pair.Value});return new ExplorationState{seed=Seed,generatorVersion=1,excavated=ids,minedCount=MinedCount,saplings=saplings.ToArray(),additions=added.ToArray()};}
+        {var ids=new Vector3Int[removed.Count];removed.CopyTo(ids);var added=new List<VoxelRecord>();foreach(var pair in additions)added.Add(new VoxelRecord{cell=pair.Key,type=pair.Value});return new ExplorationState{seed=Seed,generatorVersion=GeneratorVersion,bossDefeated=BossDefeated,surfaceBossDefeated=SurfaceBossDefeated,excavated=ids,minedCount=MinedCount,saplings=saplings.ToArray(),additions=added.ToArray()};}
+        public void DefeatSurfaceBoss(Vector3 point)
+        {if(SurfaceBossDefeated)return;SurfaceBossDefeated=true;FarmStorage.Instance?.CreateBossReward("boss:surface",point);WorldPickup.Spawn(68,2,point);WorldPickup.Spawn(67,2,point+Vector3.right);FarmExpansion.Instance?.GainExperience(100);hud.Notify("Hạ Golem tế đàn • 2 đá nâng cấp, 2 bình máu!");}
+        public void DefeatBoss()
+        {if(BossDefeated)return;BossDefeated=true;boss=null;FarmStorage.Instance?.CreateBossReward("boss:cave",Origin+new Vector3(72,4.1f,72));
+         WorldPickup.Spawn(13,10,Origin+new Vector3(72,5,72));WorldPickup.Spawn(15,3,Origin+new Vector3(73,5,72));
+         FarmExpansion.Instance?.GainExperience(80);hud.Notify("Đã hạ Golem hang sâu! +10 quặng, +3 kim loại, +80 XP.");}
         public void EnsureAt(Vector3 point)
         {
             if(point.y<500)return;
@@ -164,8 +224,8 @@ namespace NongTrai
         public bool MineCell(Vector3Int c,bool drop=false,bool yieldItem=true)
         {
             int type=BlockAt(c);if(c.y<=0||Protected(c.x,c.z)||type==0)return false;
-            removed.Add(c);MinedCount++;
-            if(yieldItem){int item=type==7?20:type==8?(Hash(c.x,c.y,c.z)%2==0?27:3):type==4?13:type==3?21:25;
+            removed.Add(c);MinedCount++;FarmVoxelWater.Instance?.Dirty();
+            if(yieldItem){int item=type==9?66:type==7?20:type==8?(Hash(c.x,c.y,c.z)%2==0?27:3):type==4?13:type==3?21:25;
                 if(drop)WorldPickup.Spawn(item,1,Origin+(Vector3)c+Vector3.one*.5f);else inventory.Add(item,1);}
             FarmExpansion.Instance?.GainExperience(2);if(MinedCount>=30)IslandManager.Instance?.UnlockMiningBlueprint();
             var key=Key(c.x,c.z);
@@ -224,9 +284,14 @@ namespace NongTrai
         void Update()
         {
             if(hud==null||hud.player==null)return;
+            if(IsExploring&&!BossDefeated&&MinedCount>=30&&boss==null)
+            {var location=Origin+new Vector3(72.5f,4.05f,72.5f);
+             if(Vector3.Distance(hud.player.transform.position,location)<36)
+             {boss=CaveBoss.Create(location,this,hud.player);hud.Notify("Cảm nhận Golem dưới lòng đất gần đây. Đào xuống tầng hang để chiến đấu!");}}
             if(!hud.player.Paused)AdvanceTrees(Time.deltaTime);
             if(IsExploring)Stream(hud.player.transform.position);
             if(hud.player.Paused||FarmHud.WorldClickSuppressed||FarmBuildingSystem.Instance.IsBuilding||
+                AdventureBag.Instance!=null&&(AdventureBag.Instance.Item==69||AdventureBag.Instance.Item==105||AdventureBag.Instance.Item==111||AdventureBag.IsEdible(AdventureBag.Instance.Item))||
                 FarmWaterSystem.Instance!=null&&(FarmWaterSystem.Instance.PendingPlacement||FarmWaterSystem.Instance.ConsumedFrame==Time.frameCount)){hold=0;return;}
             var cam=Camera.main;if(cam==null||Mouse.current==null)return;
             UpdateMiningRay(FarmAim.Ray(cam),Mouse.current.leftButton.isPressed,Time.deltaTime);
@@ -235,38 +300,51 @@ namespace NongTrai
         {
             if(hud.player.Paused||FarmBuildingSystem.Instance.IsBuilding)return false;
             miningHint="Nhìn vào khối đất/đá • Giữ CHUỘT TRÁI để đào • V đổi góc nhìn";
+            bool swordSwing=pressed && AdventureBag.Instance?.Item==106 && hud.player.TryAttack();
             // The third-person ray must pass through the player's own layer and reach past the camera offset.
             if(Physics.Raycast(ray,out var hit,24,~(1<<8),QueryTriggerInteraction.Ignore))
             {
+                var guard=hit.collider.GetComponentInParent<FarmChestGuard>();
+                if(guard!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
+                {miningHint=guard.Title+" • né khi hiện NÉ!";hasTarget=true;hold=0;
+                 if(pressed&&(swordSwing||AdventureBag.Instance?.Item!=106&&hud.player.TryAttack()))guard.Hit(hud.player.transform.position);return false;}
+                var caveBoss=hit.collider.GetComponentInParent<CaveBoss>();
+                if(caveBoss!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<7)
+                {miningHint="Golem hang sâu • LV quái cao • trái: đánh, cung: giữ rồi thả";hasTarget=true;hold=0;
+                 if(pressed&&(swordSwing||AdventureBag.Instance?.Item!=106&&hud.player.TryAttack())){caveBoss.Hit(hud.player.transform.position);}return false;}
                 var wolf=hit.collider.GetComponentInParent<NightWolf>();
                 if(wolf!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
                 {miningHint="Sói đêm • Chuột trái: đánh từng đòn";hasTarget=true;hold=0;
-                 if(Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame)wolf.Hit(hud.player.transform.position);return false;}
+                 if(pressed&&(swordSwing||AdventureBag.Instance?.Item!=106&&hud.player.TryAttack())){wolf.Hit(hud.player.transform.position);}return false;}
                 var predator=hit.collider.GetComponentInParent<DayPredator>();
                 if(predator!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
                 {miningHint=predator.name+" • Chuột trái: đánh từng đòn";hasTarget=true;hold=0;
-                 if(Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame)predator.Hit(hud.player.transform.position);return false;}
+                 if(pressed&&(swordSwing||AdventureBag.Instance?.Item!=106&&hud.player.TryAttack())){predator.Hit(hud.player.transform.position);}return false;}
                 var wild=hit.collider.GetComponentInParent<WildAnimal>();
                 if(wild!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
                 {entityTarget=wild.GetInstanceID();hold=0;breakDuration=.35f;miningHint=wild.Status;hasTarget=true;
-                 if(Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame)wild.Hit();return false;}
+                 if(pressed&&(swordSwing||AdventureBag.Instance?.Item!=106&&hud.player.TryAttack()))wild.Hit();return false;}
                 var chest=hit.collider.GetComponentInParent<FarmChest>();
                 if(chest!=null&&chest.isExploration&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
                 {
                     if(entityTarget!=chest.GetInstanceID()){entityTarget=chest.GetInstanceID();hold=0;}
                     breakDuration=.8f;hasTarget=true;hold=pressed?hold+elapsed:0;
-                    miningHint="Rương ẩn • Chuột phải mở • Giữ trái phá: "+Mathf.Min(100,Mathf.FloorToInt(hold/.8f*100))+"%";
+                    miningHint=chest.unlocked?"Rương ẩn • Chuột phải mở • Giữ trái phá: "+Mathf.Min(100,Mathf.FloorToInt(hold/.8f*100))+"%":"Rương khóa • Chuột phải trả lời câu hỏi để mở";
                     if(hold>=.8f){hold=0;chest.BreakExploration();return true;}return false;
                 }
                 var placed=hit.collider.GetComponentInParent<PlacedBlock>();
                 if(placed!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
                 {
+                    var forge=placed.GetComponent<ForgeTable>();
+                    if(forge!=null&&(AdventureBag.Instance==null||AdventureBag.Instance.Item!=107))
+                    {hold=0;miningHint="Bàn rèn • chuột trái/phải mở • cầm rìu để phá";if(pressed)forge.Interact(hud.interaction);return false;}
                     var fire=placed.GetComponent<CampfireCooker>();
                     if(fire!=null&&AdventureBag.Instance!=null&&AdventureBag.Instance.Item==7&&Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame)
                     {fire.Interact(hud.interaction);hold=0;return false;}
                     if(entityTarget!=placed.GetInstanceID()){entityTarget=placed.GetInstanceID();hold=0;}
                     int material=placed.type==0?7:placed.type==1||placed.type==4?3:1;
                     var bag=AdventureBag.Instance;breakDuration=bag.BreakSeconds(material);hasTarget=true;hold=pressed?hold+elapsed:0;
+                    if(pressed)hud.player.TriggerAnimation("Work");
                     miningHint="Giữ trái: phá khối • "+Mathf.FloorToInt(hold/breakDuration*100)+"%";
                     if(hold>=breakDuration){hold=0;if(bag.Item==104||bag.Item==107)bag.DamageTool();return FarmBuildingSystem.Instance.BreakPlaced(placed,true);}return false;
                 }
@@ -280,8 +358,8 @@ namespace NongTrai
                 if(c.y<=0||Protected(c.x,c.z))
                 {miningHint=c.y<=0?"Tầng đáy không thể đào":"Khu cổng được bảo vệ • Đi ra ngoài để đào";hold=0;return false;}
                 float seconds=AdventureBag.Instance==null?.55f:AdventureBag.Instance.BreakSeconds(BlockAt(c));breakDuration=seconds;
-                string name=BlockAt(c)==7?"Thân gỗ":BlockAt(c)==8?"Lá":BlockAt(c)==4?"Quặng":BlockAt(c)==3?"Đá":"Đất";
-                if(pressed)hold+=Mathf.Max(0,elapsed);else hold=0;
+                string name=BlockAt(c)==9?"Than":BlockAt(c)==7?"Thân gỗ":BlockAt(c)==8?"Lá":BlockAt(c)==4?"Quặng":BlockAt(c)==3?"Đá":"Đất";
+                if(pressed){hold+=Mathf.Max(0,elapsed);if(AdventureBag.Instance?.Item!=106)hud.player.TriggerAnimation("Work");}else hold=0;
                 miningHint=name+" • Giữ CHUỘT TRÁI: "+Mathf.Min(100,Mathf.FloorToInt(hold/seconds*100))+"%";
                 if(hold>=seconds){hold=0;var bag=AdventureBag.Instance;
                     if(bag!=null&&(bag.Item==104||bag.Item==107))bag.DamageTool();return MineCell(c,true,true);}
@@ -289,7 +367,7 @@ namespace NongTrai
             else{hasTarget=false;hold=0;}
             return false;
         }
-        bool IsTerrain(Collider collider){foreach(var c in chunks.Values)if(c.collider==collider)return true;return false;}
+        public bool IsTerrain(Collider collider){foreach(var c in chunks.Values)if(c.collider==collider)return true;return false;}
         void LateUpdate()
         {
             if(miningText==null)return;
@@ -299,7 +377,8 @@ namespace NongTrai
             if(visible)breakFill.rectTransform.sizeDelta=new Vector2(122*Mathf.Clamp01(hold/breakDuration),8);
             if(!visible)return;
             var cell=CellAt(hud.player.transform.position);
-            miningText.text=(building?"CHUỘT TRÁI: đặt khối cạnh mặt đang ngắm • Chọn dụng cụ để phá":miningHint)+(IsExploring?"\n"+BiomeAt(cell.x,cell.z)+" • Seed "+Seed+" • "+cell.x+", "+cell.z:"");
+            bool watering=AdventureBag.Instance?.Item==105;
+            miningText.text=(watering?hud.interaction.Hint:building?"CHUỘT TRÁI: đặt khối cạnh mặt đang ngắm • Chọn dụng cụ để phá":miningHint)+(IsExploring?"\n"+BiomeAt(cell.x,cell.z)+" • Seed "+Seed+" • "+cell.x+", "+cell.z:"");
             reticle.color=hasTarget?new Color(1,.8f,.2f):Color.white;
         }
         void Rebuild(Vector2Int key,Chunk chunk)

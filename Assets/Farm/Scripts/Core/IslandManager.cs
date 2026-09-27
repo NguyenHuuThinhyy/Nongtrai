@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 namespace NongTrai
 {
@@ -23,11 +23,17 @@ namespace NongTrai
         void Awake()=>Instance=this;
         void Start()
         {
+            if(GetComponent<FarmDeliveryRush>()==null)gameObject.AddComponent<FarmDeliveryRush>();
+            if(GetComponent<FarmRunner>()==null)gameObject.AddComponent<FarmRunner>();
+            if(hud.player.GetComponent<FarmConsumption>()==null)hud.player.gameObject.AddComponent<FarmConsumption>();
+            if(hud.player.GetComponent<FarmerRunEffects>()==null)hud.player.gameObject.AddComponent<FarmerRunEffects>();
+            if(GetComponent<FarmForge>()==null)gameObject.AddComponent<FarmForge>();
             MapPanel=FarmUi.Panel(hud.transform,"Hai bản đồ",new Vector2(920,540));
             FarmUi.TmpLabel(MapPanel.transform,"NÔNG TRẠI & KHÁM PHÁ",new Vector2(30,-25),new Vector2(860,60),32);
             FarmUi.Button(MapPanel.transform,"NÔNG TRẠI • Trồng cây, chăn nuôi, chế biến, giao đơn",new Vector2(30,-130),new Vector2(860,85),()=>Travel(0));
-            FarmUi.Button(MapPanel.transform,"KHÁM PHÁ • Đào địa hình, lấy quặng, xây bằng khối",new Vector2(30,-245),new Vector2(860,85),()=>Travel(1));
-            FarmUi.Label(MapPanel.transform,"Hai khu mở từ đầu. Mang vật liệu về nông trại hoặc xây tại chỗ.",new Vector2(30,-355),new Vector2(860,65),22);
+            FarmUi.Button(MapPanel.transform,"KHÁM PHÁ • Đào địa hình, lấy quặng, xây bằng khối",new Vector2(30,-235),new Vector2(860,75),()=>Travel(1));
+            FarmUi.Button(MapPanel.transform,"FARM RUNNER • Map chạy 3 làn • Vé, xu và quà mốc KM",new Vector2(30,-330),new Vector2(860,75),()=>FarmRunner.Instance?.OpenMenu());
+            FarmUi.Label(MapPanel.transform,"A/D đổi làn • W/Space nhảy • S trượt. Giao đơn hộp thư nhận vé.",new Vector2(30,-417),new Vector2(860,38),20);
             FarmUi.Button(MapPanel.transform,"Trở lại game",new Vector2(30,-455),new Vector2(860,55),hud.Resume);
             MapPanel.SetActive(false);player.PauseChanged+=OnPause;
         }
@@ -41,7 +47,7 @@ namespace NongTrai
             if(exploring){explorePosition=player.transform.position;hasExplorePosition=true;}
             else{farmPosition=player.transform.position;hasFarmPosition=true;}
             hud.Resume();player.Teleport(index==0?FarmPosition:ExplorePosition);
-            hud.Notify(index==0?"Nông trại • B túi đồ • M chế biến • chuột trái tương tác":"Khám phá • Giữ chuột trái để đào • B túi đồ/Xây dựng • Tab về nông trại");return true;
+            hud.Notify(index==0?"Nông trại • B túi đồ • M chế biến • chuột trái tương tác":"Khám phá • Đổi map giữ vị trí cũ • Chỉ hồi sinh mới về cổng • Sông (-36,0), biển (0,-75)");return true;
         }
         public void UnlockMiningBlueprint()
         { if(Blueprints>0)return;Blueprints=1;hud.Notify("Đào 30 khối: đã mở bản vẽ lò nung và đèn thủ công!"); }

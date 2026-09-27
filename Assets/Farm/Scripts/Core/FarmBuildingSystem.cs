@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -18,13 +18,14 @@ namespace NongTrai
         public bool PaletteOpen {get;private set;}
         public int SelectedType { get; private set; }
         public bool HasPlacedTable { get { foreach(var b in placed) if(b!=null && b.type==6) return true;return false; } }
+        public bool HasPlacedForge { get { foreach(var b in placed) if(b!=null && b.type==13) return true;return false; } }
         public const int FirstBlockItem=20;
-        static readonly int[] blockItems={20,21,22,23,24,25,26,28,29,30,31,36,37};
+        static readonly int[] blockItems={20,21,22,23,24,25,26,28,29,30,31,36,37,65,70,72,73};
         public static int TypeForItem(int item){for(int i=0;i<blockItems.Length;i++)if(blockItems[i]==item)return i;return -1;}
         public static int ItemForType(int type)=>type>=0&&type<blockItems.Length?blockItems[type]:-1;
-        readonly string[] names={"Khối gỗ","Khối đá","Khối gạch","Khối kính","Khối kim loại","Khối cỏ","Bàn chế tạo","Bậc gỗ","Đuốc","Hàng rào","Ván cầu","Rương đồ","Đống lửa"};
+        readonly string[] names={"Khối gỗ","Khối đá","Khối gạch","Khối kính","Khối kim loại","Khối cỏ","Bàn chế tạo","Bậc gỗ","Đuốc","Hàng rào","Ván cầu","Rương đồ","Đống lửa","Bàn rèn","Cổng hồi sinh","Bọt biển khô","Bọt biển đầy"};
         readonly Color[] colors={new Color(.55f,.31f,.14f),new Color(.47f,.51f,.53f),new Color(.68f,.25f,.18f),
-            new Color(.38f,.78f,.88f,.62f),new Color(.55f,.62f,.66f),new Color(.33f,.65f,.22f),new Color(.45f,.27f,.13f),new Color(.6f,.38f,.19f),new Color(1,.75f,.3f),new Color(.49f,.27f,.12f),new Color(.66f,.42f,.2f),new Color(.42f,.25f,.13f),new Color(1,.51f,.16f)};
+            new Color(.38f,.78f,.88f,.62f),new Color(.55f,.62f,.66f),new Color(.33f,.65f,.22f),new Color(.45f,.27f,.13f),new Color(.6f,.38f,.19f),new Color(1,.75f,.3f),new Color(.49f,.27f,.12f),new Color(.66f,.42f,.2f),new Color(.42f,.25f,.13f),new Color(.42f,.46f,.50f),new Color(.42f,.46f,.50f)};
         readonly List<PlacedBlock> placed=new List<PlacedBlock>();
         GameObject overlay,preview;TMP_Text title;Image[] slots;float rotation,fallTick;
 
@@ -33,19 +34,19 @@ namespace NongTrai
         void OnDestroy(){if(Instance==this)Instance=null;}
         void CreateHud()
         {
-            overlay=FarmUi.Panel(hud.gameplayChrome.transform,"Chế độ xây dựng",new Vector2(1100,175));
+            overlay=FarmUi.Panel(hud.gameplayChrome.transform,"Chế độ xây dựng",new Vector2(1340,175));
             var r=overlay.GetComponent<RectTransform>();r.anchorMin=r.anchorMax=r.pivot=new Vector2(.5f,1);r.anchoredPosition=new Vector2(0,-245);
             title=FarmUi.TmpLabel(overlay.transform,"",new Vector2(18,-10),new Vector2(1060,38),21);
             slots=new Image[names.Length];
             for(int i=0;i<names.Length;i++)
             {
-                int type=i;var button=FarmUi.Button(overlay.transform,"",new Vector2(8+i*83,-54),new Vector2(76,104),()=>Select(type));
+                int type=i;var button=FarmUi.Button(overlay.transform,"",new Vector2(8+i*76,-54),new Vector2(70,104),()=>Select(type));
                 button.GetComponentInChildren<Text>().enabled=false;
                 slots[i]=button.GetComponent<Image>();
                 var pic=new GameObject("Icon "+names[i],typeof(RectTransform),typeof(Image));var pr=pic.GetComponent<RectTransform>();
                 pr.SetParent(button.transform,false);pr.anchorMin=pr.anchorMax=new Vector2(.5f,.5f);pr.pivot=new Vector2(.5f,.5f);pr.anchoredPosition=new Vector2(0,12);pr.sizeDelta=new Vector2(44,44);
                 var image=pic.GetComponent<Image>();image.sprite=FarmItemIconLibrary.Get(FarmItemIconLibrary.ForItem(ItemForType(i)));image.preserveAspect=true;image.raycastTarget=false;
-                var label=FarmUi.TmpLabel(button.transform,names[i],new Vector2(2,-72),new Vector2(72,27),12);label.alignment=TextAlignmentOptions.Center;
+                var label=FarmUi.TmpLabel(button.transform,names[i],new Vector2(2,-72),new Vector2(66,27),11);label.alignment=TextAlignmentOptions.Center;
             }
             overlay.SetActive(false);
         }
@@ -75,6 +76,8 @@ namespace NongTrai
         {
             if(hud==null||player.Paused)return;fallTick+=Time.deltaTime;if(fallTick>=.08f){SettleFloatingBlocks(fallTick);fallTick=0;}
             var keyboard=Keyboard.current;var mouse=Mouse.current;
+            if(AdventureBag.Instance?.Item==69||AdventureBag.Instance?.Item==29&&FarmTnt.Target(FarmAim.Ray(viewCamera),player)!=null)
+            {preview.SetActive(false);return;}
             if(!IsBuilding)return;
             if(keyboard!=null)
             {
@@ -116,26 +119,29 @@ namespace NongTrai
         void UpdatePreview()
         {
             if(!Target(out var hit)){preview.SetActive(false);return;}preview.SetActive(true);preview.transform.position=Snap(hit);
-            preview.transform.rotation=Quaternion.Euler(0,rotation,0);preview.transform.localScale=SelectedType==6?new Vector3(1.5f,1,.9f):Vector3.one;
+            preview.transform.rotation=Quaternion.Euler(0,rotation,0);preview.transform.localScale=SelectedType==14?new Vector3(2.5f,3,1.1f):SelectedType==6?new Vector3(1.5f,1,.9f):Vector3.one;
+            if(SelectedType==14)preview.transform.position+=Vector3.up;
         }
         void Place()
         {
             if(!preview.activeSelf)return;
-            TryPlaceSelected(preview.transform.position,rotation);
+            TryPlaceSelected(preview.transform.position-(SelectedType==14?Vector3.up:Vector3.zero),rotation);
         }
         public bool TryPlaceSelected(Vector3 position,float yAngle)
         {
             if(!IsBuilding)return false;
             int item=ItemForType(SelectedType);
+            if(SelectedType==14&&(position.y<500||FarmTravelPortal.Active!=null))
+            {hud.Notify(position.y<500?"Cổng hồi sinh chỉ đặt ở map khám phá.":"Đã có cổng hồi sinh. Phá, nhặt lại cổng cũ để chuyển vị trí.");return false;}
             var half=SelectedType==6?new Vector3(.74f,.49f,.44f):Vector3.one*.49f;
-            if(Physics.CheckBox(position,half,Quaternion.Euler(0,yAngle,0),~(1<<2),QueryTriggerInteraction.Ignore))
+            if(SelectedType==14)half=new Vector3(1.24f,1.49f,.54f);
+            var center=position+(SelectedType==14?Vector3.up:Vector3.zero);
+            if(Physics.CheckBox(center,half,Quaternion.Euler(0,yAngle,0),~(1<<2),QueryTriggerInteraction.Ignore))
             {hud.Notify("Ô bị chiếm hoặc chạm nhân vật. Chọn mặt ngoài của khối.");return false;}
-            if(Vector3.Distance(position,player.transform.position)<1.25f)
-            { hud.Notify("Không thể đặt khối sát nhân vật.");return false; }
             foreach(var block in placed)if(block!=null && Vector3.Distance(block.transform.position,position)<.9f)
             { hud.Notify("Ô này đã có khối xây.");return false; }
             if(!inventory.Remove(item,1)){hud.Notify("Không còn "+names[SelectedType]+" trong túi.");return false;}
-            Create(SelectedType,position,new Vector3(0,yAngle,0));FarmAudio.Instance?.Play(FarmAudio.Cue.Hoe);
+            Create(SelectedType,position,new Vector3(0,yAngle,0));player.TriggerAnimation("Place");FarmActionFeedback.Emit(position, new Color(.72f,.58f,.35f),12);FarmAudio.Instance?.Play(FarmAudio.Cue.Hoe);
             hud.Notify("Đã đặt "+names[SelectedType]+". Bỏ chọn khối rồi giữ chuột trái để phá và nhặt lại.");return true;
         }
         void Remove()
@@ -143,12 +149,14 @@ namespace NongTrai
             if(!Target(out var hit))return;var block=hit.collider.GetComponentInParent<PlacedBlock>();if(block==null)return;
             bool removedTable=block.type==6;
             block.GetComponentInChildren<FarmChest>()?.DropContents();
-            inventory.Add(ItemForType(block.type),1);placed.Remove(block);Destroy(block.gameObject);
+            inventory.Add(ItemForType(block.type),1);placed.Remove(block);Destroy(block.gameObject);FarmVoxelWater.Instance?.Dirty();
             if(removedTable && !HasPlacedTable) Select(6);
             hud.Notify("Đã tháo "+names[block.type]+" và trả vào túi.");
         }
+        public bool Dismantle(PlacedBlock block)
+        {if(block==null||!placed.Remove(block))return false;inventory.Add(ItemForType(block.type),1);block.gameObject.SetActive(false);Destroy(block.gameObject);FarmVoxelWater.Instance?.Dirty();return true;}
         public bool BreakPlaced(PlacedBlock block,bool drop)
-        {if(block==null||!placed.Remove(block))return false;block.GetComponentInChildren<FarmChest>()?.DropContents();WorldPickup.Spawn(ItemForType(block.type),1,block.transform.position);block.gameObject.SetActive(false);Destroy(block.gameObject);return true;}
+        {if(block==null||!placed.Remove(block))return false;block.GetComponentInChildren<FarmChest>()?.DropContents();WorldPickup.Spawn(ItemForType(block.type),1,block.transform.position);block.gameObject.SetActive(false);Destroy(block.gameObject);FarmVoxelWater.Instance?.Dirty();return true;}
         PlacedBlock Create(int type,Vector3 position,Vector3 euler,int[] chestItems=null,int[] chestMutated=null)
         {
             GameObject root=new GameObject("Khối xây • "+names[type]);root.transform.SetPositionAndRotation(position,Quaternion.Euler(euler));
@@ -180,7 +188,33 @@ namespace NongTrai
                 Destroy(flame.GetComponent<Collider>());var material=new Material(Shader.Find("Universal Render Pipeline/Lit"));material.color=colors[type];flame.GetComponent<Renderer>().material=material;
                 var light=new GameObject("Vùng sáng an toàn").AddComponent<Light>();light.transform.SetParent(root.transform,false);light.transform.localPosition=Vector3.up*.4f;light.type=LightType.Point;light.range=9;light.intensity=3;light.color=new Color(1,.57f,.24f);
             }
+            else if(type==13)
+            {
+                Part(root.transform,"Bệ gỗ bàn rèn",new Vector3(0,-.30f,0),new Vector3(1,.4f,.8f),colors[0]);
+                Part(root.transform,"Đe thép",new Vector3(0,.06f,0),new Vector3(.80f,.22f,.52f),colors[13]);
+                Part(root.transform,"Mặt đe",new Vector3(0,.24f,0),new Vector3(1.08f,.12f,.56f),new Color(.65f,.69f,.69f));
+                root.AddComponent<ForgeTable>();
+            }
+            else if(type==14)
+            {
+                Color stone=new Color(.35f,.43f,.48f),glow=new Color(.21f,.80f,.89f);
+                for(int side=-1;side<=1;side+=2)
+                {
+                    Part(root.transform,"Trụ cổng",new Vector3(side*1.05f,1,0),new Vector3(.4f,3,.8f),stone);
+                    Part(root.transform,"Ngọc cổng",new Vector3(side*1.05f,1.3f,-.43f),new Vector3(.18f,.65f,.08f),glow);
+                }
+                Part(root.transform,"Vòm cổng",new Vector3(0,2.4f,0),new Vector3(2.5f,.3f,.8f),stone);
+                // No solid collider in the opening; the posts provide interaction and mining targets.
+                var sign=new GameObject("Cổng về trại",typeof(TMPro.TextMeshPro));sign.transform.SetParent(root.transform,false);
+                sign.transform.localPosition=new Vector3(0,2.8f,0);sign.transform.localScale=Vector3.one*.15f;
+                var label=sign.GetComponent<TMPro.TextMeshPro>();label.font=FarmUi.Font;label.text="CỔNG HỒI SINH\nChuột phải: về trại";label.fontSize=3;label.alignment=TMPro.TextAlignmentOptions.Center;
+                var light=new GameObject("Ánh cổng",typeof(Light));light.transform.SetParent(root.transform,false);light.transform.localPosition=Vector3.up*1.6f;light.GetComponent<Light>().color=glow;light.GetComponent<Light>().range=5;light.GetComponent<Light>().intensity=1.5f;
+                root.AddComponent<FarmTravelPortal>();
+            }
+            else if(type==15||type==16)
+            {Part(root.transform,"Bọt biển",Vector3.zero,Vector3.one,type==15?new Color(.94f,.81f,.23f):new Color(.55f,.55f,.19f));var sponge=root.AddComponent<FarmSponge>();if(type==15)sponge.Absorb();}
             else Part(root.transform,names[type],Vector3.zero,Vector3.one,colors[type]);
+            FarmVoxelWater.Instance?.Displace(new Bounds(position,Vector3.one));
             return block;
         }
         static void Part(Transform parent,string name,Vector3 local,Vector3 scale,Color color)
@@ -198,7 +232,7 @@ namespace NongTrai
         }
         public void Restore(BuildingState state)
         {
-            foreach(var block in placed)if(block!=null)Destroy(block.gameObject);placed.Clear();
+            foreach(var block in placed)if(block!=null){block.gameObject.SetActive(false);Destroy(block.gameObject);}placed.Clear();
             if(state?.blocks!=null)foreach(var record in state.blocks)if(record.type>=0&&record.type<names.Length)
             {var block=Create(record.type,record.position,record.euler,record.chestItems,record.chestMutated);block.GetComponent<CampfireCooker>()?.Restore(record.cooking,record.cookRemaining,record.cookedOutput);}
         }
@@ -209,7 +243,7 @@ namespace NongTrai
         public bool Cooking {get;private set;}
         public float Remaining {get;private set;}
         public int OutputItem {get;private set;}=39;
-        public string InteractionHint=>Cooking?"Thịt đang nướng • "+Mathf.CeilToInt(Remaining)+" giây":"Chọn thịt sống rồi [Chuột trái] vào lửa để nướng";
+        public string InteractionHint=>Cooking?"Thịt đang nướng • "+Mathf.CeilToInt(Remaining)+" giây":"Chọn thịt sống rồi [Chuột phải] vào lửa để nướng";
         public bool CanInteract(FarmPlayer player)=>true;
         public void SetHighlighted(bool value)=>InteractionOutline.Set(this,value);
         public void Interact(PlayerInteraction actor)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -6,11 +6,11 @@ using UnityEngine.InputSystem;
 using TMPro;
 namespace NongTrai
 {
-    [Serializable] public sealed class BagSlot { public int item=-1,count,durability; public BagSlot Copy()=>new BagSlot{item=item,count=count,durability=durability}; }
+    [Serializable] public sealed class BagSlot { public int item=-1,count,durability,forgeLevel,bonusDamage,criticalChance,haste; public BagSlot Copy()=>new BagSlot{item=item,count=count,durability=durability,forgeLevel=forgeLevel,bonusDamage=bonusDamage,criticalChance=criticalChance,haste=haste}; }
     [Serializable] public sealed class BagState { public BagSlot[] slots;public int selected;public float satiety=100; }
     public static class FarmAim
     {
-        public static Ray Ray(Camera camera)=>camera.ViewportPointToRay(new Vector3(.5f,.56f,0));
+        public static Ray Ray(Camera camera)=>camera.ViewportPointToRay(new Vector3(.5f,.5f,0));
         public static bool Hit(Camera camera,out RaycastHit hit)=>Physics.Raycast(Ray(camera),out hit,24,~(1<<8),QueryTriggerInteraction.Ignore);
     }
     public sealed class AdventureBag:MonoBehaviour
@@ -23,15 +23,15 @@ namespace NongTrai
         public bool HoldingBlock=>FarmBuildingSystem.TypeForItem(Item)>=0;
         Image[] pictures=new Image[36],backgrounds=new Image[36];TMP_Text[] labels=new TMP_Text[36];TMP_Text status,dragLabel;Image dragGhost;
         public int dragSource=-1;BagSlot held;bool accepted;int inspected;int sellQuantity=1;int lastItem=int.MinValue;TMP_Text sellLabel;
-        readonly string[] tools={"Hạt lúa mì","Hạt cà chua","Hạt đậu nành","Thức ăn thú","Xẻng","Bình tưới","Kiếm","Rìu","Giỏ hái","Xẻng cũ","Xẻng cũ"};
+        readonly string[] tools={"Hạt lúa mì","Hạt cà chua","Hạt đậu nành","Thức ăn thú","Xẻng","Xô nước","Kiếm","Rìu","Giỏ hái","Xẻng cũ","Xẻng cũ","Cung gỗ"};
         void Awake(){Instance=this;Defaults();}
         void OnDestroy(){if(Instance==this)Instance=null;}
         void Defaults(){for(int i=0;i<36;i++)Slots[i]=new BagSlot();for(int i=0;i<8;i++)Slots[i]=new BagSlot{item=100+i,count=1,durability=i==7?20:i==4||i==6?100:0};}
-        public string Name(int id)=>id<0?"Ô trống":id>=100&&id<=110?tools[id-100]:inventory.Name(id);
-        public int Icon(int id)=>id>=100?new[]{0,1,2,20,21,22,23,24,25,21,21}[Mathf.Clamp(id-100,0,10)]:FarmItemIconLibrary.ForItem(id);
+        public string Name(int id)=>id<0?"Ô trống":id>=100&&id<=111?tools[id-100]:inventory.Name(id);
+        public int Icon(int id)=>id>=100?new[]{0,1,2,20,21,22,23,24,25,21,21,110}[Mathf.Clamp(id-100,0,11)]:FarmItemIconLibrary.ForItem(id);
         public string CountText(int index)
         {var s=Slots[index];if(s.item>=100&&s.item<=102)return inventory.shop.Seeds[s.item-100].ToString();if(s.item==103)return inventory.shop.FeedStock.ToString();
-         if(s.item==105){var water=FarmWaterSystem.Instance;return water==null?"0 nước":water.CanWater+"/"+water.CanCapacity;}
+         if(s.item==105){var water=FarmWaterSystem.Instance;return water==null?"RỖNG":water.CanWater>0?"ĐẦY":"RỖNG";}
          return s.item>=104?"ĐB "+s.durability:s.count.ToString();}
         public void Initialize(FarmInventory source)
         {
@@ -40,6 +40,7 @@ namespace NongTrai
             var parent=inventory.Panel.transform;
             FarmUi.TmpLabel(parent,"TÚI ĐỒ • 27 Ô + HOTBAR 9 Ô",new Vector2(30,-20),new Vector2(1300,52),30);
             FarmUi.TmpLabel(parent,"Kéo-thả để đổi ô • Shift + click: đưa xuống hotbar • Chuột phải bắt đầu kéo: tách nửa",new Vector2(30,-80),new Vector2(1310,50),21);
+            FarmUi.TmpLabel(parent,"THANH NHANH 1–9: kéo vật phẩm vào hàng ô viền vàng bên dưới để dùng ngoài màn hình",new Vector2(30,-120),new Vector2(1310,38),20);
             for(int i=0;i<36;i++)
             {
                 int slot=i;int row=i<9?3:((i-9)/9),col=i%9;
@@ -58,12 +59,44 @@ namespace NongTrai
             FarmUi.Button(parent,"Hết",new Vector2(1185,-787),new Vector2(95,47),()=>ChangeSellQuantity(int.MaxValue));
             FarmUi.Button(parent,"Tiếp tục",new Vector2(30,-870),new Vector2(225,54),inventory.hud.Resume);
             FarmUi.Button(parent,"Cửa hàng",new Vector2(265,-870),new Vector2(225,54),inventory.shop.Open);
-            FarmUi.Button(parent,"Bán số lượng",new Vector2(500,-870),new Vector2(225,54),()=>{var s=Slots[inspected];if(s.item<100&&s.item>=0)inventory.Sell(s.item,Mathf.Min(s.count,sellQuantity));Sync();RefreshView();});
+            FarmUi.Button(parent,"Bán số lượng",new Vector2(500,-870),new Vector2(225,54),()=>SellInspected());
             FarmUi.Button(parent,"Sửa dụng cụ: 20 xu",new Vector2(735,-870),new Vector2(310,54),Repair);
             FarmUi.Button(parent,"Xây dựng",new Vector2(1055,-870),new Vector2(225,54),()=>{inventory.hud.Resume();FarmBuildingSystem.Instance.Toggle();});
-            dragLabel=FarmUi.TmpLabel(parent,"",new Vector2(400,-730),new Vector2(650,45),22);
+            FarmUi.Button(parent,"BÁN TẤT CẢ ĐỒ TRONG TÚI",new Vector2(760,-730),new Vector2(520,45),()=>SellEverything());
+            FarmUi.Button(parent,"Bỏ vật phẩm đã chọn",new Vector2(30,-730),new Vector2(350,45),()=>DiscardInspected());
+            dragLabel=FarmUi.TmpLabel(parent,"",new Vector2(395,-730),new Vector2(350,45),22);
             var ghost=new GameObject("Vật phẩm đang kéo",typeof(RectTransform),typeof(Image));ghost.transform.SetParent(parent,false);dragGhost=ghost.GetComponent<Image>();dragGhost.raycastTarget=false;dragGhost.rectTransform.sizeDelta=new Vector2(64,64);dragGhost.gameObject.SetActive(false);
             Sync();RefreshView();
+        }
+        public int SellEverything()
+        {
+            EndDrag();int before=inventory.shop.Money;
+            // Sell authoritative stock too, including seed purchases waiting for a free slot.
+            for(int crop=0;crop<3;crop++){inventory.shop.Credit(inventory.shop.Seeds[crop]*(crop==0?2:crop==1?4:7));inventory.shop.Seeds[crop]=0;}
+            inventory.shop.Credit(inventory.shop.FeedStock*2);inventory.shop.AddFeed(-inventory.shop.FeedStock);
+            for(int item=0;item<FarmInventory.ItemCount;item++)inventory.Sell(item,int.MaxValue);
+            Sync();for(int i=0;i<Slots.Length;i++)if(Slots[i].item>=104&&Slots[i].count>0){inspected=i;sellQuantity=int.MaxValue;SellInspected();}
+            Sync();Tell("Đã bán toàn bộ vật phẩm: +"+(inventory.shop.Money-before)+" xu. Dụng cụ có thể mua lại ở shop.");return inventory.shop.Money-before;
+        }
+        public bool SellInspected()
+        {
+            EndDrag();var slot=Slots[inspected];if(slot.count<=0)return false;
+            if(slot.item>=100&&slot.item<=103)
+            {int n=Mathf.Min(slot.count,sellQuantity);if(slot.item<=102)inventory.shop.Seeds[slot.item-100]-=n;else inventory.shop.AddFeed(-n);
+             inventory.shop.Credit(n*(slot.item==100?2:slot.item==101?4:slot.item==102?7:2));}
+            else if(slot.item>=104&&slot.item<=111)
+            {int value=Mathf.Max(1,Mathf.RoundToInt((slot.item==105?25:slot.item==107?30:60)*Mathf.Clamp01(slot.durability/(slot.item==107?20f:100f))));
+             inventory.shop.Credit(value);if(slot.item==105)FarmWaterSystem.Instance?.EmptyBucket();Slots[inspected]=new BagSlot();Tell("Đã bán dụng cụ: +"+value+" xu.");}
+            else if(slot.item>=0&&slot.item<100)inventory.Sell(slot.item,Mathf.Min(slot.count,sellQuantity));
+            else return false;
+            Sync();Select(Selected);RefreshView();return true;
+        }
+        public bool DiscardInspected()
+        {
+            EndDrag();var slot=Slots[inspected];if(slot.count<=0)return false;
+            if(slot.item>=100&&slot.item<=103){int n=Mathf.Min(slot.count,sellQuantity);if(slot.item<=102)inventory.shop.Seeds[slot.item-100]-=n;else inventory.shop.AddFeed(-n);}
+            if(slot.item<100)inventory.Remove(slot.item,Mathf.Min(slot.count,sellQuantity));else if(slot.item>=104)Slots[inspected]=new BagSlot();
+            if(slot.item==105)FarmWaterSystem.Instance?.EmptyBucket();Sync();Select(Selected);RefreshView();Tell("Đã bỏ vật phẩm đã chọn.");return true;
         }
         void Repair(){var s=Slots[inspected];int limit=s.item==107?20:100;if(s.item<104||s.durability>=limit)return;if(!inventory.shop.TrySpend(20)){Tell("Cần 20 xu để sửa.");return;}s.durability=limit;Tell("Đã sửa dụng cụ.");}
         public void Select(int index){Selected=Mathf.Clamp(index,0,8);if(LegacySlot>=0&&LegacySlot<3)inventory.field.Select(LegacySlot);FarmBuildingSystem.Instance?.EquipBlock(HoldingBlock?FarmBuildingSystem.TypeForItem(Item):-1);}
@@ -79,6 +112,9 @@ namespace NongTrai
             {var s=Slots[i];if(pass==0?s.item==id&&s.count<64:s.count==0){int n=Mathf.Min(64-s.count,amount);s.item=id;s.count+=n;amount-=n;}}
             return amount;
         }
+        public bool PickupWeapon(BagSlot weapon)
+        {if(weapon==null||weapon.item<104||weapon.item>111)return false;Sync();
+         for(int i=0;i<Slots.Length;i++)if(Slots[i].count==0){Slots[i]=weapon.Copy();Slots[i].count=1;RefreshView();return true;}return false;}
         public bool Pickup(int id,int amount)
         {Sync();if(Space(id)<amount)return false;
          if(id>=100){for(int i=0;i<36&&amount>0;i++)if(Slots[i].count==0){Slots[i]=new BagSlot{item=id,count=1,durability=id==107?20:100};amount--;}RefreshView();return amount==0;}
@@ -86,6 +122,13 @@ namespace NongTrai
         public void Sync()
         {
             if(inventory==null)return;
+            for(int id=100;id<=103;id++)
+            {
+                int stock=id==103?inventory.shop.FeedStock:inventory.shop.Seeds[id-100];
+                int delta=stock-Total(id);
+                if(delta>0)Insert(id,delta);
+                else if(delta<0)for(int i=35;i>=0&&delta<0;i--){var slot=Slots[i];if(slot.item!=id)continue;int take=Mathf.Min(slot.count,-delta);slot.count-=take;delta+=take;if(slot.count==0)Slots[i]=new BagSlot();}
+            }
             for(int id=0;id<FarmInventory.ItemCount;id++)
             {
                 int difference=inventory.Count(id)-Total(id);
@@ -95,9 +138,9 @@ namespace NongTrai
         }
         public bool DamageTool()
         {var s=Slots[Selected];if(s.item!=104&&s.item!=106&&s.item!=107)return true;if(s.durability<=0){Tell("Dụng cụ hỏng: chọn ô rồi sửa trong túi.");return false;}s.durability--;return true;}
-        public bool CorrectTool(int material)=>material==7?Item==107:material==3||material==4||material==8?Item==104:false;
+        public bool CorrectTool(int material)=>material==7?Item==107:material==3||material==4||material==9||material==8?Item==104:false;
         public float BreakSeconds(int material)
-        {float seconds=material==3||material==4?2:material==7?1.6f:material==8?.35f:.8f;return CorrectTool(material)&&Slots[Selected].durability>0?seconds*.4f:seconds;}
+        {float seconds=material==3||material==4||material==9?2:material==7?1.6f:material==8?.35f:.8f;return CorrectTool(material)&&Slots[Selected].durability>0?seconds*.4f:seconds;}
         public void BeginDrag(int index,bool half)
         {
             if(held!=null||Slots[index].count==0)return;dragSource=index;accepted=false;held=Slots[index].Copy();
@@ -139,7 +182,7 @@ namespace NongTrai
         {
             if(inventory==null)return;Sync();
             if(Item!=lastItem){lastItem=Item;FarmBuildingSystem.Instance?.EquipBlock(HoldingBlock?FarmBuildingSystem.TypeForItem(Item):-1);}
-            if(!inventory.hud.player.Paused)Satiety=Mathf.Max(0,Satiety-Time.deltaTime*.03f);
+            if(!inventory.hud.player.Paused)Satiety=Mathf.Max(0,Satiety-Time.deltaTime*inventory.hud.player.HungerRate);
             if(held!=null&&Mouse.current!=null&&Mouse.current.rightButton.wasPressedThisFrame)SplitDragging();
             if(inventory.Panel.activeSelf)RefreshView();
             else if(held!=null)EndDrag();
@@ -148,15 +191,25 @@ namespace NongTrai
         {
             if(pictures[0]==null)return;
             {
-                for(int i=0;i<36;i++){var s=Slots[i];pictures[i].enabled=s.count>0;if(s.count>0)pictures[i].sprite=FarmItemIconLibrary.Get(Icon(s.item));labels[i].text=(i<9?"["+(i+1)+"] ":"")+Name(s.item)+(s.count>0?"\n"+CountText(i):"");backgrounds[i].color=i==Selected?new Color(.55f,.4f,.12f):new Color(.14f,.26f,.21f);}
+                for(int i=0;i<36;i++){var s=Slots[i];pictures[i].enabled=s.count>0;if(s.count>0)pictures[i].sprite=FarmItemIconLibrary.Get(Icon(s.item));labels[i].text=(i<9?"["+(i+1)+"] ":"")+Name(s.item)+(s.count>0?"\n"+CountText(i):"");backgrounds[i].color=i==Selected?new Color(.67f,.47f,.14f):i<9?new Color(.34f,.42f,.20f):new Color(.14f,.26f,.21f);}
                 dragLabel.text=held==null?"Độ no: "+Mathf.RoundToInt(Satiety)+"%":"Đang kéo: "+Name(held.item)+" ×"+held.count;
                 if(sellLabel!=null)sellLabel.text="Bán: "+Mathf.Min(sellQuantity,Mathf.Max(1,Slots[inspected].count));
             }
             if(dragGhost!=null){dragGhost.gameObject.SetActive(held!=null);if(held!=null){dragGhost.sprite=FarmItemIconLibrary.Get(Icon(held.item));RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)inventory.Panel.transform,Mouse.current.position.ReadValue(),null,out var point);dragGhost.rectTransform.anchoredPosition=point;}}
         }
+        public static bool IsEdible(int id)=>id>=0&&id<=3||id==7||id>=9&&id<=11||id==32||id==33||id==39||id>=43&&id<=48||id>=57&&id<=62||id==67;
         public bool Eat()
-        {int id=Item;bool edible=id>=0&&id<=3||id>=9&&id<=11||id==32||id==33||id==39||id>=43&&id<=48||id>=60&&id<=62;
-         if(!edible||Satiety>=99)return false;if(!inventory.Remove(id,1))return false;Satiety=Mathf.Min(100,Satiety+(id==32||id==33||id==39||id>=60&&id<=62?40:20));inventory.hud.Notify("Đã ăn "+Name(id)+" • No "+Mathf.RoundToInt(Satiety)+"%");return true;}
+        {
+            int id=Item;if(!IsEdible(id))return false;
+            if(id==67)
+            {if(AdventureWolves.Instance==null||AdventureWolves.Instance.Health>=100||!inventory.Remove(id,1))return false;
+             AdventureWolves.Instance.Heal(50);inventory.hud.Notify("Đã uống bình máu • hồi 50 máu.");return true;}
+            if(Satiety>=99||!inventory.Remove(id,1))return false;
+            bool raw=id==7||id>=57&&id<=59;
+            Satiety=Mathf.Min(100,Satiety+(raw?10:id==32||id==33||id==39||id>=60&&id<=62?40:20));
+            inventory.hud.Notify("Đã ăn "+Name(id)+" • No "+Mathf.RoundToInt(Satiety)+"%");return true;
+        }
+
     }
     public sealed class BagSlotDrag:MonoBehaviour,IBeginDragHandler,IDragHandler,IEndDragHandler,IDropHandler,IPointerClickHandler
     {

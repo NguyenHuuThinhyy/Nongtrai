@@ -16,6 +16,7 @@ namespace NongTrai
         LineRenderer line;
         Collider target;
         Component owner;
+        Material outlineMaterial;
         static readonly int[] corners={0,1,3,2,0,4,5,1,5,7,3,7,6,2,6,4};
         public static void Set(Component source,bool enabled)
         {
@@ -36,10 +37,14 @@ namespace NongTrai
             line=gameObject.AddComponent<LineRenderer>();line.useWorldSpace=true;line.positionCount=corners.Length;
             line.loop=false;line.widthMultiplier=.035f;
             line.startColor=line.endColor=new Color(1,.88f,.26f);
-            var shader=Shader.Find("Universal Render Pipeline/Unlit");
-            if(shader!=null) line.material=new Material(shader);
+            // A Resources material keeps this shader in Windows builds (Shader.Find alone doesn't).
+            var template=Resources.Load<Material>("FarmUnlit");
+            outlineMaterial=template!=null?new Material(template):new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            outlineMaterial.color=new Color(1,.80f,.18f);
+            line.sharedMaterial=outlineMaterial;
             line.enabled=false;
         }
+        void OnDestroy() { if(outlineMaterial!=null)Destroy(outlineMaterial);if(instance==this)instance=null; }
         void Update() { if(target!=null) Draw(); }
         void Draw()
         {

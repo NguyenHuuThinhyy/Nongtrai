@@ -11,7 +11,7 @@ namespace NongTrai
         public int id;
         int hits;
         void Start()
-        {positions[id]=transform.position;scales[id]=transform.childCount>0?transform.GetChild(0).localScale.x/.65f:1;}
+        {positions[id]=transform.position;var renderers=GetComponentsInChildren<Renderer>();var bounds=new Bounds(transform.position,Vector3.zero);foreach(var r in renderers)bounds.Encapsulate(r.bounds);scales[id]=Mathf.Clamp(bounds.size.y/5.4f,.35f,2);}
         public string InteractionHint=>"[Chuột trái] Đốn cây gỗ • rìu 1 nhát, tay 3 nhát";
         public bool CanInteract(FarmPlayer player)=>true;
         public void SetHighlighted(bool selected)=>InteractionOutline.Set(this,selected);
@@ -35,6 +35,9 @@ namespace NongTrai
         static void Create(int id,Vector3 position,float scale)
         {
             var root=new GameObject("Cây gỗ nông trại "+id);root.transform.position=position;root.AddComponent<FarmDecorTree>().id=id;
+            var prefab=Resources.Load<GameObject>("FarmTree"+(Mathf.Abs(id)%4));
+            if(prefab!=null){var model=Instantiate(prefab,root.transform,false);model.transform.localScale*=scale;model.transform.localPosition*=scale;
+             var collider=root.AddComponent<CapsuleCollider>();collider.center=Vector3.up*1.65f*scale;collider.radius=.38f*scale;collider.height=3.4f*scale;return;}
             Part(root.transform,"Thân",PrimitiveType.Cylinder,Vector3.up*1.7f*scale,new Vector3(.65f,1.7f,.65f)*scale,new Color(.65f,.43f,.24f),true);
             Part(root.transform,"Tán",PrimitiveType.Sphere,Vector3.up*4.4f*scale,new Vector3(4.5f,4.3f,4.2f)*scale,new Color(.39f,.63f,.24f),false);
             Part(root.transform,"Tán sáng",PrimitiveType.Sphere,new Vector3(1,5.2f,-.5f)*scale,new Vector3(3,2.8f,3)*scale,new Color(.5f,.73f,.3f),false);

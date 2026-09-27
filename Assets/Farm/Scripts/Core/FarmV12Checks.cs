@@ -33,12 +33,12 @@ namespace NongTrai
                 if(!save.shop.Purchase(18,out _))throw new Exception("Torch did not become available next day");
                 var plot=UnityEngine.Object.FindFirstObjectByType<FarmPlot>();
                 plot.Restore(PlotState.Ready,save.field.crops[1],1,.7f,true);
-                inventory.AddMutated(1,2);
+                inventory.AddMutated(1,2);storage.Open();
                 if(!storage.Transfer(38,2,true)||storage.WarehouseMutated[1]<2)
                     throw new Exception("Mutated crop warehouse deposit lost its source crop");
                 if(!storage.Transfer(38,2,false)||inventory.MutatedCrops[1]<2)
                     throw new Exception("Mutated crop warehouse withdrawal lost its source crop");
-                int money=save.shop.Money;
+                inventory.hud.Resume();int money=save.shop.Money;
                 if(inventory.Sell(38,2)!=108||save.shop.Money!=money+108)
                     throw new Exception("Mutated tomato did not sell for three times 18 xu");
 
@@ -74,10 +74,11 @@ namespace NongTrai
                 IrrigationStation sprinkler=null;
                 foreach(var station in UnityEngine.Object.FindObjectsByType<IrrigationStation>(FindObjectsSortMode.None))
                     if(station.portable)sprinkler=station;
-                if(sprinkler==null||!water.RefillPortable(sprinkler)||sprinkler.remainingSeconds<1799)
+                if(sprinkler==null||!water.RefillPortable(sprinkler)||sprinkler.remainingSeconds<1078)
                     throw new Exception("Portable sprinkler refill failed");
-                if(!water.DismantlePortable(sprinkler)||inventory.Count(56)<1||!water.TryPlacePortable(new Vector3(65,0,12)))
-                    throw new Exception("Sprinkler could not be collected and placed again");
+                if(!water.DismantlePortable(sprinkler))throw new Exception("Rental return failed");
+                save.shop.Credit(FarmWaterSystem.PortablePrice);water.BuyPortable();
+                if(!water.TryPlacePortable(new Vector3(65,0,12)))throw new Exception("New rental placement failed");
                 processing.Restore(null);inventory.Add(0,2);
                 if(!processing.Enqueue(7))throw new Exception("Chicken-feed processing recipe failed");
                 int chickenFeed=inventory.Count(52);processing.Advance(31);
@@ -107,7 +108,7 @@ namespace NongTrai
                 orders.Orders[0].completed=true;
                 if(!save.Save())throw new Exception("v12 changed save failed");
                 string payload=File.ReadAllText(save.SavePath);
-                if(!payload.Contains("\"version\": 15")||!payload.Contains("\"mutated\": true")||
+                if(!payload.Contains("\"version\": 21")||!payload.Contains("\"mutated\": true")||
                     !payload.Contains("\"weatherRemaining\""))
                     throw new Exception("v12 save fields missing");
                 plot.Restore(PlotState.Untilled,null,0,0);

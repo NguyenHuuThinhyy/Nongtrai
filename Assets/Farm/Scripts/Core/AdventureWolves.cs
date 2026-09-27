@@ -40,7 +40,8 @@ namespace NongTrai
             deathPanel.SetActive(false);
         }
         void OnDestroy() { if (Instance == this) Instance = null; }
-        public void RestoreHealth(float value) { Health = Mathf.Clamp(value <= 0 ? 100 : value, 1, 100); }
+        public void Heal(float amount){if(!IsAwaitingRespawn)Health=Mathf.Min(100,Health+Mathf.Max(0,amount));}
+        public void RestoreHealth(float value) { Health = Mathf.Clamp(value <= 0 ? 100 : value, 1, 100);if(deathPanel!=null)deathPanel.SetActive(false); }
         public bool IsNight => TimeManager.Instance != null && (TimeManager.Instance.Hour >= 18 || TimeManager.Instance.Hour < 6);
         public bool IsSafe(Vector3 point)
         {
@@ -144,16 +145,16 @@ namespace NongTrai
                     for(int i=0;i<bag.Slots.Length;i++)if(bag.Slots[i].count>0&&
                         (bag.Slots[i].item<100||bag.Slots[i].item>=104))choices.Add(i);
                     if(choices.Count==0)break;
-                    int slot=choices[Random.Range(0,choices.Count)];int item=bag.Slots[slot].item;
+                    int slot=choices[Random.Range(0,choices.Count)];int item=bag.Slots[slot].item;var weapon=item>=104?bag.Slots[slot].Copy():null;
                     int crop=item==38?hud.interaction.inventory.FirstMutantCrop():-1;
                     if(item<100)hud.interaction.inventory.Remove(item,1);
                     else{bag.Slots[slot].count--;if(bag.Slots[slot].count<=0)bag.Slots[slot]=new BagSlot();}
-                    WorldPickup.Spawn(item,1,hud.player.transform.position+Vector3.up,crop);
+                    WorldPickup.Spawn(item,1,hud.player.transform.position+Vector3.up,crop,weapon);
                     bag.Sync();
                 }
             }
             Health=100;starvationTimer=0;deathPanel.SetActive(false);
-            hud.player.Teleport(hud.player.transform.position.y>500?IslandManager.ExploreArrival:IslandManager.FarmArrival);
+            hud.player.Teleport(hud.player.transform.position.y>500?FarmTravelPortal.Arrival:IslandManager.FarmArrival);
             hud.Resume();hud.Notify(pay?"Đã hồi sinh và giữ đồ (-100 xu).":"Đã hồi sinh. 3 món đã rơi tại vị trí ngã xuống.");
         }
     }
@@ -162,7 +163,7 @@ namespace NongTrai
     public sealed class DayPredator:MonoBehaviour
     {
         const float MaxHealth=55;
-        AdventureWolves owner;CharacterController body;bool snake;float health=MaxHealth,gravity,attackCooldown,alert,roam,retreatTimer;Vector3 target,knockback;
+        AdventureWolves owner;CharacterController body;bool snake;float health=MaxHealth,gravity,attackCooldown,alert,roam,retreatTimer,nextJump;Vector3 target,knockback;
         Transform healthCanvas;Image healthFill;
         public float Health=>health;
         public bool HasHealthBar=>healthFill!=null;
@@ -185,14 +186,17 @@ namespace NongTrai
          var fill=FarmUi.Panel(back.transform,"Máu còn",new Vector2(96,8));enemy.healthFill=fill.GetComponent<Image>();
          enemy.healthFill.color=isSnake?new Color(.72f,.25f,.3f):new Color(.92f,.3f,.25f);
          var fr=fill.GetComponent<RectTransform>();fr.anchorMin=fr.anchorMax=fr.pivot=new Vector2(0,.5f);fr.anchoredPosition=new Vector2(2,0);
-         enemy.target=point;return enemy;}
+         enemy.target=point;FarmEnemyHealthBar.Attach(root,isSnake?"RẮN":"CÁO",MaxHealth,()=>enemy.health,isSnake?1.5f:2);return enemy;}
         static void Part(Transform parent,string name,Vector3 pos,Vector3 scale,Color color)
         {var go=GameObject.CreatePrimitive(PrimitiveType.Sphere);go.name=name;go.transform.SetParent(parent,false);go.transform.localPosition=pos;go.transform.localScale=scale;
          Destroy(go.GetComponent<Collider>());var material=new Material(Shader.Find("Universal Render Pipeline/Lit"));material.color=color;go.GetComponent<Renderer>().material=material;}
         public void Hit(Vector3 attacker)
         {var bag=AdventureBag.Instance;int tool=bag==null?-1:bag.Item;if((tool==104||tool==106||tool==107)&&!bag.DamageTool())return;
-         health-=tool==106?24:tool==107?16:6;knockback=transform.position-attacker;knockback.y=0;knockback=knockback.normalized*3;
+         health-=FarmForge.Instance==null?(tool==106?24+(FarmForge.Instance==null?0:FarmForge.Instance.SwordDamageBonus):tool==107?16+(FarmForge.Instance==null?0:FarmForge.Instance.AxeDamageBonus):6):FarmForge.Instance.ResolveMelee((tool==106?24+(FarmForge.Instance==null?0:FarmForge.Instance.SwordDamageBonus):tool==107?16+(FarmForge.Instance==null?0:FarmForge.Instance.AxeDamageBonus):6),transform.position+Vector3.up);knockback=transform.position-attacker;knockback.y=0;knockback=knockback.normalized*3;
          alert=8;if(health<=0){FarmExpansion.Instance?.GainExperience(12);FarmEffects.Burst(transform.position+Vector3.up,"+12 XP",Color.yellow);Destroy(gameObject);}}
+        public void HitRanged(Vector3 attacker,int damage)
+        {health-=damage;knockback=(transform.position-attacker).normalized*2.2f;knockback.y=0;alert=8;
+         if(health<=0){FarmExpansion.Instance?.GainExperience(12);FarmEffects.Burst(transform.position+Vector3.up,"+12 XP",Color.yellow);Destroy(gameObject);}}
         void Update()
         {if(owner==null||TimeManager.Instance.player.Paused)return;var player=TimeManager.Instance.player.transform;
          if(healthCanvas!=null&&Camera.main!=null)
@@ -205,17 +209,18 @@ namespace NongTrai
          if(distance<10&&Vector3.Dot(transform.forward,delta.normalized)>.42f)
          {var eye=transform.position+Vector3.up*(snake?.38f:.65f);var toward=player.position+Vector3.up*.9f-eye;
           if(Physics.Raycast(eye,toward.normalized,out var hit,toward.magnitude+1,~0,QueryTriggerInteraction.Ignore)&&hit.collider.GetComponentInParent<FarmPlayer>()!=null)alert=8;}
-         if(retreatTimer>0){retreatTimer=Mathf.Max(0,retreatTimer-Time.deltaTime);target=transform.position-delta.normalized*2.8f;}
+         if(retreatTimer>0){retreatTimer=Mathf.Max(0,retreatTimer-Time.deltaTime);target=transform.position-delta.normalized*4f;}
          else if(alert>0)target=player.position;
          else{roam-=Time.deltaTime;if(roam<=0){target=transform.position+new Vector3(Random.Range(-3f,3f),0,Random.Range(-3f,3f));roam=Random.Range(2f,5f);}}
          Vector3 move=target-transform.position;move.y=0;move=move.sqrMagnitude>.2f?move.normalized:Vector3.zero;
          if(move.sqrMagnitude>.01f)transform.rotation=Quaternion.Slerp(transform.rotation,Quaternion.LookRotation(move),Time.deltaTime*6);
          gravity=body.isGrounded?-.8f:Mathf.Max(-20,gravity-24*Time.deltaTime);
+         FarmEnemyJump.TryJump(body,move,ref gravity,ref nextJump);
          body.Move((move*(retreatTimer>0?3.4f:alert>0?(snake?3.8f:5.2f):1.0f)+knockback+Vector3.up*gravity)*Time.deltaTime);
          knockback=Vector3.MoveTowards(knockback,Vector3.zero,Time.deltaTime*9);
          delta=player.position-transform.position;delta.y=0;
-         if(alert>0&&retreatTimer<=0&&delta.magnitude<1.85f&&attackCooldown<=0)
-         {attackCooldown=2.2f;retreatTimer=.65f;
+         if(alert>0&&retreatTimer<=0&&delta.magnitude<1.85f&&attackCooldown<=0&&FarmActionFeedback.CanReach(transform,TimeManager.Instance.player,2.1f))
+         {attackCooldown=2.2f;retreatTimer=1.1f;
           owner.Damage(snake?10:8,(snake?"Rắn cắn":"Cáo cắn")+"! Hãy lùi lại và dùng kiếm.");
           TimeManager.Instance.player.ApplyImpact(delta,2.6f);
           FarmEffects.Burst(player.position+Vector3.up*1.2f,"BỊ CẮN",new Color(.67f,.3f,.9f));}
@@ -227,7 +232,7 @@ namespace NongTrai
         AdventureWolves pack;
         CharacterController controller;
         const float MaxHealth=160;
-        float gravity, biteTimer,health=MaxHealth;
+        float gravity, biteTimer,disengage,nextJump,health=MaxHealth;
         Vector3 knockback;
         Transform healthCanvas;
         Image healthFill;
@@ -259,16 +264,20 @@ namespace NongTrai
             var back=FarmUi.Panel(wolf.healthCanvas,"Nền máu",new Vector2(100,12));
             var fill=FarmUi.Panel(back.transform,"Máu còn",new Vector2(96,8));wolf.healthFill=fill.GetComponent<Image>();wolf.healthFill.color=new Color(.9f,.2f,.2f);
             var fr=fill.GetComponent<RectTransform>();fr.anchorMin=fr.anchorMax=fr.pivot=new Vector2(0,.5f);fr.anchoredPosition=new Vector2(2,0);
+            FarmEnemyHealthBar.Attach(root,"SÓI",MaxHealth,()=>wolf.health,2.1f);
             return wolf;
         }
         public void Hit(Vector3 attacker)
         {
             var bag=AdventureBag.Instance;int item=bag==null?-1:bag.Item;
             if((item==104||item==106||item==107)&&!bag.DamageTool())return;
-            health-=item==106?24+(FarmExpansion.Instance==null?0:FarmExpansion.Instance.ToolTiers[2]*6):item==107?18:6;
+            health-=FarmForge.Instance==null?(item==106?24+(FarmExpansion.Instance==null?0:FarmExpansion.Instance.ToolTiers[2]*6)+(FarmForge.Instance==null?0:FarmForge.Instance.SwordDamageBonus):item==107?18+(FarmForge.Instance==null?0:FarmForge.Instance.AxeDamageBonus):6):FarmForge.Instance.ResolveMelee((item==106?24+(FarmExpansion.Instance==null?0:FarmExpansion.Instance.ToolTiers[2]*6)+(FarmForge.Instance==null?0:FarmForge.Instance.SwordDamageBonus):item==107?18+(FarmForge.Instance==null?0:FarmForge.Instance.AxeDamageBonus):6),transform.position+Vector3.up);
             knockback=(transform.position-attacker).normalized*3.5f;knockback.y=0;
             if(health<=0){WorldPickup.Spawn(7,1,transform.position);Destroy(gameObject);}
         }
+        public void HitRanged(Vector3 attacker,int damage)
+        {health-=damage;knockback=(transform.position-attacker).normalized*2.2f;knockback.y=0;
+         if(health<=0){WorldPickup.Spawn(7,1,transform.position);Destroy(gameObject);}}
         void OnDestroy(){if(den!=null)Destroy(den);}
         public void Retreat(){retreating=true;}
         static void Part(Transform parent, string name, Vector3 position, Vector3 scale, Color color)
@@ -290,8 +299,9 @@ namespace NongTrai
                 if(home.sqrMagnitude<1.2f){Destroy(gameObject);return;}
                 Vector3 retreat=home.normalized;
                 gravity=controller.isGrounded?-.8f:Mathf.Max(-20,gravity-25*Time.deltaTime);
+                FarmEnemyJump.TryJump(controller,retreat,ref gravity,ref nextJump);
                 var flags=controller.Move((retreat*4.8f+Vector3.up*gravity)*Time.deltaTime);
-                if((flags&CollisionFlags.Sides)!=0&&controller.isGrounded)gravity=5.2f;
+
                 transform.rotation=Quaternion.Slerp(transform.rotation,Quaternion.LookRotation(retreat),Time.deltaTime*8);
                 return;
             }
@@ -299,17 +309,20 @@ namespace NongTrai
             bool afraid = pack.IsSafe(transform.position) || pack.IsSafe(player.position);
             Vector3 direction = afraid ? -delta.normalized : delta.normalized;
             if (delta.magnitude > 23) direction = delta.normalized;
-            if (delta.magnitude < 1.6f && !afraid)
+            if (delta.magnitude < 1.6f && !afraid && FarmActionFeedback.CanReach(transform,TimeManager.Instance.player,1.9f))
             {
                 biteTimer -= Time.deltaTime;
-                if (biteTimer <= 0) { biteTimer = 2.2f; pack.Bite(transform.position); }
+                if (biteTimer <= 0) { biteTimer = 2.2f; disengage=.95f; pack.Bite(transform.position); }
             }
+            disengage=Mathf.Max(0,disengage-Time.deltaTime);
+            if(disengage>0&&!afraid)direction=-delta.normalized;
             if (direction.sqrMagnitude > .01f) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 5);
             gravity = controller.isGrounded ? -.8f : Mathf.Max(-20, gravity - 25 * Time.deltaTime);
-            float chaseSpeed=afraid?4.2f:delta.magnitude<7?6.8f:2.7f;
+            float chaseSpeed=afraid?4.2f:disengage>0?4.8f:delta.magnitude<7?6.8f:2.7f;
+            FarmEnemyJump.TryJump(controller,direction,ref gravity,ref nextJump);
             var collision=controller.Move((direction * chaseSpeed + knockback + Vector3.up * gravity) * Time.deltaTime);
             knockback=Vector3.MoveTowards(knockback,Vector3.zero,Time.deltaTime*8);
-            if((collision&CollisionFlags.Sides)!=0&&controller.isGrounded)gravity=5.2f;
+
         }
     }
 }

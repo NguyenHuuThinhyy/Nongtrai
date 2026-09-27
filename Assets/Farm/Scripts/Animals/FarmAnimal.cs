@@ -51,14 +51,32 @@ namespace NongTrai
         public void SetHighlighted(bool selected) => InteractionOutline.Set(this,selected);
         static readonly List<FarmAnimal> herd = new List<FarmAnimal>();
         FarmPlayer player;
+        Rigidbody body;
         Canvas productCanvas;
         Vector3 goal;
         float resting, phase;
         void OnEnable() => herd.Add(this);
         void OnDisable() => herd.Remove(this);
-        void Start() { player=FindFirstObjectByType<FarmPlayer>(); if(!cooldownRestored&&species!=AnimalSpecies.Chicken)
+        void Start() { player=FindFirstObjectByType<FarmPlayer>(); if(player!=null)player.PauseChanged+=OnPlayerPause; body=GetComponent<Rigidbody>();
+            if(body!=null){body.interpolation=RigidbodyInterpolation.Interpolate;body.collisionDetectionMode=CollisionDetectionMode.ContinuousSpeculative;}
+            if(!cooldownRestored&&species!=AnimalSpecies.Chicken)
             ProductCooldown=species==AnimalSpecies.Cow?45:species==AnimalSpecies.Sheep?60:90;
             ChooseGoal();CreateProductIcon(); }
+        void OnDestroy(){if(player!=null)player.PauseChanged-=OnPlayerPause;}
+        void OnPlayerPause(bool paused)
+        {
+            if(body==null)return;
+            if(paused)
+            {
+                // Stop at the currently rendered pose; interpolation would otherwise keep
+                // blending toward the last physics step after the pause menu opens.
+                var visible=transform.position;
+                body.interpolation=RigidbodyInterpolation.None;
+                body.position=visible;
+            }
+            else if(body.interpolation!=RigidbodyInterpolation.Interpolate)
+                body.interpolation=RigidbodyInterpolation.Interpolate;
+        }
         void CreateProductIcon()
         {
             var root=new GameObject("Biểu tượng sản phẩm",typeof(RectTransform),typeof(Canvas));root.transform.SetParent(transform,false);
@@ -160,8 +178,10 @@ namespace NongTrai
             Vector3 next=transform.position+move*speed*step;
             next.x=Mathf.Clamp(next.x,minimum.x,maximum.x); next.z=Mathf.Clamp(next.z,minimum.y,maximum.y);
             DistanceTravelled+=Vector3.Distance(next,transform.position);
-            transform.position=next;
-            if(move.sqrMagnitude>0.01f) transform.rotation=Quaternion.RotateTowards(transform.rotation,Quaternion.LookRotation(move),100*step);
+            if(body!=null)body.MovePosition(next);else transform.position=next;
+            if(move.sqrMagnitude>0.01f)
+            {var facing=Quaternion.RotateTowards(transform.rotation,Quaternion.LookRotation(move),100*step);
+             if(body!=null)body.MoveRotation(facing);else transform.rotation=facing;}
             phase+=step*speed*7;
             for(int i=0;i<legs.Length;i++) legs[i].localRotation=Quaternion.Euler(Mathf.Sin(phase+(i%2)*Mathf.PI)*20,0,0);
         }

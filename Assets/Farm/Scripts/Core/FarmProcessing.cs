@@ -26,8 +26,15 @@ namespace NongTrai
         public FarmRecipe[] Recipes { get; private set; }
         public GameObject Panel { get; private set; }
         readonly List<ProcessingRecord> queue=new List<ProcessingRecord>();
-        Text header,status,feedback;GameObject[] recipeButtons;int activeMachine=-1;
+        Button woodFuelButton,coalFuelButton;Text header,status,feedback;GameObject[] recipeButtons;int activeMachine=-1;
         public int QueueCount => queue.Count;
+        public float[] FuelSeconds {get;private set;}=new float[2];
+        public int PreferredFuel {get;private set;}=66;
+        public void RestoreFuel(float[] values,int preferred=66){FuelSeconds=new float[2];if(values!=null)for(int i=0;i<Mathf.Min(2,values.Length);i++)FuelSeconds[i]=Mathf.Clamp(values[i],0,10000);PreferredFuel=preferred==20?20:66;}
+        public bool AddFuel(int item)
+        {int slot=activeMachine==1?0:1;if(item!=20&&item!=66||!inventory.Remove(item,1))return false;FuelSeconds[slot]+=item==66?120:30;PreferredFuel=item;Refresh();return true;}
+        float Burn(int slot,float requested)
+        {float used=0;while(used<requested){if(FuelSeconds[slot]<=0){int fuel=inventory.Count(PreferredFuel)>0?PreferredFuel:PreferredFuel==66?20:66;if(!inventory.Remove(fuel,1))break;FuelSeconds[slot]+=fuel==66?120:30;}float step=Mathf.Min(requested-used,FuelSeconds[slot]);used+=step;FuelSeconds[slot]-=step;}return used;}
         void Awake() => Instance=this;
         void Start()
         {
@@ -44,10 +51,12 @@ namespace NongTrai
                 string ingredients=r.inputs!=null&&r.inputs.Length>0?string.Join(" + ",Array.ConvertAll(r.inputs,x=>x.count+" "+inventory.Name(x.item))):r.inputCount+" "+inventory.Name(r.input);
                 string label=r.machine+" • "+r.name+" : "+ingredients
                     +" → "+r.outputCount+" "+inventory.Name(r.output)+" ("+r.seconds+"s)";
-                recipeButtons[i]=FarmUi.Button(Panel.transform,label,new Vector2(30,-160-i*64),new Vector2(960,56),()=>Enqueue(index)).gameObject;
+                recipeButtons[i]=FarmUi.Button(Panel.transform,label,new Vector2(30,-155-i*58),new Vector2(960,52),()=>Enqueue(index)).gameObject;
                 var caption=recipeButtons[i].GetComponentInChildren<Text>();caption.rectTransform.anchoredPosition=new Vector2(78,-5);caption.rectTransform.sizeDelta=new Vector2(845,52);
                 FarmItemIconLibrary.Attach(recipeButtons[i].transform,r.output,new Vector2(10,-5),new Vector2(54,54));
             }
+            woodFuelButton=FarmUi.Button(Panel.transform,"Lò nung • gỗ +30 giây",new Vector2(30,-807),new Vector2(470,52),()=>{if(!AddFuel(20))Say("Cần 1 khối gỗ.");});
+            coalFuelButton=FarmUi.Button(Panel.transform,"Lò nung • than +120 giây",new Vector2(520,-807),new Vector2(470,52),()=>{if(!AddFuel(66))Say("Cần 1 than.");});
             feedback=FarmUi.Label(Panel.transform,"Nguyên liệu trừ khi xếp hàng; sản phẩm vào túi khi hoàn tất.",new Vector2(30,-875),new Vector2(960,40),19);
             FarmUi.Button(Panel.transform,"Trở lại game",new Vector2(30,-934),new Vector2(960,54),hud.Resume);
             Panel.SetActive(false);hud.player.PauseChanged+=OnPause;
@@ -119,6 +128,11 @@ namespace NongTrai
         void ShowRecipes()
         {
             if(header==null)return;
+            bool fuel=activeMachine<0||activeMachine==1||activeMachine==5;
+            woodFuelButton.gameObject.SetActive(fuel);coalFuelButton.gameObject.SetActive(fuel);
+            string machine=activeMachine==1?"Lò bánh":"Lò nung";
+            woodFuelButton.GetComponentInChildren<Text>().text=machine+" • gỗ +30 giây";
+            coalFuelButton.GetComponentInChildren<Text>().text=machine+" • than +120 giây";
             header.text=activeMachine<0?"XƯỞNG CHẾ BIẾN":Recipes[activeMachine].machine.ToUpper()+" • "+Recipes[activeMachine].name;
             int visible=0;
             for(int i=0;i<recipeButtons.Length;i++)if(recipeButtons[i]!=null)
@@ -127,7 +141,7 @@ namespace NongTrai
                 recipeButtons[i].SetActive(show);
                 if(show)
                 {
-                    recipeButtons[i].GetComponent<RectTransform>().anchoredPosition=new Vector2(30,-160-visible*64);
+                    recipeButtons[i].GetComponent<RectTransform>().anchoredPosition=new Vector2(30,-155-visible*58);
                     visible++;
                 }
             }
@@ -171,7 +185,8 @@ namespace NongTrai
                 for(int earlier=0;earlier<i;earlier++)
                 { var other=FindRecipe(queue[earlier].recipe); if(other!=null && other.machine==recipe.machine) { first=false;break; } }
                 if(!first) continue;
-                job.remaining-=seconds;
+                int fuelSlot=recipe.machine==Recipes[1].machine?0:recipe.machine==Recipes[5].machine?1:-1;
+                job.remaining-=fuelSlot<0?seconds:Burn(fuelSlot,Mathf.Min(seconds,job.remaining));
                 if(job.remaining>0) continue;
                 inventory.Add(recipe.output,recipe.outputCount);queue.RemoveAt(i);
                 expansion.GainExperience(18);
@@ -189,7 +204,7 @@ namespace NongTrai
             string value=activeMachine<0?"Hàng đợi: "+queue.Count+" công việc":"Máy "+Recipes[activeMachine].machine+" • "+(IsBusy(activeMachine)?"đang hoạt động":"sẵn sàng");
             foreach(var job in queue)if(activeMachine<0||FindRecipe(job.recipe)?.machine==Recipes[activeMachine].machine)
                 value+=" • "+(FindRecipe(job.recipe)?.name??job.recipe)+" "+Mathf.CeilToInt(job.remaining)+"s";
-            status.text=value;
+            status.text=value+"\nNhiên liệu lò bánh: "+Mathf.CeilToInt(FuelSeconds[0])+"s • lò nung: "+Mathf.CeilToInt(FuelSeconds[1])+"s (tự lấy than/gỗ khi hết).";
         }
         public void RefreshLocks()
         {

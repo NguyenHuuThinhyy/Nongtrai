@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.IO;
 using UnityEngine;
@@ -23,6 +23,21 @@ namespace NongTrai
             var hud = FindFirstObjectByType<FarmHud>();
             if (player == null || hud == null || Camera.main == null)
                 throw new InvalidOperationException("Missing milestone 1 scene dependencies.");
+            if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmSystemsOnly")>=0)
+            {yield return new WaitForSeconds(2);yield return FarmSystemsChecks.Run(hud.save,player,hud);Application.Quit(0);yield break;}
+            if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmWaterCanOnly")>=0)
+            {yield return new WaitForSeconds(2);yield return FarmWaterCanChecks.Run(hud.save,player,hud);Application.Quit(0);yield break;}
+            if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmTntOnly")>=0)
+            {yield return new WaitForSeconds(2);yield return FarmTntChecks.Run(hud.save,player,hud);Application.Quit(0);yield break;}
+            if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmFeedbackOnly")>=0)
+            {yield return new WaitForSeconds(2);yield return FarmAdventureFeedbackChecks.Run(hud.save,player,hud);Application.Quit(0);yield break;}
+            if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmPolishOnly")>=0)
+            {
+                yield return new WaitForSeconds(2);
+                yield return FarmVisualChecks.Run(player,hud);
+                yield return FarmPolishChecks.Run(hud.save,player,hud);
+                Debug.Log("FARM_POLISH_ONLY_OK");Application.Quit(0);yield break;
+            }
             player.SetPaused(false);
             // Cửa sổ kiểm tra nền có thể mất focus: tiếp tục mô phỏng trong thời gian chờ tiếp đất.
             float deadline = Time.time + 3;
@@ -48,6 +63,17 @@ namespace NongTrai
             UnityEngine.InputSystem.InputSystem.QueueStateEvent(keyboard,new UnityEngine.InputSystem.LowLevel.KeyboardState());
             yield return null;
             if(maxJumpY<1.2f||player.transform.position.z<-32)throw new InvalidOperationException("SPACE + forward failed to cross a one metre block: "+player.transform.position+" peak="+maxJumpY);
+            var farmerMotion=player.visual.GetComponent<FarmerAnimation>();
+            if(farmerMotion==null||farmerMotion.arms==null||farmerMotion.legs==null||farmerMotion.arms[0]==null||farmerMotion.legs[0]==null)
+                throw new InvalidOperationException("Farmer arm/leg bones missing.");
+            var legAtStart=farmerMotion.legs[0].localRotation;var armAtStart=farmerMotion.arms[0].localRotation;
+            float legSwing=0,armSwing=0;
+            UnityEngine.InputSystem.InputSystem.QueueStateEvent(keyboard,new UnityEngine.InputSystem.LowLevel.KeyboardState(UnityEngine.InputSystem.Key.W));
+            float walkEnd=Time.time+.45f;
+            while(Time.time<walkEnd){legSwing=Mathf.Max(legSwing,Quaternion.Angle(legAtStart,farmerMotion.legs[0].localRotation));
+                armSwing=Mathf.Max(armSwing,Quaternion.Angle(armAtStart,farmerMotion.arms[0].localRotation));yield return null;}
+            UnityEngine.InputSystem.InputSystem.QueueStateEvent(keyboard,new UnityEngine.InputSystem.LowLevel.KeyboardState());
+            if(legSwing<3||armSwing<3)throw new InvalidOperationException("Farmer does not visibly swing arms and legs while walking: "+armSwing+"/"+legSwing);
             jumpBlock.SetActive(false);Destroy(jumpBlock);player.Teleport(originalPosition);
             Debug.Log("FARM_JUMP_BLOCK_OK: keyboard SPACE/W crossed a one metre collider.");
             player.cameraRig.ToggleView();
@@ -73,10 +99,11 @@ namespace NongTrai
                 { plot.Work(crop,out _);plot.Tick(60); }
                 if (plot.State != PlotState.Ready) throw new InvalidOperationException("Watered crop did not ripen.");
                 plot.Work(crop, out int harvested); field.Record(crop, harvested);
-                if (harvested != crop.yield || field.Harvested[i] != crop.yield || plot.State != PlotState.Tilled)
+                if (harvested != crop.yield || (i<6?field.Harvested[i]:hud.interaction.inventory.Count(crop.specialProduct)) != crop.yield || plot.State != PlotState.Tilled)
                     throw new InvalidOperationException("Harvest or inventory failed.");
                 plot.Work(crop, out int duplicate);
                 if (duplicate != 0 || plot.State != PlotState.Growing) throw new InvalidOperationException("Replant failed.");
+                if(i>=6)hud.interaction.inventory.Remove(crop.specialProduct,crop.yield);
                 if(i>=3)field.Harvested[i]=0; // Additional crop assertions should not change legacy shop funds.
             }
             // Trồng một dải cây trong phiên kiểm tra để xem hình dạng các giai đoạn; không lưu vào game.
@@ -278,7 +305,10 @@ namespace NongTrai
             water.Open();if(!player.Paused || !water.Panel.activeSelf) throw new InvalidOperationException("Water modal failed to open.");
             hud.Resume();if(water.Panel.activeSelf) throw new InvalidOperationException("Water modal did not close with resume/ESC flow.");
             orders.OpenCraft();if(!player.Paused || !orders.CraftPanel.activeSelf) throw new InvalidOperationException("Craft modal failed to open.");
-            if(orders.Recipes.Length!=18)throw new InvalidOperationException("Expanded JSON crafting book missing.");
+            if(orders.Recipes.Length!=25||Array.Find(orders.Recipes,r=>r.id=="wooden_bow")==null||
+               Array.Find(orders.Recipes,r=>r.id=="arrows")==null||Array.Find(orders.Recipes,r=>r.id=="water_flask")!=null||
+               Array.Find(orders.Recipes,r=>r.id=="forge_table")==null)
+                throw new InvalidOperationException("Bow, arrows or water flask recipe missing.");
             Capture(Path.Combine(folder,"craft-preview.png"),hud,camera);
             hud.Resume();if(orders.CraftPanel.activeSelf) throw new InvalidOperationException("Craft modal did not close with resume/ESC flow.");
             var beforeCraftRay=player.transform.position;
@@ -398,12 +428,19 @@ namespace NongTrai
                 if(order.remaining<=0||order.difficulty<1||order.difficulty>5||!orderItems.Add(order.item))
                     throw new InvalidOperationException("Order variety, difficulty or deadline failed.");
             orders.OpenMail();Capture(Path.Combine(folder,"mail-preview.png"),hud,camera);hud.Resume();
-            int stored=store.Warehouse[0];inventory.Add(0,3);
+            store.Open();int stored=store.Warehouse[0];inventory.Add(0,3);
             if(!store.Transfer(0,3,true)||store.Warehouse[0]!=stored+3||!store.Transfer(0,3,false)||store.Warehouse[0]!=stored)
                 throw new InvalidOperationException("Warehouse transfer failed.");
-            var testChest=FarmChest.Create(new Vector3(5,1,-35),true,"smoke",new int[38]);
-            testChest.items[20]=3;testChest.BreakExploration();
-            if(testChest.items[20]!=0)throw new InvalidOperationException("Broken chest did not drop its contents.");
+            var testChest=FarmChest.Create(new Vector3(5,1,-35),true,"smoke-wrong",new int[38]);
+            testChest.items[20]=3;
+            int dropsBefore=WorldPickup.Snapshot().Length;
+            store.Open(testChest);
+            if(store.AnswerQuiz((store.QuizCorrectChoice+1)%3)||testChest.gameObject.activeSelf||WorldPickup.Snapshot().Length!=dropsBefore)
+                throw new InvalidOperationException("Wrong chest answer did not remove chest without loot.");
+            var rewardChest=FarmChest.Create(new Vector3(7,1,-35),true,"smoke-correct",new int[FarmInventory.ItemCount]);
+            rewardChest.items[20]=3;store.Open(rewardChest);
+            if(!store.AnswerQuiz(store.QuizCorrectChoice)||rewardChest.gameObject.activeSelf||WorldPickup.Snapshot().Length<=dropsBefore)
+                throw new InvalidOperationException("Correct chest answer did not drop loot and remove chest.");
             if(!orders.Reroll(0) || orders.RerollRemaining<=0)
                 throw new InvalidOperationException("Order reroll cooldown failed.");
             for(int i=0;i<orders.Orders.Length;i++)
@@ -412,14 +449,15 @@ namespace NongTrai
                 throw new InvalidOperationException("Order recipe unlock failed.");
             save.pathOverride=Path.Combine(Application.temporaryCachePath,"farm-expansion-smoke-save.json");
             int savedLevel=progress.Level,savedFeed=shop.FeedStock,savedStation=water.StationWater[0],savedOrders=orders.CompletedOrders;
-            store.Warehouse[20]=4;
+            store.Warehouse[20]=4;var savedRunner=FarmRunner.Instance.Snapshot();var savedFuel=(float[])processing.FuelSeconds.Clone();
             if(!save.Save()) throw new InvalidOperationException("Expansion save failed.");
             progress.Restore(1,0,1,0,null,null);shop.AddFeed(9);
-            water.Restore(null);orders.Restore(null,false);building.Restore(null);store.Restore(null);
+            water.Restore(null);orders.Restore(null,false);building.Restore(null);store.Restore(null);FarmRunner.Instance.Restore(new RunnerState{tickets=0});processing.RestoreFuel(null);
             if(!save.Load() || progress.Level!=savedLevel || !progress.UnlockedRegions[1] ||
                 progress.ToolRadius(0)!=3 || shop.FeedStock!=savedFeed || water.StationWater[0]!=savedStation ||
                 orders.CompletedOrders!=savedOrders || building.Snapshot().blocks.Length!=1 || store.Warehouse[20]!=4)
                 throw new InvalidOperationException("Expansion save did not restore state.");
+            if(FarmRunner.Instance.Tickets!=savedRunner.tickets||processing.FuelSeconds[0]!=savedFuel[0]||processing.FuelSeconds[1]!=savedFuel[1])throw new InvalidOperationException("v17 runner/fuel save round-trip failed.");
             File.Delete(save.SavePath);
             if(File.Exists(save.SavePath+".bak")) File.Delete(save.SavePath+".bak");
             save.pathOverride=null;
@@ -492,13 +530,13 @@ namespace NongTrai
             yield return null;
             if(!exploration.MineCell(farCell)||exploration.BlockAt(farCell)!=0)throw new InvalidOperationException("Far negative chunk mining failed.");
             var chunkState=exploration.Snapshot();
-            int sampleHeight=exploration.SurfaceHeight(512,-512);
-            exploration.Restore(new ExplorationState{seed=seed,generatorVersion=1});
-            if(exploration.SurfaceHeight(512,-512)!=sampleHeight)throw new InvalidOperationException("Same seed changed terrain.");
-            var heights=new int[16];for(int n=0;n<16;n++)heights[n]=exploration.SurfaceHeight(256+n*16,-512);
+            int sampleHeight=exploration.SurfaceHeight(512,512);
+            exploration.Restore(new ExplorationState{seed=seed,generatorVersion=chunkState.generatorVersion});
+            if(exploration.SurfaceHeight(512,512)!=sampleHeight)throw new InvalidOperationException("Same seed changed terrain.");
+            var heights=new int[16];for(int n=0;n<16;n++)heights[n]=exploration.SurfaceHeight(256+n*16,512);
             bool changed=false;
-            exploration.Restore(new ExplorationState{seed=seed^73417,generatorVersion=1});
-            for(int n=0;n<16;n++)if(exploration.SurfaceHeight(256+n*16,-512)!=heights[n])changed=true;
+            exploration.Restore(new ExplorationState{seed=seed^73417,generatorVersion=chunkState.generatorVersion});
+            for(int n=0;n<16;n++)if(exploration.SurfaceHeight(256+n*16,512)!=heights[n])changed=true;
             if(!changed)throw new InvalidOperationException("Different seeds generated identical sampled terrain.");
 
             exploration.Restore(chunkState);
@@ -543,7 +581,7 @@ namespace NongTrai
             string modernSave=File.ReadAllText(save.SavePath);
             player.Teleport(new Vector3(200,.4f,-20));
             if(!save.Save())throw new InvalidOperationException("Migration fixture save failed.");
-            string oldSave=File.ReadAllText(save.SavePath).Replace("\"version\": 15","\"version\": 7");
+            string oldSave=File.ReadAllText(save.SavePath).Replace("\"version\": 21","\"version\": 7");
             File.WriteAllText(save.SavePath,oldSave);
             if(!save.Load()||Mathf.Abs(player.transform.position.y-1000.4f)>1)throw new InvalidOperationException("Legacy player position migration failed.");
             File.WriteAllText(save.SavePath,modernSave);if(!save.Load())throw new InvalidOperationException("Modern restore failed.");
@@ -553,6 +591,25 @@ namespace NongTrai
             Debug.Log("FARM_ISLANDS_TIME_OK: 18-minute day, seasons, rain, storm puzzle, sleep, two portals with remembered positions, voxel mining, level cap, furnace blueprint, hotbar and manual save.");
             yield return AdventureChecks.Run(save,player);
             yield return FarmV12Checks.Run(save,player);
+            var beforeFallPosition=player.transform.position;
+            var survival=AdventureWolves.Instance;
+            survival.RestoreHealth(100);
+            player.SetPaused(false);
+            player.Teleport(new Vector3(0,14,0));
+            yield return null;
+            float fallDeadline=Time.time+5f;
+            while(Time.time<fallDeadline&&!player.GetComponent<CharacterController>().isGrounded)
+            {player.SetPaused(false);yield return null;}
+            if(!player.GetComponent<CharacterController>().isGrounded||survival.Health>=100)
+                throw new InvalidOperationException("High fall did not cause damage or player did not land: position="+player.transform.position+" health="+survival.Health+" paused="+player.Paused+" creative="+CreativeModeManager.IsCreative);
+            survival.RestoreHealth(100);
+            player.Teleport(beforeFallPosition);
+            Debug.Log("FARM_FALL_DAMAGE_OK: high fall cost health, landing and restore remain safe.");
+            yield return FarmPolishChecks.Run(save,player,hud);
+            yield return FarmAdventureFeedbackChecks.Run(save,player,hud);
+            yield return FarmTntChecks.Run(save,player,hud);
+            yield return FarmWaterCanChecks.Run(save,player,hud);
+            yield return FarmSystemsChecks.Run(save,player,hud);
             save.pathOverride=Path.Combine(Application.temporaryCachePath,"farm-creative-do-not-save.json");
             if(File.Exists(save.SavePath)) File.Delete(save.SavePath);
             creative.StartCreative();
@@ -566,6 +623,58 @@ namespace NongTrai
             save.pathOverride=null;
             Debug.Log("FARM_WATER_ORDERS_CREATIVE_OK: finite water, irrigation, JSON craft, daily orders, v8 seeded chunk/terrain/building save and discard-only creative mode.");
             yield return new WaitForSeconds(2);
+            var runner=FarmRunner.Instance;
+            if(runner==null)throw new InvalidOperationException("Farm Runner missing from Tab map.");
+            runner.Restore(new RunnerState{tickets=3});runner.OpenMenu();
+            int tickets=runner.Tickets;
+            if(!runner.StartRun()||!runner.IsRunning||runner.Tickets!=tickets-1||runner.PoolCount!=6||runner.RunCamera.targetTexture!=null)
+                throw new InvalidOperationException("Runner full-screen map/ticket/pool failed.");
+            runner.ChangeLane(-1);runner.Jump();runner.Tick(.05f);
+            if(runner.Lane!=0)throw new InvalidOperationException("Runner lane input failed.");
+            float runDistance=runner.Distance;runner.Tick(.2f);
+            if(runner.Distance-runDistance<2||Mathf.Abs(runner.RunCamera.transform.position.x+.832f)>.08f)
+                throw new InvalidOperationException("Runner lost slow-frame time or lane transition exceeded 0.25 seconds.");
+            Debug.Log("FARM_RUNNER_INPUT_OK: 200ms frame time preserved, lane settled within 250ms.");
+            yield return new WaitForEndOfFrame();Capture(Path.Combine(folder,"runner-preview.png"),hud,runner.RunCamera);
+            runner.Finish();int paid=shop.Money;runner.Finish();if(shop.Money!=paid)throw new InvalidOperationException("Runner rewarded twice.");
+            runner.Restore(new RunnerState{tickets=0,ticketClock=DateTimeOffset.UtcNow.ToUnixTimeSeconds()-14400});
+            if(runner.Tickets!=2||FarmRunner.DistanceReward(2000)<=FarmRunner.DistanceReward(1000)*2)
+                throw new InvalidOperationException("Runner ticket refill/progressive reward failed.");
+            runner.AwardTicket();shop.Credit(500);if(!runner.BuyTicket()||runner.Tickets!=4)throw new InvalidOperationException("Runner ticket award/buy failed.");
+            int stonesBefore=inventory.Count(68),tntBefore=inventory.Count(69);
+            if(!runner.StartRun())throw new InvalidOperationException("Runner replay failed.");
+            runner.Slide();runner.Tick(.01f);if(!runner.Sliding)throw new InvalidOperationException("Runner slide failed.");
+            for(int tick=0;tick<5000&&runner.IsRunning&&runner.Distance<2050;tick++)
+            {int open=runner.ClearLaneAhead;runner.ChangeLane(open-runner.Lane);runner.Tick(.05f);}
+            if(!runner.IsRunning||runner.Distance<2000||runner.PoolCount!=6)throw new InvalidOperationException("Runner safe route/pool failed before 2km: "+runner.Distance);
+            runner.Finish();if(inventory.Count(68)!=stonesBefore+1||inventory.Count(69)!=tntBefore+1)throw new InvalidOperationException("Runner milestone gifts missing.");
+            hud.Resume();Debug.Log("FARM_RUNNER_OK: independent full-screen scene, farmer, lane/jump, six pooled segments, tickets, escalating reward, one-time settlement.");
+            if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmArtCheck")>=0)yield return FarmVisualChecks.Run(player,hud);
+            if(player.GetComponent<FarmBow>()==null)throw new InvalidOperationException("Bow shooting component missing.");
+            inventory.Add(20,4);inventory.Add(21,2);inventory.Add(6,1);inventory.Add(15,1);
+            int bowRecipe=Array.FindIndex(orders.Recipes,r=>r.id=="wooden_bow");
+            int arrowRecipe=Array.FindIndex(orders.Recipes,r=>r.id=="arrows");
+            if(!orders.Craft(bowRecipe)||!orders.Craft(arrowRecipe)||inventory.Count(63)<5)throw new InvalidOperationException("Bow/arrow crafting failed.");
+            water.FillFromRiver();water.EmptyBucket();
+            if(water.CanWater!=0||Array.Exists(orders.Recipes,r=>r.output==64||r.output==71))throw new InvalidOperationException("Duplicate bottle recipes remain.");
+            Debug.Log("FARM_BOW_WATER_OK: bow and five arrows crafted; unified bucket, old bottle recipes removed.");
+            inventory.Add(20,4);inventory.Add(21,4);inventory.Add(15,3);inventory.Add(13,2);shop.Credit(100);
+            int forgeRecipe=Array.FindIndex(orders.Recipes,r=>r.id=="forge_table");
+            if(!orders.Craft(forgeRecipe)||inventory.Count(65)<1)
+                throw new InvalidOperationException("Forge table could not be crafted.");
+            building.Restore(new BuildingState{blocks=new[]{new PlacedBlockRecord{type=13,position=new Vector3(6,.5f,6)}}});
+            inventory.Add(68,1);FarmForge.Instance.Restore(0);
+            if(!building.HasPlacedForge||FarmForge.Instance==null||!FarmForge.Instance.TryEnhance()||FarmForge.Instance.SwordLevel!=1)
+                throw new InvalidOperationException("Sword forge level 1 failed.");
+            exploration.Restore(new ExplorationState{seed=exploration.Seed,generatorVersion=2,minedCount=30});
+            if(exploration.BlockAt(new Vector3Int(72,6,72))!=0||exploration.BlockAt(new Vector3Int(72,3,72))==0)
+                throw new InvalidOperationException("Deep boss cave geometry failed.");
+            var caveBoss=CaveBoss.Create(ExplorationWorld.Origin+new Vector3(72.5f,4.05f,72.5f),exploration,player);
+            caveBoss.HitRanged(caveBoss.transform.position,CaveBoss.MaxHealth+1);
+            if(!exploration.BossDefeated||!exploration.Snapshot().bossDefeated)
+                throw new InvalidOperationException("Exploration boss defeat was not persisted.");
+            Debug.Log("FARM_FORGE_BOSS_OK: craftable forge, sword enhancement, deep cave and persistent boss reward.");
+            yield return FarmNewFeaturesChecks.Run(save,player,hud);
             Debug.Log("FARM_CROPS_SMOKE_OK: grounded, cameras, pause, 80 plots, three crops, dry growth blocked, watering, harvest inventory, replant, screenshot.");
             Application.Quit(0);
         }

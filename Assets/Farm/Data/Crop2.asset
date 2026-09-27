@@ -16,3 +16,5 @@ MonoBehaviour:
   growthSeconds: 300
   yield: 3
   fruitColor: {r: 0.55, g: 0.72, b: 0.18, a: 1}
+  stageVisuals: []
+  fruitVisual: {fileID: 0}

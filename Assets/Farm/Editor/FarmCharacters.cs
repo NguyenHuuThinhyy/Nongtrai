@@ -7,65 +7,75 @@ namespace NongTrai.Editor
         { var t=new GameObject(name).transform; t.SetParent(parent,false); t.localPosition=position; return t; }
         static GameObject Soft(string name, Transform parent, Vector3 p, Vector3 s, Material m)
             => Shape(name,PrimitiveType.Sphere,p,s,m,parent,false);
-        static void SmoothTorso(Transform parent,Material shirt,Material denim)
-        {
-            const int sides=24;
-            float[] heights={.70f,.78f,.86f,.97f,1.08f,1.20f,1.31f,1.41f};
-            float[] widths={.18f,.25f,.28f,.30f,.32f,.34f,.31f,.16f};
-            float[] depths={.15f,.19f,.21f,.22f,.22f,.22f,.19f,.13f};
-            var vertices=new Vector3[heights.Length*sides];var uv=new Vector2[vertices.Length];
-            for(int row=0;row<heights.Length;row++)for(int side=0;side<sides;side++)
-            {float a=side*Mathf.PI*2/sides;int index=row*sides+side;
-             vertices[index]=new Vector3(Mathf.Cos(a)*widths[row],heights[row],Mathf.Sin(a)*depths[row]);
-             uv[index]=new Vector2(side/(float)sides,row/(float)(heights.Length-1));}
-            var top=new System.Collections.Generic.List<int>();var bottom=new System.Collections.Generic.List<int>();
-            for(int row=0;row<heights.Length-1;row++)for(int side=0;side<sides;side++)
-            {int a=row*sides+side,b=row*sides+(side+1)%sides,c=(row+1)*sides+side,d=(row+1)*sides+(side+1)%sides;
-             var list=row<4?bottom:top;list.Add(a);list.Add(c);list.Add(b);list.Add(b);list.Add(c);list.Add(d);}
-            var body=new GameObject("Áo quần liền khối",typeof(MeshFilter),typeof(MeshRenderer));body.transform.SetParent(parent,false);
-            var mesh=new Mesh{name="Farmer smooth torso"};mesh.vertices=vertices;mesh.uv=uv;mesh.subMeshCount=2;
-            mesh.SetTriangles(top,0);mesh.SetTriangles(bottom,1);mesh.RecalculateNormals();mesh.RecalculateBounds();
-            if(!UnityEditor.AssetDatabase.IsValidFolder(Root+"Meshes"))UnityEditor.AssetDatabase.CreateFolder("Assets/Farm","Meshes");
-            string meshPath=Root+"Meshes/FarmerTorso.asset";
-            var existing=UnityEditor.AssetDatabase.LoadAssetAtPath<Mesh>(meshPath);
-            if(existing==null)UnityEditor.AssetDatabase.CreateAsset(mesh,meshPath);
-            else{UnityEditor.EditorUtility.CopySerialized(mesh,existing);UnityEngine.Object.DestroyImmediate(mesh);mesh=existing;UnityEditor.EditorUtility.SetDirty(existing);}
-            body.GetComponent<MeshFilter>().sharedMesh=mesh;body.GetComponent<MeshRenderer>().sharedMaterials=new[]{shirt,denim};
-        }
         static void BuildFarmer(Transform visual)
         {
-            var denim=Mat("Farmer denim","365F83"); var skin=Mat("Farmer skin","E9B28D");
-            var hair=Mat("Hair","493025"); var dark=Mat("Eyes and boots","302B29");
-            var shirt=Mat("Farmer shirt","C85849"); var blush=Mat("Cheeks","DB8472");
-            SmoothTorso(visual,shirt,denim);
-            Soft("Túi áo cong",visual,new Vector3(0,.95f,.263f),new Vector3(.18f,.10f,.025f),Mat("Pocket blue","5484A1"));
-            Shape("Cổ",PrimitiveType.Capsule,new Vector3(0,1.36f,0),new Vector3(.18f,.15f,.18f),skin,visual,false);
-            Soft("Đầu cân đối",visual,new Vector3(0,1.59f,0),new Vector3(.46f,.50f,.43f),skin);
-            Soft("Tóc ôm đầu",visual,new Vector3(0,1.78f,-.025f),new Vector3(.48f,.18f,.44f),hair);
-            for(int i=0;i<4;i++) Soft("Lọn tóc",visual,new Vector3(-.16f+i*.105f,1.78f,.18f),new Vector3(.10f,.09f,.10f),hair);
-            Soft("Mũi",visual,new Vector3(0,1.53f,.23f),new Vector3(.055f,.08f,.06f),skin);
-            Soft("Miệng",visual,new Vector3(0,1.46f,.206f),new Vector3(.075f,.018f,.015f),hair);
-            Shape("Vành mũ",PrimitiveType.Cylinder,new Vector3(0,1.90f,-.015f),new Vector3(.64f,.025f,.59f),gold,visual,false);
-            Soft("Chóp mũ",visual,new Vector3(0,1.98f,-.015f),new Vector3(.48f,.22f,.43f),gold);
-            Shape("Dây mũ",PrimitiveType.Cylinder,new Vector3(0,1.94f,-.015f),new Vector3(.49f,.025f,.44f),hair,visual,false);
-            var motion=visual.gameObject.AddComponent<FarmerAnimation>(); motion.arms=new Transform[2]; motion.legs=new Transform[2];
-            for(int i=0;i<2;i++)
+            const string path=Root+"Models/Imported/Kenney_MiniCharacters/character-male-e.fbx";
+            var model=FarmImportedModelBuilder.Attach(path,visual,"Farmer",1.90f);
+            if(model==null)throw new System.InvalidOperationException("Missing licensed Kenney Mini Character model.");
+            DressFarmer(model);
+            var animator=model.GetComponentInChildren<Animator>();
+            if(animator==null)throw new System.InvalidOperationException("Player model has no imported rig.");
+            animator.runtimeAnimatorController=FarmImportedModelBuilder.BuildFarmerController(path);
+            animator.applyRootMotion=false;animator.cullingMode=AnimatorCullingMode.AlwaysAnimate;
+            var motion=visual.gameObject.AddComponent<FarmerAnimation>();motion.animator=animator;
+            motion.arms=new Transform[2];motion.legs=new Transform[2];
+            Transform head=null;
+            foreach(var bone in model.GetComponentsInChildren<Transform>())
             {
-                int side=i==0?-1:1;
-                Soft("Tai",visual,new Vector3(side*.235f,1.57f,0),new Vector3(.08f,.12f,.09f),skin);
-                Soft("Mắt",visual,new Vector3(side*.105f,1.62f,.207f),new Vector3(.052f,.055f,.025f),cream);
-                Soft("Tròng mắt",visual,new Vector3(side*.105f,1.62f,.224f),new Vector3(.026f,.035f,.016f),dark);
-                Soft("Lông mày",visual,new Vector3(side*.105f,1.69f,.196f),new Vector3(.079f,.02f,.015f),hair);
-                Soft("Má",visual,new Vector3(side*.16f,1.51f,.188f),new Vector3(.045f,.02f,.018f),blush);
-                Soft("Dây yếm bo tròn",visual,new Vector3(side*.22f,1.15f,.205f),new Vector3(.085f,.34f,.055f),denim);
-                Soft("Brass button",visual,new Vector3(side*.21f,1.07f,.229f),Vector3.one*.055f,gold);
-                var leg=Pivot("Leg pivot",visual,new Vector3(side*.145f,.76f,0)); motion.legs[i]=leg;
-                Shape("Ống quần",PrimitiveType.Capsule,new Vector3(0,-.32f,0),new Vector3(.20f,.36f,.20f),denim,leg,false);
-                Soft("Giày",leg,new Vector3(0,-.65f,.08f),new Vector3(.23f,.17f,.32f),dark);
-                var arm=Pivot("Arm pivot",visual,new Vector3(side*.32f,1.26f,0)); motion.arms[i]=arm;
-                Shape("Tay áo",PrimitiveType.Capsule,new Vector3(side*.035f,-.19f,0),new Vector3(.19f,.25f,.19f),shirt,arm,false);
-                Shape("Cẳng tay",PrimitiveType.Capsule,new Vector3(side*.04f,-.40f,0),new Vector3(.12f,.18f,.13f),skin,arm,false);
-                Soft("Bàn tay",arm,new Vector3(side*.04f,-.55f,0),new Vector3(.14f,.14f,.15f),skin);
+                if(bone.name=="RightHand"||bone.name=="arm-right")motion.rightHand=bone;
+                if(bone.name=="arm-left")motion.arms[0]=bone;
+                if(bone.name=="arm-right")motion.arms[1]=bone;
+                if(bone.name=="leg-left")motion.legs[0]=bone;
+                if(bone.name=="leg-right")motion.legs[1]=bone;
+                if(bone.name=="head")head=bone;
+                if(bone.name=="root")motion.rigRoot=bone;
+            }
+            var straw=UnityEditor.AssetDatabase.LoadAssetAtPath<Material>(Root+"Materials/FarmerStraw.mat");
+            if(straw==null){straw=new Material(Shader.Find("Universal Render Pipeline/Lit"));straw.color=new Color(.75f,.51f,.20f);UnityEditor.AssetDatabase.CreateAsset(straw,Root+"Materials/FarmerStraw.mat");}
+            var brim=GameObject.CreatePrimitive(PrimitiveType.Cylinder);brim.name="Mũ rơm • vành";brim.transform.SetParent(visual,false);
+            brim.transform.localPosition=new Vector3(0,1.90f,0);brim.transform.localScale=new Vector3(1.18f,.026f,1.05f);Object.DestroyImmediate(brim.GetComponent<Collider>());brim.GetComponent<Renderer>().sharedMaterial=straw;
+            var crown=GameObject.CreatePrimitive(PrimitiveType.Cylinder);crown.name="Mũ rơm • thân";crown.transform.SetParent(visual,false);
+            crown.transform.localPosition=new Vector3(0,2.0f,0);crown.transform.localScale=new Vector3(.58f,.075f,.54f);Object.DestroyImmediate(crown.GetComponent<Collider>());crown.GetComponent<Renderer>().sharedMaterial=straw;
+            if(head==null)throw new System.InvalidOperationException("Farmer head bone missing.");
+            // Preserve the normalized metre dimensions while following the animated head.
+            brim.transform.SetParent(head,true);crown.transform.SetParent(head,true);
+            motion.toolSocket=Pivot("Tool socket (metres)",visual,new Vector3(.32f,.95f,.15f));
+            motion.carrySocket=Pivot("Animal carry socket (metres)",visual,new Vector3(0,1.05f,.55f));
+        }
+        static void DressFarmer(GameObject model)
+        {
+            if(!UnityEditor.AssetDatabase.IsValidFolder(Root+"Meshes"))UnityEditor.AssetDatabase.CreateFolder(Root.TrimEnd('/'),"Meshes");
+            Material Clothing(string name,Color color)
+            {string path=Root+"Materials/"+name+".mat";var m=UnityEditor.AssetDatabase.LoadAssetAtPath<Material>(path);if(m==null){m=new Material(Shader.Find("Universal Render Pipeline/Lit"));UnityEditor.AssetDatabase.CreateAsset(m,path);}m.color=color;m.SetFloat("_Smoothness",.08f);return m;}
+            var denim=Clothing("FarmerDenim",new Color(.22f,.40f,.64f));var shirt=Clothing("FarmerShirt",new Color(.94f,.85f,.65f));var boots=Clothing("FarmerBoots",new Color(.32f,.20f,.12f));
+            var skinMaterial=Clothing("FarmerLightSkin",new Color(.98f,.84f,.71f));
+            foreach(var renderer in model.GetComponentsInChildren<SkinnedMeshRenderer>())
+            {
+                bool head=renderer.name.Contains("head");if(!renderer.name.Contains("body")&&!head)continue;
+                var source=renderer.sharedMesh;var uv=source.uv;var original=renderer.sharedMaterial;
+                var atlas=original.GetTexture("_BaseMap") as Texture2D;if(atlas==null)continue;
+                string atlasPath=UnityEditor.AssetDatabase.GetAssetPath(atlas);var importer=UnityEditor.AssetImporter.GetAtPath(atlasPath) as UnityEditor.TextureImporter;
+                bool wasReadable=importer.isReadable;if(!wasReadable){importer.isReadable=true;importer.SaveAndReimport();atlas=UnityEditor.AssetDatabase.LoadAssetAtPath<Texture2D>(atlasPath);}
+                var lists=new System.Collections.Generic.List<int>[5];for(int k=0;k<5;k++)lists[k]=new System.Collections.Generic.List<int>();
+                var weights=source.boneWeights;var triangles=source.triangles;var vertices=source.vertices;
+                float minY=float.MaxValue,maxY=float.MinValue;foreach(var v in vertices){minY=Mathf.Min(minY,v.y);maxY=Mathf.Max(maxY,v.y);}
+                for(int k=0;k<triangles.Length;k+=3)
+                {
+                    int a=triangles[k];Color color=atlas.GetPixelBilinear(uv[a].x,uv[a].y);string bone=renderer.bones[weights[a].boneIndex0].name;
+                    bool skin=color.r>.55f&&color.r>color.g*1.13f&&color.g>color.b*1.08f&&color.b/color.r>.4f;
+                    int material=skin?4:color.b<color.g*.65f&&color.r>.5f?1:color.maxColorComponent>.7f?2:1;
+                    if(head&&!skin)material=0;
+                    if(!head&&bone.Contains("arm")&&color.maxColorComponent<.35f)material=0;
+                    if(bone.Contains("leg")&&vertices[a].y<minY+(maxY-minY)*.18f)material=3;
+                    lists[material].Add(triangles[k]);lists[material].Add(triangles[k+1]);lists[material].Add(triangles[k+2]);
+                }
+                string meshPath=Root+"Meshes/"+(head?"FarmerFace":"FarmerWorkClothes")+".asset";var mesh=Object.Instantiate(source);mesh.name="CC0 farmer work clothes";mesh.subMeshCount=5;
+                for(int k=0;k<5;k++)mesh.SetTriangles(lists[k],k);
+                var existing=UnityEditor.AssetDatabase.LoadAssetAtPath<Mesh>(meshPath);
+                if(existing!=null){UnityEditor.EditorUtility.CopySerialized(mesh,existing);Object.DestroyImmediate(mesh);mesh=existing;}else UnityEditor.AssetDatabase.CreateAsset(mesh,meshPath);
+                if(!wasReadable){importer.isReadable=false;importer.SaveAndReimport();}
+                renderer.sharedMesh=mesh;renderer.sharedMaterials=new[]{original,denim,shirt,boots,skinMaterial};
+                UnityEditor.PrefabUtility.RecordPrefabInstancePropertyModifications(renderer);
             }
         }
         static void BuildAnimals()
@@ -122,6 +132,29 @@ namespace NongTrai.Editor
                 }
                 var collider=root.gameObject.AddComponent<CapsuleCollider>(); collider.center=new Vector3(0,.65f*size,0); collider.radius=.45f*size; collider.height=1.3f*size;
                 var rb=root.gameObject.AddComponent<Rigidbody>(); rb.isKinematic=true; rb.useGravity=false;
+                if(type<=3)
+                {
+                    model.gameObject.SetActive(false);
+                    string path=type==3
+                        ? Root+"Models/Imported/Animals_Chicken/Chicken.obj"
+                        : Root+"Models/Imported/Quaternius_FarmAnimals/"+(type==0?"Cow.fbx":type==1?"Pig.fbx":"Sheep.fbx");
+                    float targetHeight=type==0?1.4f:type==1?.95f:type==2?1.1f:.52f;
+                    var imported=FarmImportedModelBuilder.Attach(path,root,"Model • "+kind,targetHeight);
+                    var animator=imported.GetComponentInChildren<Animator>();
+                    if(animator!=null)
+                    {
+                        animator.runtimeAnimatorController=FarmImportedModelBuilder.BuildAnimalController(path,type);
+                        animator.applyRootMotion=false;
+                        var animation=imported.AddComponent<FarmAnimalVisual>();animation.animator=animator;animation.motionRoot=root;animation.proceduralGait=type!=0;
+                    }
+                    else
+                    {
+                        var animation=imported.AddComponent<FarmAnimalVisual>();animation.motionRoot=root;
+                    }
+                    collider.center=new Vector3(0,type==3?.26f:.7f,0);
+                    collider.radius=type==0?.58f:type==3?.22f:.45f;
+                    collider.height=type==0?1.65f:type==3?.52f:1.3f;
+                }
                 if(index<4) UnityEditor.PrefabUtility.SaveAsPrefabAsset(root.gameObject,Root+"Prefabs/Animal"+index+".prefab");
                 animal.AssignPen(home);
             }

@@ -13,7 +13,7 @@ namespace NongTrai
         public bool[] stationBuilt;
         public PortableSprinklerRecord[] portable;
         public bool pendingPortable;
-        public int lastPortablePurchaseDay;
+        public int lastPortablePurchaseDay,rentedToday;
         public int spareCans,pumpStock;
         public float pumpProgress;
     }
@@ -45,8 +45,13 @@ namespace NongTrai
         public int ConsumedFrame {get;private set;}=-1;
         public int PortableCount=>portable.Count;
         public const int PortablePrice=350;
-        int lastPortablePurchaseDay;
+        int lastPortablePurchaseDay,rentedToday;
+        public int RentalLimit=>3+(expansion.Level>=3?1:0)+(expansion.Level>=5?1:0)+(expansion.Level>=7?1:0);
+        public int RentedToday {get{RefreshRentalDay();return rentedToday;}}
+        static float GameSeconds=>TimeManager.Instance==null?0:((TimeManager.Instance.Day-1)+TimeManager.Instance.NormalizedTime)*TimeManager.DayLengthSeconds;
+        void RefreshRentalDay(){int day=TimeManager.Instance==null?1:TimeManager.Instance.Day;if(lastPortablePurchaseDay!=day){lastPortablePurchaseDay=day;rentedToday=0;}}
         Text status,feedback;
+        static readonly Vector3[] WaterNeighbours={Vector3.left,Vector3.right,Vector3.forward,Vector3.back};
         float tick;
 
         void Awake() => Instance=this;
@@ -64,12 +69,10 @@ namespace NongTrai
             Panel=FarmUi.Panel(hud.transform,"Quản lý nước",new Vector2(930,720));
             FarmUi.TmpLabel(Panel.transform,"NƯỚC & TRẠM TƯỚI",new Vector2(30,-25),new Vector2(870,55),30);
             status=FarmUi.Label(Panel.transform,"",new Vector2(30,-90),new Vector2(870,100),21);
-            FarmUi.Button(Panel.transform,"Mua vòi phun di động • 350 xu • nhận vào túi (1/ngày)",
+            FarmUi.Button(Panel.transform,"Thuê vòi tự tưới • 350 xu • hoạt động 1 ngày game",
                 new Vector2(30,-215),new Vector2(870,68),BuyPortable);
-            FarmUi.Label(Panel.transform,"Click máy bơm để lấy một bình nước; máy hút thêm 1 bình mỗi 10 phút chơi, chứa tối đa 3. Bạn mang tối đa 3 bình.\nVòi phun tưới trong bán kính 6 m, nạp 1 nước để chạy 30 phút.",
-                new Vector2(30,-310),new Vector2(870,125),22);
-            feedback=FarmUi.Label(Panel.transform,"Mua vòi vào túi, chọn trên hotbar rồi click đất để đặt; click trái vòi để nạp, chuột phải để thu lại.",
-                new Vector2(30,-545),new Vector2(870,55),19);
+            FarmUi.Label(Panel.transform,"Chọn XÔ NƯỚC có sẵn: chuột trái múc khi rỗng, chuột trái đặt nước khi đầy.\nVòi thuê tự tưới bán kính 6 m, không cần nạp; hết hạn sau 1 ngày game.\nThuê tối đa 3/ngày; LV3/5/7 mở 4/5/6 vòi mỗi ngày.",new Vector2(30,-310),new Vector2(870,150),22);
+            feedback=FarmUi.Label(Panel.transform,"Chọn vòi trong túi rồi trái vào đất để đặt. Chuột phải thu hồi và kết thúc thuê.",new Vector2(30,-545),new Vector2(870,55),19);
             FarmUi.Button(Panel.transform,"Trở lại game",new Vector2(30,-630),new Vector2(870,55),hud.Resume);
             FarmUi.Label(Panel.transform,"Có thể nhấn ESC để đóng bảng",new Vector2(625,-22),new Vector2(270,36),17);
             Panel.SetActive(false);
@@ -153,6 +156,16 @@ namespace NongTrai
             else {added=CanCapacity;SpareCans++;}
             PumpStock--;Refresh();return added;
         }
+        public void FillFromRiver(){CanWater=CanCapacity;SpareCans=0;Refresh();}
+        public void EmptyBucket(){CanWater=0;SpareCans=0;Refresh();}
+        public bool UseReserveFlask(FarmInventory inventory)
+        {
+            if(inventory==null||inventory.Count(64)<1||CanWater>=CanCapacity)return false;
+            if(!inventory.Remove(64,1))return false;
+            inventory.Add(71,1);
+            CanWater=Mathf.Min(CanCapacity,CanWater+8);
+            Refresh();return true;
+        }
         void LoadSpareIfEmpty()
         {if(CanWater<=0&&SpareCans>0){SpareCans--;CanWater=CanCapacity;}}
         public void AdvancePump(float seconds)
@@ -178,7 +191,7 @@ namespace NongTrai
             if(!expansion.UnlockedRegions[region]) { Say("Cần mở vùng đất "+(region+1)+" trước.");return false; }
             if(!shop.TrySpend(prices[region])) { Say("Không đủ "+prices[region]+" xu.");return false; }
             StationBuilt[region]=true;StationWater[region]=8;stations[region].gameObject.SetActive(true);
-            Say("Đã xây trạm vùng "+(region+1)+" và nạp sẵn 8 nước. Lấy thêm nước ở hồ rồi E tại trạm.");FarmAudio.Instance?.Play(FarmAudio.Cue.Buy);return true;
+            Say("Đã xây trạm vùng "+(region+1)+" • tự tưới, không cần nạp nước.");FarmAudio.Instance?.Play(FarmAudio.Cue.Buy);return true;
         }
         public int TransferToStation(int region)
         {
@@ -189,29 +202,25 @@ namespace NongTrai
         }
         public void BuyPortable()
         {
-            int day=TimeManager.Instance==null?1:TimeManager.Instance.Day;
-            if(lastPortablePurchaseDay==day){Say("Hôm nay đã mua vòi phun. Chờ sang ngày mới để mua tiếp.");return;}
-            if(AdventureBag.Instance!=null&&AdventureBag.Instance.Space(56)<1){Say("Túi đã đầy, cần chỗ cho vòi phun.");return;}
-            if(!shop.TrySpend(PortablePrice)){Say("Cần "+PortablePrice+" xu để mua vòi phun.");return;}
-            lastPortablePurchaseDay=day;shop.inventory.Add(56,1);Say("Vòi phun đã vào túi. Kéo lên hotbar, chọn rồi click mặt đất khi muốn đặt.");
+            RefreshRentalDay();
+            if(rentedToday>=RentalLimit){Say("Đã thuê đủ "+RentalLimit+" vòi hôm nay. LV3/5/7 mở thêm lượt.");return;}
+            if(AdventureBag.Instance!=null&&AdventureBag.Instance.Space(56)<1){Say("Túi đầy.");return;}
+            if(!shop.TrySpend(PortablePrice)){Say("Cần "+PortablePrice+" xu để thuê.");return;}
+            rentedToday++;shop.inventory.Add(56,1);Say("Đã thuê vòi "+rentedToday+"/"+RentalLimit+" hôm nay. Chọn vòi rồi trái vào đất để đặt.");
         }
         IrrigationStation PlacePortable(Vector3 point,float remaining)
         {
             var clone=Instantiate(stations[0].gameObject,point+Vector3.up*1.05f,Quaternion.identity);
             clone.name="Vòi phun di động";clone.SetActive(true);
-            var result=clone.GetComponent<IrrigationStation>();result.portable=true;result.remainingSeconds=Mathf.Max(0,remaining);
+            var result=clone.GetComponent<IrrigationStation>();result.portable=true;result.remainingSeconds=Mathf.Max(0,remaining);result.rentalExpiresAt=GameSeconds+result.remainingSeconds;
             portable.Add(result);return result;
         }
         public bool TryPlacePortable(Vector3 point)
-        {if(shop.inventory.Count(56)<1||!shop.inventory.Remove(56,1))return false;PlacePortable(point,1800);return true;}
+        {if(shop.inventory.Count(56)<1||!shop.inventory.Remove(56,1))return false;PlacePortable(point,TimeManager.DayLengthSeconds);return true;}
         public bool DismantlePortable(IrrigationStation sprinkler)
-        {if(sprinkler==null||!sprinkler.portable||AdventureBag.Instance!=null&&AdventureBag.Instance.Space(56)<1||!portable.Remove(sprinkler))return false;
-         shop.inventory.Add(56,1);sprinkler.gameObject.SetActive(false);Destroy(sprinkler.gameObject);Refresh();return true;}
-        public bool RefillPortable(IrrigationStation sprinkler)
-        {
-            if(sprinkler==null||!sprinkler.portable||!Consume(1))return false;
-            sprinkler.remainingSeconds=1800;Refresh();return true;
-        }
+        {if(sprinkler==null||!sprinkler.portable||!portable.Remove(sprinkler))return false;
+         sprinkler.gameObject.SetActive(false);Destroy(sprinkler.gameObject);Refresh();return true;}
+        public bool RefillPortable(IrrigationStation sprinkler)=>sprinkler!=null&&sprinkler.portable&&sprinkler.remainingSeconds>0;
         void Update()
         {
             if(hud==null || hud.player.Paused) return;
@@ -222,25 +231,29 @@ namespace NongTrai
                 ConsumedFrame=Time.frameCount;
                 if(Camera.main!=null&&FarmAim.Hit(Camera.main,out var hit)&&hit.normal.y>.65f&&
                     Vector3.Distance(hit.point,hud.player.transform.position)<6f)
-                {if(TryPlacePortable(hit.point))hud.Notify("Đã đặt vòi phun • vòng xanh là vùng tưới. Click trái để nạp, chuột phải để thu lại.");}
+                {if(TryPlacePortable(hit.point))hud.Notify("Đã đặt vòi thuê • tự tưới trong vòng xanh, không cần nạp nước.");}
                 else hud.Notify("Hãy ngắm mặt đất phẳng gần nhân vật để đặt vòi phun.");
             }
             for(int i=portable.Count-1;i>=0;i--)
             {if(portable[i]==null){portable.RemoveAt(i);continue;}
-             portable[i].remainingSeconds=Mathf.Max(0,portable[i].remainingSeconds-Time.deltaTime);}
+             portable[i].remainingSeconds=Mathf.Max(0,portable[i].rentalExpiresAt-GameSeconds);
+             if(portable[i].remainingSeconds<=0){Destroy(portable[i].gameObject);portable.RemoveAt(i);}}
             tick+=Time.deltaTime;if(tick<1) return;tick=0;
             var plots=FindObjectsByType<FarmPlot>(FindObjectsSortMode.None);
             for(int region=0;region<4;region++)
             {
-                if(!StationBuilt[region] || StationWater[region]<=0 || stations[region]==null) continue;
+                if(!StationBuilt[region] || stations[region]==null) continue;
                 foreach(var plot in plots)
                 {
-                    if(StationWater[region]<=0) break;
                     if(expansion.RegionFor(plot)!=region || plot.State!=PlotState.Growing || plot.Moisture>=.2f) continue;
                     if(Vector3.Distance(plot.transform.position,stations[region].transform.position)>6f) continue;
-                    plot.AddMoisture(.55f);StationWater[region]--;
+                    plot.AddMoisture(.55f);
                 }
             }
+            // A placed water source can also irrigate the immediately adjacent farm plots.
+            foreach(var plot in plots)if(plot.State==PlotState.Growing&&plot.Moisture<.6f&&FarmVoxelWater.Instance!=null)
+                foreach(var direction in WaterNeighbours)
+                    if(FarmVoxelWater.Instance.IsSubmerged(plot.transform.position+direction*1.8f+Vector3.up*.25f)){plot.AddMoisture(.35f);break;}
             foreach(var sprinkler in portable)if(sprinkler!=null&&sprinkler.remainingSeconds>0)
             {
                 foreach(var plot in plots)if(plot.State==PlotState.Growing&&plot.Moisture<.6f&&
@@ -253,12 +266,12 @@ namespace NongTrai
         {var records=new List<PortableSprinklerRecord>();foreach(var item in portable)if(item!=null)
             records.Add(new PortableSprinklerRecord{position=item.transform.position-Vector3.up*1.05f,remaining=item.remainingSeconds});
          return new WaterState { canWater=CanWater,stationWater=(int[])StationWater.Clone(),
-             stationBuilt=(bool[])StationBuilt.Clone(),portable=records.ToArray(),pendingPortable=false,lastPortablePurchaseDay=lastPortablePurchaseDay,
+             stationBuilt=(bool[])StationBuilt.Clone(),portable=records.ToArray(),pendingPortable=false,lastPortablePurchaseDay=lastPortablePurchaseDay,rentedToday=rentedToday,
              spareCans=SpareCans,pumpStock=PumpStock,pumpProgress=PumpProgress };}
         public void Restore(WaterState state,bool legacy=false)
         {
             foreach(var item in portable)if(item!=null){item.gameObject.SetActive(false);Destroy(item.gameObject);}portable.Clear();
-            lastPortablePurchaseDay=state==null?0:state.lastPortablePurchaseDay;
+            lastPortablePurchaseDay=state==null?0:state.lastPortablePurchaseDay;rentedToday=state==null?0:Mathf.Max(0,state.rentedToday);
             if(state!=null&&state.pendingPortable&&shop.inventory.Count(56)==0)shop.inventory.Add(56,1);
             CanWater=state==null?0:Mathf.Clamp(state.canWater,0,CanCapacity);
             SpareCans=legacy||state==null?0:Mathf.Clamp(state.spareCans,0,MaxCarriedCans-(CanWater>0?1:0));
@@ -277,9 +290,7 @@ namespace NongTrai
         void Refresh()
         {
             if(status==null) return;
-            status.text="Bình đang dùng: "+CanWater+"/"+CanCapacity+" nước • Mang "+CarriedCans+"/3 bình • Máy bơm "+PumpStock+"/3 bình\n"
-                +(PumpStock>=3?"Máy bơm đã đầy":"Hút thêm sau "+Mathf.CeilToInt(PumpRemaining/60)+" phút chơi")+" • Vòi di động: "+PortableCount+"\n"
-                +"Trạm cũ: "+StationWater[0]+"/32 • "+StationWater[1]+"/32 • "+StationWater[2]+"/32 • "+StationWater[3]+"/32";
+            status.text="Xô nước: "+(CanWater>0?"ĐẦY":"RỖNG")+" • Vòi đang thuê: "+PortableCount+"\nHôm nay thuê "+RentedToday+"/"+RentalLimit+" • LV3/5/7 mở thêm lượt • Không cần nạp nước";
         }
     }
 
@@ -293,17 +304,9 @@ namespace NongTrai
 
     public sealed class WaterSource : MonoBehaviour,IInteractable
     {
-        public string InteractionHint => "[Chuột trái] Lấy 1 bình nước • máy có "+(FarmWaterSystem.Instance==null?0:FarmWaterSystem.Instance.PumpStock)+" bình";
+        public string InteractionHint => "[Chuột trái] Thuê vòi tưới tự động";
         public bool CanInteract(FarmPlayer player) => true;
-        public void Interact(PlayerInteraction actor)
-        {
-            int added=FarmWaterSystem.Instance.RefillCan();
-            var water=FarmWaterSystem.Instance;
-            actor.Say(added>0?"Đã lấy 1 bình ("+added+" nước) • mang "+water.CarriedCans+"/3 bình.":
-                water.PumpStock<=0?"Máy chưa hút đủ nước. Bình mới sau "+Mathf.CeilToInt(water.PumpRemaining/60)+" phút chơi.":
-                "Đã mang đủ 3 bình hoặc bình đang dùng đã đầy.");
-            if(added>0)FarmAudio.Instance?.Play(FarmAudio.Cue.Water);
-        }
+        public void Interact(PlayerInteraction actor)=>FarmWaterSystem.Instance.Open();
         public void SetHighlighted(bool selected) => InteractionOutline.Set(this,selected);
     }
 
@@ -332,10 +335,10 @@ namespace NongTrai
 
     public sealed class IrrigationStation : MonoBehaviour,IInteractable
     {
-        public int region;public bool portable;public float remainingSeconds;Transform arms;ParticleSystem spray;MeshRenderer coverageRing;Transform[] droplets,splashes;
+        public int region;public bool portable;public float remainingSeconds,rentalExpiresAt;Transform arms;ParticleSystem spray;MeshRenderer coverageRing;Transform[] droplets,splashes;
         public bool WaterVisualsActive => coverageRing!=null&&coverageRing.enabled&&spray!=null&&spray.isPlaying&&droplets!=null&&droplets[0]!=null&&droplets[0].gameObject.activeSelf&&splashes!=null;
-        public string InteractionHint => portable?"[Chuột trái] Vòi phun • còn "+Mathf.CeilToInt(remainingSeconds/60)+" phút • nạp 1 nước để chạy 30 phút":
-            "[Chuột trái] Nạp trạm vùng "+(region+1)+" • "+(FarmWaterSystem.Instance==null?0:FarmWaterSystem.Instance.StationWater[region])+"/32 nước • bán kính 6m";
+        public string InteractionHint => portable?"Vòi thuê • còn "+Mathf.CeilToInt(remainingSeconds/60)+" phút game • tự tưới, không nạp nước":
+            "Trạm vùng "+(region+1)+" • tự tưới bán kính 6 m, không cần nạp nước";
         public void InitializeVisuals(Transform rotatingArms)
         {
             arms=rotatingArms;
@@ -387,7 +390,7 @@ namespace NongTrai
         }
         void Update()
         {
-            bool active=portable?remainingSeconds>0:FarmWaterSystem.Instance!=null&&FarmWaterSystem.Instance.StationWater[region]>0;
+            bool active=portable?remainingSeconds>0:FarmWaterSystem.Instance!=null&&FarmWaterSystem.Instance.StationBuilt[region];
             if(arms!=null&&active)arms.Rotate(0,42*Time.deltaTime,0,Space.Self);
             if(coverageRing!=null)coverageRing.enabled=true;
             if(spray!=null)
@@ -415,9 +418,7 @@ namespace NongTrai
         public bool CanInteract(FarmPlayer player) => true;
         public void Interact(PlayerInteraction actor)
         {
-            if(portable){actor.Say(FarmWaterSystem.Instance.RefillPortable(this)?"Đã nạp 1 nước • vòi hoạt động 30 phút chơi thực.":"Bình rỗng. Lấy nước tại hồ.");return;}
-            int moved=FarmWaterSystem.Instance.TransferToStation(region);
-            actor.Say(moved>0?"Đã nạp "+moved+" nước vào trạm.":"Bình rỗng hoặc bồn trạm đã đầy.");
+            actor.Say(portable?"Vòi đang tự tưới. Chuột phải để thu hồi và kết thúc thuê.":"Trạm tự tưới, không cần nạp nước.");
         }
         public void SetHighlighted(bool selected) => InteractionOutline.Set(this,selected);
     }

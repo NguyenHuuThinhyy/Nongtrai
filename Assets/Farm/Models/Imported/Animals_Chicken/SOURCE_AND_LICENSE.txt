@@ -1,0 +1,13 @@
+Chicken (animated)
+Author: CDmir
+Collaborator: TinyWorlds
+Source: https://opengameart.org/content/chicken-animated
+Original download: chicken.zip (6.2 MB listed on source page)
+License: CC0 1.0 Universal
+License URL: https://creativecommons.org/publicdomain/zero/1.0/
+Source license rechecked: 2026-09-27
+
+The Unity project uses an OBJ mesh from this pack with procedural walking motion.
+CC0 allows game distribution and commercial use; attribution is not required.
+Credit retained voluntarily: CDmir and TinyWorlds, Chicken (animated), OpenGameArt.
+This is a provenance record, not a replacement license text.

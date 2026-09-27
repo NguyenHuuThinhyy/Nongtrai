@@ -1,11 +1,11 @@
-﻿using UnityEngine;
-using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 namespace NongTrai
 {
     public sealed class FruitTree : MonoBehaviour, IInteractable
     {
         public GameObject fruitVisual;
+        public GameObject orchardTreeVisual,blueberryBushVisual;
         public float remaining=30;
         public bool planted;
         public float age=240;
@@ -19,33 +19,30 @@ namespace NongTrai
         public int FruitCount=>fruitKind==3?8:5;
         FarmPlayer player;
         Vector3 matureScale;
-        TextMeshPro progress;
         Image progressFill;
-        GameObject fruitIcon;
+        Canvas progressCanvas;
         int chopHits;
         void Start()
         {
-            player=FindFirstObjectByType<FarmPlayer>();matureScale=transform.localScale*(fruitKind==3?.53f:1f);
+            player=FindFirstObjectByType<FarmPlayer>();matureScale=transform.localScale;
             if(fruitKind==3)
-            {var trunk=transform.Find("Trunk");if(trunk!=null)trunk.gameObject.SetActive(false);
+            {if(orchardTreeVisual!=null)orchardTreeVisual.SetActive(false);if(blueberryBushVisual!=null)blueberryBushVisual.SetActive(true);
+             var trunk=transform.Find("Trunk");if(trunk!=null)trunk.gameObject.SetActive(false);
              var leaves=transform.Find("Leaves");if(leaves!=null){leaves.localPosition=new Vector3(0,1.2f,0);leaves.localScale=new Vector3(3f,1.45f,3f);}
-             if(fruitVisual!=null){fruitVisual.transform.localPosition=Vector3.down;foreach(Transform berry in fruitVisual.transform)berry.localScale=Vector3.one*.19f;}}
-            else if(fruitKind==1&&fruitVisual!=null)
-                foreach(Transform pear in fruitVisual.transform)pear.localScale=new Vector3(.27f,.38f,.27f);
+             if(fruitVisual!=null){int i=0;foreach(Transform berry in fruitVisual.transform){berry.localScale=Vector3.one*.15f;
+                berry.localPosition=new Vector3(Mathf.Sin(i*2.4f)*.82f,.9f+(i%3)*.17f,Mathf.Cos(i*2.4f)*.82f);i++;}}
+             var capsule=GetComponent<CapsuleCollider>();if(capsule!=null){capsule.center=Vector3.up*.7f;capsule.height=1.4f;capsule.radius=.55f;}}
+            else
+            {
+                if(orchardTreeVisual!=null)orchardTreeVisual.SetActive(true);if(blueberryBushVisual!=null)blueberryBushVisual.SetActive(false);
+                if(fruitKind==1&&fruitVisual!=null)foreach(Transform pear in fruitVisual.transform)pear.localScale=new Vector3(.36f,.49f,.36f);
+            }
             if(fruitVisual!=null)fruitVisual.SetActive(false);
-            var label=new GameObject("Tiến độ cây",typeof(TextMeshPro));label.transform.SetParent(transform,false);
-            label.transform.localPosition=Vector3.up*3.6f;label.transform.localScale=Vector3.one*.03f;
-            progress=label.GetComponent<TextMeshPro>();progress.font=FarmUi.Font;progress.fontSize=4;
-            progress.alignment=TextAlignmentOptions.Center;progress.outlineColor=Color.black;progress.outlineWidth=.2f;
-            progress.rectTransform.sizeDelta=new Vector2(14,2);
             var canvas=new GameObject("Thanh tiến độ cây",typeof(RectTransform),typeof(Canvas));canvas.transform.SetParent(transform,false);
-            canvas.transform.localPosition=Vector3.up*3.35f;canvas.transform.localScale=Vector3.one*.012f;canvas.GetComponent<Canvas>().renderMode=RenderMode.WorldSpace;
+            canvas.transform.localPosition=Vector3.up*(fruitKind==3?1.85f:5.35f);canvas.transform.localScale=Vector3.one*.012f;progressCanvas=canvas.GetComponent<Canvas>();progressCanvas.renderMode=RenderMode.WorldSpace;
             var back=FarmUi.Panel(canvas.transform,"Nền",new Vector2(100,12));back.GetComponent<Image>().color=new Color(.1f,.2f,.15f,.9f);
             var fill=FarmUi.Panel(back.transform,"Đã lớn",new Vector2(96,8));progressFill=fill.GetComponent<Image>();progressFill.color=new Color(.5f,.86f,.27f);
             var fr=fill.GetComponent<RectTransform>();fr.anchorMin=fr.anchorMax=fr.pivot=new Vector2(0,.5f);fr.anchoredPosition=new Vector2(2,0);
-            fruitIcon=new GameObject("Biểu tượng táo chín",typeof(RectTransform),typeof(Canvas));fruitIcon.transform.SetParent(transform,false);
-            fruitIcon.transform.localPosition=Vector3.up*4.1f;fruitIcon.transform.localScale=Vector3.one*.012f;fruitIcon.GetComponent<Canvas>().renderMode=RenderMode.WorldSpace;
-            FarmItemIconLibrary.Attach(fruitIcon.transform,FruitItem,new Vector2(-28,28),new Vector2(56,56));
             if(fruitVisual!=null&&fruitKind>0)
             {Color tint=fruitKind==1?new Color(.70f,.85f,.26f):fruitKind==2?new Color(1f,.61f,.34f):new Color(.37f,.37f,.80f);
              foreach(var renderer in fruitVisual.GetComponentsInChildren<Renderer>())renderer.material.color=tint;}
@@ -59,15 +56,14 @@ namespace NongTrai
             float growth=planted?Mathf.Clamp01(age/GrowthSeconds):1;
             transform.localScale=matureScale*Mathf.Lerp(.25f,1,growth);
             if(fruitVisual!=null)fruitVisual.SetActive(Ready);
-            if(fruitIcon!=null){fruitIcon.SetActive(Ready);if(Camera.main!=null)fruitIcon.transform.rotation=Camera.main.transform.rotation;}
-            if(progressFill!=null){progressFill.rectTransform.sizeDelta=new Vector2(96*(growth<1?growth:1-Mathf.Clamp01(remaining/FruitSeconds)),8);
-                if(Camera.main!=null)progressFill.GetComponentInParent<Canvas>().transform.rotation=Camera.main.transform.rotation;}
+            if(progressFill!=null)
+            {progressCanvas.gameObject.SetActive(!Ready);
+             if(!Ready){progressFill.rectTransform.sizeDelta=new Vector2(96*(growth<1?growth:1-Mathf.Clamp01(remaining/FruitSeconds)),8);
+                if(Camera.main!=null)progressCanvas.transform.rotation=Camera.main.transform.rotation;}}
             if(mutated&&fruitVisual!=null)
             {var glow=Color.HSVToRGB(Mathf.Repeat(Time.time*.2f,1),.8f,1);
              foreach(var renderer in fruitVisual.GetComponentsInChildren<Renderer>())
              {renderer.material.color=glow;renderer.material.SetColor("_EmissionColor",glow*2);renderer.material.EnableKeyword("_EMISSION");}}
-            if(progress!=null){progress.text=growth<1?new[]{"Mầm","Cây non","Cây lớn","Sắp trưởng thành"}[Mathf.Min(3,Mathf.FloorToInt(growth*4))]+" "+Mathf.RoundToInt(growth*100)+"%":Ready?FruitName.ToUpper()+" "+FruitCount+" QUẢ":"Còn "+Mathf.CeilToInt(remaining)+"s • 0 quả";
-                if(Camera.main!=null)progress.transform.rotation=Camera.main.transform.rotation;}
         }
         int Slot=>FarmHudV2.Instance==null?8:FarmHudV2.Instance.SelectedSlot;
         public string Hint => Slot==5?"[Chuột trái] Tưới "+FruitName+" • lớn/ra quả nhanh hơn":Slot==7?"[Chuột trái] Rìu hạ cây • nhận 6 khối gỗ":age<GrowthSeconds?"Cây "+FruitName+" "+Mathf.RoundToInt(age/GrowthSeconds*100)+"% • 3 click tay để đốn":
@@ -78,7 +74,7 @@ namespace NongTrai
         {
             if(Slot==5)
             {if(FarmWaterSystem.Instance==null||!FarmWaterSystem.Instance.Consume(1)){actor.Say("Bình hết nước • nạp tại hồ.");return;}
-             AdvanceWater(55);actor.Say("Đã tưới "+FruitName+" • sinh trưởng nhanh hơn 55 giây.");return;}
+             FarmActionFeedback.Emit(transform.position+Vector3.up*.5f,new Color(.3f,.78f,1),28);AdvanceWater(55);actor.Say("Đã tưới "+FruitName+" • sinh trưởng nhanh hơn 55 giây.");return;}
             if(Slot==7)
             {
                 if(!AdventureBag.Instance.DamageTool()){actor.Say("Rìu đã hỏng; sửa ở túi đồ.");return;}

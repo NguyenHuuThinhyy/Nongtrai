@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.IO;
 using UnityEngine;
@@ -14,7 +14,7 @@ namespace NongTrai
         [Serializable] sealed class ResourceRecord { public int id; public float remaining; }
         [Serializable] sealed class SaveData
         {
-            public int version=15,money,fruit,treeCount,selected,feed,level,xp,day,weather,levelCap,shopPurchaseDay,questStage;
+            public int version=21,money,fruit,treeCount,selected,feed,level,xp,day,weather,levelCap,shopPurchaseDay,questStage;
             public int[] shopPurchases;
             public float dayTime,musicVolume,effectsVolume,weatherRemaining;
             public bool expanded,tutorialDone;
@@ -27,7 +27,10 @@ namespace NongTrai
             public WaterState water;
             public OrderSystemState orders;
             public BuildingState building;
+            public TntRecord[] tnt;
             public StorageState storage;
+            public DeliveryRushState deliveryRush;
+            public int swordEnhancementLevel;public int[] weaponLevels;public RunnerState runner;public VoxelWaterState voxelWater;public float[] machineFuel;public int preferredFuel=66;
             public float playerHealth=100;
             public ExplorationState exploration;
             public BagState bag;public PickupRecord[] drops;public WildlifeState wildlife;
@@ -59,6 +62,18 @@ namespace NongTrai
             if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmSmokeCheck")<0) Load();
         }
 
+        public bool ArchiveForNewGame()
+        {
+            try
+            {
+                string archive=SavePath+".before-new-game-"+DateTime.UtcNow.ToString("yyyyMMdd-HHmmss-fffffff");
+                foreach(string suffix in new[]{".bak",".tmp",""})
+                    if(File.Exists(SavePath+suffix))File.Move(SavePath+suffix,archive+suffix);
+                return true;
+            }
+            catch(Exception ex){Debug.LogError("Cannot start new game: "+ex.Message);return false;}
+        }
+
         public bool Save()
         {
             if(CreativeModeManager.IsCreative) return false;
@@ -77,7 +92,9 @@ namespace NongTrai
                     effectsVolume=FarmAudio.Instance.EffectsVolume,
                     water=water==null?null:water.Snapshot(),orders=orders==null?null:orders.Snapshot(),
                     bag=AdventureBag.Instance?.Snapshot(),drops=WorldPickup.Snapshot(),wildlife=AdventureWildlife.Instance?.Snapshot(),exploration=ExplorationWorld.Instance?.Snapshot(),building=building==null?null:building.Snapshot(),
-                    storage=FarmStorage.Instance?.Snapshot(),playerHealth=AdventureWolves.Instance==null?100:AdventureWolves.Instance.Health,
+                    storage=FarmStorage.Instance?.Snapshot(),deliveryRush=FarmDeliveryRush.Instance?.Snapshot(),swordEnhancementLevel=FarmForge.Instance==null?0:FarmForge.Instance.SwordLevel,
+                    runner=FarmRunner.Instance?.Snapshot(),weaponLevels=FarmForge.Instance==null?null:(int[])FarmForge.Instance.Levels.Clone(),voxelWater=FarmVoxelWater.Instance?.Snapshot(),tnt=FarmTnt.Snapshot(),machineFuel=(float[])processing.FuelSeconds.Clone(),preferredFuel=processing.PreferredFuel,
+                    playerHealth=AdventureWolves.Instance==null?100:AdventureWolves.Instance.Health,
                     cutDecorTrees=FarmDecorTree.SnapshotCuts(),pendingPen=FarmPenPlacement.Instance==null?-1:FarmPenPlacement.Instance.Pending };
                 var plots=FindObjectsByType<FarmPlot>(FindObjectsSortMode.None);
                 data.plots=new PlotRecord[plots.Length];
@@ -117,15 +134,39 @@ namespace NongTrai
             }
             catch(Exception error) { Debug.LogError("Lưu nông trại thất bại: "+error); return false; }
         }
+        // Copyright (c) HThinh.yy. Retire duplicate bottle items without losing their sale value.
+        static void MigrateBuckets(SaveData data)
+        {
+            int refund=0;bool filled=false,hadBottle=false;
+            void RemoveBottles(int[] items,int offset)
+            {
+                if(items==null)return;
+                foreach(int id in new[]{64,71}){int i=id-offset;if(i<0||i>=items.Length)continue;int count=Mathf.Max(0,items[i]);
+                    refund+=count*(id==64?28:12);filled|=id==64&&count>0;hadBottle|=count>0;items[i]=0;}
+            }
+            RemoveBottles(data.products,4);RemoveBottles(data.storage?.warehouse,0);
+            if(data.storage?.explored!=null)foreach(var chest in data.storage.explored)RemoveBottles(chest.items,0);
+            if(data.building?.blocks!=null)foreach(var block in data.building.blocks)RemoveBottles(block.chestItems,0);
+            if(data.drops!=null)foreach(var drop in data.drops)if(drop.item==64||drop.item==71){refund+=drop.count*(drop.item==64?28:12);filled|=drop.item==64;hadBottle=true;drop.count=0;}
+            if(data.bag?.slots!=null)
+            {
+                foreach(var slot in data.bag.slots)if(slot!=null&&(slot.item==64||slot.item==71)){slot.item=-1;slot.count=0;}
+                if(hadBottle&&!Array.Exists(data.bag.slots,x=>x!=null&&x.item==105&&x.count>0))
+                    for(int i=0;i<data.bag.slots.Length;i++)if(data.bag.slots[i]==null||data.bag.slots[i].count==0){data.bag.slots[i]=new BagSlot{item=105,count=1};break;}
+            }
+            data.money+=refund;
+            if(data.water!=null){data.water.spareCans=0;if(filled||data.water.canWater>0)data.water.canWater=24;}
+        }
         public bool Load()
         {
             if(!File.Exists(SavePath)) return false;
             try
             {
                 var data=JsonUtility.FromJson<SaveData>(File.ReadAllText(SavePath));
-                if(data==null || data.version<2 || data.version>15 || data.seeds==null || data.seeds.Length!=3 ||
+                if(data==null || data.version<2 || data.version>21 || data.seeds==null || data.seeds.Length!=3 ||
                     data.harvested==null || data.harvested.Length<3 || data.products==null || data.products.Length<4)
                     throw new InvalidDataException("Phiên bản dữ liệu lưu không phù hợp.");
+                if(data.version<21)MigrateBuckets(data);
                 if(data.version<8)
                 {
                     // Move the expedition vertically away from farm so it can expand in every direction.
@@ -197,6 +238,7 @@ namespace NongTrai
                     if(data.resources!=null) foreach(var item in data.resources)
                         foreach(var resource in FindObjectsByType<ResourceNode>(FindObjectsSortMode.None))
                             if(resource.id==item.id) resource.remaining=Mathf.Max(0,item.remaining);
+                    if(data.version<18&&data.exploration!=null)data.exploration.generatorVersion=4;
                     ExplorationWorld.Instance?.Restore(data.exploration);
                     player.Teleport(data.version<7 && data.playerPosition.x>100?IslandManager.ExploreArrival:data.playerPosition);
                 }
@@ -211,10 +253,15 @@ namespace NongTrai
                 }
                 if(building!=null) building.Restore(data.version>=6?data.building:null);
                 FarmStorage.Instance?.Restore(data.version>=11?data.storage:null);
+                FarmDeliveryRush.Instance?.Restore(data.version>=16?data.deliveryRush:null);
+
+                FarmRunner.Instance?.Restore(data.runner);FarmVoxelWater.Instance?.Restore(data.voxelWater);FarmTnt.Restore(data.tnt);processing.RestoreFuel(data.machineFuel,data.preferredFuel);
                 AdventureWolves.Instance?.RestoreHealth(data.version>=11?data.playerHealth:100);
                 if(data.version<12&&data.drops!=null)
                     foreach(var drop in data.drops)if(drop.item==109||drop.item==110)drop.item=104;
-                WorldPickup.Restore(data.drops);AdventureBag.Instance?.Restore(data.bag,data.version<12);AdventureWildlife.Instance?.Restore(data.wildlife);
+                WorldPickup.Restore(data.drops);AdventureBag.Instance?.Restore(data.bag,data.version<12);
+                if(data.version<19)FarmForge.Instance?.Restore(data.version>=16?data.swordEnhancementLevel:0,data.weaponLevels);
+                AdventureWildlife.Instance?.Restore(data.wildlife);
                 if(data.version<10)islands?.Snapshot();
                 return true;
             }

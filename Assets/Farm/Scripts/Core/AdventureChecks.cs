@@ -12,7 +12,7 @@ namespace NongTrai
             save.pathOverride=Path.Combine(Application.temporaryCachePath,"farm-bag-check.json");
             if(!save.Save())throw new Exception("Bag fixture save failed");string original=File.ReadAllText(save.SavePath);
             for(int id=0;id<28;id++)if(inv.Count(id)>0)inv.Remove(id,inv.Count(id));bag.Restore(null);
-            bag.Slots[0]=new BagSlot();inv.Add(20,70);bag.Sync();
+            save.shop.Seeds[0]=0;bag.Slots[0]=new BagSlot();inv.Add(20,70);bag.Sync();
             if(bag.Slots[0].count!=64)throw new Exception("Stacks did not cap at64 / prefer empty hotbar");
             bag.BeginDrag(0,true);bag.Drop(20);
             if(bag.Slots[0].count!=32||bag.Slots[20].count!=32)throw new Exception("Split stack failed");

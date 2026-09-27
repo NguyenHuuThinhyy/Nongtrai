@@ -13,8 +13,13 @@ namespace NongTrai
         {
             anchor = new GameObject("Animal in hands").transform;
             var animation=player.visual.GetComponent<FarmerAnimation>();
-            anchor.SetParent(animation!=null&&animation.arms!=null&&animation.arms.Length>1?animation.arms[1]:player.visual, false);
-            anchor.localPosition = new Vector3(.04f, -.62f, .25f);
+            if(animation!=null&&animation.carrySocket!=null)
+            {anchor.SetParent(animation.carrySocket,false);anchor.localRotation=Quaternion.Euler(0,180,0);return;}
+            var hand=animation==null||animation.animator==null||!animation.animator.isHuman?null:animation.animator.GetBoneTransform(HumanBodyBones.RightHand);
+            if(hand==null&&animation!=null&&animation.arms!=null&&animation.arms.Length>1)hand=animation.arms[1];
+            bool rigged=animation!=null&&animation.animator!=null&&animation.animator.isHuman&&hand==animation.animator.GetBoneTransform(HumanBodyBones.RightHand);
+            anchor.SetParent(hand!=null?hand:player.visual, false);
+            anchor.localPosition = rigged?new Vector3(0,-.1f,.12f):hand!=null?new Vector3(.04f,-.62f,.25f):new Vector3(.04f,1,-.2f);
             anchor.localRotation = Quaternion.Euler(0, 180, 0);
         }
         public bool Pickup(FarmAnimal animal)

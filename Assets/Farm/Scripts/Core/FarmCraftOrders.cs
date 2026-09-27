@@ -128,7 +128,8 @@ namespace NongTrai
             if(index<0 || index>=Recipes.Length) return "?";
             var recipe=Recipes[index];string value=recipe.name+": ";
             for(int i=0;i<recipe.inputs.Length;i++) value+=(i>0?" + ":"")+recipe.inputs[i].count+" "+inventory.Name(recipe.inputs[i].item);
-            return value+" → 1 "+(recipe.output>=100?recipe.name:inventory.Name(recipe.output));
+            if(recipe.output==64)value+=" + 8 nước";
+            return value+" → "+(recipe.output==63?"5 ":"1 ")+(recipe.output>=100?recipe.name:inventory.Name(recipe.output));
         }
         void CreateWorldObjects()
         {
@@ -175,14 +176,17 @@ namespace NongTrai
             if(index<0 || index>=Recipes.Length) return false;
             if(!CraftUnlocked(index)) { SayCraft(index==2?"Giỏ táo mở khi có ván từ xưởng cưa.":"Đào 30 khối ở map Khám phá để mở bản vẽ đèn.");return false; }
             var recipe=Recipes[index];
+            if(recipe.output==64&&(FarmWaterSystem.Instance==null||FarmWaterSystem.Instance.CanWater<8))
+            {SayCraft("Cần 8 nước trong bình tưới để đóng một bình nước dự trữ.");return false;}
             if(recipe.output>=100&&AdventureBag.Instance.Space(recipe.output)<1)
             {SayCraft("Cần một ô trống trong túi để nhận dụng cụ.");return false;}
             foreach(var input in recipe.inputs) if(inventory.Count(input.item)<input.count)
             { SayCraft("Thiếu "+input.count+" "+inventory.Name(input.item)+".");return false; }
             foreach(var input in recipe.inputs) inventory.Remove(input.item,input.count);
-            if(recipe.output>=100)AdventureBag.Instance.Pickup(recipe.output,1);else inventory.Add(recipe.output,1);
+            if(recipe.output==64)FarmWaterSystem.Instance.Consume(8);
+            if(recipe.output>=100)AdventureBag.Instance.Pickup(recipe.output,1);else inventory.Add(recipe.output,recipe.output==63?5:1);
             expansion.GainExperience(10);
-            SayCraft("Đã chế tạo 1 "+recipe.name+".");FarmAudio.Instance?.Play(FarmAudio.Cue.Harvest);return true;
+            SayCraft("Đã chế tạo "+(recipe.output==63?"5 mũi tên":"1 "+recipe.name)+".");FarmAudio.Instance?.Play(FarmAudio.Cue.Harvest);return true;
         }
         public void OnNewDay(int day)
         { if(day!=orderDay) GenerateOrders(day); }
@@ -236,10 +240,10 @@ namespace NongTrai
             var order=Orders[index];
             if(!inventory.Remove(order.item,order.count))
             { SayMail("Chưa đủ "+order.count+" "+inventory.Name(order.item)+" để giao.");return false; }
-            order.completed=true;CompletedOrders++;shop.Credit(order.reward);expansion.GainExperience(20+order.count*2+order.difficulty*5);
+            order.completed=true;CompletedOrders++;FarmRunner.Instance?.AwardTicket();shop.Credit(order.reward);expansion.GainExperience(20+order.count*2+order.difficulty*5);
             for(int next=0;next<Orders.Length;next++)if(!Orders[next].completed){selectedOrder=next;break;}
             int blockReward=20+(CompletedOrders-1)%6;inventory.Add(blockReward,2);
-            SayMail("Giao thành công: +"+order.reward+" xu và +2 "+inventory.Name(blockReward)+". Tổng đơn: "+CompletedOrders+".");
+            SayMail("Giao thành công: +1 vé Farm Runner • +"+order.reward+" xu và +2 "+inventory.Name(blockReward)+". Tổng đơn: "+CompletedOrders+".");
             FarmEffects.Burst(hud.player.transform.position+Vector3.up*2,"+"+order.reward+" xu",Color.yellow);
             FarmAudio.Instance?.Play(FarmAudio.Cue.Sell);FarmProcessing.Instance?.RefreshLocks();return true;
         }

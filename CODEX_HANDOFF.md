@@ -1,3 +1,126 @@
+# Bản hiện tại — Systems / HThinh.yy — 27/09/2026
+
+Live D:/GAME_NongTrai, mirror Git Nongtrai, branch main/origin https://github.com/NguyenHuuThinhyy/Nongtrai.git. Người dùng đã yêu cầu cập nhật Git đầy đủ cho nhóm: commit/push source đã kiểm tra, không chỉ giữ working changes như các bản trước. Runtime Builds/Windows-Systems/NongTrai.exe. Backup Recovery/Before-Systems-20260927-215005/UnitySource.zip và GitMirror-before-sync.zip. Không chạy CreateScene; SHA256 scene trùng backup.
+
+## Dữ liệu / thay đổi
+
+- Save21, đọc v2–20; ItemCount78, crafting25. Item64/71 để dành đọc dữ liệu cũ, không còn recipe hay loot phát sinh trong chơi thường. Item105 là xô duy nhất. PlayerInteraction.Update gọi TryWaterCanInteraction cho TRÁI trước tưới/đào; Explore.Update bỏ mining item105. Rỗng mới ScoopCan, đầy mới PourCan, EmptyBucket không tự lấy bình dự phòng. HeldItemVisual dựng xô có mặt nước đầy/rỗng, chỉ rebuild khi trạng thái đổi. Giữ API bơm/bình cũ cho tương thích/test cũ, UI chơi thường chỉ có xô và thuê vòi.
+- MigrateBuckets(v<21): quét products, warehouse/explored chests, placed chests, drops; bỏ64/71, hoàn28/12xu, dọn bag proxy, có bình cũ thì giữ/cấp105 nếu có ô; còn nước thì đầy, bỏ spareCans. Không đụng thuốc máu67. Không reset seed/map/level.
+- 72/73 bọt biển khô/đầy, building types15/16. Shop offer40 giá80xu, unlimited. FarmSponge.Absorb chỉ một lần, 3×3×3 ô quanh tâm; nguồn trong vùng bị xóa, dòng của nguồn đó rút. dryCells/farmDryCells lưu vùng đã hút để nước tự nhiên không lập tức đổ lại; đặt nguồn mới gần đó xóa dấu khô trong8ô. Type16 lưu trong BuildingState, phải thu vào túi, bán được. Mesh/material theo khối tái dùng; không tạo mỗi frame.
+- Seed proxy100–103 Sync theo stock thực, hết thì nhả ô; mua lại tự Insert. SellInspected bán được hạt/feed và mọi dụng cụ. SellEverything bán stock thật trước (kể cả >36stack), hàng hóa, rồi dụng cụ; không tái sinh công cụ. Shop offer41 xô50xu, bán25xu, không cho mua xô thứ hai. Còn mua xẻng/kiếm/rìu như cũ.
+- Vòi56 thuê350xu, hoạt động1080 giây game kể từ đặt; GameSeconds dùng Day+NormalizedTime nên ngủ qua ngày tính hạn. 3lượt/ngày, LV3/5/7 mở4/5/6. rentedToday+lastPortablePurchaseDay lưu. Bấm phải thu sớm kết thúc thuê, không hoànvoucher/lượt. Tự tưới6m, không Consume; trạm cũ cũng tự tưới. Nước đặt sát luống làm ẩm. UI nâng bình cũ bỏ vì xô chỉ đầy/rỗng.
+- 74/75 hạt bí pha lê/dâu hoàng kim; 76/77 sản phẩm240/360xu. FarmSpecialCrops.Install(FieldManager.Awake) clone crop3/4 thành index6/7,240/300giây, yield3; specialProduct ánh xạ inventory. Không mutation ngẫu nhiên cho2giống này để giữ phân loại sản phẩm. Rương boss:2hạt74+1hạt75; khôngshop/recipe. DefeatBoss/DefeatSurfaceBoss tạo boss:cave/boss:surface, FarmStorage lưu/stream rương theo vị trí; quiz đúng thả/sai xóa. Rươngguardtier4 cũng thêmhạt, specialLoot tránh nhân bản khi migrate.
+- FarmEnemyJump probe phía trước, giới hạn cao1.2m, kiểm khoảng đầu, impulse8.5/cooldown.9s. Dùng choCaveBoss/FarmChestGuard/DayPredator/NightWolf; CharacterController.Move vẫn chặn va chạm. FarmEnemyHealthBar chung, tên+HP/max, 35m; ẩn thanh nhỏ cũ. HUD máu người lớn hơn; RestoreHealth tắt deathPanel cũ khi tải save.
+- Góc phải dưới © HThinh.yy, header mã mới, COPYRIGHT.md ghi sở hữu phần gốc và giữ nguyên giấy phép asset bên thứ ba. Không tải model/texture mới, nhiều visual còn primitive như bản trước.
+
+## Kiểm tra / bàn giao
+
+Build Logs/build-systems-final.log FARM_M1_BUILD_OK100978671,169file runtime. Bộ riêng FarmSystemsChecks -farmSystemsOnly đã qua; gồm seed0/rebuy/sellall, sponge/full/save, thuê/level/reset/expire, bosschest/plant/harvest, boss thực sự nhảy1block, HP, migratebottles. FarmWaterCanChecks đổi input thật sang trái; các smoke cũ cập nhật seedslots/craft25/save21. Lượt full trước Logs/smoke-systems-release.log exit0; lượt cuối sau kiểm stock5000hạt Logs/smoke-systems-final.log exit0. Startup Logs/startup-systems-final.log responsive8s, không Exception/Error. Đã xem ảnh HP/copyright trong game. Trạng thái bàn giao cuối được ghi trong BAO_CAO_SYSTEMS.md và DongGoi/RELEASE-MANIFEST.json.
+
+Git chỉ source Assets/Packages/ProjectSettings + meta/docs/license. Không Library/Temp/Logs/Builds/DongGoi/Recovery. Không dùng force push. README hướng dẫn clone/open/build, CHOI_GAME đã đổi điều khiển nước.
+
+## Lịch sử trước Systems (quy tắc cũ về nước/vòi đã được thay)
+
+# Bản hiện tại — Bình tưới múc/đổ nước 27/09/2026
+
+Runtime `Builds/Windows-WaterCan/NongTrai.exe`. Backup `Recovery/Before-WaterCan-20260927-144955/UnitySource.zip`; mirror backup cùng thư mục. Không dựng lại scene, SHA256 Farm.unity trùng backup. Bản TNT cũ chuyển vào OldRelease trong backup.
+
+Item105 (bình tưới mặc định, ô6): PlayerInteraction.TryWaterCanInteraction được gọi cho chuột phải trước fallback ScanNearest. RayWater ưu tiên nước, tầm24m từ camera/6m từ người và chặn bởi collider. Múc nước nạp CanCapacity, không cần item64/71 và không trừ PumpStock. Đổ chỉ nhận địa hình/khối xây, thành công mới Consume toàn bộ CanWater hiện tại; dự phòng tự nạp theo luật cũ. Bấm trái trên cây giữ nguyên. Múc nguồn đã đặt xóa nguồn rồi dựng lại dòng; nước tự nhiên là nguồn vô hạn.
+
+FarmVoxelWater.ScoopCan/PourCan dùng nguồn voxel cũ ở Khám phá. FarmSurfaceWater thêm lưới giới hạn ở nông trại, đọc bounds từ Pond surface - decorative/Pond bottom của scene; chặn dòng bằng collider, tối đa64nguồn/7ô ngang/12000 bước dựng lại, mesh/material dùng chung không collider nước. Không thay khối đất. Nguồn trên đất nông trại lưu trong VoxelWaterState.farmSources (trường tùy chọn, giữ save20); pendingFarmSources giữ dữ liệu nếu auto-load trước Start. Vật phẩm bình rỗng71/bình dự trữ64 vẫn đọc/dùng như cũ.
+
+FarmWaterCanChecks: -farmSmokeCheck -farmWaterCanOnly, cũng chạy full suite trước creative. Test múc hồ/sông không bình phụ, input phải thật múc và đổ, lan nước, che tia ray/nhắm sai không mất nước, múc nguồn lại, save/load cả2map, trái tưới cây. HUD/tutorial nêu rõ ô6 và chuột phải.
+
+Build Logs/build-water-can-release.log: FARM_M1_BUILD_OK100958875. Full smoke/art Logs/smoke-water-can-release.log exit0, FARM_WATER_CAN_OK/FARM_TNT_OK và các checkpoint cũ. Startup Logs/startup-water-can-release.log phản hồi sau8s, không Exception/Error. Đã xem water-can-flow-preview.png. Báo cáo BAO_CAO_NUOC.md, gói/manifest trong DongGoi. Git mirror giữ working changes; không commit/push. Không tải asset mới.
+
+## Lịch sử trước bản WaterCan
+
+# Bản hiện tại — TNT châm bằng đuốc 27/09/2026
+
+Backup Recovery/Before-TNT-20260927-142343/UnitySource.zip. Save20, đọc v2–19; thêm TntRecord[] tnt. Không thay scene, không chạy CreateScene. Runtime mới Builds/Windows-TNT, build bằng FARM_BUILD_OUTPUT.
+
+FarmTnt tách khỏi ExplorationLandmarks sang FarmTnt.cs. Item69: PlayerInteraction xử lý trái/phải trước xây dựng/đào; ray24m, reach6m từ người, chỉ địa hình/PlacedBlock map Khám phá, CheckBox tránh vật khác/người; chỉ trừ TNT sau xác nhận vị trí. Item29 đuốc: trái/phải lên TNT → Ignite, không trừ đuốc. FarmBuildingSystem bỏ preview/đặt khi đang ngắm TNT với đuốc (không lệ thuộc thứ tự Update). Mining bỏ qua item69.
+
+Ngòi phase0..9, mỗi pha .5s: chẵn sáng, lẻ tắt; năm nhịp hoàn chỉnh rồi nổ phase10. Frame khựng chỉ chuyển một pha để không bỏ nháy. Châm lặp không reset. Tạm dừng khi pause/ngoài Khám phá. Save lưu vị trí, ignited, phase, remaining; World.Restore ClearAll, Save.Load restore TNT sau world/building; không tự châm TNT mới. Blast giữ bán kính/loot/sát thương25 cũ, tầng đáy/cổng bảo vệ vẫn do MineCell kiểm.
+
+FarmTntChecks: -farmSmokeCheck -farmTntOnly; cũng nằm trong full suite trước creative. Kiểm không tự nổ, đuốc đúng, không trừ/đặt đuốc, 5 nháy/long frame, pause, save/load unlit và lit, blast, invalid placement, input chuột trái thật.
+
+Build Logs/build-tnt-release.log OK100947275. Full smoke/art Logs/smoke-tnt-release.log exit0, không exceptions, bao gồm input trái thật châm TNT. Startup Logs/startup-tnt-release.log responsive8s. Runtime169files/100947275bytes. Chi tiết: BAO_CAO_TNT.md.
+
+## Lịch sử trước sửa TNT
+
+# Bản hiện tại — AdventureFeedback 27/09/2026
+
+Live D:/GAME_NongTrai; mirror D:/GAME_NongTrai/Nongtrai. Backup Recovery/Before-AdventureFeedback-20260927-135229/UnitySource.zip. Không chạy CreateScene. BuildWindowsCurrentScene nhận env FARM_BUILD_OUTPUT; bản này ở Builds/Windows-AdventureFeedback, không ghi đè scene.
+
+Save19 / ItemCount72 / JSON27 / generator5 cho map mới. Item71 bình rỗng; múc 71→64, đổ/tiếp bình tưới 64→71. FarmVoxelWater dùng cùng flood fill cho mép sông đào trống và nguồn đổ, giới hạn reach7, tối đa64 nguồn; mesh riêng ở world. RayWater truy vấn nước trước terrain, không thêm collider rắn cho mặt nước. IsSubmerged đọc wet, SurfaceAt đọc cột nước. Space thoát nước bằng xung nhảy. WildWaterDistance cache tối đa65536 cột, seed tạo hồ/nhánh sông ngoài vùng landmark; giữ gen cũ khi load save để tránh đổi địa hình đã chơi.
+
+Walk6/run9, IsSprinting dựa vận tốc thực, HungerRate .03/.12. Pitch[-65,90], shoulder offset về0 khi nhìn xuống; FarmAim và reticle tại viewport .5/.5. Placement bỏ vòng cấm1.25m nhưng vẫn CheckBox va chạm thật. FarmerAnimation procedural Work/Attack/Place + shared trail; giữ hat/head, root clamp và palm socket (.25,0,.0285). FarmActionFeedback dùng1 emitter tối đa256particles, shared material. CanReach kiểm độ cao và ray vật cản để chặn cắn xuyên tầng/vách.
+
+FarmPlayer.TryAttack cooldown .3*(1-haste%). BagSlot chứa forgeLevel/bonusDamage/criticalChance/haste và Copy sao đầy đủ; Forge Levels chỉ là API tương thích. Save<19 migrate levels sau Bag.Restore; v19 không ghi đè chỉ số riêng. WorldPickup/PickupRecord lưu BagSlot khi rơi vũ khí do chết. Roll1đá+80xu: ST1..12, crit3..18, haste0..20; critx1.5, cung haste làm kéo nhanh. SwordLV5 +12ST vàHeal3/hit. UI36ô kéo/bấm giữ nguyên; bán/bỏ kiếm/rìu/cung trong túi.
+
+LootChestRecord guardTier/guardDefeated, FarmChest sở hữu guard và hủy cùng chest, không để attacker mồ côi khi unload. Spawn1/24 chunk,max2 gần player; tier1 sói160HP, tier2 rắn220HP, tier3 gấu420HP, tier4 golem1400HP. Quái canh đánh10/12/24/40, báo trước. Bậc cao đá/kim loại/máu/tên/nước nhiều hơn. Save lưu trạng thái hạ quái; câu đố vẫn đúng thả đồ/sai mất rương. Các visual quái canh là mesh primitive tự dựng, không asset tải mới.
+
+CreativeModeManager nút Chơi lại từ đầu xác nhận rồi ArchiveForNewGame (di chuyển .bak/.tmp trước, active save cuối), SceneManager.LoadScene, bắt đầu LV1; Cancel không thay đổi. Mở EXE thông thường vẫn Load manual save. Luật đổi map/respawn giữ nguyên.
+
+Kiểm thử: FarmAdventureFeedbackChecks có flag -farmFeedbackOnly (đi cùng -farmSmokeCheck). Full suite chạy feedback trước khi chuyển sang creative, vì Save bị khóa trong creative. Test dùng temporaryCachePath, không ghi save người dùng. Báo cáo và kết quả cuối: BAO_CAO_ADVENTURE_FEEDBACK.md.
+
+Build release Logs/build-feedback-release.log OK100936715. Full smoke+art Logs/smoke-feedback-release.log exit0, không exceptions. Startup Logs/startup-feedback-release.log alive/responding8s. Runtime169files/100936715bytes. Gói AdventureFeedback-20260927 + manifest trong DongGoi. Scene SHA256 không đổi so với backup. Không tải asset mới; giữ giấy phép CC0.
+
+## Lịch sử các bản trước — thông tin sau đây có thể đã cũ
+
+# Bản hiện tại — Polish / sửa nhớ vị trí đổi map 27/09/2026
+
+Live D:/GAME_NongTrai; Git mirror D:/GAME_NongTrai/Nongtrai. Backup Recovery/Before-Polish-20260927/UnitySource.zip + GitMirror-before-sync.zip. Không chạy CreateScene. BuildWindowsCurrentScene build hiện trạng; UpgradeFarmerInScene chỉ thay visual.
+
+Người dùng sửa lại “thêm tóc” thành tốc chạy. Cuối cùng giữ tóc gốc; runSpeed9, walkSpeed4, gia tốc28/hãm34. Hat child head. Generic arm palm (.25,0,.0285) theo source rig +X; FarmerAnimation.UpdateSocket chạy SAU chỉnh xương, gripRotation hiệu chỉnh từ idle, không dùng +90 Z cũ (chĩa vũ khí dọc cẳng tay). Clamp rigRoot local position để không nhân đôi nhảy. HeldItemVisual cache material, tắt collider ngay.
+
+Save18 / ItemCount71 / JSON26 / generator4. Item70=portal, buildingtype14. FarmTravelPortal.Active tách cổng gốc; Arrival tìm lối đi phía trước/sau, fallback cổng gốc khi thiếu/bị chặn. Theo đính chính: chỉ chết hồi sinh mới dùng cổng. Travel giữ farmPosition/explorePosition như cũ, kể cả khi chưa đặt cổng. Lưu cổng bằng BuildingState. FarmPlayer.IslandSafePoint chỉ trả marker cổng gốc, không gọi Arrival lúc teleport (tránh nạp thêm chunk quanh cổng khi điểm đến ở xa). Save cũ giữ seed/edits, migrate gen4.
+
+FarmVoxelWater sinh sông tây(-36,0), biển nam(0,-75), world mesh không parent Canvas; thêm 4 quad chân trời ngoài vùng tương tác. Player bơi/nổi cơ bản Space ngoi. Quặng1/83, than1/61. BossHP2400, damage38/52, windup.7/.5, enraged nửa máu.
+
+CreativeModeManager.ReturnToMainMenu nay chỉ mở xác nhận. ConfirmRestart(true) Save thành công mới reload; false bỏ phần chưa lưu có cảnh báo; CancelRestart giữ tiến độ. UI “Chơi game lại”. FarmForge có lưới36ô+2đích click/drop, chỉ chọn tham chiếu; không trừ trước, không tạo bản sao inventory.
+
+Runner dùng substeps1/60, HUD10Hz, 5 difficulty tiers, 10–26m/s, 6segment/40m pool, 1–3 hàng, đổi safe lane mỗi hàng, xe tràn từ lề sau500m (dừng dịch khi còn26m). Clamp dt chỉ >.5s. Không cam kết FPS mọi máy.
+
+Đã build Logs/build-travel-fix-final.log: FARM_M1_BUILD_OK100909789. Toàn bộ smoke Logs/smoke-travel-fix-final.log exit0. FarmPolishChecks dùng farm-polish-smoke-save.json ở temporaryCachePath; kiểmLV4, tốc9m/s, hat/socket, nước/ore, portal fullsave+respawn, forge click/drop. Runner test frame200ms/250ms đổi làn và2050m. Startup thường8s responsive, không exceptions. Báo cáo BAO_CAO_POLISH.md, hướng dẫn CHOI_GAME.md, gói/manifest trong DongGoi. Asset licenses CC0 giữ nguyên, không tải mới. Nhiều công trình/dụng cụ/predators/Golem vẫn primitive, NPC chưa có.
+
+## Lịch sử trước bản Polish (có thông tin đã cũ)
+
+# Trạng thái đang bàn giao — cập nhật 27/09/2026
+
+Nguồn Unity thật: `D:\GAME_NongTrai`; Git mirror: `D:\GAME_NongTrai\Nongtrai`. Không chạy CreateScene. Backup trước cập nhật: `Recovery/Before-Runner-20260927/UnitySource.zip`.
+
+## Bản phát hành đã kiểm tra
+
+Build `Logs/build-runner-final.log`: FARM_M1_BUILD_OK 100885906. Smoke `Logs/smoke-runner-final.log`: exit0, cả legacy và test mới, Runner đi2050m/quà2km, boss đánh trong vùng. Startup thường phản hồi sau8s. Đã kiểm ảnh hồ có nước; mặt nước phải là world GameObject độc lập, tuyệt đối không parent vào Canvas. Chi tiết: BAO_CAO_FARM_RUNNER.md. Nhân vật hiện là **Kenney e1,90m**, yếm xanh/áo kem/mũ rơm/da sáng; các mẫu a/b/c/d/f và SurvivalKit không dùng đã chuyển Recovery sau GUID audit. Source mirror sẽ giữ working changes, không push tự động.
+
+## Thay đổi mới
+
+FarmRunner.cs tạo scene runtime riêng với full-screen camera, pause farm, pool 6 đoạn, input A/D/W/Space/S, vé hồi theo UTC, tiền chung, quà mốc. Tab gọi Runner; FarmDeliveryRush cũ giữ source/dữ liệu migration nhưng không còn là mục Tab. Hộp thư vẫn giao đơn và tặng vé. Demo chưa có skin/cánh/đổi giới tính.
+
+FarmConsumption: giữ trái đủ3s mới ăn, cancel khi đổi/thả; bình máu67. FarmerRunEffects bụi chân; FarmerAnimation dùng góc gốc để tránh tích lũy xoay xương.
+
+ItemCount70: 63 tên,64 nước,65 bàn rèn,66 than,67 bình máu,68 đá nâng cấp,69 TNT. JSON25 công thức. Forge sửa lỗi colors[13] vượt mảng, tách mở bàn khỏi mining, chọn106/111/107 + đá68. Save17 lưu weaponLevels,runner,voxelWater,machineFuel,preferredFuel. Legacy v2–16 đọc được; generator3 tạo hồ/đấu trường/làng/hố sâu ở vùng cố định, giữ excavated/additions.
+
+FarmVoxelWater: nguồn + mesh chung; rơi/lan7ô; block placement displacement; giới hạn64nguồn người chơi. Không bơi/áp lực nước. ExplorationLandmarks: làng/tế đàn bằng geometry Unity, boss home/leash. Than block9 trong tầng đá; lò bánh/nung gỗ30s,than120s. Arrow ghim/follow transform và thu hồi trong3phút (chưa lưu riêng tên đang ghim).
+
+FarmStorage clone mảng rương, khóa chuyển đồ khi bảng đóng/rương đã mất, mở phải nhắm rương. Không alias save snapshots. Building.Restore tắt object cũ trước Destroy để không còn collider trong cùng frame.
+
+Smoke mới: FarmNewFeaturesChecks; toàn bộ BuildSmokeCheck và FarmVisualChecks vẫn chạy bằng `-farmSmokeCheck -farmArtCheck`, dùng save tạm, không đụng save người chơi. Kết quả cuối ghi ở báo cáo bản phát hành; không suy ra pass chỉ từ mô tả này.
+
+## Ghi chú lịch sử bên dưới
+
+Các đường dẫn build, số version, NEXT TASK và lỗi trong phần lịch sử có thể đã cũ. Ưu tiên mã hiện tại và phần cập nhật này. Build scene hiện tại bằng `NongTrai.Editor.FarmProjectBuilder.BuildWindowsCurrentScene`.
+
+---
+
+# CẬP NHẬT HÌNH ẢNH VÀ DI CHUYỂN — 25/09/2026
+
+- Scene và `FarmProjectBuilder` hiện dùng Kenney Mini Characters `character-male-a.fbx` CC0. Builder đã bỏ đường dẫn Quaternius người cũ để tránh lần dựng sau ghi đè model mới. Bò/heo/cừu dùng Quaternius FBX, gà OBJ; cây Kenney Nature Kit. File cũ không còn tham chiếu đã chuyển vào `Recovery/ArtRepair-20260925/UnusedAssets`; bản sao source trước sửa ở `Recovery/ArtRepair-20260925/before-repair.zip`.
+- Di chuyển nhân vật được tăng/giảm tốc, vật nuôi dùng Rigidbody interpolation và dừng ngay khi pause. Rơi cao gây mất máu; cáo/rắn/sói lùi sau cắn. Lúa mì vàng ấm, bụi việt quất xanh lá, icon quả nổi trên tán đã bỏ; ánh sáng và sương map khám phá điều chỉnh để dễ nhìn. `BuildSmokeCheck` kiểm tra rơi cao và câu đố rương; `FarmVisualChecks` chụp ảnh và kiểm tra model/vật liệu khi chạy cùng `-farmSmokeCheck -farmArtCheck`.
+- Rương khám phá có câu hỏi mở khóa; trạng thái `LootChestRecord.unlocked` lưu cùng storage hiện tại, bản lưu cũ đọc được với mặc định khóa. Các yêu cầu trong bản đính kèm về cung giữ-thả, hang sâu rộng, minigame giao hàng năm màn và cường hóa kiếm chưa được triển khai; cần làm theo từng hệ thống và kiểm tra riêng, không gộp với dữ liệu save v15 nếu chưa có migration.
+
 # CẬP NHẬT ƯU TIÊN — 25/09/2026: BẢN v15
 
 Ưu tiên code hiện tại, `README.md` và `CHOI_GAME.md` trước các ghi chú v14 trở xuống.
@@ -72,6 +195,8 @@ Thông tin dưới mục này về bốn đảo, NPC, đấu giá và minigame �
 ---
 
 # CODEX HANDOFF — Nông Trại / First Harvest
+
+> **CẬP NHẬT 2026-09-25 (bản phản hồi nhân vật/gameplay):** Dự án Unity gốc ở `D:\GAME_NongTrai`, Git mirror ở `Nongtrai`. Trước khi sửa đã lưu `Recovery/Before-Feedback-20260925/UnitySource-before-feedback.zip`. Scene chỉ thay visual nhân vật bằng `FarmProjectBuilder.UpgradeFarmerInScene`; **không** chạy `CreateScene`/`RebuildSceneAndBuildWindows`. Model người chơi là Kenney Mini Characters `character-male-b.fbx` CC0 cao 1,82 m, có mũ rơm và gait tay/chân bổ sung. `HeldItemVisual` sửa lỗi ô trống vẫn vẽ giỏ lớn trước mặt. Rương khám phá đúng rơi đồ và biến mất, sai biến mất không thưởng. Bàn chế tạo có cung, 5 mũi tên, bình nước dự trữ và bàn rèn (22 công thức). `FarmBow` dùng giữ/thả chuột; `FarmDeliveryRush` vào qua Tab, có năm tuyến 3D và save tiến độ; `FarmForge` cường hóa kiếm LV1–5. Hang mới rộng hơn ở vùng tạo mới, hang boss gần ô (72,72) có Golem sau 30 khối đào, thưởng quặng/kim loại/XP. Save schema v16, đọc v2–v15. Smoke/bản Windows cuối cần xem log mới nhất `Logs/build-feedback-final.log`, `Logs/smoke-feedback-final.log` sau khi đóng gói; ảnh art ở `Builds/Windows-3DArt/ArtChecks`.
 
 > **CẬP NHẬT 2026-09-23:** Kế hoạch từng được ghi là “chưa triển khai” trong tài liệu này đã được triển khai sau khi handoff được tạo. Trạng thái đúng hiện nằm trong code: `FarmWaterSystem.cs`, `FarmCraftOrders.cs`, `CreativeModeManager.cs`, bản lưu v5, hotbar bắt buộc, cây 2/3/5 phút, túi 20 món và scene/build mới. README/CHOI_GAME cùng lịch sử Git mới hơn là nguồn chính xác hơn các đoạn trạng thái cũ bên dưới.
 

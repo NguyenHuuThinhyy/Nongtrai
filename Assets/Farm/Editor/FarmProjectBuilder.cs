@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using NongTrai;
 using Unity.Cinemachine;
 using UnityEditor;
@@ -246,9 +246,18 @@ namespace NongTrai.Editor
         static void Tree(Transform parent, Vector3 p, float s,int id)
         {
             var root=Pivot("Cây gỗ nông trại "+id,parent,p);root.gameObject.AddComponent<FarmDecorTree>().id=id;
-            Shape("Tree trunk", PrimitiveType.Cylinder, Vector3.up * 1.7f * s, new Vector3(0.65f, 1.7f, 0.65f) * s, wood, root);
-            Shape("Tree crown", PrimitiveType.Sphere, Vector3.up * 4.4f * s, new Vector3(4.5f, 4.3f, 4.2f) * s, leaves, root, false);
-            Shape("Tree crown highlight", PrimitiveType.Sphere, new Vector3(1, 5.2f, -0.5f) * s, new Vector3(3, 2.8f, 3) * s, grass, root, false);
+            string[] trees={"tree_default.fbx","tree_oak.fbx","tree_fat.fbx","tree_pineRoundA.fbx"};
+            string path=Root+"Models/Imported/Kenney_NatureKit/"+trees[Mathf.Abs(id)%trees.Length];
+            if(FarmImportedModelBuilder.Attach(path,root,"Tán và thân cây",5.4f*s)==null)
+            {
+                Shape("Tree trunk", PrimitiveType.Cylinder, Vector3.up * 1.7f * s, new Vector3(0.65f, 1.7f, 0.65f) * s, wood, root);
+                Shape("Tree crown", PrimitiveType.Sphere, Vector3.up * 4.4f * s, new Vector3(4.5f, 4.3f, 4.2f) * s, leaves, root, false);
+                Shape("Tree crown highlight", PrimitiveType.Sphere, new Vector3(1, 5.2f, -0.5f) * s, new Vector3(3, 2.8f, 3) * s, grass, root, false);
+            }
+            else
+            {
+                var collider=root.gameObject.AddComponent<CapsuleCollider>();collider.center=Vector3.up*1.65f;collider.radius=.38f;collider.height=3.4f;
+            }
         }
         static void Fence(Transform parent, Vector3 p, bool sideways)
         {
@@ -286,11 +295,12 @@ namespace NongTrai.Editor
             if (config == null) { config = ScriptableObject.CreateInstance<NongTrai.PlayerSettings>(); AssetDatabase.CreateAsset(config, Root + "Data/PlayerSettings.asset"); }
             var root = new GameObject("Player"); root.layer = 8; root.transform.position = new Vector3(0, 0.15f, 0);
             var controller = root.AddComponent<CharacterController>();
-            controller.height = 1.85f; controller.radius = 0.32f; controller.center = Vector3.up * 0.925f;
+            controller.height = 2.05f; controller.radius = 0.32f; controller.center = Vector3.up * 1.025f;
             controller.stepOffset = 0.3f; controller.slopeLimit = 45;
             controller.minMoveDistance = 0;
             root.AddComponent<FarmInput>();
             var player = root.AddComponent<FarmPlayer>(); player.settings = config;
+            root.AddComponent<FarmBow>();
             var visual = new GameObject("Visual - replace with rigged farmer").transform; visual.SetParent(root.transform, false);
             player.visual = visual;
             BuildFarmer(visual);
@@ -317,6 +327,13 @@ namespace NongTrai.Editor
                 if (crop == null) { crop = ScriptableObject.CreateInstance<CropDefinition>(); AssetDatabase.CreateAsset(crop, path); }
                 crop.displayName = cropNames[i]; crop.growthSeconds = new[]{120f,180f,300f,420f,540f,720f}[i];
                 crop.yield=new[]{3,3,3,2,2,1}[i];crop.fruitColor = colors[i];
+                crop.stageVisuals=null;crop.fruitVisual=null;
+                if(i==0)
+                {
+                    crop.stageVisuals=new GameObject[4];
+                    for(int stage=0;stage<4;stage++)crop.stageVisuals[stage]=FarmImportedModelBuilder.CropPrefab(stage==0?"crops_wheatStageA.fbx":"crops_wheatStageB.fbx","WheatStage"+stage,new[]{.18f,.35f,.55f,.72f}[stage]);
+                }
+                if(i==3)crop.fruitVisual=FarmImportedModelBuilder.CropPrefab("crop_pumpkin.fbx","PumpkinFruit",.35f);
                 EditorUtility.SetDirty(crop); field.crops[i] = crop;
             }
             interaction.field = field;
@@ -348,7 +365,7 @@ namespace NongTrai.Editor
             hud.instructions=Panel(hud.pausePanel.transform,"Instructions",new Vector2(595,-35),new Vector2(665,510),new Color(.15f,.25f,.19f,1));
             Label(hud.instructions.transform,"HƯỚNG DẪN\n\nWASD đi • Shift chạy • Space nhảy\nChuột nhìn • V đổi góc nhìn • E bản đồ nhiệm vụ\n1–3 Hạt • 5 Xẻng xới/đào • 6 Tưới • 7 Kiếm\nCây chín click trái để hái tay • 8 Rìu đốn nhanh\nB Túi đồ rồi chọn Shop/Xây dựng • M Máy chế biến\nTrái đặt/giữ phá • R xoay • Tab Đổi map\nF cho thú ăn • Click máng để cho cả chuồng ăn\nThịt sống + đống lửa: click để nướng 10 giây\nX hoặc Esc đóng bảng • Sáng tạo F8 bay\nMáu cạn: chọn trả 100 xu hoặc rơi 3 món\n\nThoát không tự lưu. Nhấn Lưu game để lưu.",new Vector2(25,-25),new Vector2(615,470),19,Color.white);
             Button(hud.pausePanel.transform,"Cài đặt âm lượng",new Vector2(560,-415),hud.OpenSettings);
-            Button(hud.pausePanel.transform,"Về menu chính",new Vector2(560,-315),hud.ReturnToMain);
+            Button(hud.pausePanel.transform,"Chơi game lại",new Vector2(560,-315),hud.ReturnToMain);
             hud.instructions.SetActive(false);
             hud.pausePanel.SetActive(false);
             BuildShop(hud,interaction);
@@ -382,12 +399,26 @@ namespace NongTrai.Editor
 
         public static void BuildWindows()
         {
+            BuildWindowsCurrentScene();
+        }
+
+        public static void RebuildSceneAndBuildWindows()
+        {
             CreateScene();
-            Directory.CreateDirectory("Builds/Windows");
+            BuildWindowsCurrentScene();
+        }
+
+        public static void BuildWindowsCurrentScene()
+        {
+            if (!File.Exists(Root + "Scenes/Farm.unity"))
+                throw new System.Exception("Main Farm scene is missing; create it from the Unity menu first.");
+            string outputDirectory=System.Environment.GetEnvironmentVariable("FARM_BUILD_OUTPUT");
+            if(string.IsNullOrEmpty(outputDirectory))outputDirectory="Builds/Windows-3DArt";
+            Directory.CreateDirectory(outputDirectory);
             var result = BuildPipeline.BuildPlayer(new BuildPlayerOptions
             {
                 scenes = new[] { Root + "Scenes/Farm.unity" },
-                locationPathName = "Builds/Windows/NongTrai.exe",
+                locationPathName = outputDirectory + "/NongTrai.exe",
                 target = BuildTarget.StandaloneWindows64,
                 options = BuildOptions.None
             });

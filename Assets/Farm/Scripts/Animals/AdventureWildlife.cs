@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 namespace NongTrai
@@ -95,11 +95,21 @@ namespace NongTrai
         public void Hit()
         {
             var bag=AdventureBag.Instance;if((bag.Item==104||bag.Item==106||bag.Item==107)&&!bag.DamageTool())return;
-            record.health-=bag.Item==106?20+(FarmExpansion.Instance==null?0:FarmExpansion.Instance.ToolTiers[2]*5):bag.Item==107?15:5;flee=5;
+            int damage=bag.Item==106?20+(FarmExpansion.Instance==null?0:FarmExpansion.Instance.ToolTiers[2]*5)+(FarmForge.Instance==null?0:FarmForge.Instance.SwordDamageBonus):bag.Item==107?15+(FarmForge.Instance==null?0:FarmForge.Instance.AxeDamageBonus):5;
+            record.health-=FarmForge.Instance==null?damage:FarmForge.Instance.ResolveMelee(damage,transform.position+Vector3.up);flee=5;
             knockback=(transform.position-manager.Player.transform.position).normalized*3.5f;knockback.y=0;
             if(record.health>0)return;record.dead=true;record.respawnRemaining=UnityEngine.Random.Range(480f,780f);
             int meat=record.species==0?57:record.species==1?7:record.species==2?58:59;
             WorldPickup.Spawn(meat,record.age<180?1:record.species==3?2:3,transform.position);if(record.species==2)WorldPickup.Spawn(6,2,transform.position);
+            gameObject.SetActive(false);Destroy(gameObject);
+        }
+        public void HitRanged(Vector3 attacker,int damage)
+        {
+            record.health-=damage;flee=5;knockback=(transform.position-attacker).normalized*2.2f;knockback.y=0;
+            if(record.health>0)return;record.dead=true;record.respawnRemaining=UnityEngine.Random.Range(480f,780f);
+            int meat=record.species==0?57:record.species==1?7:record.species==2?58:59;
+            WorldPickup.Spawn(meat,record.age<180?1:record.species==3?2:3,transform.position);
+            if(record.species==2)WorldPickup.Spawn(6,2,transform.position);
             gameObject.SetActive(false);Destroy(gameObject);
         }
     }

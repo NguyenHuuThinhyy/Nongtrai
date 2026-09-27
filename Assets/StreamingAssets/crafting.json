@@ -184,8 +184,14 @@
       "name": "Rương đồ",
       "output": 36,
       "inputs": [
-        { "item": 20, "count": 4 },
-        { "item": 14, "count": 1 }
+        {
+          "item": 20,
+          "count": 4
+        },
+        {
+          "item": 14,
+          "count": 1
+        }
       ]
     },
     {
@@ -193,27 +199,173 @@
       "name": "Đống lửa",
       "output": 37,
       "inputs": [
-        { "item": 20, "count": 3 },
-        { "item": 21, "count": 2 }
+        {
+          "item": 20,
+          "count": 3
+        },
+        {
+          "item": 21,
+          "count": 2
+        }
       ]
     },
     {
       "id": "shovel",
       "name": "Xẻng",
       "output": 104,
-      "inputs": [ { "item": 20, "count": 2 }, { "item": 21, "count": 2 } ]
+      "inputs": [
+        {
+          "item": 20,
+          "count": 2
+        },
+        {
+          "item": 21,
+          "count": 2
+        }
+      ]
     },
     {
       "id": "sword",
       "name": "Kiếm",
       "output": 106,
-      "inputs": [ { "item": 20, "count": 1 }, { "item": 15, "count": 2 } ]
+      "inputs": [
+        {
+          "item": 20,
+          "count": 1
+        },
+        {
+          "item": 15,
+          "count": 2
+        }
+      ]
     },
     {
       "id": "axe",
       "name": "Rìu",
       "output": 107,
-      "inputs": [ { "item": 20, "count": 2 }, { "item": 15, "count": 1 } ]
+      "inputs": [
+        {
+          "item": 20,
+          "count": 2
+        },
+        {
+          "item": 15,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "wooden_bow",
+      "name": "Cung gỗ",
+      "output": 111,
+      "inputs": [
+        {
+          "item": 20,
+          "count": 3
+        },
+        {
+          "item": 6,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "arrows",
+      "name": "5 mũi tên",
+      "output": 63,
+      "inputs": [
+        {
+          "item": 20,
+          "count": 1
+        },
+        {
+          "item": 21,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "forge_table",
+      "name": "Bàn rèn",
+      "output": 65,
+      "inputs": [
+        {
+          "item": 20,
+          "count": 4
+        },
+        {
+          "item": 21,
+          "count": 4
+        },
+        {
+          "item": 15,
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "health_potion",
+      "name": "Bình máu (+50 HP)",
+      "output": 67,
+      "inputs": [
+        {
+          "item": 3,
+          "count": 2
+        },
+        {
+          "item": 48,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "upgrade_stone",
+      "name": "Đá nâng cấp",
+      "output": 68,
+      "inputs": [
+        {
+          "item": 13,
+          "count": 5
+        },
+        {
+          "item": 15,
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "tnt",
+      "name": "TNT",
+      "output": 69,
+      "inputs": [
+        {
+          "item": 66,
+          "count": 3
+        },
+        {
+          "item": 20,
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "respawn_portal",
+      "name": "Cổng hồi sinh khám phá",
+      "output": 70,
+      "inputs": [
+        {
+          "item": 21,
+          "count": 8
+        },
+        {
+          "item": 15,
+          "count": 3
+        },
+        {
+          "item": 68,
+          "count": 1
+        }
+      ]
     }
   ]
 }

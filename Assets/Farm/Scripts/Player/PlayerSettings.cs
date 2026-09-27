@@ -1,12 +1,12 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace NongTrai
 {
     [CreateAssetMenu(menuName = "Nong Trai/Player Settings")]
     public sealed class PlayerSettings : ScriptableObject
     {
-        public float walkSpeed = 4;
-        public float runSpeed = 7;
+        public float walkSpeed = 6;
+        public float runSpeed = 9;
         public float jumpHeight = 1.6f;
         public float gravity = -22;
         public float mouseSensitivity = 0.12f;

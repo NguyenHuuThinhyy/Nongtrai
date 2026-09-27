@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace NongTrai
@@ -7,7 +7,7 @@ namespace NongTrai
     // không phụ thuộc font hay asset bên ngoài.
     public static class FarmItemIconLibrary
     {
-        public static int ForItem(int item)=>item==104?21:item==105?22:item==106?23:item==107?24:item==108?25:item==26?100:item==27?54:item>=28&&item<=37?40+item-28:item==38?55:item==39?56:item>=40&&item<=55?73+item-40:item>=56&&item<=62?89+item-56:item>=20&&item<=25?10+item:item;
+        public static int ForItem(int item)=>item==72?35:item==73?31:item==74?73:item==75?74:item==76?76:item==77?77:item==71?119:item==70?118:item==66?114:item==67?115:item==68?116:item==69?117:item==111?110:item==63?111:item==64?112:item==65?113:item==104?21:item==105?22:item==106?23:item==107?24:item==108?25:item==26?100:item==27?54:item>=28&&item<=37?40+item-28:item==38?55:item==39?56:item>=40&&item<=55?73+item-40:item>=56&&item<=62?89+item-56:item>=20&&item<=25?10+item:item;
         public static UnityEngine.UI.Image Attach(Transform parent,int item,Vector2 position,Vector2 size)
         {
             var go=new GameObject("Minh họa "+item,typeof(RectTransform),typeof(UnityEngine.UI.Image));
@@ -33,6 +33,12 @@ namespace NongTrai
             Color gold=Hex("F0C94B"),red=Hex("E64E3F"),cream=Hex("F6E7B0"),blue=Hex("54A9D8"),gray=Hex("AEB9BC");
             switch(id)
             {
+                case 119: Rect(p,22,9,42,43,gray);Rect(p,25,14,39,37,cream);Rect(p,27,42,37,55,brown);break;
+                case 118: Rect(p,9,8,19,52,gray);Rect(p,45,8,55,52,gray);Rect(p,9,48,55,58,gray);Line(p,16,20,16,40,blue,3);Line(p,48,20,48,40,blue,3);break;
+                case 114: Disk(p,26,27,17,Hex("202932"));Disk(p,42,33,12,Hex("38404B"));break;
+                case 115: Rect(p,17,12,47,43,red);Rect(p,25,43,39,55,brown);Rect(p,28,19,36,37,cream);Rect(p,22,25,42,32,cream);break;
+                case 116: Triangle(p,10,32,32,57,54,32,blue);Triangle(p,10,32,54,32,32,7,Hex("88E1F2"));break;
+                case 117: Rect(p,12,12,52,48,red);Rect(p,12,26,52,37,cream);Line(p,32,48,42,58,brown,3);break;
                 case 0: Line(p,31,10,31,50,green,4);for(int y=21;y<52;y+=8){Disk(p,24,y,5,gold);Disk(p,38,y+3,5,gold);}break;
                 case 1: Disk(p,32,31,20,red);Rect(p,29,49,35,56,green);Line(p,22,51,42,51,green,4);break;
                 case 2: Line(p,18,14,45,50,green,5);for(int i=0;i<3;i++) Disk(p,25+i*8,25+i*8,7,lightGreen);break;
@@ -103,6 +109,10 @@ namespace NongTrai
                     for(int x=12;x<=55;x+=14)Line(p,x,9,x,31,brown,4);break;
                 case 100: Rect(p,9,23,55,33,brown);for(int x=15;x<=49;x+=33)Rect(p,x,10,x+5,23,brown);
                     Line(p,13,42,50,42,cream,5);Line(p,22,34,22,52,gray,4);break;
+                case 110: Arc(p,18,32,21,brown);Line(p,32,13,32,52,cream,2);break;
+                case 111: Line(p,10,31,54,31,brown,5);Triangle(p,43,24,59,31,43,38,gray);break;
+                case 112: Rect(p,21,12,44,50,blue);Rect(p,25,47,40,54,gray);Disk(p,32,32,8,cream);break;
+                case 113: Rect(p,10,38,54,48,gray);Rect(p,25,19,43,38,gray);Rect(p,16,48,49,54,brown);break;
                 default: Rect(p,13,13,51,51,dark);break;
             }
         }

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 namespace NongTrai
 {
     public enum PlotState { Untilled, Tilled, Growing, Ready }
@@ -14,14 +14,16 @@ namespace NongTrai
         int stage = -1;
         static Material green, stem;
         Material fruit;
+        Renderer[] importedFruitRenderers;
+        MaterialPropertyBlock fruitBlock;
         void Start() => Highlight(false);
         string RequiredAction => State==PlotState.Untilled?"chọn Cuốc":State==PlotState.Tilled?"chọn Hạt giống":
-            State==PlotState.Ready?"hái tay":"chọn Bình tưới";
+            State==PlotState.Ready?"hái tay":"thuê vòi / đặt nước cạnh ruộng";
         public string Description => FarmExpansion.Instance!=null && !FarmExpansion.Instance.IsUnlocked(this)
             ? "Vùng đất chưa mở • [N] Mua đất khi đủ cấp" : State == PlotState.Untilled ? "Đất trống • chọn Cuốc rồi [Chuột trái]" :
             State == PlotState.Tilled ? "Đất đã cày • chọn Hạt giống rồi [Chuột trái]" :
             State == PlotState.Ready ? Crop.displayName + (Mutated?" đột biến":"") + " chín • [Chuột trái] để hái" :
-            Crop.displayName + " • " + Mathf.FloorToInt(Growth * 100) + "% • Nước " + Mathf.CeilToInt(Moisture * 100) + "% • "+RequiredAction+" rồi [Chuột trái]";
+            Crop.displayName + " • " + Mathf.FloorToInt(Growth * 100) + "% • Nước " + Mathf.CeilToInt(Moisture * 100) + "% • "+RequiredAction;
         public string InteractionHint => Description;
         public bool CanInteract(FarmPlayer player) => true;
         public void Interact(PlayerInteraction actor)
@@ -35,7 +37,7 @@ namespace NongTrai
             {
                 Crop = selected; State = PlotState.Growing; Growth = 0; Moisture = 0;
                 fruit = Material(Crop.fruitColor); Refresh();
-                return "Đã gieo " + Crop.displayName + ". Chọn Bình tưới rồi nhấn chuột trái; tưới giúp cây lớn nhanh.";
+                return "Đã gieo " + Crop.displayName + ". Thuê vòi tự tưới hoặc đặt nước cạnh ruộng để cây lớn nhanh.";
             }
             if (State == PlotState.Growing) { Moisture = 1; Refresh(); return "Đã tưới đầy nước cho " + Crop.displayName; }
             harvested = Crop.yield; string result = "Thu hoạch +" + harvested + " " + Crop.displayName;
@@ -65,7 +67,7 @@ namespace NongTrai
             if(State!=PlotState.Growing)return false;
             Moisture=Mathf.Min(1,Moisture+.35f);
             Growth=Mathf.Min(1,Growth+.12f);
-            if(!Mutated&&Random.value<.08f)Mutated=true;
+            if(Crop.specialProduct<0&&!Mutated&&Random.value<.08f)Mutated=true;
             if(Growth>=1)State=PlotState.Ready;
             Refresh();return true;
         }
@@ -81,6 +83,9 @@ namespace NongTrai
             if(!Mutated||fruit==null)return;
             var glow=Color.HSVToRGB(Mathf.Repeat(Time.time*.22f+id*.08f,1),.75f,1);
             fruit.color=glow;fruit.SetColor("_EmissionColor",glow*2.2f);fruit.EnableKeyword("_EMISSION");
+            if(importedFruitRenderers!=null)
+            {if(fruitBlock==null)fruitBlock=new MaterialPropertyBlock();foreach(var renderer in importedFruitRenderers)
+             {renderer.GetPropertyBlock(fruitBlock);fruitBlock.SetColor("_BaseColor",glow);fruitBlock.SetColor("_Color",glow);fruitBlock.SetColor("_EmissionColor",glow*2.2f);renderer.SetPropertyBlock(fruitBlock);}}
         }
         public void Highlight(bool value)
         {
@@ -97,6 +102,7 @@ namespace NongTrai
             int next = Crop == null ? -1 : Mathf.Min(3, Mathf.FloorToInt(Growth * 4));
             if (next == stage) return;
             stage = next;
+            importedFruitRenderers=null;
             if (plants != null) { plants.gameObject.SetActive(false); Destroy(plants.gameObject); }
             if (Crop == null) return;
             if (green == null) { green = Material(new Color(0.19f, 0.46f, 0.12f)); stem = Material(new Color(0.35f, 0.54f, 0.12f)); }
@@ -105,6 +111,16 @@ namespace NongTrai
             // Giữ kích thước cây theo mét, độc lập với tỷ lệ của ô đất.
             plants.localScale = new Vector3(1 / transform.localScale.x, 1 / transform.localScale.y, 1 / transform.localScale.z);
             plants.gameObject.AddComponent<CropStageAnimation>();
+            if(Crop.displayName=="Lúa mì"&&Crop.stageVisuals!=null&&Crop.stageVisuals.Length>stage&&Crop.stageVisuals[stage]!=null)
+            {
+                for(int x=0;x<4;x++)for(int z=0;z<3;z++)
+                {
+                    var stalk=Instantiate(Crop.stageVisuals[stage],plants,false);
+                    stalk.transform.localPosition+=new Vector3(-.62f+x*.42f,.12f,-.42f+z*.42f);
+                    // The prefab is already normalized; retain its authored scale.
+                }
+                return;
+            }
             float height = 0.18f + stage * 0.23f;
             for (int x = -1; x <= 1; x += 2)
                 for (int z = -1; z <= 1; z += 2)
@@ -119,7 +135,15 @@ namespace NongTrai
                     if (stage >= 2)
                     {
                         if(Crop.displayName=="Bí ngô")
-                            Part(PrimitiveType.Sphere,p+new Vector3(0,.26f,0),new Vector3(.47f,.31f,.43f),fruit);
+                        {
+                            if(Crop.fruitVisual!=null)
+                            {
+                                var pumpkin=Instantiate(Crop.fruitVisual,plants,false);pumpkin.transform.localPosition+=p;
+                                var renderers=pumpkin.GetComponentsInChildren<Renderer>(true);
+                                if(importedFruitRenderers==null)importedFruitRenderers=renderers;else importedFruitRenderers=Merge(importedFruitRenderers,renderers);
+                            }
+                            else Part(PrimitiveType.Sphere,p+new Vector3(0,.26f,0),new Vector3(.47f,.31f,.43f),fruit);
+                        }
                         else if(Crop.displayName=="Dâu ruộng")
                         {for(int berry=0;berry<3;berry++)Part(PrimitiveType.Sphere,p+new Vector3((berry-1)*.18f,.20f+berry*.05f,.16f),new Vector3(.13f,.15f,.13f),fruit);}
                         else if(Crop.displayName=="Hướng dương")
@@ -135,6 +159,8 @@ namespace NongTrai
             go.transform.SetParent(plants, false); go.transform.localPosition = p; go.transform.localScale = s;
             go.GetComponent<Renderer>().sharedMaterial = material; return go.transform;
         }
+        static Renderer[] Merge(Renderer[] a,Renderer[] b)
+        {var merged=new Renderer[a.Length+b.Length];System.Array.Copy(a,merged,a.Length);System.Array.Copy(b,0,merged,a.Length,b.Length);return merged;}
         static Material Material(Color color) { var m = new Material(Shader.Find("Universal Render Pipeline/Lit")); m.color = color; m.enableInstancing = true; return m; }
         void OnDestroy() { if (fruit != null) Destroy(fruit); }
     }

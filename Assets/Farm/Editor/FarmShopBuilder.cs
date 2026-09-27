@@ -136,13 +136,33 @@ namespace NongTrai.Editor
                 Box("Support", new Vector3(side * 1.2f, 1.2f, .4f), new Vector3(.13f, 2.4f, .13f), cream, counter);
             Sign(counter, new Vector3(-5, 0, 9.1f), "Cửa hàng", "Nhấn B mở túi đồ rồi chọn Mở cửa hàng.");
             var tree = new GameObject("Cây táo");
-            Shape("Trunk", PrimitiveType.Cylinder, new Vector3(0, 1.1f, 0), new Vector3(.45f, 1.1f, .45f), wood, tree.transform);
-            Soft("Leaves", tree.transform, new Vector3(0, 2.5f, 0), new Vector3(3, 2.5f, 3), leaves);
+            var trunk=Shape("Trunk", PrimitiveType.Cylinder, new Vector3(0, 1.1f, 0), new Vector3(.45f, 1.1f, .45f), wood, tree.transform);
+            var canopy=Soft("Leaves", tree.transform, new Vector3(0, 2.5f, 0), new Vector3(3, 2.5f, 3), leaves);
+            var orchard=FarmImportedModelBuilder.Attach(Root+"Models/Imported/Kenney_NatureKit/tree_oak.fbx",tree.transform,"Cây ăn quả",5.1f);
+            GameObject blueberry=null;
+            if(orchard!=null)
+            {
+                trunk.SetActive(false);canopy.SetActive(false);
+                var collider=tree.AddComponent<CapsuleCollider>();collider.center=Vector3.up*1.4f;collider.radius=.45f;collider.height=2.8f;
+                blueberry=FarmImportedModelBuilder.Attach(Root+"Models/Imported/Kenney_NatureKit/plant_bushDetailed.fbx",tree.transform,"Bụi việt quất",1.45f);
+                if(blueberry!=null)
+                {
+                    const string bushPath=Root+"Materials/Imported/BlueberryFoliage.mat";
+                    var bushMaterial=AssetDatabase.LoadAssetAtPath<Material>(bushPath);
+                    if(bushMaterial==null){bushMaterial=new Material(Shader.Find("Universal Render Pipeline/Lit"));AssetDatabase.CreateAsset(bushMaterial,bushPath);}
+                    bushMaterial.color=new Color(.24f,.48f,.28f);
+                    bushMaterial.SetFloat("_Smoothness",.08f);bushMaterial.enableInstancing=true;
+                    EditorUtility.SetDirty(bushMaterial);
+                    foreach(var renderer in blueberry.GetComponentsInChildren<Renderer>(true))renderer.sharedMaterial=bushMaterial;
+                    blueberry.SetActive(false);
+                }
+            }
             var fruit = Pivot("Apples", tree.transform, Vector3.zero);
             for (int i = 0; i < 8; i++)
-                Soft("Apple", fruit, new Vector3(Mathf.Sin(i * 2.4f) * 1.15f, 2.25f + (i % 3) * .35f,
-                    Mathf.Cos(i * 2.4f) * 1.15f), Vector3.one * .30f, red);
+                Soft("Apple", fruit, new Vector3(Mathf.Sin(i * 2.4f) * 1.48f, 3.25f + (i % 3) * .34f,
+                    Mathf.Cos(i * 2.4f) * 1.48f), Vector3.one * .43f, red);
             var behavior = tree.AddComponent<FruitTree>(); behavior.fruitVisual = fruit.gameObject;
+            behavior.orchardTreeVisual=orchard;behavior.blueberryBushVisual=blueberry;
             shop.treePrefab = PrefabUtility.SaveAsPrefabAsset(tree, Root + "Prefabs/AppleTree.prefab");
             Object.DestroyImmediate(tree);
         }

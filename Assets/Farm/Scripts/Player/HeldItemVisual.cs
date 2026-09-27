@@ -1,25 +1,33 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace NongTrai
 {
     public sealed class HeldItemVisual:MonoBehaviour
     {
-        public FarmPlayer player;Transform holder;int current=int.MinValue;bool building;
+        public FarmPlayer player;Transform holder;int current=int.MinValue;bool building,bucketFull;
+        readonly System.Collections.Generic.Dictionary<Color,Material> materials=new System.Collections.Generic.Dictionary<Color,Material>();
+        void OnDestroy(){foreach(var material in materials.Values)Destroy(material);}
         void Start()
         {
             holder=new GameObject("Vật phẩm nhỏ trên tay").transform;holder.SetParent(transform,false);
             var animator=player==null?GetComponentInChildren<FarmerAnimation>():player.visual.GetComponent<FarmerAnimation>();
-            var hand=animator!=null&&animator.arms!=null&&animator.arms.Length>1?animator.arms[1]:null;
+            if(animator!=null&&animator.toolSocket!=null)
+            {holder.SetParent(animator.toolSocket,false);holder.localPosition=Vector3.zero;holder.localRotation=Quaternion.identity;return;}
+            var hand=animator==null||animator.animator==null||!animator.animator.isHuman?null:animator.animator.GetBoneTransform(HumanBodyBones.RightHand);
+            if(hand==null&&animator!=null&&animator.arms!=null&&animator.arms.Length>1)hand=animator.arms[1];
             if(hand!=null)holder.SetParent(hand,false);
-            holder.localPosition=hand!=null?new Vector3(.04f,-.58f,.13f):new Vector3(.53f,.78f,.30f);
-            holder.localRotation=Quaternion.Euler(0,0,-12);
+            bool rigged=animator!=null&&animator.animator!=null&&animator.animator.isHuman&&hand==animator.animator.GetBoneTransform(HumanBodyBones.RightHand);
+            holder.localPosition=rigged?new Vector3(0,.015f,.035f):hand!=null?new Vector3(.04f,-.58f,.13f):new Vector3(.53f,.78f,.30f);
+            holder.localRotation=rigged?Quaternion.Euler(8,0,-18):Quaternion.Euler(0,0,-12);
         }
         void Update()
         {
             bool nextBuilding=FarmBuildingSystem.Instance!=null&&FarmBuildingSystem.Instance.IsBuilding;
             int next=nextBuilding?30+FarmBuildingSystem.Instance.SelectedType:(FarmHudV2.Instance==null?0:FarmHudV2.Instance.SelectedSlot);
-            if(!nextBuilding&&AdventureBag.Instance!=null)next=AdventureBag.Instance.Item>=100?AdventureBag.Instance.Item-100:200+AdventureBag.Instance.Item;
-            if(next==current&&nextBuilding==building)return;current=next;building=nextBuilding;Rebuild();
+            if(!nextBuilding&&AdventureBag.Instance!=null)
+            {int item=AdventureBag.Instance.Item;next=item<0?-1:item>=100?item-100:200+item;}
+            bool full=FarmWaterSystem.Instance!=null&&FarmWaterSystem.Instance.CanWater>0;
+            if(next==current&&nextBuilding==building&&(next!=5||full==bucketFull))return;bucketFull=full;current=next;building=nextBuilding;Rebuild();
         }
         void Rebuild()
         {
@@ -31,6 +39,9 @@ namespace NongTrai
             if(current>=200)
             {
                 int item=current-200;
+                if(item==64||item==67||item==71){Color liquid=item==71?new Color(.75f,.85f,.88f):item==67?new Color(.88f,.15f,.19f):blue;Part(PrimitiveType.Cylinder,Vector3.zero,new Vector3(.13f,.12f,.13f),liquid);Part(PrimitiveType.Cylinder,Vector3.up*.15f,new Vector3(.07f,.04f,.07f),brown);return;}
+                if(item==68){Part(PrimitiveType.Sphere,Vector3.zero,Vector3.one*.2f,new Color(.25f,.8f,1));return;}
+                if(item==69){Part(PrimitiveType.Cube,Vector3.zero,Vector3.one*.22f,new Color(.85f,.16f,.10f));return;}
                 if(item==27){Part(PrimitiveType.Cylinder,Vector3.zero,new Vector3(.04f,.22f,.04f),brown);Part(PrimitiveType.Sphere,Vector3.up*.18f,Vector3.one*.16f,Color.green);return;}
                 if(item==56)
                 {Part(PrimitiveType.Cylinder,Vector3.zero,new Vector3(.11f,.08f,.11f),blue);
@@ -43,8 +54,24 @@ namespace NongTrai
                 Part(PrimitiveType.Cube,Vector3.zero,new Vector3(.22f,.18f,.20f),item==15?metal:brown);return;
             }
             if(current<0){return;}
+            if(current==11)
+            {
+                var upper=Part(PrimitiveType.Cylinder,new Vector3(-.10f,.19f,0),new Vector3(.035f,.22f,.035f),brown);
+                upper.localRotation=Quaternion.Euler(0,0,-28);
+                var lower=Part(PrimitiveType.Cylinder,new Vector3(-.10f,-.19f,0),new Vector3(.035f,.22f,.035f),brown);
+                lower.localRotation=Quaternion.Euler(0,0,28);
+                Part(PrimitiveType.Cylinder,new Vector3(.02f,0,0),new Vector3(.012f,.43f,.012f),new Color(.92f,.86f,.70f));return;
+            }
             if(current<3){Part(PrimitiveType.Sphere,Vector3.zero,Vector3.one*.18f,current==0?Color.yellow:current==1?Color.red:Color.green);return;}
             if(current==3){Part(PrimitiveType.Cube,Vector3.zero,new Vector3(.22f,.28f,.14f),brown);return;}
+            if(current==5)
+            {
+                Part(PrimitiveType.Cylinder,new Vector3(0,-.13f,0),new Vector3(.34f,.14f,.34f),metal);
+                Part(PrimitiveType.Cylinder,new Vector3(0,.015f,0),new Vector3(.29f,.008f,.29f),bucketFull?blue:new Color(.12f,.15f,.16f));
+                Part(PrimitiveType.Cube,new Vector3(-.16f,.13f,0),new Vector3(.035f,.25f,.035f),brown);
+                Part(PrimitiveType.Cube,new Vector3(.16f,.13f,0),new Vector3(.035f,.25f,.035f),brown);
+                Part(PrimitiveType.Cube,new Vector3(0,.24f,0),new Vector3(.35f,.035f,.035f),brown);return;
+            }
             if(current>=4&&current<=10&&current!=8)
             {
                 var handle=Part(PrimitiveType.Cylinder,new Vector3(0,.18f,0),new Vector3(.055f,.34f,.055f),brown);
@@ -67,9 +94,10 @@ namespace NongTrai
         }
         Transform Part(PrimitiveType type,Vector3 local,Vector3 scale,Color color)
         {
-            var go=GameObject.CreatePrimitive(type);Destroy(go.GetComponent<Collider>());
+            var go=GameObject.CreatePrimitive(type);go.GetComponent<Collider>().enabled=false;Destroy(go.GetComponent<Collider>());if(player!=null)go.layer=player.visual.gameObject.layer;
             go.name="Vật cầm";go.transform.SetParent(holder,false);go.transform.localPosition=local;go.transform.localScale=scale;
-            var material=new Material(Shader.Find("Universal Render Pipeline/Lit"));material.color=color;go.GetComponent<Renderer>().material=material;return go.transform;
+            if(!materials.TryGetValue(color,out var material)){material=new Material(Shader.Find("Universal Render Pipeline/Lit"));material.color=color;materials[color]=material;}
+            go.GetComponent<Renderer>().sharedMaterial=material;return go.transform;
         }
         static Color BlockColor(int type){Color[] c={new Color(.55f,.31f,.14f),new Color(.47f,.51f,.53f),new Color(.68f,.25f,.18f),new Color(.38f,.78f,.88f),new Color(.55f,.62f,.66f),new Color(.33f,.65f,.22f),new Color(.45f,.27f,.13f),new Color(.62f,.42f,.2f),new Color(1,.68f,.22f),new Color(.47f,.29f,.12f),new Color(.70f,.48f,.24f)};return c[Mathf.Clamp(type,0,c.Length-1)];}
     }

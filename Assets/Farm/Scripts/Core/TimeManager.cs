@@ -142,21 +142,26 @@ namespace NongTrai
             float hour=NormalizedTime*24;
             float daylight=Mathf.Clamp01(Mathf.Sin((NormalizedTime-.25f)*Mathf.PI*2));
             float twilight=Mathf.Clamp01(1-Mathf.Abs(hour-6)/2)+Mathf.Clamp01(1-Mathf.Abs(hour-18)/2);
-            Color sky=Color.Lerp(new Color(.04f,.08f,.19f),new Color(.62f,.80f,.91f),daylight);
-            Color warm=hour<12?new Color(1f,.49f,.25f):new Color(1f,.30f,.18f);
-            sky=Color.Lerp(sky,warm,twilight*.55f);
+            float civilLight=Mathf.SmoothStep(0,1,Mathf.Clamp01((Mathf.Sin((NormalizedTime-.25f)*Mathf.PI*2)+.32f)/.68f));
+            Color sky=Color.Lerp(new Color(.055f,.10f,.20f),new Color(.57f,.78f,.93f),civilLight);
+            Color warm=hour<12?new Color(1f,.83f,.65f):new Color(1f,.72f,.52f);
+            sky=Color.Lerp(sky,warm,twilight*.16f);
             float cloud=Weather==FarmWeather.Storm ? .45f : Weather==FarmWeather.Rain ? .70f : 1f;
             sun.transform.rotation=Quaternion.Euler(NormalizedTime*360-90,-35,0);
-            sun.color=Color.Lerp(new Color(.24f,.38f,.72f),Color.Lerp(Color.white,warm,twilight*.75f),daylight);
-            sun.intensity=(.28f+daylight*1.95f+twilight*.65f)*cloud;
-            RenderSettings.ambientMode=UnityEngine.Rendering.AmbientMode.Trilight;
-            RenderSettings.ambientSkyColor=sky*cloud;
-            RenderSettings.ambientEquatorColor=sky*.75f*cloud;
-            RenderSettings.ambientGroundColor=sky*.40f*cloud;
+            sun.color=Color.Lerp(new Color(.48f,.60f,.84f),Color.Lerp(Color.white,warm,twilight*.55f),civilLight);
+            sun.intensity=(.20f+daylight*1.22f+twilight*.55f)*cloud;
+            sun.shadowStrength=.7f;
+            // Update the ambient probe explicitly: imported meshes and streamed chunks receive
+            // the same readable light even without baked probes or a realtime GI environment.
+            Color ambient=Color.Lerp(new Color(.18f,.22f,.29f),new Color(.53f,.60f,.64f),civilLight)*Mathf.Lerp(.75f,1,cloud);
+            RenderSettings.ambientMode=UnityEngine.Rendering.AmbientMode.Flat;
+            RenderSettings.ambientLight=ambient;
+            var probe=new UnityEngine.Rendering.SphericalHarmonicsL2();probe.AddAmbientLight(ambient.linear);
+            RenderSettings.ambientProbe=probe;
             if(viewCamera!=null) viewCamera.backgroundColor=sky*cloud;
             bool exploring=player!=null&&player.transform.position.y>500;
-            RenderSettings.fogStartDistance=exploring?18:Weather==FarmWeather.Fog?12:Weather==FarmWeather.Storm?20:65;
-            RenderSettings.fogEndDistance=exploring?32:Weather==FarmWeather.Fog?48:Weather==FarmWeather.Storm?65:140;
+            RenderSettings.fogStartDistance=exploring?32:Weather==FarmWeather.Fog?12:Weather==FarmWeather.Storm?20:65;
+            RenderSettings.fogEndDistance=exploring?70:Weather==FarmWeather.Fog?48:Weather==FarmWeather.Storm?65:140;
             RenderSettings.fogColor=exploring?sky*cloud:Weather==FarmWeather.Storm?new Color(.30f,.36f,.45f):
                 Weather==FarmWeather.Fog?new Color(.75f,.78f,.80f):new Color(.68f,.82f,.85f);
 

@@ -1,4 +1,4 @@
-﻿using TMPro;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -15,6 +15,9 @@ namespace NongTrai
         public FarmPlot Plot { get; private set; }
         public FarmSign Target { get; private set; }
         public string Hint => carry!=null && carry.Held!=null?"[CHUỘT PHẢI] Thả vật nuôi vào chuồng đúng loại":
+            AdventureBag.Instance?.Item==105?"Xô nước: TRÁI khi rỗng để múc • TRÁI khi đầy để đặt nước":
+            AdventureBag.Instance?.Item==69?"TNT: trái/phải đặt ở Khám phá • cầm đuốc để châm":
+            AdventureBag.Instance?.Item==29?"Đuốc: ngắm TNT, trái/phải để châm • ngắm đất, trái để đặt đuốc":
             selected==null?"":selected.InteractionHint;
         public event System.Action<string> Message;
         readonly Collider[] nearby=new Collider[128];
@@ -52,14 +55,21 @@ namespace NongTrai
                 if(keyboard.pKey.wasPressedThisFrame) { shop.barn?.Open();return; }
                 if(keyboard.tabKey.wasPressedThisFrame) { IslandManager.Instance?.OpenMap();return; }
             }
+            if(Mouse.current!=null&&carry.Held==null&&(Mouse.current.leftButton.wasPressedThisFrame||Mouse.current.rightButton.wasPressedThisFrame))
+                if(TryTntInteraction(FarmAim.Ray(viewCamera)))return;
+            if(Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame&&TryWaterCanInteraction(FarmAim.Ray(viewCamera)))return;
             if(Mouse.current!=null&&Mouse.current.rightButton.wasPressedThisFrame&&carry.Held==null)
             {
                 var bag=AdventureBag.Instance;
+                if(bag?.Item==105)return;
                 if(FarmAim.Hit(viewCamera,out var useHit)&&Vector3.Distance(useHit.point,player.transform.position)<6)
                 {
+                    var sponge=useHit.collider.GetComponentInParent<FarmSponge>();if(sponge!=null){sponge.Interact(this);return;}
                     var sprinkler=useHit.collider.GetComponentInParent<IrrigationStation>();
-                    if(sprinkler!=null&&sprinkler.portable){Say(FarmWaterSystem.Instance.DismantlePortable(sprinkler)?"Đã thu vòi phun vào túi; có thể đặt lại.":"Không thể thu vòi phun.");return;}
+                    if(sprinkler!=null&&sprinkler.portable){Say(FarmWaterSystem.Instance.DismantlePortable(sprinkler)?"Đã thu hồi vòi và kết thúc lượt thuê.":"Không thể thu vòi phun.");return;}
                     var wild=useHit.collider.GetComponentInParent<WildAnimal>();if(wild!=null){wild.Feed();return;}
+                    var forge=useHit.collider.GetComponentInParent<ForgeTable>();if(forge!=null){forge.Interact(this);return;}
+                    var portal=useHit.collider.GetComponentInParent<FarmTravelPortal>();if(portal!=null){portal.Interact(this);return;}
                     var chest=useHit.collider.GetComponentInParent<FarmChest>();if(chest!=null){chest.Interact(this);return;}
                     var farmAnimal=useHit.collider.GetComponentInParent<FarmAnimal>();
                     if(farmAnimal!=null&&bag!=null&&bag.Item==34)
@@ -78,8 +88,8 @@ namespace NongTrai
                     if(bag!=null&&(bag.Item==27||bag.Item>=49&&bag.Item<=51)&&!ExplorationWorld.Instance.IsExploring)
                     {FruitTree.TryPlantAt(useHit.point,shop,inventory,out string feedback,bag.Item);Say(feedback);return;}
                 }
-                if(bag!=null&&bag.Eat())return;
-                ScanNearest();if(selected!=null){selected.Interact(this);return;}
+
+                ScanNearest();if(selected!=null&&!(selected is FarmChest)&&!(selected is ForgeTable)&&!(selected is FarmTravelPortal)){selected.Interact(this);return;}
             }
             if(FarmBuildingSystem.Instance!=null&&FarmBuildingSystem.Instance.IsBuilding)
             { ClearSelection();return; }
@@ -99,7 +109,7 @@ namespace NongTrai
                 if(FarmPenPlacement.Instance!=null&&(FarmPenPlacement.Instance.Pending>=0||FarmPenPlacement.Instance.ConsumedFrame==Time.frameCount))return;
             if(Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame&&FarmWaterSystem.Instance!=null&&
                 (FarmWaterSystem.Instance.PendingPlacement||FarmWaterSystem.Instance.ConsumedFrame==Time.frameCount))return;
-            if(Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame&&!ExplorationWorld.Instance.IsExploring)
+            if(Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame&&AdventureBag.Instance?.Item!=111&&!AdventureBag.IsEdible(AdventureBag.Instance==null?-1:AdventureBag.Instance.Item)&&!ExplorationWorld.Instance.IsExploring)
                 if(TryLeftInteractRay(FarmAim.Ray(viewCamera)))return;
         }
         static IInteractable FindTarget(Collider collider)
@@ -137,6 +147,34 @@ namespace NongTrai
             }
             SetSelection(best,bestCollider);
         }
+        public bool TryWaterCanInteraction(Ray ray)
+        {
+            if(player.Paused||FarmHud.WorldClickSuppressed||carry.Held!=null||AdventureBag.Instance?.Item!=105)return false;
+            var water=FarmVoxelWater.Instance;var can=FarmWaterSystem.Instance;
+            if(water==null||can==null)return false;
+            if(can.CanWater<=0&&water.RayWater(ray,24,out var point))
+            {
+                if(Vector3.Distance(point,player.transform.position+Vector3.up)>=6){Say("Tiến gần mặt nước hơn (tầm múc 6 m).");return true;}
+                if(water.ScoopCan(point)){player.TriggerAnimation("Work");FarmAudio.Instance?.Play(FarmAudio.Cue.Water);Say("Xô đã ĐẦY • chuột trái vào đất để đặt nước.");}
+                return true;
+            }
+            if(can.CanWater<=0){Say("Xô RỖNG • ngắm mặt hồ/sông, bấm chuột trái để múc.");return true;}
+            if(Physics.Raycast(ray,out var hit,24,~(1<<8),QueryTriggerInteraction.Ignore)&&Vector3.Distance(hit.point,player.transform.position+Vector3.up)<6)
+            {
+                if(water.PourCan(hit)){player.TriggerAnimation("Work");FarmAudio.Instance?.Play(FarmAudio.Cue.Water);Say("Đã đặt nước • xô RỖNG. Chuột trái vào nước để múc lại.");}
+                else Say("Đặt nước trên đất trống hoặc khối xây. Vòi thuê tự tưới cây.");
+            }
+            else Say("Ngắm mặt đất gần nhân vật để đổ nước (tầm 6 m).");
+            return true;
+        }
+        public bool TryTntInteraction(Ray ray)
+        {
+            if(player.Paused||FarmHud.WorldClickSuppressed)return false;
+            var target=FarmTnt.Target(ray,player);
+            if(target!=null){target.Interact(this);return true;}
+            if(AdventureBag.Instance?.Item==69){FarmTnt.TryPlace(this,ray);return true;}
+            return false;
+        }
         public bool TryLeftInteractRay(Ray ray)
         {
             if(player.Paused||player.transform.position.y>500||
@@ -147,7 +185,7 @@ namespace NongTrai
             {if(animal.ProductReady){animal.TryCollect(inventory,out string message);Say(message);}
              else if(carry.Pickup(animal)){Say(carry.LastMessage);ClearSelection();}return true;}
             if(target==null||!target.CanInteract(player))return false;
-            target.Interact(this);return true;
+            player.TriggerAnimation("Work");target.Interact(this);return true;
         }
         void SetSelection(IInteractable best,Collider bestCollider)
         {
