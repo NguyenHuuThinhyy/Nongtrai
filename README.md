@@ -83,3 +83,10 @@ Unity Hub → Add project from disk → **thư mục vừa clone** (thư mục c
 Build bằng `NongTrai.Editor.FarmProjectBuilder.BuildWindowsCurrentScene`, biến `FARM_BUILD_OUTPUT=Builds/Windows-Systems`; dùng đường dẫn Unity.exe trên máy của bạn và `-projectPath` trỏ vào thư mục clone. Git chứa source, asset/model cùng giấy phép, cấu hình, meta, tài liệu và smoke checks; Library/Temp/Logs/Builds/DongGoi/Recovery không đưa lên Git. Bản ZIP Windows/Unity được đóng gói riêng tại máy bàn giao.
 
 Xem CODEX_HANDOFF.md trước khi sửa; chạy game build với `-farmSmokeCheck -farmArtCheck` để kiểm tra toàn bộ, hoặc thêm `-farmSystemsOnly` để kiểm tra riêng các hệ thống mới. Kiểm thử dùng save tạm. Quyền sở hữu mã/thiết kế gốc: [COPYRIGHT.md](COPYRIGHT.md); giữ giấy phép asset của bên thứ ba.
+
+## File cần giữ khi làm việc nhóm
+
+- Git chứa toàn bộ `Assets` (kèm `.meta` và giấy phép), `Packages`, `ProjectSettings` và tài liệu. Các file này đủ để Unity mở dự án sau khi clone.
+- `Library`, `Temp`, `Obj`, `Logs`, cấu hình IDE cá nhân và dữ liệu debug do Unity tạo được bỏ qua trong Git. Unity tự tạo lại cache khi mở dự án; lần mở đầu có thể lâu hơn.
+- `Builds`, `DongGoi`, `Recovery` là dữ liệu bàn giao/khôi phục trên máy, không đưa vào source Git. Bản chạy mới nhất ở `Builds/Windows-Systems`; giữ cả thư mục khi sao chép.
+- Giữ bản sao source trước khi sửa scene. Chỉ dọn bản build cũ sau khi đã phân biệt với bản mới đang chạy; không xóa asset, `.meta`, script tương thích save hoặc giấy phép chỉ vì không thấy dùng trong scene.

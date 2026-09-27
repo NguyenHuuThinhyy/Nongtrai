@@ -11,3 +11,20 @@
 /Recovery/
 /DongGoi/
 /Nongtrai/
+
+# Unity/IDE files regenerated on each machine.
+/.vs/
+/.idea/
+/.vscode/
+/MemoryCaptures/
+/Recordings/
+*_BurstDebugInformation_DoNotShip/
+*_BackUpThisFolder_ButDontShipItWithYourGame/
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+.DS_Store
+Thumbs.db
+Desktop.ini

@@ -1,5 +1,11 @@
 # Bản hiện tại — Systems / HThinh.yy — 27/09/2026
 
+## Đồng bộ Git và dọn file — 27/09/2026
+
+Source Systems đã push lên `main` tại commit `6139748`. Đối chiếu sau bàn giao: 567 file trong Assets/Packages/ProjectSettings khớp từng byte giữa dự án live và mirror Git. Bổ sung `.gitignore` cho cache IDE, captures và thư mục debug Unity. Không sửa gameplay/scene trong lượt dọn này, không chạy lại build/smoke.
+
+Đã rà soát Library (~1,89 GB), log cũ và 6 thư mục runtime cũ trong Recovery. Lệnh xóa bị kiểm duyệt công cụ chặn (`blocked by policy`), kể cả khi thu hẹp chỉ Library; chưa xóa các mục này. Giữ bản game đang chạy, ZIP bàn giao, source backup, meta và giấy phép. Baseline hash nằm tại `Recovery/Cleanup-20260927/source-sha256-before.json` (chỉ ở máy bàn giao).
+
 Live D:/GAME_NongTrai, mirror Git Nongtrai, branch main/origin https://github.com/NguyenHuuThinhyy/Nongtrai.git. Người dùng đã yêu cầu cập nhật Git đầy đủ cho nhóm: commit/push source đã kiểm tra, không chỉ giữ working changes như các bản trước. Runtime Builds/Windows-Systems/NongTrai.exe. Backup Recovery/Before-Systems-20260927-215005/UnitySource.zip và GitMirror-before-sync.zip. Không chạy CreateScene; SHA256 scene trùng backup.
 
 ## Dữ liệu / thay đổi
