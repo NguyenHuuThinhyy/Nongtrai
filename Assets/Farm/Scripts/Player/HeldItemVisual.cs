@@ -6,6 +6,7 @@ namespace NongTrai
     {
         public FarmPlayer player;Transform holder;int current=int.MinValue;bool building,bucketFull;
         readonly System.Collections.Generic.Dictionary<Color,Material> materials=new System.Collections.Generic.Dictionary<Color,Material>();
+        public Vector3 BowOrigin => holder != null && current == 11 ? holder.position : transform.position+Vector3.up*1.4f;
         void OnDestroy(){foreach(var material in materials.Values)Destroy(material);}
         void Start()
         {

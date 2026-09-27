@@ -1,18 +1,20 @@
 # Nông Trại – First Harvest
 
-**Repo đã có cả bản chơi và gói tải:** [Builds/Windows-ChestLoot](Builds/Windows-ChestLoot) chứa EXE cùng đầy đủ dữ liệu; [DongGoi](DongGoi) chứa ZIP Windows/Unity. Chọn **Code → Download ZIP**, giải nén toàn bộ rồi chạy **CHAY_GAME.bat** ở thư mục gốc. Clone repo cũng có đủ bản chơi và source để build tiếp.
+**Repo đã có cả bản chơi và gói tải:** [Builds/Windows-BowPhysics](Builds/Windows-BowPhysics) chứa EXE cùng đầy đủ dữ liệu; [DongGoi](DongGoi) chứa ZIP Windows/Unity. Chọn **Code → Download ZIP**, giải nén toàn bộ rồi chạy **CHAY_GAME.bat** ở thư mục gốc. Clone repo cũng có đủ bản chơi và source để build tiếp.
 
-**Tải bản Windows và source Unity đầy đủ:** [GitHub Release ChestLoot](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/chestloot-20260927). Hướng dẫn cho thành viên mới: [HUONG_DAN_NHOM.md](HUONG_DAN_NHOM.md). Script build scene hiện tại: [Tools/Build-Windows.ps1](Tools/Build-Windows.ps1).
+**Tải bản Windows và source Unity đầy đủ:** [GitHub Release BowPhysics](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/bowphysics-20260927). Hướng dẫn cho thành viên mới: [HUONG_DAN_NHOM.md](HUONG_DAN_NHOM.md). Script build scene hiện tại: [Tools/Build-Windows.ps1](Tools/Build-Windows.ps1).
 
 Game nông trại Unity cho Windows. Trồng cây bằng chuột trái, chăm vật nuôi, chế biến/chế tạo theo JSON, giao đơn tại hộp thư, mở đất, nâng cấp dụng cụ và khám phá địa hình khối sinh liên tục theo seed. Có túi đồ 36 ô dùng chung hotbar 9 ô, minh họa vật phẩm, bản đồ nông trại 2D và thông báo vật nuôi đói. Cả hai map nhớ vị trí khi chuyển qua lại. Khi chết: trả 100 xu để hồi sinh tại chỗ, giữ đồ; lựa chọn miễn phí về cổng và rơi tối đa 3 món. Một ngày game dài 18 phút, có bốn mùa, thời tiết, ngủ qua đêm và câu đố ứng phó bão. Menu chính có chế độ sáng tạo LV99 để bay và kiểm thử mà không sửa bản lưu chơi thường.
+
+**Cung đã sửa:** tên bù độ rơi theo tâm ngắm, tốc độ theo lực kéo, va chạm theo từng đoạn ngắn; mỗi lần bắn mất 1 độ bền, cung hỏng cần sửa. Xem [BAO_CAO_BOW_PHYSICS.md](BAO_CAO_BOW_PHYSICS.md).
 
 **Rương mới:** chuột phải mở thẳng bảng đồ; bấm từng món, Shift + click cả chồng hoặc **Lấy tất cả**. Giữ trái để đập vỡ và thả phần đồ còn lại. Không có câu hỏi; vẫn cần hạ quái canh.
 
 **CombatComfort:** hồi sinh tại chỗ giá 100 xu; bọt biển đầy hong 10 giây ở đống lửa; kiếm có vòng ngắm rỗng với hỗ trợ đánh hơi lệch tâm, giữ tầm đánh và chặn bởi tường.
 
-**Gói mới:** `DongGoi/NongTrai-Windows-ChestLoot-20260927.zip` và `DongGoi/NongTrai-Unity-ChestLoot-20260927.zip`. Báo cáo: [BAO_CAO_CHEST_LOOT.md](BAO_CAO_CHEST_LOOT.md). Gói trước được giữ dự phòng trong Recovery; runtime đang dùng là Windows-ChestLoot.
+**Gói mới:** `DongGoi/NongTrai-Windows-BowPhysics-20260927.zip` và `DongGoi/NongTrai-Unity-BowPhysics-20260927.zip`. Báo cáo: [BAO_CAO_BOW_PHYSICS.md](BAO_CAO_BOW_PHYSICS.md). Gói trước được giữ dự phòng trong Recovery; runtime đang dùng là Windows-BowPhysics.
 
-**Chơi ngay:** mở `D:\GAME_NongTrai\Builds\Windows-ChestLoot\NongTrai.exe`; giữ nguyên cả thư mục `Windows-ChestLoot` khi sao chép sang máy khác. Không cần cài Unity để chạy bản Windows. Xem [CHOI_GAME.md](CHOI_GAME.md) để biết điều khiển và vòng chơi.
+**Chơi ngay:** mở `D:\GAME_NongTrai\Builds\Windows-BowPhysics\NongTrai.exe`; giữ nguyên cả thư mục `Windows-BowPhysics` khi sao chép sang máy khác. Không cần cài Unity để chạy bản Windows. Xem [CHOI_GAME.md](CHOI_GAME.md) để biết điều khiển và vòng chơi.
 
 **Bản Systems:** một xô nước dùng **chuột trái**: rỗng → múc hồ/sông, đầy → đặt nước → rỗng. Shop bán bọt biển hút nước trong 1 ô xung quanh rồi đầy. Hạt hết tự biến mất; bán được tất cả đồ trong túi. Thuê vòi tự tưới 350 xu/ngày, tối đa 3/ngày (LV3/5/7 mở 4/5/6), không nạp nước. Rương boss có bí pha lê và dâu hoàng kim. Quái nhảy qua khối cao 1 ô, thanh máu có số rõ hơn. © HThinh.yy ở góc màn hình.
 
@@ -27,7 +29,7 @@ Nhân vật hiện dùng Kenney Mini Characters biến thể `character-male-e.f
 Để build bản Windows đang dùng, đóng Editor đang mở cùng dự án rồi chạy. Lệnh này dùng scene hiện tại và không gọi builder dựng lại:
 
 ```powershell
-$env:FARM_BUILD_OUTPUT='Builds/Windows-ChestLoot'
+$env:FARM_BUILD_OUTPUT='Builds/Windows-BowPhysics'
 & 'D:\Unity\Editors\6000.3.22f1\Editor\Unity.exe' -batchmode -nographics -quit -projectPath 'D:\GAME_NongTrai' -executeMethod NongTrai.Editor.FarmProjectBuilder.BuildWindowsCurrentScene -logFile 'D:\GAME_NongTrai\Logs\build.log'
 ```
 
@@ -88,7 +90,7 @@ git pull --ff-only origin main
 
 Unity Hub → Add project from disk → **thư mục vừa clone** (thư mục chứa Assets/Packages/ProjectSettings). Dùng Unity 6000.3.22f1, mở Assets/Farm/Scenes/Farm.unity. Chờ Unity tự tạo Library và tải Packages. Không chạy CreateScene hoặc RebuildSceneAndBuildWindows vì sẽ ghi đè scene/prefab đã nâng cấp.
 
-Build bằng `NongTrai.Editor.FarmProjectBuilder.BuildWindowsCurrentScene`, biến `FARM_BUILD_OUTPUT=Builds/Windows-ChestLoot`; dùng đường dẫn Unity.exe trên máy của bạn và `-projectPath` trỏ vào thư mục clone. Git chứa source, asset/model cùng giấy phép, cấu hình, meta, tài liệu, smoke checks và bản phát hành hiện tại trong Builds/DongGoi; Library/Temp/Logs/Recovery không đưa lên Git. Bản ZIP Windows/Unity được tải từ GitHub Releases; không cần lấy file riêng từ máy bàn giao.
+Build bằng `NongTrai.Editor.FarmProjectBuilder.BuildWindowsCurrentScene`, biến `FARM_BUILD_OUTPUT=Builds/Windows-BowPhysics`; dùng đường dẫn Unity.exe trên máy của bạn và `-projectPath` trỏ vào thư mục clone. Git chứa source, asset/model cùng giấy phép, cấu hình, meta, tài liệu, smoke checks và bản phát hành hiện tại trong Builds/DongGoi; Library/Temp/Logs/Recovery không đưa lên Git. Bản ZIP Windows/Unity được tải từ GitHub Releases; không cần lấy file riêng từ máy bàn giao.
 
 Xem CODEX_HANDOFF.md trước khi sửa; chạy game build với `-farmSmokeCheck -farmArtCheck` để kiểm tra toàn bộ, hoặc thêm `-farmSystemsOnly` để kiểm tra riêng các hệ thống mới. Kiểm thử dùng save tạm. Quyền sở hữu mã/thiết kế gốc: [COPYRIGHT.md](COPYRIGHT.md); giữ giấy phép asset của bên thứ ba.
 
@@ -96,5 +98,5 @@ Xem CODEX_HANDOFF.md trước khi sửa; chạy game build với `-farmSmokeChec
 
 - Git chứa toàn bộ `Assets` (kèm `.meta` và giấy phép), `Packages`, `ProjectSettings` và tài liệu. Các file này đủ để Unity mở dự án sau khi clone.
 - `Library`, `Temp`, `Obj`, `Logs`, cấu hình IDE cá nhân và dữ liệu debug do Unity tạo được bỏ qua trong Git. Unity tự tạo lại cache khi mở dự án; lần mở đầu có thể lâu hơn.
-- `Builds/Windows-ChestLoot` và các gói hiện tại trong `DongGoi` được đưa trực tiếp lên Git theo yêu cầu bàn giao. `Recovery` chỉ giữ trên máy. Bản chạy mới nhất ở `Builds/Windows-ChestLoot`; giữ cả thư mục khi sao chép.
+- `Builds/Windows-BowPhysics` và các gói hiện tại trong `DongGoi` được đưa trực tiếp lên Git theo yêu cầu bàn giao. `Recovery` chỉ giữ trên máy. Bản chạy mới nhất ở `Builds/Windows-BowPhysics`; giữ cả thư mục khi sao chép.
 - Giữ bản sao source trước khi sửa scene. Chỉ dọn bản build cũ sau khi đã phân biệt với bản mới đang chạy; không xóa asset, `.meta`, script tương thích save hoặc giấy phép chỉ vì không thấy dùng trong scene.

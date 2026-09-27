@@ -1,3 +1,15 @@
+# Bản hiện tại — BowPhysics / 27-09-2026
+
+Đọc BAO_CAO_BOW_PHYSICS.md và đầu CHOI_GAME.md. Runtime `Builds/Windows-BowPhysics/NongTrai.exe`, gói ZIP Windows/Unity BowPhysics trong DongGoi, launcher gốc đã trỏ bản mới. Git tiếp tục chứa đủ runtime/ZIP theo yêu cầu người dùng. Bản ChestLoot cũ ở Recovery/Before-BowPhysics-20260927 và lịch sử Git/Release.
+
+FarmBow LateUpdate order200 sau Cinemachine100, aim ray tâm camera, nghiệm quỹ đạo thấp gravity9.81/speed16–40 theo charge. Origin holder bàn tay, kiểm vật cản ngực→tay; góc nhìn thứ nhất ngang ngực. FarmArrowProjectile dùng tích phân gia tốc hằng + sphere sweep radius.025 từng đoạn <=1/120s, tip làm origin. Khi bắn thành công mới Remove63 và DamageTool (thêm111), cung0 không bắn; HUD ĐB/100; hủy kéo khi pause/UI/đổi cung. Giữ save21, damage/rèn/nhặt tên. Không gọi CreateScene, hash scene giữ nguyên.
+
+FarmBowChecks mới, tích hợp full smoke và cờ -farmBowOnly: 28 quỹ đạo/góc cao-thấp/đứng, 15/30/60/144FPS, hai ray camera, tườngmỏng, wear/ammo/broken/tap/pause. Logs/smoke-bow-only.log đạt; Logs/smoke-bow-full.log full+art exit0; startup-bow.log alive/responding15s không exception. Build log build-20260927-233710.log thành công100993487byte/169file. Ảnh ở Logs/BowPhysicsScreens. Tools/Build-Windows.ps1 đổi Start-Process -Wait sang process.WaitForExit vì wrapper cũ chờ Windows job dù Unity đã kết thúc; helper mới kiểm cú pháp, runtime build trước sửa helper.
+
+Không tải asset mới. Cần giữ cache Library cục bộ để tránh nhập lại toàn bộ ở mỗi lần sửa; không đưa cache/log/save/debug lên Git.
+
+## Lịch sử trước BowPhysics
+
 # Bàn giao trực tiếp trên nhánh main — yêu cầu mới nhất
 
 Người dùng yêu cầu thấy Builds và DongGoi ngay trong danh sách file GitHub và tải Code → Download ZIP là có thể chơi. Vì vậy repo theo dõi toàn bộ runtime đã kiểm tra trong Builds/Windows-ChestLoot (169 file), 5 file hiện tại trong DongGoi và launcher CHAY_GAME.bat ở gốc. .gitignore chỉ mở ngoại lệ cho bản phát hành này; cache, log, Recovery và bản build thử vẫn bỏ qua.

@@ -1,3 +1,13 @@
+# Cung: ngắm, quỹ đạo và độ bền — BowPhysics / 27-09-2026
+
+- Giữ chuột trái để kéo cung, thả để bắn; kéo đầy sau 0,8 giây (chỉ số rèn có thể rút ngắn).
+- Tên bắn từ vị trí cung/tay, hướng về điểm dưới dấu + và bù độ rơi trong tầm lực kéo. Kéo mạnh tăng tốc độ tên từ 16 đến 40 m/s; tên chịu trọng lực 9,81 m/s². Mục tiêu quá xa với lực kéo hiện tại có thông báo, cần kéo mạnh hơn hoặc tiến gần. Quái đang di chuyển vẫn cần ngắm đón.
+- Tường/khối giữa cung và mục tiêu chặn tên. Tên ghim vào vật thể/quái, có thể đến gần nhặt lại như trước.
+- Mỗi lần bắn thành công mất **1 tên + 1 độ bền của đúng chiếc cung đang cầm**. Thả quá sớm, hết tên, tạm dừng hoặc cung hỏng không tiêu hao. Cung còn 0 độ bền không bắn được: mở túi, chọn cung → **Sửa dụng cụ: 20 xu**. Thanh cung hiện ĐB /100.
+- Bản mới: `Builds/Windows-BowPhysics/NongTrai.exe`; chạy `CHAY_GAME.bat` ở gốc hoặc giải nén ZIP Windows BowPhysics trong DongGoi.
+
+## Lịch sử cập nhật
+
 # Bản cập nhật ChestLoot — 27/09/2026
 
 - **Rương:** chuột phải mở thẳng bảng đồ, không giải câu hỏi. Click một món để lấy 1, Shift + click lấy cả chồng, hoặc bấm **LẤY TẤT CẢ**. Túi đầy thì phần còn lại nằm trong rương. Giữ chuột trái 0,8 giây để đập vỡ rương khám phá, thả toàn bộ đồ còn lại và vật phẩm rương. Rương có quái canh cần hạ quái trước. Đồ đã lấy không xuất hiện lại khi rời vùng hoặc lưu/tải.

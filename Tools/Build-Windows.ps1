@@ -48,7 +48,9 @@ try {
     $env:FARM_BUILD_OUTPUT = $outputPath
     $arguments = @('-batchmode', '-nographics', '-quit', '-projectPath', ('"' + $taskProjectRoot + '"'),
         '-executeMethod', 'NongTrai.Editor.FarmProjectBuilder.BuildWindowsCurrentScene', '-logFile', ('"' + $logPath + '"'))
-    $process = Start-Process -FilePath $UnityEditor -ArgumentList $arguments -PassThru -Wait -WindowStyle Hidden
+    # Wait only for the editor, not background processes inherited by its Windows job.
+    $process = Start-Process -FilePath $UnityEditor -ArgumentList $arguments -PassThru -WindowStyle Hidden
+    $process.WaitForExit()
     if ($process.ExitCode -ne 0 -or -not (Select-String -LiteralPath $logPath -Pattern 'FARM_M1_BUILD_OK' -Quiet)) {
         throw "Unity build failed. Read $logPath"
     }

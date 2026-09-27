@@ -137,7 +137,7 @@ namespace NongTrai
             }
         }
         public bool DamageTool()
-        {var s=Slots[Selected];if(s.item!=104&&s.item!=106&&s.item!=107)return true;if(s.durability<=0){Tell("Dụng cụ hỏng: chọn ô rồi sửa trong túi.");return false;}s.durability--;return true;}
+        {var s=Slots[Selected];if(s.item!=104&&s.item!=106&&s.item!=107&&s.item!=111)return true;if(s.durability<=0){Tell("Dụng cụ hỏng: chọn ô rồi sửa trong túi.");return false;}s.durability--;return true;}
         public bool CorrectTool(int material)=>material==7?Item==107:material==3||material==4||material==9||material==8?Item==104:false;
         public float BreakSeconds(int material)
         {float seconds=material==3||material==4||material==9?2:material==7?1.6f:material==8?.35f:.8f;return CorrectTool(material)&&Slots[Selected].durability>0?seconds*.4f:seconds;}
