@@ -5,7 +5,7 @@
   "save_version": 21,
   "git_repository": "https://github.com/NguyenHuuThinhyy/Nongtrai",
   "git_branch": "main",
-  "source_git_commit": "11cdedd8ff53c3e28695430808c5f17cb30dcffb",
+  "source_git_commit": "3dfd3aca89c3b79aca2f99695c5ed2d307afe800",
   "build_git_commit": "11cdedd8ff53c3e28695430808c5f17cb30dcffb",
   "runtime_bytes": 100993487,
   "runtime_files": 169,
@@ -17,15 +17,17 @@
   "packages": [
     {
       "file": "NongTrai-Windows-BowPhysics-20260927.zip",
-      "bytes": 36990476,
-      "sha256": "ca05680cc33c2b7916b2cb80e8bde03cd8284ca5cf24422fdd971f9d89404e0d",
+      "bytes": 36985512,
+      "sha256": "4eeff3e0181c02be119ec31dbbcc381bab84a10191c181766e8b743b9aacf2d5",
       "entries": 179
     },
     {
       "file": "NongTrai-Unity-BowPhysics-20260927.zip",
-      "bytes": 4699855,
-      "sha256": "1ab97604fc89b1e3f1d8e5053f9a214152c174b02e92fbbb6eeaa1555db339ba",
-      "entries": 593
+      "bytes": 4665364,
+      "sha256": "f96365404a657d457615fc57b84207c5e181da6d71829bf65d31cf486ce53e82",
+      "entries": 585
     }
-  ]
+  ],
+  "documentation_only_update": true,
+  "package_revision": "reports-cleanup"
 }
