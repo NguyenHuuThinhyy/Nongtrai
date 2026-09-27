@@ -1,5 +1,7 @@
 # Nông Trại – First Harvest
 
+**Tải bản Windows và source Unity đầy đủ:** [GitHub Release ChestLoot](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/chestloot-20260927). Hướng dẫn cho thành viên mới: [HUONG_DAN_NHOM.md](HUONG_DAN_NHOM.md). Script build scene hiện tại: [Tools/Build-Windows.ps1](Tools/Build-Windows.ps1).
+
 Game nông trại Unity cho Windows. Trồng cây bằng chuột trái, chăm vật nuôi, chế biến/chế tạo theo JSON, giao đơn tại hộp thư, mở đất, nâng cấp dụng cụ và khám phá địa hình khối sinh liên tục theo seed. Có túi đồ 36 ô dùng chung hotbar 9 ô, minh họa vật phẩm, bản đồ nông trại 2D và thông báo vật nuôi đói. Cả hai map nhớ vị trí khi chuyển qua lại. Khi chết: trả 100 xu để hồi sinh tại chỗ, giữ đồ; lựa chọn miễn phí về cổng và rơi tối đa 3 món. Một ngày game dài 18 phút, có bốn mùa, thời tiết, ngủ qua đêm và câu đố ứng phó bão. Menu chính có chế độ sáng tạo LV99 để bay và kiểm thử mà không sửa bản lưu chơi thường.
 
 **Rương mới:** chuột phải mở thẳng bảng đồ; bấm từng món, Shift + click cả chồng hoặc **Lấy tất cả**. Giữ trái để đập vỡ và thả phần đồ còn lại. Không có câu hỏi; vẫn cần hạ quái canh.
@@ -84,7 +86,7 @@ git pull --ff-only origin main
 
 Unity Hub → Add project from disk → **thư mục vừa clone** (thư mục chứa Assets/Packages/ProjectSettings). Dùng Unity 6000.3.22f1, mở Assets/Farm/Scenes/Farm.unity. Chờ Unity tự tạo Library và tải Packages. Không chạy CreateScene hoặc RebuildSceneAndBuildWindows vì sẽ ghi đè scene/prefab đã nâng cấp.
 
-Build bằng `NongTrai.Editor.FarmProjectBuilder.BuildWindowsCurrentScene`, biến `FARM_BUILD_OUTPUT=Builds/Windows-ChestLoot`; dùng đường dẫn Unity.exe trên máy của bạn và `-projectPath` trỏ vào thư mục clone. Git chứa source, asset/model cùng giấy phép, cấu hình, meta, tài liệu và smoke checks; Library/Temp/Logs/Builds/DongGoi/Recovery không đưa lên Git. Bản ZIP Windows/Unity được đóng gói riêng tại máy bàn giao.
+Build bằng `NongTrai.Editor.FarmProjectBuilder.BuildWindowsCurrentScene`, biến `FARM_BUILD_OUTPUT=Builds/Windows-ChestLoot`; dùng đường dẫn Unity.exe trên máy của bạn và `-projectPath` trỏ vào thư mục clone. Git chứa source, asset/model cùng giấy phép, cấu hình, meta, tài liệu và smoke checks; Library/Temp/Logs/Builds/DongGoi/Recovery không đưa lên Git. Bản ZIP Windows/Unity được tải từ GitHub Releases; không cần lấy file riêng từ máy bàn giao.
 
 Xem CODEX_HANDOFF.md trước khi sửa; chạy game build với `-farmSmokeCheck -farmArtCheck` để kiểm tra toàn bộ, hoặc thêm `-farmSystemsOnly` để kiểm tra riêng các hệ thống mới. Kiểm thử dùng save tạm. Quyền sở hữu mã/thiết kế gốc: [COPYRIGHT.md](COPYRIGHT.md); giữ giấy phép asset của bên thứ ba.
 

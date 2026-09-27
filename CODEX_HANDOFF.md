@@ -1,3 +1,11 @@
+# Bàn giao cho nhóm qua GitHub Releases — 27/09/2026
+
+Release: https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/chestloot-20260927. Có gói Windows chạy ngay, source Unity đầy đủ, RELEASE-MANIFEST.json, SHA256SUMS.txt và HUONG_DAN_NHOM.md. Đọc hướng dẫn này để clone/mở/build ở máy khác; Tools/Build-Windows.ps1 gọi BuildWindowsCurrentScene, không dựng lại scene. Script đã kiểm cú pháp PowerShell; bản runtime dùng build/smoke đã đạt của ChestLoot, không build lại trong lượt upload.
+
+Mã gameplay/assets/config khớp commit build a2507c7. Commit bàn giao chỉ thêm hướng dẫn và công cụ ngoài Assets; manifest ghi riêng build_git_commit và source_git_commit. Git không chứa cache/log/ZIP; các gói tải nằm trong Release. Đã dọn lại Library sinh sau lần build cuối, log cũ và ảnh CombatComfort cũ; giữ log/ảnh kiểm tra ChestLoot, runtime mới và source backups. Library sẽ tự tạo lại khi mở Unity.
+
+## Bản game và lịch sử
+
 # Bản hiện tại — ChestLoot / HThinh.yy — 27/09/2026
 
 Rương bỏ câu đố theo yêu cầu mới nhất. Runtime `Builds/Windows-ChestLoot/NongTrai.exe`; backup `Recovery/Before-ChestLoot-20260927/UnitySource.zip`. Đọc CHOI_GAME.md và BAO_CAO_CHEST_LOOT.md; các quy tắc câu đố rương trong mục lịch sử dưới đây đã bị thay thế.
