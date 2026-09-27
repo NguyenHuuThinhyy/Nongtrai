@@ -1,32 +1,31 @@
 {
-  "release": "ChestLoot-20260927",
-  "release_url": "https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/chestloot-20260927",
+  "release": "BowPhysics-20260927",
+  "release_url": "https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/bowphysics-20260927",
   "unity": "6000.3.22f1",
   "save_version": 21,
   "git_repository": "https://github.com/NguyenHuuThinhyy/Nongtrai",
   "git_branch": "main",
-  "git_commit": "4e14064fa8096e71f66678c86a68052ab58bf60b",
-  "source_git_commit": "4e14064fa8096e71f66678c86a68052ab58bf60b",
-  "build_git_commit": "a2507c73195795e413f642995df663b72dd98bad",
-  "gameplay_matches_build_commit": true,
-  "runtime_bytes": 100987215,
+  "source_git_commit": "11cdedd8ff53c3e28695430808c5f17cb30dcffb",
+  "build_git_commit": "11cdedd8ff53c3e28695430808c5f17cb30dcffb",
+  "runtime_bytes": 100993487,
   "runtime_files": 169,
-  "build_log": "Logs/build-chest-loot-final.log",
-  "smoke_log": "Logs/smoke-chest-loot-final.log",
+  "build_log": "Logs/build-20260927-233710.log",
+  "bow_check_log": "Logs/smoke-bow-only.log",
+  "smoke_log": "Logs/smoke-bow-full.log",
   "smoke_exit": 0,
-  "startup": "alive/responding after 8 seconds; no exceptions",
+  "startup": "alive/responding after 15 seconds; no exceptions",
   "packages": [
     {
-      "file": "NongTrai-Windows-ChestLoot-20260927.zip",
-      "bytes": 36986321,
-      "sha256": "b874866ea7b5347611543e070af550f2f7126e3466fcca7f4b0d7bb58e650043",
+      "file": "NongTrai-Windows-BowPhysics-20260927.zip",
+      "bytes": 36990476,
+      "sha256": "ca05680cc33c2b7916b2cb80e8bde03cd8284ca5cf24422fdd971f9d89404e0d",
       "entries": 179
     },
     {
-      "file": "NongTrai-Unity-ChestLoot-20260927.zip",
-      "bytes": 4692201,
-      "sha256": "fdbf932b7df13001f547bc122d9e344e14e308b796b61a210be75d4938664082",
-      "entries": 588
+      "file": "NongTrai-Unity-BowPhysics-20260927.zip",
+      "bytes": 4699855,
+      "sha256": "1ab97604fc89b1e3f1d8e5053f9a214152c174b02e92fbbb6eeaa1555db339ba",
+      "entries": 593
     }
   ]
 }

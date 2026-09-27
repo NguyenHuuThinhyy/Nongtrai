@@ -1,9 +1,13 @@
 # Tải game và tiếp tục phát triển — HThinh.yy
 
-## Chơi bản Windows
+## Chơi ngay từ repo
 
-1. Mở [Release ChestLoot](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/chestloot-20260927).
-2. Tải `NongTrai-Windows-ChestLoot-20260927.zip`, giải nén toàn bộ rồi chạy `CHAY_GAME.bat` hoặc `NongTrai.exe`.
+Bấm **Code → Download ZIP**, giải nén toàn bộ, mở **CHAY_GAME.bat** ở thư mục gốc. Khi dùng `git clone`, có thể chạy ngay file này. Bản EXE và mọi thư mục đi kèm ở `Builds/Windows-BowPhysics`; gói Windows/Unity ở `DongGoi`.
+
+## Chơi bản Windows từ Releases
+
+1. Mở [Release BowPhysics](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/bowphysics-20260927).
+2. Tải `NongTrai-Windows-BowPhysics-20260927.zip`, giải nén toàn bộ rồi chạy `CHAY_GAME.bat` hoặc `NongTrai.exe`.
 3. Giữ EXE cùng `NongTrai_Data`, `MonoBleedingEdge`, `D3D12` và các DLL trong gói. Không cần Unity để chơi. Đọc `CHOI_GAME.md` đi kèm.
 
 ## Lấy đầy đủ source để sửa và build tiếp
@@ -13,7 +17,7 @@ git clone https://github.com/NguyenHuuThinhyy/Nongtrai.git
 cd Nongtrai
 ```
 
-Hoặc tải `NongTrai-Unity-ChestLoot-20260927.zip` ở Release và giải nén. Git clone phù hợp để làm việc nhóm, cập nhật và gửi thay đổi; ZIP source dành cho mở dự án không cần Git.
+Hoặc tải `NongTrai-Unity-BowPhysics-20260927.zip` ở Release và giải nén. Git clone phù hợp để làm việc nhóm, cập nhật và gửi thay đổi; ZIP source dành cho mở dự án không cần Git.
 
 - Cài Unity Hub và **Unity 6000.3.22f1** trên Windows; bảo đảm Editor có hỗ trợ build Windows. Dự án dùng URP, bản Windows hiện tại dùng backend Mono.
 - Unity Hub → Add project from disk → chọn thư mục chứa `Assets`, `Packages`, `ProjectSettings`.
@@ -43,6 +47,6 @@ Smoke dùng save tạm. Bản lưu chơi thường nằm trong `%USERPROFILE%\Ap
 
 ## Gửi thay đổi cho nhóm
 
-Tạo nhánh riêng, sửa và kiểm tra trước khi gửi PR. Commit cả `.meta` mới, source và cấu hình liên quan. Không commit cache/build/ZIP; đưa gói Windows và Unity lên GitHub Releases. Đọc `CODEX_HANDOFF.md` để biết hệ thống đang dùng.
+Tạo nhánh riêng, sửa và kiểm tra trước khi gửi PR. Commit cả `.meta` mới, source và cấu hình liên quan. Theo yêu cầu bàn giao, bản build và ZIP hiện tại được commit tại Builds/Windows-BowPhysics và DongGoi, đồng thời có trên Releases. Khi cập nhật bản phát hành, đồng bộ EXE, toàn bộ dữ liệu/DLL và checksum cùng nhau. Không commit cache, log, bản build thử hoặc save cá nhân. Đọc `CODEX_HANDOFF.md` để biết hệ thống đang dùng.
 
 Release có `RELEASE-MANIFEST.json` và `SHA256SUMS.txt`. File manifest phân biệt commit build game với commit tài liệu bàn giao; mã gameplay của hai commit được đối chiếu giống nhau.
