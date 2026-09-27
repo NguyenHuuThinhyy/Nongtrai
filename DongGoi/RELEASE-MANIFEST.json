@@ -1,0 +1,32 @@
+{
+  "release": "ChestLoot-20260927",
+  "release_url": "https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/chestloot-20260927",
+  "unity": "6000.3.22f1",
+  "save_version": 21,
+  "git_repository": "https://github.com/NguyenHuuThinhyy/Nongtrai",
+  "git_branch": "main",
+  "git_commit": "4e14064fa8096e71f66678c86a68052ab58bf60b",
+  "source_git_commit": "4e14064fa8096e71f66678c86a68052ab58bf60b",
+  "build_git_commit": "a2507c73195795e413f642995df663b72dd98bad",
+  "gameplay_matches_build_commit": true,
+  "runtime_bytes": 100987215,
+  "runtime_files": 169,
+  "build_log": "Logs/build-chest-loot-final.log",
+  "smoke_log": "Logs/smoke-chest-loot-final.log",
+  "smoke_exit": 0,
+  "startup": "alive/responding after 8 seconds; no exceptions",
+  "packages": [
+    {
+      "file": "NongTrai-Windows-ChestLoot-20260927.zip",
+      "bytes": 36986321,
+      "sha256": "b874866ea7b5347611543e070af550f2f7126e3466fcca7f4b0d7bb58e650043",
+      "entries": 179
+    },
+    {
+      "file": "NongTrai-Unity-ChestLoot-20260927.zip",
+      "bytes": 4692201,
+      "sha256": "fdbf932b7df13001f547bc122d9e344e14e308b796b61a210be75d4938664082",
+      "entries": 588
+    }
+  ]
+}

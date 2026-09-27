@@ -3,13 +3,27 @@
 /Obj/
 /Logs/
 /UserSettings/
-/Builds/
+# Checked-in playable release; other build outputs remain local.
+/Builds/*
+!/Builds/Windows-ChestLoot/
+/Builds/Windows-ChestLoot/*
+!/Builds/Windows-ChestLoot/NongTrai.exe
+!/Builds/Windows-ChestLoot/UnityPlayer.dll
+!/Builds/Windows-ChestLoot/UnityCrashHandler64.exe
+!/Builds/Windows-ChestLoot/NongTrai_Data/
+!/Builds/Windows-ChestLoot/MonoBleedingEdge/
+!/Builds/Windows-ChestLoot/D3D12/
 *.csproj
 *.sln
 *.slnx
 
 /Recovery/
-/DongGoi/
+/DongGoi/*
+!/DongGoi/NongTrai-Windows-ChestLoot-20260927.zip
+!/DongGoi/NongTrai-Unity-ChestLoot-20260927.zip
+!/DongGoi/RELEASE-MANIFEST.json
+!/DongGoi/SHA256SUMS.txt
+!/DongGoi/HUONG_DAN_NHOM.md
 /Nongtrai/
 
 # Unity/IDE files regenerated on each machine.

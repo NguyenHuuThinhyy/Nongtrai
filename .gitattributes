@@ -1,0 +1,4 @@
+# Preserve the exact tested bytes of release artifacts, including Mono config files.
+/Builds/** -text
+/DongGoi/** -text
+/CHAY_GAME.bat -text

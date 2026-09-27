@@ -1,3 +1,11 @@
+# Bàn giao trực tiếp trên nhánh main — yêu cầu mới nhất
+
+Người dùng yêu cầu thấy Builds và DongGoi ngay trong danh sách file GitHub và tải Code → Download ZIP là có thể chơi. Vì vậy repo theo dõi toàn bộ runtime đã kiểm tra trong Builds/Windows-ChestLoot (169 file), 5 file hiện tại trong DongGoi và launcher CHAY_GAME.bat ở gốc. .gitignore chỉ mở ngoại lệ cho bản phát hành này; cache, log, Recovery và bản build thử vẫn bỏ qua.
+
+Các ZIP và manifest trong DongGoi giữ nguyên byte từ Release chestloot-20260927; source_git_commit/build_git_commit mô tả phiên bản bên trong gói, không phải commit thêm các gói vào repo. Mã gameplay không thay đổi trong lượt này. Hướng dẫn ở gốc đã cập nhật việc chạy trực tiếp sau clone/Download ZIP. Những chỉ dẫn cũ bên dưới nói không đưa build/ZIP lên Git đã được thay thế bởi yêu cầu này.
+
+## Lịch sử bàn giao
+
 # Bàn giao cho nhóm qua GitHub Releases — 27/09/2026
 
 Release: https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/chestloot-20260927. Có gói Windows chạy ngay, source Unity đầy đủ, RELEASE-MANIFEST.json, SHA256SUMS.txt và HUONG_DAN_NHOM.md. Đọc hướng dẫn này để clone/mở/build ở máy khác; Tools/Build-Windows.ps1 gọi BuildWindowsCurrentScene, không dựng lại scene. Script đã kiểm cú pháp PowerShell; bản runtime dùng build/smoke đã đạt của ChestLoot, không build lại trong lượt upload.

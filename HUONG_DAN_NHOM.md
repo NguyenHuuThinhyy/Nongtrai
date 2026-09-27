@@ -1,6 +1,10 @@
 # Tải game và tiếp tục phát triển — HThinh.yy
 
-## Chơi bản Windows
+## Chơi ngay từ repo
+
+Bấm **Code → Download ZIP**, giải nén toàn bộ, mở **CHAY_GAME.bat** ở thư mục gốc. Khi dùng `git clone`, có thể chạy ngay file này. Bản EXE và mọi thư mục đi kèm ở `Builds/Windows-ChestLoot`; gói Windows/Unity ở `DongGoi`.
+
+## Chơi bản Windows từ Releases
 
 1. Mở [Release ChestLoot](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/chestloot-20260927).
 2. Tải `NongTrai-Windows-ChestLoot-20260927.zip`, giải nén toàn bộ rồi chạy `CHAY_GAME.bat` hoặc `NongTrai.exe`.
@@ -43,6 +47,6 @@ Smoke dùng save tạm. Bản lưu chơi thường nằm trong `%USERPROFILE%\Ap
 
 ## Gửi thay đổi cho nhóm
 
-Tạo nhánh riêng, sửa và kiểm tra trước khi gửi PR. Commit cả `.meta` mới, source và cấu hình liên quan. Không commit cache/build/ZIP; đưa gói Windows và Unity lên GitHub Releases. Đọc `CODEX_HANDOFF.md` để biết hệ thống đang dùng.
+Tạo nhánh riêng, sửa và kiểm tra trước khi gửi PR. Commit cả `.meta` mới, source và cấu hình liên quan. Theo yêu cầu bàn giao, bản build và ZIP hiện tại được commit tại Builds/Windows-ChestLoot và DongGoi, đồng thời có trên Releases. Khi cập nhật bản phát hành, đồng bộ EXE, toàn bộ dữ liệu/DLL và checksum cùng nhau. Không commit cache, log, bản build thử hoặc save cá nhân. Đọc `CODEX_HANDOFF.md` để biết hệ thống đang dùng.
 
 Release có `RELEASE-MANIFEST.json` và `SHA256SUMS.txt`. File manifest phân biệt commit build game với commit tài liệu bàn giao; mã gameplay của hai commit được đối chiếu giống nhau.
