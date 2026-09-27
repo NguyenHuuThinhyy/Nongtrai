@@ -65,6 +65,7 @@ namespace NongTrai
                 if(FarmAim.Hit(viewCamera,out var useHit)&&Vector3.Distance(useHit.point,player.transform.position)<6)
                 {
                     var sponge=useHit.collider.GetComponentInParent<FarmSponge>();if(sponge!=null){sponge.Interact(this);return;}
+                    var campfire=useHit.collider.GetComponentInParent<CampfireCooker>();if(campfire!=null){campfire.Interact(this);return;}
                     var sprinkler=useHit.collider.GetComponentInParent<IrrigationStation>();
                     if(sprinkler!=null&&sprinkler.portable){Say(FarmWaterSystem.Instance.DismantlePortable(sprinkler)?"Đã thu hồi vòi và kết thúc lượt thuê.":"Không thể thu vòi phun.");return;}
                     var wild=useHit.collider.GetComponentInParent<WildAnimal>();if(wild!=null){wild.Feed();return;}

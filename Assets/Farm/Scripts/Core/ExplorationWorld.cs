@@ -26,6 +26,8 @@ namespace NongTrai
         readonly HashSet<Vector3Int> removed=new HashSet<Vector3Int>();
         readonly Dictionary<Vector2Int,Chunk> chunks=new Dictionary<Vector2Int,Chunk>();
         TMPro.TMP_Text miningText,reticle;
+        FarmSwordReticle swordReticle;
+        Component swordTarget;
         UnityEngine.UI.Image breakFill;UnityEngine.GameObject breakBack;string miningHint="";
         readonly List<SaplingRecord> saplings=new List<SaplingRecord>();readonly Dictionary<Vector3Int,int> additions=new Dictionary<Vector3Int,int>();readonly Dictionary<SaplingRecord,GameObject> sprouts=new Dictionary<SaplingRecord,GameObject>();readonly HashSet<Vector3Int> leavesToCheck=new HashSet<Vector3Int>();float leafClock;
         Material[] materials;float hold;float breakDuration=1;int entityTarget;Vector3Int target;bool hasTarget;
@@ -72,6 +74,10 @@ namespace NongTrai
             var fill=FarmUi.Panel(breakBack.transform,"Tiến độ",new Vector2(0,8));breakFill=fill.GetComponent<UnityEngine.UI.Image>();breakFill.color=new Color(1,.74f,.18f);
             var fr=fill.GetComponent<RectTransform>();fr.anchorMin=fr.anchorMax=fr.pivot=new Vector2(0,.5f);fr.anchoredPosition=new Vector2(2,0);
             reticle.alignment=TMPro.TextAlignmentOptions.Center;reticle.raycastTarget=false;
+            var circle=new GameObject("Vòng ngắm kiếm",typeof(RectTransform),typeof(FarmSwordReticle));
+            circle.transform.SetParent(hud.gameplayChrome.transform,false);swordReticle=circle.GetComponent<FarmSwordReticle>();
+            swordReticle.rectTransform.anchorMin=swordReticle.rectTransform.anchorMax=swordReticle.rectTransform.pivot=new Vector2(.5f,.5f);
+            swordReticle.raycastTarget=false;circle.SetActive(false);
         }
         public void CreateStarterOrchard()
         {
@@ -301,29 +307,36 @@ namespace NongTrai
             if(hud.player.Paused||FarmBuildingSystem.Instance.IsBuilding)return false;
             miningHint="Nhìn vào khối đất/đá • Giữ CHUỘT TRÁI để đào • V đổi góc nhìn";
             bool swordSwing=pressed && AdventureBag.Instance?.Item==106 && hud.player.TryAttack();
+            swordTarget=AdventureBag.Instance?.Item==106?FarmSwordAim.FindTarget(hud.player,ray,Camera.main):null;
+            if(swordTarget!=null)
+            {
+                hasTarget=true;hold=0;miningHint="Trong tầm kiếm • Chuột trái: đánh "+swordTarget.name;
+                if(swordSwing)FarmSwordAim.Strike(swordTarget,hud.player.transform.position);
+                return false;
+            }
             // The third-person ray must pass through the player's own layer and reach past the camera offset.
             if(Physics.Raycast(ray,out var hit,24,~(1<<8),QueryTriggerInteraction.Ignore))
             {
                 var guard=hit.collider.GetComponentInParent<FarmChestGuard>();
                 if(guard!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
                 {miningHint=guard.Title+" • né khi hiện NÉ!";hasTarget=true;hold=0;
-                 if(pressed&&(swordSwing||AdventureBag.Instance?.Item!=106&&hud.player.TryAttack()))guard.Hit(hud.player.transform.position);return false;}
+                 if(pressed&&AdventureBag.Instance?.Item!=106&&hud.player.TryAttack())guard.Hit(hud.player.transform.position);return false;}
                 var caveBoss=hit.collider.GetComponentInParent<CaveBoss>();
                 if(caveBoss!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<7)
                 {miningHint="Golem hang sâu • LV quái cao • trái: đánh, cung: giữ rồi thả";hasTarget=true;hold=0;
-                 if(pressed&&(swordSwing||AdventureBag.Instance?.Item!=106&&hud.player.TryAttack())){caveBoss.Hit(hud.player.transform.position);}return false;}
+                 if(pressed&&AdventureBag.Instance?.Item!=106&&hud.player.TryAttack()){caveBoss.Hit(hud.player.transform.position);}return false;}
                 var wolf=hit.collider.GetComponentInParent<NightWolf>();
                 if(wolf!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
                 {miningHint="Sói đêm • Chuột trái: đánh từng đòn";hasTarget=true;hold=0;
-                 if(pressed&&(swordSwing||AdventureBag.Instance?.Item!=106&&hud.player.TryAttack())){wolf.Hit(hud.player.transform.position);}return false;}
+                 if(pressed&&AdventureBag.Instance?.Item!=106&&hud.player.TryAttack()){wolf.Hit(hud.player.transform.position);}return false;}
                 var predator=hit.collider.GetComponentInParent<DayPredator>();
                 if(predator!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
                 {miningHint=predator.name+" • Chuột trái: đánh từng đòn";hasTarget=true;hold=0;
-                 if(pressed&&(swordSwing||AdventureBag.Instance?.Item!=106&&hud.player.TryAttack())){predator.Hit(hud.player.transform.position);}return false;}
+                 if(pressed&&AdventureBag.Instance?.Item!=106&&hud.player.TryAttack()){predator.Hit(hud.player.transform.position);}return false;}
                 var wild=hit.collider.GetComponentInParent<WildAnimal>();
                 if(wild!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
                 {entityTarget=wild.GetInstanceID();hold=0;breakDuration=.35f;miningHint=wild.Status;hasTarget=true;
-                 if(pressed&&(swordSwing||AdventureBag.Instance?.Item!=106&&hud.player.TryAttack()))wild.Hit();return false;}
+                 if(pressed&&AdventureBag.Instance?.Item!=106&&hud.player.TryAttack())wild.Hit();return false;}
                 var chest=hit.collider.GetComponentInParent<FarmChest>();
                 if(chest!=null&&chest.isExploration&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
                 {
@@ -372,7 +385,16 @@ namespace NongTrai
         {
             if(miningText==null)return;
             bool building=FarmBuildingSystem.Instance.IsBuilding;bool visible=(IsExploring||building||hasTarget)&&!hud.player.Paused;
-            miningText.gameObject.SetActive(visible);reticle.gameObject.SetActive(!hud.player.Paused);
+            bool sword=AdventureBag.Instance?.Item==106;
+            miningText.gameObject.SetActive(visible);reticle.gameObject.SetActive(!hud.player.Paused&&!sword);
+            swordReticle.gameObject.SetActive(!hud.player.Paused&&sword);
+            if(sword)
+            {
+                var canvas=swordReticle.canvas;
+                float diameter=(Camera.main==null?Screen.height:Camera.main.pixelHeight)*FarmSwordAim.ViewportRadius*2/Mathf.Max(.01f,canvas.scaleFactor);
+                swordReticle.rectTransform.sizeDelta=new Vector2(diameter,diameter);
+                swordReticle.color=swordTarget!=null?new Color(1,.78f,.22f):Color.white;
+            }
             breakBack.SetActive(visible&&!building&&hold>0);
             if(visible)breakFill.rectTransform.sizeDelta=new Vector2(122*Mathf.Clamp01(hold/breakDuration),8);
             if(!visible)return;

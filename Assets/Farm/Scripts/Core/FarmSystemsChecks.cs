@@ -42,6 +42,65 @@ namespace NongTrai
             sponge.Interact(hud.interaction);Check(inventory.Count(73)==1,"Wet sponge cannot be collected");building.EquipBlock(-1);
             Debug.Log("FARM_SYSTEMS_SPONGE_OK: shop/place/radius-one absorption/full state/collect/save-load.");
 
+            // HThinh.yy: paid revival keeps the death location and inventory, on both maps.
+            var wolves=AdventureWolves.Instance;
+            foreach(var location in new[]{new Vector3(26,.1f,-30.5f),ExplorationWorld.Origin+new Vector3(12.5f,world.SurfaceHeight(12,14)+.1f,14.5f)})
+            {
+                player.Teleport(location);wolves.RestoreHealth(100);int cash=shop.Money;
+                string items=JsonUtility.ToJson(bag.Snapshot());
+                wolves.Damage(1000,"Kiểm tra hồi sinh tại chỗ");wolves.Respawn(true);
+                Check(!wolves.IsAwaitingRespawn&&wolves.Health==100&&shop.Money==cash-100&&Vector3.Distance(player.transform.position,location)<.01f,"Paid revive moved to gate or charged wrong amount");
+                Check(JsonUtility.ToJson(bag.Snapshot())==items,"Paid revive changed bag");
+                wolves.Respawn(true);Check(shop.Money==cash-100,"Revive charged twice");
+            }
+            player.Teleport(new Vector3(26,.1f,-30.5f));
+            int balance=shop.Money;Check(shop.TrySpend(balance),"Cannot set zero money fixture");
+            wolves.Damage(1000,"Kiểm tra thiếu xu");wolves.Respawn(true);
+            Check(wolves.IsAwaitingRespawn&&shop.Money==0,"Revive allowed without 100 coins");
+            shop.Credit(balance);wolves.Respawn(true);
+            Debug.Log("FARM_PAID_REVIVE_OK: in-place on both maps, exact 100 coins, inventory preserved, no double charge, insufficient funds blocked.");
+
+            // Hong bọt biển đã đặt và bọt biển cầm tay đều trả lại item72.
+            inventory.Add(73,2);building.EquipBlock(16);
+            Check(building.TryPlaceSelected(new Vector3(28,.5f,-31),0),"Wet sponge placement failed");
+            sponge=Object.FindFirstObjectByType<FarmSponge>();
+            sponge.AdvanceDrying(11);Check(sponge.Full,"Sponge dried without fire");
+            var fireObject=new GameObject("Smoke sponge fire");fireObject.transform.position=new Vector3(29.5f,.5f,-31);
+            var cooker=fireObject.AddComponent<CampfireCooker>();
+            sponge.AdvanceDrying(9);Check(sponge.Full,"Sponge dried too early");
+            sponge.AdvanceDrying(1.1f);Check(!sponge.Full&&sponge.GetComponent<PlacedBlock>().type==15,"Nearby fire did not dry sponge");
+            Check(save.Save()&&save.Load(),"Dry sponge save/load failed");
+            sponge=Object.FindFirstObjectByType<FarmSponge>();Check(sponge!=null&&!sponge.Full,"Dry state lost on load");
+            sponge.Interact(hud.interaction);building.EquipBlock(-1);
+            Equip(bag,73);int dry=inventory.Count(72),wet=inventory.Count(73);cooker.Interact(hud.interaction);
+            Check(cooker.Cooking&&cooker.OutputItem==72&&inventory.Count(73)==wet-1,"Fire did not accept wet sponge");
+            cooker.Restore(cooker.Cooking,.1f,cooker.OutputItem);hud.Resume();yield return new WaitForSeconds(.25f);
+            Check(!cooker.Cooking&&inventory.Count(72)==dry+1,"Fire did not return dry sponge");Object.Destroy(fireObject);
+            Debug.Log("FARM_SPONGE_DRY_OK: nearby fire, 10 seconds, dry state saved, collect/reuse, held sponge accepted by campfire.");
+
+            // Target help agrees with the circle, never goes through a wall, respects sword cooldown.
+            building.EquipBlock(-1);bag.Slots[8]=new BagSlot{item=106,count=1,durability=100};bag.Select(8);
+            Vector3 swordFixture=new Vector3(0,100,-26);player.Teleport(swordFixture);
+            var aimCamera=Camera.main;Vector3 aimPosition=aimCamera.transform.position;Quaternion aimRotation=aimCamera.transform.rotation;float aimFov=aimCamera.fieldOfView;
+            aimCamera.transform.SetPositionAndRotation(swordFixture+new Vector3(0,.43f,-4),Quaternion.identity);aimCamera.fieldOfView=60;
+            var fox=DayPredator.Create(swordFixture+new Vector3(.7f,0,3),wolves,false);fox.enabled=false;Physics.SyncTransforms();
+            Ray swordRay=FarmAim.Ray(aimCamera);
+            Check(FarmSwordAim.FindTarget(player,swordRay,aimCamera)==fox,"Sword missed a monster just off center");
+            float hp=fox.Health;world.UpdateMiningRay(swordRay,true,.01f);Check(fox.Health<hp,"Assisted sword hit did not apply damage");
+            hp=fox.Health;world.UpdateMiningRay(swordRay,true,.01f);Check(fox.Health==hp,"Assisted attack bypassed cooldown");
+            var wall=GameObject.CreatePrimitive(PrimitiveType.Cube);wall.transform.position=swordFixture+new Vector3(0,1,1.5f);wall.transform.localScale=new Vector3(4,3,.3f);Physics.SyncTransforms();
+            Check(FarmSwordAim.FindTarget(player,swordRay,aimCamera)==null,"Sword aim selected through wall");
+            wall.SetActive(false);fox.transform.position=swordFixture+new Vector3(3,0,3);Physics.SyncTransforms();
+            Check(FarmSwordAim.FindTarget(player,swordRay,aimCamera)==null,"Sword selected outside circle");
+            fox.transform.position=swordFixture+new Vector3(0,0,8);Physics.SyncTransforms();
+            Check(FarmSwordAim.FindTarget(player,swordRay,aimCamera)==null,"Sword selected beyond melee reach");
+            Object.Destroy(fox.gameObject);Object.Destroy(wall);
+            aimCamera.transform.SetPositionAndRotation(aimPosition,aimRotation);aimCamera.fieldOfView=aimFov;
+            player.Teleport(new Vector3(26,.1f,-30.5f));yield return null;
+            var circle=Object.FindFirstObjectByType<FarmSwordReticle>();Check(circle!=null&&circle.gameObject.activeInHierarchy&&!circle.raycastTarget,"Sword circle missing or blocks input");
+            Equip(bag,105);yield return null;Check(!circle.gameObject.activeSelf,"Sword circle remained on bucket");
+            Debug.Log("FARM_SWORD_AIM_OK: off-center hit, wall and range checks, cooldown, circle/tool switch.");
+
             can.Restore(null);int rented=inventory.Count(56);
             for(int i=0;i<3;i++)can.BuyPortable();money=shop.Money;can.BuyPortable();
             Check(can.RentalLimit==3&&can.RentedToday==3&&inventory.Count(56)==rented+3&&shop.Money==money,"LV1 rental daily cap");
@@ -83,6 +142,9 @@ namespace NongTrai
             camera.transform.position=boss.transform.position+new Vector3(5,4,-7);camera.transform.LookAt(boss.transform.position+Vector3.up*1.5f);
             yield return null;yield return new WaitForEndOfFrame();
             FarmNewFeaturesChecks.Capture(hud,camera,"forge-systems-health-preview.png");
+            Equip(bag,106);hud.Resume();world.UpdateMiningRay(FarmAim.Ray(camera),false,.01f);
+            yield return null;yield return new WaitForEndOfFrame();
+            FarmNewFeaturesChecks.Capture(hud,camera,"forge-combat-sword-circle-preview.png");
             camera.transform.SetPositionAndRotation(cameraPosition,cameraRotation);player.cameraRig.enabled=rigEnabled;if(brain!=null)brain.enabled=brainEnabled;
             Object.Destroy(boss.gameObject);Object.Destroy(obstacle);Object.Destroy(testMaterial);hud.Resume();
             Debug.Log("FARM_SYSTEMS_ENEMY_OK: actual boss jump over one block, visible numeric HP and health fill.");

@@ -1,4 +1,11 @@
-# Bản cập nhật Systems — 27/09/2026
+# Bản cập nhật CombatComfort — 27/09/2026
+
+- **Hồi sinh tại chỗ:** trả 100 xu, hồi đầy máu và giữ đồ ngay nơi ngã xuống. Không đủ xu thì nút bị khóa. Lựa chọn miễn phí vẫn về cổng và rơi tối đa 3 món.
+- **Hong bọt biển:** đặt bọt biển đầy cách đống lửa tối đa 2 m, không có tường chắn, chờ 10 giây. Hoặc cầm bọt biển đầy rồi chuột phải vào đống lửa để hong từng chiếc trong 10 giây. Thu bọt biển khô để hút nước lần nữa. Hong khối đặt cạnh lửa bắt đầu lại nếu rời xa lửa hoặc tải game; bọt biển đang xử lý trong đống lửa lưu tiến độ như nướng thịt.
+- **Ngắm kiếm:** cầm kiếm hiện vòng tròn viền rõ, giữa trong suốt; vàng khi bắt được mục tiêu. Quái hơi lệch tâm trong vòng vẫn đánh được. Không tăng tầm đánh, không xuyên tường, giữ hồi chiêu 0,3 giây. Đổi dụng cụ trở lại dấu +.
+
+Chạy `Builds/Windows-CombatComfort/NongTrai.exe` hoặc giải nén gói Windows CombatComfort mới nhất.
+
 
 ## TNT: đặt trước, châm sau
 
@@ -23,14 +30,14 @@
 - **Bán/bỏ kiếm, rìu, cung:** mở túi bằng I/B, bấm chọn ô rồi Bán số lượng hoặc Bỏ vật phẩm đã chọn. Chỉ số không chuyển sang vũ khí khác.
 - **Rương hiếm:** hạ quái canh trước khi trả lời câu hỏi. Sói → rắn → gấu → golem có sức mạnh/phần thưởng tăng theo bậc; đúng thì đồ rơi, sai mất rương.
 - **Chơi lại từ đầu:** Esc → Chơi lại từ đầu → xác nhận. Bắt đầu LV1 với map/túi mới; bản lưu cũ được cất dự phòng, không lưu phiên hiện tại. Hủy thì tiếp tục đúng vị trí/cấp độ.
-- **Lưu và mở lại game thông thường:** vẫn dùng bản lưu thủ công. Save cũ giữ địa hình cũ; sông/hồ theo seed mới có trong map tạo mới. Đổi map nhớ vị trí; chỉ chết mới về cổng hồi sinh đã đặt hoặc cổng gốc.
+- **Lưu và mở lại game thông thường:** vẫn dùng bản lưu thủ công. Save cũ giữ địa hình cũ; sông/hồ theo seed mới có trong map tạo mới. Đổi map nhớ vị trí; hồi sinh miễn phí về cổng đã đặt hoặc cổng gốc; trả 100 xu thì hồi sinh tại chỗ.
 
 ### Hướng dẫn các hệ thống có sẵn
 
 
 - **Bàn rèn:** chuột phải mở bàn đã đặt; bấm hoặc kéo kiếm/cung/rìu và đá từ túi vào hai ô. Bấm Rèn mới trừ đá/xu. Bấm ô đã chọn để bỏ chọn.
 - **Sông/biển:** Tab → Khám phá; sông ở phía tây (-36,0), biển phía nam (0,-75), theo tọa độ ô HUD. Tự nổi trên nước, Space để ngoi; đặt ván cầu nếu muốn đi qua nhanh.
-- **Cổng hồi sinh:** chế tạo bằng 8 khối đá + 3 kim loại + 1 đá nâng cấp. Chọn cổng trong hotbar/G, đặt ở Khám phá với khoảng trống 2,5 × 3 m. Chỉ có một cổng tự đặt, không tính cổng gốc. Chuột phải vào trụ để về trại. Tab đổi map luôn nhớ vị trí đứng cuối cùng; chỉ khi chết mới hồi sinh tại cổng này. Giữ trái phá, nhặt lại rồi chuyển chỗ. Khi chết: chưa có cổng/cổng bị chặn hai phía → hồi sinh ở cổng gốc. Nhớ Lưu game để giữ vị trí cổng.
+- **Cổng hồi sinh:** chế tạo bằng 8 khối đá + 3 kim loại + 1 đá nâng cấp. Chọn cổng trong hotbar/G, đặt ở Khám phá với khoảng trống 2,5 × 3 m. Chỉ có một cổng tự đặt, không tính cổng gốc. Chuột phải vào trụ để về trại. Tab đổi map luôn nhớ vị trí đứng cuối cùng; khi chọn hồi sinh miễn phí mới về cổng này. Giữ trái phá, nhặt lại rồi chuyển chỗ. Khi hồi sinh miễn phí: chưa có cổng/cổng bị chặn hai phía → hồi sinh ở cổng gốc. Nhớ Lưu game để giữ vị trí cổng.
 - **Boss:** 2.400 HP, đập 38 HP; dưới nửa máu chạy nhanh và đập 52 HP. Né khi hiện chữ báo đòn đập; chuẩn bị bình máu và vũ khí rèn.
 - **Runner:** tăng khó tại 200/500/900/1400 m, đổi làn trống giữa các hàng; sau 500 m có xe rơm từ lề. A/D đổi làn, W/Space nhảy, S trượt. Tốc độ tối đa 26 m/s.
 - Theo đính chính: **giữ Shift chạy 9 m/s** (trước 7), đi 6 m/s; tăng tốc/hãm nhanh hơn. Mũ theo xương đầu, giữ tóc gốc.
@@ -102,7 +109,7 @@ Mười một công thức chế biến nằm trong `Assets/StreamingAssets/reci
 
 Map Khám phá sinh địa hình theo seed khi đi xa và tải từng chunk 16 × 16 m. Có cây gỗ lớn theo giai đoạn, lá, quặng, thú hoang bò/heo/cừu/gà với mật độ thấp và một ít rương chứa đồ. Chuột phải mở rương; giữ trái để phá rương, đồ bên trong rơi ra. Đêm (18:00–06:00) có sói đuổi và cắn; cầm đuốc hoặc đứng gần đuốc/đống lửa đã đặt để xua sói. Ban ngày có ít cáo ở đồng cỏ và rắn trong hang; chúng phát hiện bạn phía trước, có thanh máu và lùi lại sau khi cắn. Xẻng đào nhanh, kiếm và rìu gây thêm sát thương; **mọi khối đều rơi vật phẩm khi phá**, kể cả khi không cầm đúng dụng cụ. Một click là một đòn đánh, thú và quái bị đẩy lùi nhẹ; sói có thanh máu và cần khoảng bảy nhát kiếm thường. Thú hoang tái sinh có giới hạn. Bò/heo/cừu/gà cho thịt sống riêng; cừu còn cho len. Chọn thịt sống rồi click đống lửa để nướng một miếng trong 10 giây; thịt sống không ăn trực tiếp được. Có thể dùng lúa mì hoặc cám để dụ và cho thú hoang ăn, cho hai con cùng loài ăn gần nhau để sinh sản. Đào 30 khối mở bản vẽ lò nung và đèn. Công trình và địa hình đã đào được lưu khi nhấn **Lưu game**. Nhà kho ở gần nhà nông trại có lưới kéo-thả túi/kho; rương tự chế có thể đặt ở cả hai map và cất đồ riêng.
 
-Thanh máu và độ no xuất hiện ở cả hai bản đồ. Đói cạn sẽ trừ máu định kỳ; khi độ no **trên 70**, máu hồi 2 điểm mỗi 5 giây chơi. Khi hết máu, chọn **trả 100 xu** để giữ đồ hoặc **rơi tối đa 3 món ngẫu nhiên** rồi hồi sinh. Nếu không đủ 100 xu, chỉ còn lựa chọn rơi đồ. Nhắc phím E/Tab nằm gọn bên trái HUD để không che giữa màn hình.
+Thanh máu và độ no xuất hiện ở cả hai bản đồ. Đói cạn sẽ trừ máu định kỳ; khi độ no **trên 70**, máu hồi 2 điểm mỗi 5 giây chơi. Khi hết máu, chọn **trả 100 xu** để hồi sinh tại chỗ và giữ đồ hoặc **rơi tối đa 3 món ngẫu nhiên** rồi hồi sinh miễn phí tại cổng. Nếu không đủ 100 xu, chỉ còn lựa chọn rơi đồ. Nhắc phím E/Tab nằm gọn bên trái HUD để không che giữa màn hình.
 
 **Chỉ nút Lưu game trong menu Esc ghi tiến độ.** Thoát không tự lưu. Chế độ sáng tạo dùng bản sao trong bộ nhớ, LV99, bật bay và mở cả hai map; rời chế độ sẽ bỏ toàn bộ thay đổi thử nghiệm. Bản lưu v21 đọc được v2–v20, giữ nguồn nước, bọt biển, vòi/lượt thuê, hạt đặc biệt, rương boss và chỉ số riêng của vũ khí. Đường dẫn bản lưu Windows: `%USERPROFILE%\AppData\LocalLow\Nong Trai Studio\Nong Trai - First Harvest\farm-manual-save.json`.
 

@@ -1,10 +1,12 @@
 # Nông Trại – First Harvest
 
-Game nông trại Unity cho Windows. Trồng cây bằng chuột trái, chăm vật nuôi, chế biến/chế tạo theo JSON, giao đơn tại hộp thư, mở đất, nâng cấp dụng cụ và khám phá địa hình khối sinh liên tục theo seed. Có túi đồ 36 ô dùng chung hotbar 9 ô, minh họa vật phẩm, bản đồ nông trại 2D và thông báo vật nuôi đói. Cả hai map nhớ vị trí khi chuyển qua lại. Chỉ khi chết ở Khám phá mới hồi sinh tại cổng tự đặt, hoặc cổng gốc nếu chưa có cổng. Một ngày game dài 18 phút, có bốn mùa, thời tiết, ngủ qua đêm và câu đố ứng phó bão. Menu chính có chế độ sáng tạo LV99 để bay và kiểm thử mà không sửa bản lưu chơi thường.
+Game nông trại Unity cho Windows. Trồng cây bằng chuột trái, chăm vật nuôi, chế biến/chế tạo theo JSON, giao đơn tại hộp thư, mở đất, nâng cấp dụng cụ và khám phá địa hình khối sinh liên tục theo seed. Có túi đồ 36 ô dùng chung hotbar 9 ô, minh họa vật phẩm, bản đồ nông trại 2D và thông báo vật nuôi đói. Cả hai map nhớ vị trí khi chuyển qua lại. Khi chết: trả 100 xu để hồi sinh tại chỗ, giữ đồ; lựa chọn miễn phí về cổng và rơi tối đa 3 món. Một ngày game dài 18 phút, có bốn mùa, thời tiết, ngủ qua đêm và câu đố ứng phó bão. Menu chính có chế độ sáng tạo LV99 để bay và kiểm thử mà không sửa bản lưu chơi thường.
 
-**Gói mới:** `DongGoi/NongTrai-Windows-Systems-20260927.zip` và `DongGoi/NongTrai-Unity-Systems-20260927.zip`. Báo cáo: [BAO_CAO_SYSTEMS.md](BAO_CAO_SYSTEMS.md). Gói cũ đã chuyển vào Recovery.
+**CombatComfort:** hồi sinh tại chỗ giá 100 xu; bọt biển đầy hong 10 giây ở đống lửa; kiếm có vòng ngắm rỗng với hỗ trợ đánh hơi lệch tâm, giữ tầm đánh và chặn bởi tường.
 
-**Chơi ngay:** mở `D:\GAME_NongTrai\Builds\Windows-Systems\NongTrai.exe`; giữ nguyên cả thư mục `Windows-Systems` khi sao chép sang máy khác. Không cần cài Unity để chạy bản Windows. Xem [CHOI_GAME.md](CHOI_GAME.md) để biết điều khiển và vòng chơi.
+**Gói mới:** `DongGoi/NongTrai-Windows-CombatComfort-20260927.zip` và `DongGoi/NongTrai-Unity-CombatComfort-20260927.zip`. Báo cáo: [BAO_CAO_COMBAT_COMFORT.md](BAO_CAO_COMBAT_COMFORT.md). Gói Systems được giữ dự phòng trong Recovery; các bản Windows cũ hơn đã dọn.
+
+**Chơi ngay:** mở `D:\GAME_NongTrai\Builds\Windows-CombatComfort\NongTrai.exe`; giữ nguyên cả thư mục `Windows-CombatComfort` khi sao chép sang máy khác. Không cần cài Unity để chạy bản Windows. Xem [CHOI_GAME.md](CHOI_GAME.md) để biết điều khiển và vòng chơi.
 
 **Bản Systems:** một xô nước dùng **chuột trái**: rỗng → múc hồ/sông, đầy → đặt nước → rỗng. Shop bán bọt biển hút nước trong 1 ô xung quanh rồi đầy. Hạt hết tự biến mất; bán được tất cả đồ trong túi. Thuê vòi tự tưới 350 xu/ngày, tối đa 3/ngày (LV3/5/7 mở 4/5/6), không nạp nước. Rương boss có bí pha lê và dâu hoàng kim. Quái nhảy qua khối cao 1 ô, thanh máu có số rõ hơn. © HThinh.yy ở góc màn hình.
 
@@ -19,7 +21,7 @@ Nhân vật hiện dùng Kenney Mini Characters biến thể `character-male-e.f
 Để build bản Windows đang dùng, đóng Editor đang mở cùng dự án rồi chạy. Lệnh này dùng scene hiện tại và không gọi builder dựng lại:
 
 ```powershell
-$env:FARM_BUILD_OUTPUT='Builds/Windows-Systems'
+$env:FARM_BUILD_OUTPUT='Builds/Windows-CombatComfort'
 & 'D:\Unity\Editors\6000.3.22f1\Editor\Unity.exe' -batchmode -nographics -quit -projectPath 'D:\GAME_NongTrai' -executeMethod NongTrai.Editor.FarmProjectBuilder.BuildWindowsCurrentScene -logFile 'D:\GAME_NongTrai\Logs\build.log'
 ```
 
@@ -80,7 +82,7 @@ git pull --ff-only origin main
 
 Unity Hub → Add project from disk → **thư mục vừa clone** (thư mục chứa Assets/Packages/ProjectSettings). Dùng Unity 6000.3.22f1, mở Assets/Farm/Scenes/Farm.unity. Chờ Unity tự tạo Library và tải Packages. Không chạy CreateScene hoặc RebuildSceneAndBuildWindows vì sẽ ghi đè scene/prefab đã nâng cấp.
 
-Build bằng `NongTrai.Editor.FarmProjectBuilder.BuildWindowsCurrentScene`, biến `FARM_BUILD_OUTPUT=Builds/Windows-Systems`; dùng đường dẫn Unity.exe trên máy của bạn và `-projectPath` trỏ vào thư mục clone. Git chứa source, asset/model cùng giấy phép, cấu hình, meta, tài liệu và smoke checks; Library/Temp/Logs/Builds/DongGoi/Recovery không đưa lên Git. Bản ZIP Windows/Unity được đóng gói riêng tại máy bàn giao.
+Build bằng `NongTrai.Editor.FarmProjectBuilder.BuildWindowsCurrentScene`, biến `FARM_BUILD_OUTPUT=Builds/Windows-CombatComfort`; dùng đường dẫn Unity.exe trên máy của bạn và `-projectPath` trỏ vào thư mục clone. Git chứa source, asset/model cùng giấy phép, cấu hình, meta, tài liệu và smoke checks; Library/Temp/Logs/Builds/DongGoi/Recovery không đưa lên Git. Bản ZIP Windows/Unity được đóng gói riêng tại máy bàn giao.
 
 Xem CODEX_HANDOFF.md trước khi sửa; chạy game build với `-farmSmokeCheck -farmArtCheck` để kiểm tra toàn bộ, hoặc thêm `-farmSystemsOnly` để kiểm tra riêng các hệ thống mới. Kiểm thử dùng save tạm. Quyền sở hữu mã/thiết kế gốc: [COPYRIGHT.md](COPYRIGHT.md); giữ giấy phép asset của bên thứ ba.
 
@@ -88,5 +90,5 @@ Xem CODEX_HANDOFF.md trước khi sửa; chạy game build với `-farmSmokeChec
 
 - Git chứa toàn bộ `Assets` (kèm `.meta` và giấy phép), `Packages`, `ProjectSettings` và tài liệu. Các file này đủ để Unity mở dự án sau khi clone.
 - `Library`, `Temp`, `Obj`, `Logs`, cấu hình IDE cá nhân và dữ liệu debug do Unity tạo được bỏ qua trong Git. Unity tự tạo lại cache khi mở dự án; lần mở đầu có thể lâu hơn.
-- `Builds`, `DongGoi`, `Recovery` là dữ liệu bàn giao/khôi phục trên máy, không đưa vào source Git. Bản chạy mới nhất ở `Builds/Windows-Systems`; giữ cả thư mục khi sao chép.
+- `Builds`, `DongGoi`, `Recovery` là dữ liệu bàn giao/khôi phục trên máy, không đưa vào source Git. Bản chạy mới nhất ở `Builds/Windows-CombatComfort`; giữ cả thư mục khi sao chép.
 - Giữ bản sao source trước khi sửa scene. Chỉ dọn bản build cũ sau khi đã phân biệt với bản mới đang chạy; không xóa asset, `.meta`, script tương thích save hoặc giấy phép chỉ vì không thấy dùng trong scene.

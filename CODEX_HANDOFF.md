@@ -1,3 +1,15 @@
+# Bản hiện tại — CombatComfort / HThinh.yy — 27/09/2026
+
+Runtime `Builds/Windows-CombatComfort/NongTrai.exe`; source backup `Recovery/Before-CombatComfort-20260927/UnitySource.zip`. Không chạy CreateScene, scene hash không đổi. Xem BAO_CAO_COMBAT_COMFORT.md và CHOI_GAME.md trước các mục lịch sử bên dưới.
+
+- AdventureWolves ghi deathPosition khi chết; trả 100 xu Teleport đúng vị trí đó, giữ đồ. Miễn phí vẫn về FarmTravelPortal.Arrival/FarmArrival. UI nói rõ hai lựa chọn.
+- FarmSponge hong 10 giây khi CampfireCooker.HasHeat trong 2 m và không bị tường che. Type16→15 và property block đổi sang màu khô; thu lại được item72. Timer hong khối đặt gần lửa không lưu, tải lại bắt đầu 10 giây mới. CampfireCooker nhận item73→72 qua chuột phải, 10 giây; dùng trường cooking/cookRemaining/cookedOutput hiện có để lưu. Không đổi save21.
+- FarmSwordAim dùng OverlapSphereNonAlloc, kiểm góc chung với FarmSwordAim.ViewportRadius (.055, đường kính 11% chiều cao); LOS cả camera/người chơi; tầm cũ 6/7 m, một mục tiêu mỗi đòn, cooldown/durability giữ nguyên. Vòng mesh UI không texture, hiện khi item106, giữa trong suốt, vàng khi có mục tiêu. ExplorationWorld gọi helper trước ray đào.
+- FarmSystemsChecks bổ sung trả tiền tại chỗ/cả hai map/thiếu tiền, hong bọt biển và lưu trạng thái, kiếm lệch tâm/tường/tầm/hồi chiêu/UI. Build final Logs/build-combat-comfort-package.log OK100987695; full smoke/art Logs/smoke-combat-comfort-package.log exit0; startup responsive8s không exception. Đã xem ảnh vòng kiếm mới.
+- Dọn thành công cache Library, log và runtime/ZIP Windows cũ (~3,70 GiB, gồm runtime Systems cũ; giữ ZIP dự phòng). Lệnh xóa dùng đường dẫn đã kiểm và không cưỡng chế file đang dùng. Các ghi chú bị chặn dọn ở lượt trước bên dưới là lịch sử, không còn phản ánh kết quả lượt này. Giữ source backup và giấy phép. Git đồng bộ cả source, meta, docs; không push cache/build/ZIP.
+
+## Lịch sử trước CombatComfort
+
 # Bản hiện tại — Systems / HThinh.yy — 27/09/2026
 
 ## Đồng bộ Git và dọn file — 27/09/2026

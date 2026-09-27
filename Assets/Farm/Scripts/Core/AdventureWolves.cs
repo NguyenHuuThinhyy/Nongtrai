@@ -22,6 +22,7 @@ namespace NongTrai
         GameObject deathPanel;
         TMP_Text deathText;
         Button payButton;
+        Vector3 deathPosition;
         bool warned;
         void Awake() { Instance = this; }
         void Start()
@@ -35,8 +36,8 @@ namespace NongTrai
             deathPanel=FarmUi.Panel(hud.transform,"Hồi sinh",new Vector2(760,460));
             FarmUi.TmpLabel(deathPanel.transform,"BẠN ĐÃ KIỆT SỨC",new Vector2(35,-30),new Vector2(690,60),34);
             deathText=FarmUi.TmpLabel(deathPanel.transform,"",new Vector2(35,-105),new Vector2(690,90),23);
-            payButton=FarmUi.Button(deathPanel.transform,"Trả 100 xu • giữ đồ",new Vector2(35,-230),new Vector2(690,65),()=>Respawn(true));
-            FarmUi.Button(deathPanel.transform,"Rơi 3 món ngẫu nhiên • hồi sinh",new Vector2(35,-320),new Vector2(690,65),()=>Respawn(false));
+            payButton=FarmUi.Button(deathPanel.transform,"100 xu • hồi sinh TẠI CHỖ, giữ đồ",new Vector2(35,-230),new Vector2(690,65),()=>Respawn(true));
+            FarmUi.Button(deathPanel.transform,"Miễn phí • về cổng, rơi tối đa 3 món",new Vector2(35,-320),new Vector2(690,65),()=>Respawn(false));
             deathPanel.SetActive(false);
         }
         void OnDestroy() { if (Instance == this) Instance = null; }
@@ -114,9 +115,10 @@ namespace NongTrai
             healingTimer=0;
             Health=Mathf.Max(0,Health-Mathf.Max(0,amount));hud.Notify(message);
             if(Health>0)return;
+            deathPosition=hud.player.transform.position;
             hud.player.SetPaused(true);hud.pausePanel.SetActive(false);
             deathPanel.SetActive(true);payButton.interactable=hud.interaction.shop.Money>=100;
-            deathText.text="Chọn cách hồi sinh. Bạn có "+hud.interaction.shop.Money+" xu.\nTrả xu để giữ đồ hoặc rơi tối đa 3 món tại nơi ngã xuống.";
+            deathText.text="Bạn có "+hud.interaction.shop.Money+" xu.\n100 xu: đứng dậy tại chỗ, giữ đồ. Miễn phí: về cổng, rơi đồ tại nơi ngã xuống.";
         }
         public void AdvanceRecovery(float seconds,float satiety)
         {
@@ -154,8 +156,9 @@ namespace NongTrai
                 }
             }
             Health=100;starvationTimer=0;deathPanel.SetActive(false);
-            hud.player.Teleport(hud.player.transform.position.y>500?FarmTravelPortal.Arrival:IslandManager.FarmArrival);
-            hud.Resume();hud.Notify(pay?"Đã hồi sinh và giữ đồ (-100 xu).":"Đã hồi sinh. 3 món đã rơi tại vị trí ngã xuống.");
+            // HThinh.yy: trả xu giữ đúng điểm ngã; Teleport xóa vận tốc rơi/đẩy còn lại.
+            hud.player.Teleport(pay?deathPosition:deathPosition.y>500?FarmTravelPortal.Arrival:IslandManager.FarmArrival);
+            hud.Resume();hud.Notify(pay?"Đã hồi sinh TẠI CHỖ và giữ đồ (-100 xu).":"Đã về cổng. Tối đa 3 món rơi tại vị trí ngã xuống.");
         }
     }
 

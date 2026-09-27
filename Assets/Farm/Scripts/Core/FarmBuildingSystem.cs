@@ -240,18 +240,32 @@ namespace NongTrai
     public sealed class PlacedBlock:MonoBehaviour{public int type;}
     public sealed class CampfireCooker:MonoBehaviour,IInteractable
     {
+        static readonly HashSet<CampfireCooker> fires=new HashSet<CampfireCooker>();
+        void OnEnable()=>fires.Add(this);
+        void OnDisable()=>fires.Remove(this);
+        public static bool HasHeat(Vector3 point)
+        {
+            foreach(var fire in fires)
+            {
+                if(fire==null||Vector3.Distance(point,fire.transform.position)>2)continue;
+                var start=fire.transform.position+Vector3.up*.6f;
+                var end=point+Vector3.up*.6f;
+                if(!Physics.Linecast(start,end,~((1<<8)|(1<<2)),QueryTriggerInteraction.Ignore))return true;
+            }
+            return false;
+        }
         public bool Cooking {get;private set;}
         public float Remaining {get;private set;}
         public int OutputItem {get;private set;}=39;
-        public string InteractionHint=>Cooking?"Thịt đang nướng • "+Mathf.CeilToInt(Remaining)+" giây":"Chọn thịt sống rồi [Chuột phải] vào lửa để nướng";
+        public string InteractionHint=>Cooking?(OutputItem==72?"Đang hong bọt biển":"Thịt đang nướng")+" • "+Mathf.CeilToInt(Remaining)+" giây":"Cầm thịt sống / bọt biển đầy • chuột phải để nướng / hong khô";
         public bool CanInteract(FarmPlayer player)=>true;
         public void SetHighlighted(bool value)=>InteractionOutline.Set(this,value);
         public void Interact(PlayerInteraction actor)
         {if(Cooking){actor.Say(InteractionHint);return;}
          int raw=AdventureBag.Instance==null?-1:AdventureBag.Instance.Item;
-         if(raw!=7&&raw!=57&&raw!=58&&raw!=59){actor.Say("Chọn một loại thịt sống trong hotbar rồi click lửa.");return;}
-         if(!actor.inventory.Remove(raw,1)){actor.Say("Không còn thịt sống.");return;}
-         OutputItem=raw==7?39:raw+3;Cooking=true;Remaining=10;actor.Say("Đang nướng "+actor.inventory.Name(raw)+" (10 giây).");}
+         if(raw!=73&&raw!=7&&raw!=57&&raw!=58&&raw!=59){actor.Say("Chọn thịt sống hoặc bọt biển đầy trong hotbar rồi chuột phải vào lửa.");return;}
+         if(!actor.inventory.Remove(raw,1)){actor.Say("Không còn vật phẩm đã chọn.");return;}
+         OutputItem=raw==73?72:raw==7?39:raw+3;Cooking=true;Remaining=10;actor.Say((raw==73?"Đang hong khô ":"Đang nướng ")+actor.inventory.Name(raw)+" (10 giây).");}
         public void Restore(bool cooking,float remaining,int output=39){Cooking=cooking;Remaining=Mathf.Max(0,remaining);OutputItem=output==0?39:output;}
         void Update()
         {if(!Cooking||TimeManager.Instance==null||TimeManager.Instance.player.Paused)return;
