@@ -215,6 +215,7 @@ namespace NongTrai
             {Part(root.transform,"Bọt biển",Vector3.zero,Vector3.one,type==15?new Color(.94f,.81f,.23f):new Color(.55f,.55f,.19f));var sponge=root.AddComponent<FarmSponge>();if(type==15)sponge.Absorb();}
             else Part(root.transform,names[type],Vector3.zero,Vector3.one,colors[type]);
             FarmVoxelWater.Instance?.Displace(new Bounds(position,Vector3.one));
+            FarmRedesign.Building(block);
             return block;
         }
         static void Part(Transform parent,string name,Vector3 local,Vector3 scale,Color color)

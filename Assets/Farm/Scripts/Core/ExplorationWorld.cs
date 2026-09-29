@@ -42,6 +42,7 @@ namespace NongTrai
         sealed class Chunk
         {
             public GameObject go;public MeshFilter filter;public MeshCollider collider;public Mesh mesh;
+            public Mesh collisionMesh;public GameObject decoration;
             public int[,,] cells=new int[ChunkSize,Height,ChunkSize];
         }
         static readonly Vector3Int[] dirs={Vector3Int.right,Vector3Int.left,Vector3Int.up,Vector3Int.down,new Vector3Int(0,0,1),new Vector3Int(0,0,-1)};
@@ -406,6 +407,7 @@ namespace NongTrai
         void Rebuild(Vector2Int key,Chunk chunk)
         {
             var vertices=new List<Vector3>();var triangles=new List<int>[materials.Length];for(int i=0;i<triangles.Length;i++)triangles[i]=new List<int>();
+            var collisionVertices=new List<Vector3>();var collisionTriangles=new List<int>();
             for(int x=0;x<ChunkSize;x++)for(int y=0;y<Height;y++)for(int z=0;z<ChunkSize;z++)
             {
                 int type=chunk.cells[x,y,z];if(type==0)continue;
@@ -414,15 +416,42 @@ namespace NongTrai
                     var n=new Vector3Int(x,y,z)+dirs[face];
                     int adjacent=n.x>=0&&n.x<ChunkSize&&n.z>=0&&n.z<ChunkSize&&n.y>=0&&n.y<Height?chunk.cells[n.x,n.y,n.z]:BlockAt(new Vector3Int(key.x*ChunkSize+n.x,n.y,key.y*ChunkSize+n.z));
                     if(adjacent!=0)continue;
+                    int colliderStart=collisionVertices.Count;foreach(var v in faces[face])collisionVertices.Add(new Vector3(x,y,z)+v);
+                    collisionTriangles.Add(colliderStart);collisionTriangles.Add(colliderStart+1);collisionTriangles.Add(colliderStart+2);collisionTriangles.Add(colliderStart);collisionTriangles.Add(colliderStart+2);collisionTriangles.Add(colliderStart+3);
+                    // Keep tree voxels in the mining/collision mesh, while imported
+                    // CC0 trees supply the visible geometry.
+                    if(type==7||type==8)continue;
                     int start=vertices.Count;foreach(var v in faces[face])vertices.Add(new Vector3(x,y,z)+v);
                     var t=triangles[type-1];t.Add(start);t.Add(start+1);t.Add(start+2);t.Add(start);t.Add(start+2);t.Add(start+3);
                 }
             }
             var next=new Mesh{indexFormat=IndexFormat.UInt32};next.SetVertices(vertices);next.subMeshCount=triangles.Length;
             for(int i=0;i<triangles.Length;i++)next.SetTriangles(triangles[i],i);next.RecalculateNormals();next.RecalculateBounds();
-            chunk.filter.sharedMesh=next;chunk.collider.sharedMesh=null;chunk.collider.sharedMesh=next;if(chunk.mesh!=null)Destroy(chunk.mesh);chunk.mesh=next;
+            var collision=new Mesh{indexFormat=IndexFormat.UInt32};collision.SetVertices(collisionVertices);collision.SetTriangles(collisionTriangles,0);collision.RecalculateBounds();
+            chunk.filter.sharedMesh=next;chunk.collider.sharedMesh=null;chunk.collider.sharedMesh=collision;
+            if(chunk.mesh!=null)Destroy(chunk.mesh);if(chunk.collisionMesh!=null)Destroy(chunk.collisionMesh);chunk.mesh=next;chunk.collisionMesh=collision;
+            DecorateChunk(key,chunk);
         }
-        void Dispose(Chunk chunk){if(chunk.go!=null){chunk.go.SetActive(false);Destroy(chunk.go);}if(chunk.mesh!=null)Destroy(chunk.mesh);}
+        void DecorateChunk(Vector2Int key,Chunk chunk)
+        {
+            if(chunk.decoration!=null){chunk.decoration.SetActive(false);Destroy(chunk.decoration);}
+            chunk.decoration=new GameObject("CC0 trees and meadow details");chunk.decoration.transform.SetParent(chunk.go.transform,false);
+            int grassCount=0;
+            for(int x=0;x<ChunkSize;x++)for(int z=0;z<ChunkSize;z++)
+            {
+                int gx=key.x*ChunkSize+x,gz=key.y*ChunkSize+z,top=SurfaceHeight(gx,gz);
+                if(BlockAt(new Vector3Int(gx,top,gz))==7&&BlockAt(new Vector3Int(gx,top-1,gz))!=7)
+                {string tree=Hash(gx,17,gz)%3==0?"nature-kit/tree_pineRoundA":Hash(gx,19,gz)%2==0?"nature-kit/tree_oak":"nature-kit/tree_detailed";
+                 var model=FarmRedesign.Add(chunk.decoration.transform,tree,new Vector3(x+.5f,top,z+.5f),5.2f+Hash(gx,23,gz)%20*.08f);
+                 if(model!=null)model.localRotation=Quaternion.Euler(0,Hash(gx,29,gz)%360,0);continue;}
+                uint hash=Hash(gx,31,gz);int ground=BlockAt(new Vector3Int(gx,top-1,gz));
+                if(ground==1&&hash%31==0&&grassCount++<12)
+                {var grass=FarmRedesign.Add(chunk.decoration.transform,"nature-kit/grass_leafs",new Vector3(x+.5f,top+.01f,z+.5f),.24f+hash%5*.025f);
+                 if(grass!=null)grass.localRotation=Quaternion.Euler(0,hash%360,0);
+                 if(hash%93==0)FarmRedesign.Add(chunk.decoration.transform,hash%2==0?"nature-kit/flower_redA":"nature-kit/flower_yellowC",new Vector3(x+.72f,top+.01f,z+.4f),.20f);}
+            }
+        }
+        void Dispose(Chunk chunk){if(chunk.go!=null){chunk.go.SetActive(false);Destroy(chunk.go);}if(chunk.mesh!=null)Destroy(chunk.mesh);if(chunk.collisionMesh!=null)Destroy(chunk.collisionMesh);}
         void ClearChunks(){foreach(var chunk in chunks.Values)Dispose(chunk);chunks.Clear();}
         void OnDestroy(){if(Instance==this)Instance=null;ClearChunks();if(materials!=null)foreach(var material in materials)Destroy(material);}
     }

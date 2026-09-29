@@ -7,6 +7,7 @@ namespace NongTrai
         public FarmPlayer player;Transform holder;int current=int.MinValue;bool building,bucketFull;
         readonly System.Collections.Generic.Dictionary<Color,Material> materials=new System.Collections.Generic.Dictionary<Color,Material>();
         public Vector3 BowOrigin => holder != null && current == 11 ? holder.position : transform.position+Vector3.up*1.4f;
+        public void RefreshPresentation() { current=int.MinValue; }
         void OnDestroy(){foreach(var material in materials.Values)Destroy(material);}
         void Start()
         {
@@ -33,6 +34,7 @@ namespace NongTrai
         void Rebuild()
         {
             foreach(Transform child in holder)Destroy(child.gameObject);
+            if(FarmRedesign.Held(holder,current,building))return;
             if(building){int type=current-30;var block=Part(PrimitiveType.Cube,Vector3.zero,type==8?new Vector3(.08f,.34f,.08f):new Vector3(.25f,.22f,.25f),BlockColor(type));
                 if(type==8)Part(PrimitiveType.Sphere,Vector3.up*.24f,Vector3.one*.16f,new Color(1,.65f,.12f));
                 if(type==9)Part(PrimitiveType.Cube,Vector3.up*.12f,new Vector3(.32f,.04f,.06f),BlockColor(type));return;}

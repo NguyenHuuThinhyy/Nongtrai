@@ -51,7 +51,7 @@ namespace NongTrai
             t.label.rectTransform.sizeDelta=new Vector2(5,2);t.label.color=Color.white;t.label.outlineColor=Color.black;t.label.outlineWidth=.2f;
             var fuse=new GameObject("Ánh sáng ngòi TNT",typeof(Light));fuse.transform.SetParent(go.transform,false);fuse.transform.localPosition=Vector3.up*.65f;
             t.fuseLight=fuse.GetComponent<Light>();t.fuseLight.color=new Color(1,.65f,.2f);t.fuseLight.range=2;t.fuseLight.intensity=1.5f;t.fuseLight.shadows=LightShadows.None;
-            t.RefreshFlash();return t;
+            FarmRedesign.Tnt(t);t.RefreshFlash();return t;
         }
         public bool Ignite()
         {if(Ignited||exploded)return false;Ignited=true;phase=0;remaining=PhaseSeconds;RefreshFlash();Spark();return true;}
@@ -59,6 +59,7 @@ namespace NongTrai
         void RefreshFlash()
         {
             if(material!=null)material.color=FlashOn?Color.white:red;
+            FarmRedesign.Flash(transform,FlashOn?Color.white:red);
             if(fuseLight!=null)fuseLight.enabled=FlashOn;
             if(label!=null)label.text=Ignited?"TNT • "+FlashCount+"/5":"TNT • CHƯA CHÂM";
             gameObject.name=Ignited?"TNT • ngòi cháy "+FlashCount+"/5":"TNT • chờ châm đuốc";

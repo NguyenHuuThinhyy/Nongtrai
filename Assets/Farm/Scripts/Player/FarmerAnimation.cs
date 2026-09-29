@@ -15,6 +15,7 @@ namespace NongTrai
         float phase;
         float smoothSpeed,speedVelocity;
         float actionUntil,actionStart;string currentAction;Quaternion[] armRest,legRest;
+        public void RebindVisual() { armRest=null;legRest=null;gripReady=false;if(rigRoot!=null)rigRest=rigRoot.localPosition; }
         void OnEnable() { player = GetComponentInParent<FarmPlayer>(); if(player==null)return;previous = player.transform.position;restPosition=transform.localPosition;if(rigRoot!=null)rigRest=rigRoot.localPosition; }
         void LateUpdate()
         {

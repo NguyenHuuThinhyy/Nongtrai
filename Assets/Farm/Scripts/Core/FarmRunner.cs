@@ -102,7 +102,8 @@ namespace NongTrai
             foreach(var behaviour in avatar.GetComponentsInChildren<MonoBehaviour>(true))behaviour.enabled=false;
             foreach(var col in avatar.GetComponentsInChildren<Collider>(true))col.enabled=false;
             foreach(var t in avatar.GetComponentsInChildren<Transform>(true)){t.gameObject.layer=0;if(t.name=="Vật phẩm nhỏ trên tay")t.gameObject.SetActive(false);if(t.name=="arm-left"||t.name=="arm-right"){arms.Add(t);armRest.Add(t.localRotation);}if(t.name=="leg-left"||t.name=="leg-right"){legs.Add(t);legRest.Add(t.localRotation);}}
-            animator=avatar.GetComponentInChildren<Animator>();if(animator!=null){animator.enabled=true;animator.cullingMode=AnimatorCullingMode.AlwaysAnimate;animator.updateMode=AnimatorUpdateMode.UnscaledTime;}
+            animator=null;foreach(var candidate in avatar.GetComponentsInChildren<Animator>())if(candidate.enabled)animator=candidate;
+            if(animator!=null){animator.enabled=true;animator.cullingMode=AnimatorCullingMode.AlwaysAnimate;animator.updateMode=AnimatorUpdateMode.UnscaledTime;}
             foreach(var t in avatar.GetComponentsInChildren<Transform>())if(t.name=="root"){rigRoot=t;rigRest=t.localPosition;}
             actor.SetActive(true);
             Part(world.transform,"Đất phía sau điểm xuất phát",new Vector3(0,-.25f,-20),new Vector3(64,.4f,40),new Color(.43f,.64f,.29f));
@@ -133,6 +134,9 @@ namespace NongTrai
              Part(o.forms[1].transform,"Xà ngang",new Vector3(0,1.65f,0),new Vector3(2.25f,1,1),new Color(.60f,.35f,.18f));
              for(int side=-1;side<=1;side+=2)Part(o.forms[1].transform,"Trụ cổng",new Vector3(side*1.08f,1.1f,0),new Vector3(.12f,2.2f,.3f),new Color(.60f,.35f,.18f));
              o.forms[2]=Part(o.root,"Xe rơm • ĐỔI LÀN",new Vector3(0,1.5f,0),new Vector3(2,3,1.7f),new Color(.78f,.39f,.22f));s.obstacles.Add(o);}
+            foreach(var o in s.obstacles)
+            {var hay=FarmRedesign.Add(o.forms[0].transform,"survival-kit/resource-wood",Vector3.down*.5f,1,.95f,.9f);if(hay!=null)o.forms[0].GetComponent<Renderer>().enabled=false;
+             var cart=FarmRedesign.Add(o.forms[2].transform,"car-kit/tractor",Vector3.down*.5f,1.1f,1.7f,1.7f);if(cart!=null)o.forms[2].GetComponent<Renderer>().enabled=false;}
             for(int i=0;i<18;i++)
             {var c=new Coin{root=Part(s.root,"Xu trên đường",Vector3.zero,new Vector3(.3f,.3f,.12f),new Color(1,.80f,.12f),PrimitiveType.Sphere).transform};s.coins.Add(c);}
             return s;

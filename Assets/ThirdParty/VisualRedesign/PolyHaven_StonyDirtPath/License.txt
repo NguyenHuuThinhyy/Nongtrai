@@ -1,0 +1,8 @@
+Stony Dirt Path by eye-candy.xyz / Poly Haven
+Source: https://polyhaven.com/a/stony_dirt_path
+License: CC0 1.0 Universal
+License text: https://creativecommons.org/publicdomain/zero/1.0/
+
+Downloaded maps:
+- stony_dirt_path_diff_1k.jpg
+- stony_dirt_path_nor_dx_1k.jpg

@@ -24,6 +24,7 @@ namespace NongTrai
         int chopHits;
         void Start()
         {
+            FarmRedesign.Orchard(this);
             player=FindFirstObjectByType<FarmPlayer>();matureScale=transform.localScale;
             if(fruitKind==3)
             {if(orchardTreeVisual!=null)orchardTreeVisual.SetActive(false);if(blueberryBushVisual!=null)blueberryBushVisual.SetActive(true);

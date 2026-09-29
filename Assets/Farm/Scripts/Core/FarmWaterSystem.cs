@@ -133,6 +133,7 @@ namespace NongTrai
             handle.transform.localRotation=Quaternion.Euler(0,0,-58);
             RuntimePart(source.transform,"Xô nước",PrimitiveType.Cylinder,new Vector3(1.05f,-.33f,0),new Vector3(.38f,.42f,.38f),new Color(.28f,.62f,.82f));
             source.AddComponent<WaterSource>();
+            FarmRedesign.WaterInfrastructure(source.transform,false);
             var board=GameObject.CreatePrimitive(PrimitiveType.Cube);
             board.name="Bảng quản lý nước - E";board.transform.position=new Vector3(25.4f,1.45f,-10.4f);
             board.transform.localScale=new Vector3(2.4f,1.15f,.18f);
@@ -341,6 +342,7 @@ namespace NongTrai
             "Trạm vùng "+(region+1)+" • tự tưới bán kính 6 m, không cần nạp nước";
         public void InitializeVisuals(Transform rotatingArms)
         {
+            FarmRedesign.WaterInfrastructure(transform,true);
             arms=rotatingArms;
             var waterShader=Shader.Find("Universal Render Pipeline/Unlit");
             if(waterShader==null)waterShader=Shader.Find("Universal Render Pipeline/Lit");

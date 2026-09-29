@@ -17,3 +17,50 @@ Nhân vật e được phối trang phục làm việc xanh/kem bằng mesh/mate
 ## AdventureFeedback — 27/09/2026
 
 Không tải thêm asset. Sói, rắn, gấu và golem canh rương trong `FarmChestGuard.cs` là visual primitive tự dựng, dùng vật liệu URP chung theo từng quái. Hiệu ứng dụng cụ/nước dùng lại `Resources/FarmParticles.mat`. Các model nhập và giấy phép CC0 nêu trên giữ nguyên.
+
+## Visual Redesign toàn game — 28/09/2026
+
+Toàn bộ asset mới nằm riêng trong `Assets/ThirdParty/VisualRedesign`; từng gói giữ nguyên `License.txt`. Các prefab đã chuẩn hóa cho URP được sinh vào `Assets/Farm/Resources/FarmRedesign/Models`. Script chỉ tắt renderer cũ rồi gắn hình mới; gameplay root, collider, ID vật phẩm và dữ liệu save không đổi.
+
+| Gói | Nguồn chính thức | Giấy phép | Phần đang dùng |
+|---|---|---|---|
+| Kenney Survival Kit | https://kenney.nl/assets/survival-kit | CC0 | Bàn chế tạo/rèn, rương, hàng rào, lửa trại, dụng cụ, nguyên liệu và vật phẩm cầm tay |
+| Kenney Food Kit | https://kenney.nl/assets/food-kit | CC0 | Nông sản, thức ăn, thịt, chai, túi hạt và vật phẩm rơi |
+| Kenney Nature Kit | https://kenney.nl/assets/nature-kit | CC0 | Cây, bụi, đá, cầu, hoa và cây trồng nhiều giai đoạn |
+| Kenney Factory Kit | https://kenney.nl/assets/factory-kit | CC0 | Máy chế biến, bánh răng quay, trạm tưới và máy bơm |
+| Kenney Building Kit | https://kenney.nl/assets/building-kit | CC0 | Tường, mái và bậc xây dựng |
+| Kenney Mini Characters | https://kenney.nl/assets/mini-characters | CC0 | Nhân vật nông dân mới và animation |
+| Kenney UI Pack Adventure | https://kenney.nl/assets/ui-pack-adventure | CC0 | Panel và nút HUD dạng gỗ |
+| Kenney Car Kit | https://kenney.nl/assets/car-kit | CC0 | Xe giao hàng và chướng ngại Runner |
+| Quaternius Farm Buildings | https://quaternius.com/packs/farmbuildings.html | CC0 | Chuồng lớn, kho và silo |
+| Quaternius Ultimate Crops | https://quaternius.com/packs/ultimatecrops.html | CC0 | Bụi quả và cây trồng theo giai đoạn |
+| Quaternius Ultimate Animated Animals | https://quaternius.com/packs/ultimateanimatedanimals.html | CC0 | Bò, cáo, sói có animation |
+| Quaternius Easy Enemy | https://quaternius.com/packs/easyenemy.html | CC0 | Rắn hang động |
+| Quaternius Medieval Weapons | https://quaternius.com/packs/medievalweapons.html | CC0 | Kiếm, cung và mũi tên |
+| Kenney City Kit (Suburban) | https://kenney.nl/assets/city-kit-suburban | CC0 | `building-type-n`: nhà ở hai tầng thay cho khối nhà/silo cũ; collider cửa, giường và logic ngủ vẫn thuộc root gameplay cũ |
+| PagDev Mailbox (OpenGameArt) | https://opengameart.org/content/mailbox | CC-BY 4.0 | Hộp nhận/giao bưu kiện PBR dùng cho điểm giao đơn; ghi công tác giả PagDev trong `ReadMe.txt` |
+
+## Landscape pass — 28/09/2026
+
+Không bổ sung asset có giấy phép mới. Đợt này tái sử dụng các model CC0 đã tải từ Kenney Nature Kit và Quaternius Farm Buildings:
+
+- `BigBarn`, `OpenBarn`, `SmallBarn`, `Silo_House`, `Well`: thay toàn bộ nhà nông trại và làng ở map khám phá.
+- `tree_detailed`, `tree_oak`, `tree_pineRoundA`: thay cây cảnh nông trại và cây voxel nhìn thấy ở map khám phá; collider voxel vẫn được giữ riêng cho đào/chặt cây.
+- `rock_largeA/B`, `grass_leafs`, `flower_redA`, `flower_yellowC`: dựng viền hồ, thảm cỏ và hoa trang trí.
+- Mặt hồ cong bất quy tắc, bờ đất và gợn nước được tạo bằng mesh runtime; đây là hình học trình bày, không thay `WaterSource`, vùng bơi hay collider đáy hồ.
+
+## Grass interaction và đường chính — 28/09/2026
+
+| Gói | Nguồn chính thức | Giấy phép | Phần đang dùng |
+|---|---|---|---|
+| Poly Haven, Stony Dirt Path | https://polyhaven.com/a/stony_dirt_path | CC0 | Diffuse và DirectX normal 1K cho đường chính/sân trước; texture lặp theo kích thước mặt đường |
+| Kenney Nature Kit, `grass_leafs` | https://kenney.nl/assets/nature-kit | CC0 | Cỏ 3D trên bãi cỏ; `FarmGrassMotion` tạo gió nhẹ và uốn cỏ ra xa khi người chơi tới gần |
+
+Bản sửa hồ thu hẹp dải đất sát nước, thêm dải cỏ chuyển tiếp và emission nhẹ cho mặt nước để bờ không biến thành mảng đen vào ban đêm. File giấy phép Poly Haven được giữ tại `Assets/ThirdParty/VisualRedesign/PolyHaven_StonyDirtPath/License.txt`.
+
+## Nhà ở, bàn chế tạo, hộp thư và bờ hồ kín — 28/09/2026
+
+- Nhà ở dùng `building-type-n` từ Kenney City Kit (Suburban), có hình dáng nhà dân rõ ràng hơn; model và `License.txt` nằm tại `Assets/ThirdParty/VisualRedesign/city-kit-suburban`.
+- Bàn chế tạo dùng `workbench` từ Kenney Survival Kit CC0. Hộp thư dùng model Mailbox game-ready của PagDev (CC-BY 4.0), giữ nguyên file ghi công tại `Assets/ThirdParty/VisualRedesign/OpenGameArt_Mailbox/ReadMe.txt`.
+- Hai model chỉ thay renderer của object `CraftingTable` và `DeliveryMailbox`; collider, `IInteractable`, nhãn nổi và callback mở bảng chế tạo/giao đơn không đổi.
+- Hồ có thêm một nền đất kín lớn hơn hốc cũ, bờ đất chồng lên mặt cỏ và thành bờ hai mặt kéo sâu xuống dưới. Ba lớp này ngăn lộ nền trời/khe trắng ở mép hồ từ góc nhìn thấp. Riêng mặt bờ đất có một `MeshCollider` trùng khít để nhân vật đứng trên viền mà không lún; vùng nước và trigger cũ không đổi.

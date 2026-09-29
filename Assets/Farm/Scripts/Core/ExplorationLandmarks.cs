@@ -26,12 +26,25 @@ namespace NongTrai
             var village=new GameObject("Làng ven hồ").transform;village.SetParent(landmarks.transform,false);village.localPosition=new Vector3(24,world.SurfaceHeight(24,76),76);
             for(int side=-1;side<=1;side+=2)for(int row=0;row<2;row++)
             {Vector3 home=new Vector3(side*7,0,row*9-5);Color wall=new Color(.80f,.66f,.43f);
-             Part(village,"Tường sau nhà",home+new Vector3(0,1.5f,2.5f),new Vector3(5,3,.22f),wall);
-             for(int x=-1;x<=1;x+=2)Part(village,"Tường bên",home+new Vector3(x*2.4f,1.5f,0),new Vector3(.22f,3,5),wall);
-             for(int x=-1;x<=1;x+=2)Part(village,"Mặt tiền chừa cửa",home+new Vector3(x*1.7f,1.5f,-2.5f),new Vector3(1.5f,3,.2f),wall);
-             Part(village,"Mái nhà",home+new Vector3(0,3.15f,0),new Vector3(5.6f,.4f,5.6f),new Color(.61f,.28f,.20f));
+             string model=(side+row)%2==0?"Quaternius_FarmBuildings/SmallBarn":"Quaternius_FarmBuildings/Silo_House";
+             var imported=FarmRedesign.Add(village,model,home,4.7f,5.8f,5.8f);
+             if(imported!=null) imported.localRotation=Quaternion.Euler(0,side<0?90:-90,0);
+             else {Part(village,"Tường sau nhà",home+new Vector3(0,1.5f,2.5f),new Vector3(5,3,.22f),wall);
+              for(int x=-1;x<=1;x+=2)Part(village,"Tường bên",home+new Vector3(x*2.4f,1.5f,0),new Vector3(.22f,3,5),wall);
+              Part(village,"Mái nhà",home+new Vector3(0,3.15f,0),new Vector3(5.6f,.4f,5.6f),new Color(.61f,.28f,.20f));}
              Part(village,"Lối vào",home+new Vector3(0,.025f,-3),new Vector3(1.6f,.05f,2),stone);}
-            Part(village,"Giếng làng",new Vector3(0,.45f,0),new Vector3(2,.9f,2),stone);Part(village,"Nước giếng",new Vector3(0,.93f,0),new Vector3(1.4f,.03f,1.4f),new Color(.16f,.55f,.79f));
+            if(FarmRedesign.Add(village,"Quaternius_FarmBuildings/Well",new Vector3(0,0,0),2.3f,2.8f,2.8f)==null)
+            {Part(village,"Giếng làng",new Vector3(0,.45f,0),new Vector3(2,.9f,2),stone);Part(village,"Nước giếng",new Vector3(0,.93f,0),new Vector3(1.4f,.03f,1.4f),new Color(.16f,.55f,.79f));}
+            for(int i=0;i<12;i++)
+            {float a=i*Mathf.PI*2/12;Vector3 p=new Vector3(Mathf.Cos(a)*12,0,Mathf.Sin(a)*13);
+             var tree=FarmRedesign.Add(village,i%3==0?"nature-kit/tree_pineRoundA":"nature-kit/tree_detailed",p,4.6f+i%3*.45f);
+             if(tree!=null)tree.localRotation=Quaternion.Euler(0,i*61,0);
+             FarmRedesign.Add(village,"nature-kit/grass_leafs",p+new Vector3(.7f,0,.35f),.32f);}
+            // Decorate the generated exploration lake without changing voxel water or swimming rules.
+            for(int i=0;i<20;i++)
+            {float a=i*Mathf.PI*2/20;int lx=Mathf.RoundToInt(56+Mathf.Cos(a)*10.5f),lz=Mathf.RoundToInt(18+Mathf.Sin(a)*10.5f);
+             float y=world.SurfaceHeight(lx,lz);Vector3 p=new Vector3(lx,y,lz);
+             FarmRedesign.Add(landmarks.transform,i%2==0?"nature-kit/rock_largeA":"nature-kit/grass_leafs",p,i%2==0?.42f:.32f);}
             Sign(village,new Vector3(0,3.6f,-10),"LÀNG VEN HỒ • LỐI ĐI GIỮA HAI DÃY NHÀ");
             Sign(landmarks.transform,new Vector3(32,12,12),"HỒ → (56,18) • TẾ ĐÀN → (88,24)\nLÀNG → (24,76) • HỐ SÂU ← (-18,35)\nSÔNG ← (-36,0) • BIỂN ↓ (0,-75)",.22f);
         }
