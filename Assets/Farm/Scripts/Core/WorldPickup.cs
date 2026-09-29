@@ -13,6 +13,7 @@ namespace NongTrai
             go.name="Vật phẩm rơi";go.transform.position=position+Vector3.up*.35f;go.transform.localScale=Vector3.one*.22f;
             var m=new Material(Shader.Find("Universal Render Pipeline/Lit"));m.color=item==20?new Color(.55f,.3f,.1f):item==21?Color.gray:Color.yellow;go.GetComponent<Renderer>().material=m;
             var drop=go.AddComponent<WorldPickup>();drop.item=item;drop.count=count;drop.mutatedCrop=mutatedCrop;drop.weapon=weapon?.Copy();drop.resting=go.transform.position;
+            string art=FarmRedesign.ItemKey(item);if(art!=null)FarmRedesign.Replace(go.transform,art,Vector3.down*.6f,1.2f,1.4f,1.4f);
         }
         void OnEnable()=>all.Add(this);void OnDisable()=>all.Remove(this);
         void OnDestroy(){var r=GetComponent<Renderer>();if(r!=null)Destroy(r.material);}

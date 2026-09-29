@@ -121,7 +121,8 @@ namespace NongTrai
                 Part("Vạch làn",PrimitiveType.Cube,new Vector3(x*1.05f,.04f,z),new Vector3(.10f,.025f,2.6f),new Color(.96f,.85f,.55f));
             for(int z=9;z<108;z+=12)for(int side=-1;side<=1;side+=2)
             {Color color=level==0?new Color(.33f,.58f,.24f):new Color(.65f,.48f,.34f);
-             Part("Cảnh ven đường",level==0?PrimitiveType.Sphere:PrimitiveType.Cube,new Vector3(side*7,level==0?1.5f:1.4f,z),new Vector3(2.3f,level==0?2.8f:2.5f,2.3f),color);}
+             var scenery=Part("Cảnh ven đường",level==0?PrimitiveType.Sphere:PrimitiveType.Cube,new Vector3(side*7,level==0?1.5f:1.4f,z),new Vector3(2.3f,level==0?2.8f:2.5f,2.3f),color);
+             if(level==0){var art=FarmRedesign.Add(scenery.transform,"nature-kit/tree_small",Vector3.down*.5f,1);if(art!=null)scenery.GetComponent<Renderer>().enabled=false;}}
             obstacles.Clear();
             int count=4+level*3;
             for(int i=0;i<count;i++)
@@ -164,6 +165,8 @@ namespace NongTrai
             {VehiclePart("Thân tên lửa",PrimitiveType.Capsule,new Vector3(0,.8f,0),new Vector3(.65f,.80f,.65f),body).transform.localRotation=Quaternion.Euler(90,0,0);
              for(int s=-1;s<=1;s+=2)VehiclePart("Cánh tên lửa",PrimitiveType.Cube,new Vector3(s*.48f,.53f,-.55f),new Vector3(.5f,.08f,.7f),new Color(.92f,.44f,.25f));
              VehiclePart("Lửa đuôi",PrimitiveType.Capsule,new Vector3(0,.8f,-1.0f),new Vector3(.3f,.18f,.3f),new Color(1,.68f,.2f));}
+            string vehicleArt=tier==1||tier==2?"car-kit/tractor":tier==3?"car-kit/delivery":tier==4?"car-kit/truck":null;
+            if(vehicleArt!=null){foreach(var r in vehicle.GetComponentsInChildren<Renderer>())r.enabled=false;FarmRedesign.Add(vehicle,vehicleArt,Vector3.zero,tier>=3?1.65f:1.25f,tier>=3?1.8f:1.3f,tier>=3?2.5f:2);}
             if(routeCamera==null)
             {var cameraObject=new GameObject("Delivery Rush camera",typeof(Camera),typeof(UniversalAdditionalCameraData));routeCamera=cameraObject.GetComponent<Camera>();
              routeCamera.targetTexture=routeTexture;routeCamera.fieldOfView=58;routeCamera.nearClipPlane=.1f;routeCamera.farClipPlane=110;

@@ -22,7 +22,7 @@ namespace NongTrai
 
             Check(player.settings.runSpeed==9&&player.settings.walkSpeed==6,"Updated map speed missing");
             player.Teleport(new Vector3(0,.1f,-35));yield return null;
-            var keys=UnityEngine.InputSystem.Keyboard.current;
+            var keys=UnityEngine.InputSystem.Keyboard.current??UnityEngine.InputSystem.InputSystem.AddDevice<UnityEngine.InputSystem.Keyboard>();
             UnityEngine.InputSystem.InputSystem.QueueStateEvent(keys,new UnityEngine.InputSystem.LowLevel.KeyboardState(UnityEngine.InputSystem.Key.W,UnityEngine.InputSystem.Key.LeftShift));
             yield return new WaitForSeconds(.5f);Vector3 runStart=player.transform.position;float runTime=Time.time;
             yield return new WaitForSeconds(.35f);Vector3 runDelta=player.transform.position-runStart;runDelta.y=0;

@@ -111,6 +111,7 @@ namespace NongTrai
             // Giữ kích thước cây theo mét, độc lập với tỷ lệ của ô đất.
             plants.localScale = new Vector3(1 / transform.localScale.x, 1 / transform.localScale.y, 1 / transform.localScale.z);
             plants.gameObject.AddComponent<CropStageAnimation>();
+            if(FarmRedesign.Crops(plants,Crop,stage,out importedFruitRenderers))return;
             if(Crop.displayName=="Lúa mì"&&Crop.stageVisuals!=null&&Crop.stageVisuals.Length>stage&&Crop.stageVisuals[stage]!=null)
             {
                 for(int x=0;x<4;x++)for(int z=0;z<3;z++)

@@ -39,7 +39,8 @@ namespace NongTrai
             for(int side=-1;side<=1;side+=2)g.Part("Mắt",new Vector3(side*.17f,eyes,g.Tier==4?.52f:.87f),Vector3.one*.12f,true);
             var sign=new GameObject("Tên và máu quái canh",typeof(TextMeshPro));sign.transform.SetParent(root.transform,false);sign.transform.localPosition=Vector3.up*(height+.65f);sign.transform.localScale=Vector3.one*.15f;
             g.label=sign.GetComponent<TextMeshPro>();g.label.font=FarmUi.Font;g.label.fontSize=4;g.label.alignment=TextAlignmentOptions.Center;g.label.rectTransform.sizeDelta=new Vector2(18,4);g.label.color=Color.yellow;
-            g.label.outlineColor=Color.black;g.label.outlineWidth=.25f;FarmEnemyHealthBar.Attach(root,g.Title,g.MaxHealth,()=>g.Health,height+1.2f);return g;
+            g.label.outlineColor=Color.black;g.label.outlineWidth=.25f;FarmEnemyHealthBar.Attach(root,g.Title,g.MaxHealth,()=>g.Health,height+1.2f);
+            if(g.Tier==4)FarmRedesign.RockGolem(root.transform);return g;
         }
         void Part(string name,Vector3 at,Vector3 scale,bool glow=false)
         {var part=GameObject.CreatePrimitive(Tier==4?PrimitiveType.Cube:PrimitiveType.Sphere);part.name=name;part.transform.SetParent(transform,false);part.transform.localPosition=at;part.transform.localScale=scale;

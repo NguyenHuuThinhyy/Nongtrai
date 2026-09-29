@@ -119,6 +119,8 @@ namespace NongTrai
             shaft.transform.localScale = new Vector3(.035f,.35f,.035f);
             if (arrowMaterial == null) { arrowMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit")); arrowMaterial.color = new Color(.67f,.47f,.25f); }
             shaft.GetComponent<Renderer>().sharedMaterial = arrowMaterial;
+            var imported=FarmRedesign.Add(arrow.transform,"Quaternius_Weapons/Arrow",Vector3.down*.7f,.7f,.12f,.12f);
+            if(imported!=null)shaft.GetComponent<Renderer>().enabled=false;
             arrow.AddComponent<FarmArrowProjectile>().Launch(velocity,player.transform.position,damage);
             if (!inRange) Tell("Mục tiêu ngoài tầm lực kéo này • tên sẽ rơi trước điểm ngắm.");
             return true;

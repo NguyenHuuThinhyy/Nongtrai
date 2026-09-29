@@ -23,6 +23,8 @@ namespace NongTrai
             var hud = FindFirstObjectByType<FarmHud>();
             if (player == null || hud == null || Camera.main == null)
                 throw new InvalidOperationException("Missing milestone 1 scene dependencies.");
+            if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmRedesignOnly")>=0)
+            {yield return FarmRedesignChecks.Run(player,hud);Application.Quit(0);yield break;}
             if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmBowOnly")>=0)
             {yield return new WaitForSeconds(2);yield return FarmBowChecks.Run(hud.save,player,hud);Application.Quit(0);yield break;}
             if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmSystemsOnly")>=0)

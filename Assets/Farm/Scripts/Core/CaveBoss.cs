@@ -31,6 +31,7 @@ namespace NongTrai
             boss.label.fontSize=4;boss.label.color=Color.white;boss.label.outlineColor=Color.black;boss.label.outlineWidth=.22f;
             boss.label.rectTransform.sizeDelta=new Vector2(11,2);
             FarmEnemyHealthBar.Attach(root,surface?"GOLEM TẾ ĐÀN":"GOLEM HANG",MaxHealth,()=>boss.Health,3.55f);
+            FarmRedesign.RockGolem(root.transform);
             return boss;
         }
         static void Part(Transform parent,string name,Vector3 position,Vector3 scale,Color color)
