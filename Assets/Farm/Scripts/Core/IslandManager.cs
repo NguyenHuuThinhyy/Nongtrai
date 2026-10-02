@@ -25,16 +25,18 @@ namespace NongTrai
         {
             if(GetComponent<FarmDeliveryRush>()==null)gameObject.AddComponent<FarmDeliveryRush>();
             if(GetComponent<FarmRunner>()==null)gameObject.AddComponent<FarmRunner>();
+            if(GetComponent<FarmNumberMemory>()==null)gameObject.AddComponent<FarmNumberMemory>();
             if(hud.player.GetComponent<FarmConsumption>()==null)hud.player.gameObject.AddComponent<FarmConsumption>();
             if(hud.player.GetComponent<FarmerRunEffects>()==null)hud.player.gameObject.AddComponent<FarmerRunEffects>();
             if(GetComponent<FarmForge>()==null)gameObject.AddComponent<FarmForge>();
-            MapPanel=FarmUi.Panel(hud.transform,"Hai bản đồ",new Vector2(920,540));
+            MapPanel=FarmUi.Panel(hud.transform,"Hai bản đồ",new Vector2(920,650));
             FarmUi.TmpLabel(MapPanel.transform,"NÔNG TRẠI & KHÁM PHÁ",new Vector2(30,-25),new Vector2(860,60),32);
             FarmUi.Button(MapPanel.transform,"NÔNG TRẠI • Trồng cây, chăn nuôi, chế biến, giao đơn",new Vector2(30,-130),new Vector2(860,85),()=>Travel(0));
             FarmUi.Button(MapPanel.transform,"KHÁM PHÁ • Đào địa hình, lấy quặng, xây bằng khối",new Vector2(30,-235),new Vector2(860,75),()=>Travel(1));
             FarmUi.Button(MapPanel.transform,"FARM RUNNER • Map chạy 3 làn • Vé, xu và quà mốc KM",new Vector2(30,-330),new Vector2(860,75),()=>FarmRunner.Instance?.OpenMenu());
-            FarmUi.Label(MapPanel.transform,"A/D đổi làn • W/Space nhảy • S trượt. Giao đơn hộp thư nhận vé.",new Vector2(30,-417),new Vector2(860,38),20);
-            FarmUi.Button(MapPanel.transform,"Trở lại game",new Vector2(30,-455),new Vector2(860,55),hud.Resume);
+            FarmUi.Button(MapPanel.transform,"TÌM SỐ 2D • 5 câu • Thưởng xu và đá nâng cấp",new Vector2(30,-420),new Vector2(860,75),()=>FarmNumberMemory.Instance?.Open());
+            FarmUi.Label(MapPanel.transform,"A/D đổi làn • W/Space nhảy • S trượt. Giao đơn hộp thư nhận vé.",new Vector2(30,-510),new Vector2(860,38),20);
+            FarmUi.Button(MapPanel.transform,"Trở lại game",new Vector2(30,-565),new Vector2(860,55),hud.Resume);
             MapPanel.SetActive(false);player.PauseChanged+=OnPause;
         }
         void OnDestroy(){if(Instance==this)Instance=null;if(player!=null)player.PauseChanged-=OnPause;}

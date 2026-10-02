@@ -23,6 +23,8 @@ namespace NongTrai
             var hud = FindFirstObjectByType<FarmHud>();
             if (player == null || hud == null || Camera.main == null)
                 throw new InvalidOperationException("Missing milestone 1 scene dependencies.");
+            if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmNumberMemoryOnly")>=0)
+            {yield return new WaitForSeconds(2);yield return FarmNumberMemoryChecks.Run(hud.save,player,hud);Application.Quit(0);yield break;}
             if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmRedesignOnly")>=0)
             {yield return FarmRedesignChecks.Run(player,hud);Application.Quit(0);yield break;}
             if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmBowOnly")>=0)
@@ -621,6 +623,7 @@ namespace NongTrai
             yield return FarmTntChecks.Run(save,player,hud);
             yield return FarmWaterCanChecks.Run(save,player,hud);
             yield return FarmBowChecks.Run(save,player,hud);
+            yield return FarmNumberMemoryChecks.Run(save,player,hud);
             yield return FarmSystemsChecks.Run(save,player,hud);
             save.pathOverride=Path.Combine(Application.temporaryCachePath,"farm-creative-do-not-save.json");
             if(File.Exists(save.SavePath)) File.Delete(save.SavePath);

@@ -1,10 +1,16 @@
+# Tìm số 2D — 02-10-2026
+
+- **Tab → Tìm số 2D:** chọn số cần tìm trong lưới 7 × 7. Mỗi lượt có 5 câu, mỗi câu 5 giây. Click sai không cộng điểm; hết giờ chuyển câu tiếp.
+- **Thưởng:** 20 xu/câu đúng, 5/5 thêm 100 xu; tối đa 3 lượt có điểm/ngày game. Lần 5/5 đầu tiên trong ngày thêm 1 đá nâng cấp. 0/5 hoặc thoát giữa lượt không mất lượt thưởng. Hết lượt vẫn luyện tập được.
+- **Esc/nút góc phải:** về nông trại, giữ nguyên vị trí. Nông trại tạm dừng khi chơi 2D. Túi đầy thì đá thưởng rơi cạnh nhân vật. Chế độ sáng tạo chỉ luyện tập. Lưu thủ công giữ quota thưởng; thoát game vẫn theo cơ chế lưu hiện có.
+
 # Cung: ngắm, quỹ đạo và độ bền — BowPhysics / 27-09-2026
 
 - Giữ chuột trái để kéo cung, thả để bắn; kéo đầy sau 0,8 giây (chỉ số rèn có thể rút ngắn).
 - Tên bắn từ vị trí cung/tay, hướng về điểm dưới dấu + và bù độ rơi trong tầm lực kéo. Kéo mạnh tăng tốc độ tên từ 16 đến 40 m/s; tên chịu trọng lực 9,81 m/s². Mục tiêu quá xa với lực kéo hiện tại có thông báo, cần kéo mạnh hơn hoặc tiến gần. Quái đang di chuyển vẫn cần ngắm đón.
 - Tường/khối giữa cung và mục tiêu chặn tên. Tên ghim vào vật thể/quái, có thể đến gần nhặt lại như trước.
 - Mỗi lần bắn thành công mất **1 tên + 1 độ bền của đúng chiếc cung đang cầm**. Thả quá sớm, hết tên, tạm dừng hoặc cung hỏng không tiêu hao. Cung còn 0 độ bền không bắn được: mở túi, chọn cung → **Sửa dụng cụ: 20 xu**. Thanh cung hiện ĐB /100.
-- Bản mới: `Builds/Windows-BowPhysics/NongTrai.exe`; chạy `CHAY_GAME.bat` ở gốc hoặc giải nén ZIP Windows BowPhysics trong DongGoi.
+- Bản mới: `Builds/Windows-NumberMemory/NongTrai.exe`; chạy `CHAY_GAME.bat` ở gốc hoặc giải nén ZIP Windows NumberMemory trong DongGoi.
 
 ## Rương, hồi sinh và chiến đấu
 

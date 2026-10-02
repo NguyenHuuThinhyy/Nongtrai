@@ -30,6 +30,7 @@ namespace NongTrai
             public TntRecord[] tnt;
             public StorageState storage;
             public DeliveryRushState deliveryRush;
+            public NumberMemoryState numberMemory;
             public int swordEnhancementLevel;public int[] weaponLevels;public RunnerState runner;public VoxelWaterState voxelWater;public float[] machineFuel;public int preferredFuel=66;
             public float playerHealth=100;
             public ExplorationState exploration;
@@ -93,7 +94,7 @@ namespace NongTrai
                     water=water==null?null:water.Snapshot(),orders=orders==null?null:orders.Snapshot(),
                     bag=AdventureBag.Instance?.Snapshot(),drops=WorldPickup.Snapshot(),wildlife=AdventureWildlife.Instance?.Snapshot(),exploration=ExplorationWorld.Instance?.Snapshot(),building=building==null?null:building.Snapshot(),
                     storage=FarmStorage.Instance?.Snapshot(),deliveryRush=FarmDeliveryRush.Instance?.Snapshot(),swordEnhancementLevel=FarmForge.Instance==null?0:FarmForge.Instance.SwordLevel,
-                    runner=FarmRunner.Instance?.Snapshot(),weaponLevels=FarmForge.Instance==null?null:(int[])FarmForge.Instance.Levels.Clone(),voxelWater=FarmVoxelWater.Instance?.Snapshot(),tnt=FarmTnt.Snapshot(),machineFuel=(float[])processing.FuelSeconds.Clone(),preferredFuel=processing.PreferredFuel,
+                    numberMemory=FarmNumberMemory.Instance?.Snapshot(),runner=FarmRunner.Instance?.Snapshot(),weaponLevels=FarmForge.Instance==null?null:(int[])FarmForge.Instance.Levels.Clone(),voxelWater=FarmVoxelWater.Instance?.Snapshot(),tnt=FarmTnt.Snapshot(),machineFuel=(float[])processing.FuelSeconds.Clone(),preferredFuel=processing.PreferredFuel,
                     playerHealth=AdventureWolves.Instance==null?100:AdventureWolves.Instance.Health,
                     cutDecorTrees=FarmDecorTree.SnapshotCuts(),pendingPen=FarmPenPlacement.Instance==null?-1:FarmPenPlacement.Instance.Pending };
                 var plots=FindObjectsByType<FarmPlot>(FindObjectsSortMode.None);
@@ -255,7 +256,7 @@ namespace NongTrai
                 FarmStorage.Instance?.Restore(data.version>=11?data.storage:null);
                 FarmDeliveryRush.Instance?.Restore(data.version>=16?data.deliveryRush:null);
 
-                FarmRunner.Instance?.Restore(data.runner);FarmVoxelWater.Instance?.Restore(data.voxelWater);FarmTnt.Restore(data.tnt);processing.RestoreFuel(data.machineFuel,data.preferredFuel);
+                FarmNumberMemory.Instance?.Restore(data.numberMemory);FarmRunner.Instance?.Restore(data.runner);FarmVoxelWater.Instance?.Restore(data.voxelWater);FarmTnt.Restore(data.tnt);processing.RestoreFuel(data.machineFuel,data.preferredFuel);
                 AdventureWolves.Instance?.RestoreHealth(data.version>=11?data.playerHealth:100);
                 if(data.version<12&&data.drops!=null)
                     foreach(var drop in data.drops)if(drop.item==109||drop.item==110)drop.item=104;

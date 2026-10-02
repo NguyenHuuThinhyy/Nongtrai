@@ -219,6 +219,8 @@ namespace NongTrai
         }
         public static void Theme(Image image)
         {
+            // The imported 2D game owns its colors and contrast.
+            if(image.GetComponentInParent<Midterm2D.NumberMemoryGame>(true)!=null)return;
             if(image.sprite!=null||image.type==Image.Type.Filled||image.GetComponent<Mask>()!=null||image.GetComponent<RectMask2D>()!=null)return;
             var size=image.rectTransform.rect.size;
             if(size.x<38||size.y<32||image.color.a<.5f)return; // Leave gauges, water, reticle and overlays alone.
