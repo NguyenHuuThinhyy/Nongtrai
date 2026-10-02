@@ -1,8 +1,9 @@
 @echo off
-if not exist "%~dp0Builds\Windows-BowPhysics\NongTrai.exe" (
-    echo Missing Builds\Windows-BowPhysics\NongTrai.exe. Extract the entire downloaded ZIP first.
+set "GAME_DIR=%~dp0Builds\Windows-NumberMemory"
+if not exist "%GAME_DIR%\NongTrai.exe" (
+    echo Missing NongTrai.exe. Keep the full Windows build folder beside this launcher.
     pause
     exit /b 1
 )
-cd /d "%~dp0Builds\Windows-BowPhysics"
-start "" "%~dp0Builds\Windows-BowPhysics\NongTrai.exe"
+cd /d "%GAME_DIR%"
+start "" "%GAME_DIR%\NongTrai.exe"

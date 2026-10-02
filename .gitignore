@@ -5,22 +5,22 @@
 /UserSettings/
 # Checked-in playable release; other build outputs remain local.
 /Builds/*
-!/Builds/Windows-BowPhysics/
-/Builds/Windows-BowPhysics/*
-!/Builds/Windows-BowPhysics/NongTrai.exe
-!/Builds/Windows-BowPhysics/UnityPlayer.dll
-!/Builds/Windows-BowPhysics/UnityCrashHandler64.exe
-!/Builds/Windows-BowPhysics/NongTrai_Data/
-!/Builds/Windows-BowPhysics/MonoBleedingEdge/
-!/Builds/Windows-BowPhysics/D3D12/
+!/Builds/Windows-NumberMemory/
+/Builds/Windows-NumberMemory/*
+!/Builds/Windows-NumberMemory/NongTrai.exe
+!/Builds/Windows-NumberMemory/UnityPlayer.dll
+!/Builds/Windows-NumberMemory/UnityCrashHandler64.exe
+!/Builds/Windows-NumberMemory/NongTrai_Data/
+!/Builds/Windows-NumberMemory/MonoBleedingEdge/
+!/Builds/Windows-NumberMemory/D3D12/
 *.csproj
 *.sln
 *.slnx
 
 /Recovery/
 /DongGoi/*
-!/DongGoi/NongTrai-Windows-BowPhysics-20260927.zip
-!/DongGoi/NongTrai-Unity-BowPhysics-20260927.zip
+!/DongGoi/NongTrai-Windows-NumberMemory-20261002.zip
+!/DongGoi/NongTrai-Unity-NumberMemory-20261002.zip
 !/DongGoi/RELEASE-MANIFEST.json
 !/DongGoi/SHA256SUMS.txt
 !/DongGoi/HUONG_DAN_NHOM.md
@@ -42,3 +42,7 @@
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+!/DongGoi/Cau1_2D.unitypackage
+/VisualRedesignChecks/
+/Documentation/

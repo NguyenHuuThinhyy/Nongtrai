@@ -1,0 +1,6 @@
+{
+  "name": "Midterm2D",
+  "rootNamespace": "Midterm2D",
+  "references": ["UnityEngine.UI"],
+  "autoReferenced": true
+}

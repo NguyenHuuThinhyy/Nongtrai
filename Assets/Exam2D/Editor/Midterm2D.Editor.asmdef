@@ -1,0 +1,6 @@
+{
+  "name": "Midterm2D.Editor",
+  "references": ["Midterm2D", "UnityEngine.UI", "Unity.InputSystem"],
+  "includePlatforms": ["Editor"],
+  "autoReferenced": true
+}

@@ -83,7 +83,7 @@ namespace NongTrai
             overlay.SetActive(true);overlay.transform.SetAsLastSibling();EnsureCloseButton(overlay);
         }
         public bool HandleEscape()
-        { if(FarmRunner.Instance!=null&&FarmRunner.Instance.IsRunning){FarmRunner.Instance.Finish();return true;} if(settingsPanel!=null && settingsPanel.activeSelf) { CloseSettings();return true; }
+        { if(FarmNumberMemory.Instance!=null&&FarmNumberMemory.Instance.IsOpen){FarmNumberMemory.Instance.Close();return true;} if(FarmRunner.Instance!=null&&FarmRunner.Instance.IsRunning){FarmRunner.Instance.Finish();return true;} if(settingsPanel!=null && settingsPanel.activeSelf) { CloseSettings();return true; }
           if(AdventureWolves.Instance!=null&&AdventureWolves.Instance.IsAwaitingRespawn)return true;
           if(CloseOverlay()) return true;
           return mainMenu!=null && mainMenu.activeSelf; }
@@ -115,7 +115,7 @@ namespace NongTrai
         void OnEnable() { interaction.Message += ShowMessage; player.PauseChanged += OnPause; }
         void OnDisable() { interaction.Message -= ShowMessage; player.PauseChanged -= OnPause; }
         void OnPause(bool paused)
-        { if(FarmRunner.Instance!=null&&FarmRunner.Instance.IsRunning){gameplayChrome.SetActive(false);pausePanel.SetActive(false);return;}
+        { if(FarmNumberMemory.Instance!=null&&FarmNumberMemory.Instance.IsOpen){gameplayChrome.SetActive(false);pausePanel.SetActive(false);return;} if(FarmRunner.Instance!=null&&FarmRunner.Instance.IsRunning){gameplayChrome.SetActive(false);pausePanel.SetActive(false);return;}
           if(gameplayChrome!=null) gameplayChrome.SetActive(!paused);
           pausePanel.SetActive(paused && (mainMenu==null || !mainMenu.activeSelf) && (settingsPanel==null || !settingsPanel.activeSelf));instructions.SetActive(false);
           if(!paused) { if(mainMenu!=null) mainMenu.SetActive(false);if(settingsPanel!=null) settingsPanel.SetActive(false); } }
@@ -124,6 +124,7 @@ namespace NongTrai
         public void Notify(string text) => ShowMessage(text);
         void Update()
         {
+            if(FarmNumberMemory.Instance!=null&&FarmNumberMemory.Instance.IsOpen)return;
             if(FarmRunner.Instance!=null&&FarmRunner.Instance.IsRunning)return;
             var keysForMap=Keyboard.current;
             if(!player.Paused&&keysForMap!=null&&keysForMap.eKey.wasPressedThisFrame)

@@ -1,33 +1,54 @@
 {
-  "release": "BowPhysics-20260927",
-  "release_url": "https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/bowphysics-20260927",
+  "release": "NumberMemory-20261002",
+  "release_url": "https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/number-memory-20261002",
   "unity": "6000.3.22f1",
   "save_version": 21,
   "git_repository": "https://github.com/NguyenHuuThinhyy/Nongtrai",
-  "git_branch": "main",
-  "source_git_commit": "3dfd3aca89c3b79aca2f99695c5ed2d307afe800",
-  "build_git_commit": "11cdedd8ff53c3e28695430808c5f17cb30dcffb",
-  "runtime_bytes": 100993487,
-  "runtime_files": 169,
-  "build_log": "Logs/build-20260927-233710.log",
-  "bow_check_log": "Logs/smoke-bow-only.log",
-  "smoke_log": "Logs/smoke-bow-full.log",
-  "smoke_exit": 0,
-  "startup": "alive/responding after 15 seconds; no exceptions",
-  "packages": [
+  "feature_branch": "codex/number-memory-rewards",
+  "source_git_commit": "f56926e2841b17c5c0639eba5823f1ccdf086814",
+  "build_git_commit": "1ec8beda5f7ac36ae85bdcb95321e15fefd2c625",
+  "runtime_bytes": 116059527,
+  "runtime_files": 170,
+  "build_log": "Logs/build-20261002-205230.log",
+  "checks": [
     {
-      "file": "NongTrai-Windows-BowPhysics-20260927.zip",
-      "bytes": 36985512,
-      "sha256": "4eeff3e0181c02be119ec31dbbcc381bab84a10191c181766e8b743b9aacf2d5",
-      "entries": 179
+      "log": "Logs/smoke-number-memory-release-only.log",
+      "exit": 0,
+      "marker": "FARM_NUMBER_MEMORY_OK"
     },
     {
-      "file": "NongTrai-Unity-BowPhysics-20260927.zip",
-      "bytes": 4665364,
-      "sha256": "f96365404a657d457615fc57b84207c5e181da6d71829bf65d31cf486ce53e82",
-      "entries": 585
+      "log": "Logs/smoke-number-memory-release-full.log",
+      "exit": 0,
+      "marker": "FARM_CROPS_SMOKE_OK"
+    },
+    {
+      "log": "Logs/smoke-number-memory-redesign.log",
+      "exit": 0,
+      "marker": "FARM_REDESIGN_CHECKS_OK"
     }
   ],
-  "documentation_only_update": true,
-  "package_revision": "reports-cleanup"
+  "startup": "alive/responding after 15 seconds; no exceptions",
+  "farm_scene_sha256": "d4d1ffaabbeddafe2b86b6732b3598fe518fb61254870cba6a4d79d3244e182d",
+  "source_files": 1404,
+  "packages": [
+    {
+      "file": "NongTrai-Windows-NumberMemory-20261002.zip",
+      "bytes": 43143319,
+      "sha256": "89e4f78bb0f9ad099a0b4a17f88b44c8a3ce4d5c4468d588ea8cf7c88f88dcfd",
+      "entries": 175
+    },
+    {
+      "file": "NongTrai-Unity-NumberMemory-20261002.zip",
+      "bytes": 19895218,
+      "sha256": "3917af944873ec419373fb1611ced7d0617dc07625a5ba2b4e6aa1e3e8752c26",
+      "entries": 1404
+    },
+    {
+      "file": "Cau1_2D.unitypackage",
+      "bytes": 50817,
+      "sha256": "024d0229ca0d3771cffb04f900fce35d14fb32da19f7f38376a97fc71d06e708",
+      "asset_records": 13
+    }
+  ],
+  "source_changes_since_build": "release download paths and ignore rules only"
 }
