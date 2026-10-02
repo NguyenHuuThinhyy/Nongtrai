@@ -7,7 +7,7 @@ Bấm **Code → Download ZIP**, giải nén toàn bộ, mở **CHAY_GAME.bat** 
 ## Chơi bản Windows từ Releases
 
 1. Mở [Release Tìm số 2D](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/number-memory-20261002).
-2. Tải `NongTrai-Windows-NumberMemory-20260927.zip`, giải nén toàn bộ rồi chạy `CHAY_GAME.bat` hoặc `NongTrai.exe`.
+2. Tải `NongTrai-Windows-NumberMemory-20261002.zip`, giải nén toàn bộ rồi chạy `CHAY_GAME.bat` hoặc `NongTrai.exe`.
 3. Giữ EXE cùng `NongTrai_Data`, `MonoBleedingEdge`, `D3D12` và các DLL trong gói. Không cần Unity để chơi. Đọc `CHOI_GAME.md` đi kèm.
 
 ## Lấy đầy đủ source để sửa và build tiếp

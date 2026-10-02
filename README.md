@@ -14,7 +14,7 @@ Game nông trại Unity cho Windows. Trồng cây bằng chuột trái, chăm v�
 
 **Minigame mới:** Tab → **Tìm số 2D**. 5 câu, 5 giây/câu; 20 xu/câu đúng, thêm 100 xu khi đạt 5/5. Tối đa 3 lượt thưởng/ngày; 1 đá nâng cấp cho lần 5/5 đầu tiên/ngày. Esc trở lại nông trại; thoát giữa lượt không nhận thưởng.
 
-**Gói mới:** `DongGoi/NongTrai-Windows-NumberMemory-20260927.zip` và `DongGoi/NongTrai-Unity-NumberMemory-20261002.zip`. Gói trước được giữ dự phòng trong Recovery; runtime đang dùng là Windows-NumberMemory.
+**Gói mới:** `DongGoi/NongTrai-Windows-NumberMemory-20261002.zip` và `DongGoi/NongTrai-Unity-NumberMemory-20261002.zip`. Gói trước được giữ dự phòng trong Recovery; runtime đang dùng là Windows-NumberMemory.
 
 **Chơi ngay:** mở `D:\GAME_NongTrai\Builds\Windows-NumberMemory\NongTrai.exe`; giữ nguyên cả thư mục `Windows-NumberMemory` khi sao chép sang máy khác. Không cần cài Unity để chạy bản Windows. Xem [CHOI_GAME.md](CHOI_GAME.md) để biết điều khiển và vòng chơi.
 
