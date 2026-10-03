@@ -60,6 +60,9 @@ namespace NongTrai
             ? Path.Combine(Application.persistentDataPath,"farm-manual-save.json") : pathOverride;
         IEnumerator Start()
         {
+            // Keep the multi-scene restart smoke test isolated from a real player save.
+            if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmRestartFlowSmokeCheck")>=0)
+                pathOverride=Path.Combine(Application.temporaryCachePath,"farm-restart-flow-smoke-save.json");
             yield return null;
             FarmRestaurant.Ensure();
             if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmSmokeCheck")<0) Load();

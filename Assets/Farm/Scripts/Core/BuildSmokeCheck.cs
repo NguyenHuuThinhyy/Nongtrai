@@ -2,18 +2,31 @@ using System;
 using System.Collections;
 using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace NongTrai
 {
     // Chỉ chạy khi có cờ kiểm tra, không ảnh hưởng phiên chơi thông thường.
     public sealed class BuildSmokeCheck : MonoBehaviour
     {
+        static int restartFlowStage;
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetSmokeState()=>restartFlowStage=0;
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Install()
         {
-            if (Array.IndexOf(Environment.GetCommandLineArgs(), "-farmSmokeCheck") >= 0)
-                new GameObject("Build Smoke Check").AddComponent<BuildSmokeCheck>();
+            var args=Environment.GetCommandLineArgs();
+            if(Array.IndexOf(args,"-farmRestartFlowSmokeCheck")>=0)
+            {
+                SceneManager.sceneLoaded-=InstallRestartFlowCheck;
+                SceneManager.sceneLoaded+=InstallRestartFlowCheck;
+                EnsureRestartFlowCheck();return;
+            }
+            if(Array.IndexOf(args,"-farmSmokeCheck")>=0)EnsureRestartFlowCheck();
         }
+        static void InstallRestartFlowCheck(Scene scene,LoadSceneMode mode)=>EnsureRestartFlowCheck();
+        static void EnsureRestartFlowCheck()
+        {if(FindFirstObjectByType<BuildSmokeCheck>()==null)new GameObject("Build Smoke Check").AddComponent<BuildSmokeCheck>();}
         IEnumerator Start()
         {
             Application.runInBackground = true;
@@ -23,6 +36,8 @@ namespace NongTrai
             var hud = FindFirstObjectByType<FarmHud>();
             if (player == null || hud == null || Camera.main == null)
                 throw new InvalidOperationException("Missing milestone 1 scene dependencies.");
+            if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmRestartFlowSmokeCheck")>=0)
+            {yield return RestartFlowSmoke(player,hud);yield break;}
             if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmRestaurantOnly")>=0)
             {yield return FarmRestaurantChecks.Run(hud.save,player,hud);Application.Quit(0);yield break;}
             if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmNumberMemoryOnly")>=0)
@@ -695,6 +710,42 @@ namespace NongTrai
             yield return FarmNewFeaturesChecks.Run(save,player,hud);
             Debug.Log("FARM_CROPS_SMOKE_OK: grounded, cameras, pause, 80 plots, three crops, dry growth blocked, watering, harvest inventory, replant, screenshot.");
             Application.Quit(0);
+        }
+        IEnumerator RestartFlowSmoke(FarmPlayer player,FarmHud hud)
+        {
+            yield return new WaitForSecondsRealtime(1);
+            if(restartFlowStage==0)
+            {
+                var manager=CreativeModeManager.Instance;
+                if(manager==null||hud.mainMenu==null||!hud.mainMenu.activeSelf)throw new InvalidOperationException("Restart smoke did not start at the title menu.");
+                if(!hud.save.Save())throw new InvalidOperationException("Could not create isolated restart smoke save.");
+                manager.ReturnToMainMenu();
+                if(!manager.RestartConfirmationOpen)throw new InvalidOperationException("Restart confirmation did not open.");
+                restartFlowStage=1;manager.ConfirmRestart(true);yield break;
+            }
+            if(restartFlowStage==1)
+            {
+                if(hud.mainMenu.activeSelf||player.Paused||FarmExpansion.Instance.Level!=1)
+                    throw new InvalidOperationException("Confirm restart returned to the title menu or did not start a fresh farm.");
+                player.SetPaused(true);yield return null;
+                var creative=hud.pausePanel.transform.Find("Chuyển sang chế độ sáng tạo")?.GetComponent<UnityEngine.UI.Button>();
+                var normal=hud.pausePanel.transform.Find("Về chế độ thường • tải bản lưu")?.GetComponent<UnityEngine.UI.Button>();
+                if(creative==null||!creative.gameObject.activeInHierarchy)throw new InvalidOperationException("Pause menu is missing its Creative switch.");
+                creative.onClick.Invoke();yield return null;
+                if(!CreativeModeManager.IsCreative||!CreativeModeManager.IsFlying||player.Paused||hud.mainMenu.activeSelf||hud.saveButton.interactable)
+                    throw new InvalidOperationException("Creative switch returned to the menu or did not enter Creative mode.");
+                player.SetPaused(true);yield return null;
+                if(normal==null||!normal.gameObject.activeInHierarchy)throw new InvalidOperationException("Creative pause menu is missing its return-to-normal switch.");
+                restartFlowStage=2;normal.onClick.Invoke();yield break;
+            }
+            if(restartFlowStage==2)
+            {
+                if(CreativeModeManager.IsCreative||hud.mainMenu.activeSelf||player.Paused||FarmExpansion.Instance.Level!=1)
+                    throw new InvalidOperationException("Returning from Creative did not resume the saved normal farm directly.");
+                Debug.Log("FARM_RESTART_CREATIVE_FLOW_OK: confirmed restart enters a fresh farm, Creative toggles in-place, and return to normal reloads directly without the title menu.");
+                Application.Quit(0);yield break;
+            }
+            throw new InvalidOperationException("Unexpected restart smoke stage: "+restartFlowStage);
         }
         static void Capture(string path, FarmHud hud, Camera camera)
         {

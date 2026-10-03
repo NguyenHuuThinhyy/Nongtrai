@@ -23,6 +23,7 @@ namespace NongTrai
         public Button saveButton;
         public GameObject mainMenu,settingsPanel;
         bool settingsFromMain,settingsFromGameplay;
+        Button creativeModeButton,normalModeButton;
         GameObject modalWithClose;
         float remaining;
         IEnumerator Start()
@@ -35,6 +36,9 @@ namespace NongTrai
             FarmUi.Button(mainMenu.transform,"Cài đặt âm lượng",new Vector2(35,-350),new Vector2(780,65),OpenSettings);
             FarmUi.Button(mainMenu.transform,"Thoát game",new Vector2(35,-430),new Vector2(780,65),Quit);
             FarmUi.Label(mainMenu.transform,"Sáng tạo dùng bản sao tiến độ và bỏ thay đổi khi thoát. Chơi thường chỉ lưu khi nhấn Lưu game.",new Vector2(35,-525),new Vector2(780,70),18);
+            creativeModeButton=FarmUi.Button(pausePanel.transform,"Chuyển sang chế độ sáng tạo",new Vector2(560,-215),new Vector2(520,65),StartCreative);
+            normalModeButton=FarmUi.Button(pausePanel.transform,"Về chế độ thường • tải bản lưu",new Vector2(560,-215),new Vector2(520,65),StartNormal);
+            RefreshModeButtons();
             settingsPanel=FarmUi.Panel(transform,"Cài đặt âm lượng",new Vector2(780,560));
             FarmUi.Label(settingsPanel.transform,"CÀI ĐẶT ÂM LƯỢNG",new Vector2(30,-30),new Vector2(720,55),30);
             VolumeSlider("Nhạc nền",new Vector2(30,-130),true);
@@ -43,7 +47,21 @@ namespace NongTrai
             settingsPanel.SetActive(false);mainMenu.SetActive(false);
             yield return null;
             if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmSmokeCheck")<0)
-            { player.SetPaused(true);pausePanel.SetActive(false);mainMenu.SetActive(true); }
+            {
+                if(CreativeModeManager.ConsumeEnterFarmAfterNextLoad())
+                { EnterFarmAfterReload();yield break; }
+                player.SetPaused(true);pausePanel.SetActive(false);mainMenu.SetActive(true);
+            }
+        }
+        public void EnterFarmAfterReload()
+        {
+            mainMenu.SetActive(false);settingsPanel.SetActive(false);pausePanel.SetActive(false);
+            player.SetPaused(false);ShowMessage("Nông trại mới đã sẵn sàng • bắt đầu từ LV1.");
+        }
+        void RefreshModeButtons()
+        {
+            if(creativeModeButton!=null)creativeModeButton.gameObject.SetActive(!CreativeModeManager.IsCreative);
+            if(normalModeButton!=null)normalModeButton.gameObject.SetActive(CreativeModeManager.IsCreative);
         }
         void VolumeSlider(string label,Vector2 pos,bool music)
         {
@@ -117,7 +135,7 @@ namespace NongTrai
         void OnEnable() { interaction.Message += ShowMessage; player.PauseChanged += OnPause; }
         void OnDisable() { interaction.Message -= ShowMessage; player.PauseChanged -= OnPause; }
         void OnPause(bool paused)
-        { if(FarmNumberMemory.Instance!=null&&FarmNumberMemory.Instance.IsOpen){gameplayChrome.SetActive(false);pausePanel.SetActive(false);return;} if(FarmRunner.Instance!=null&&FarmRunner.Instance.IsRunning){gameplayChrome.SetActive(false);pausePanel.SetActive(false);return;}
+        { RefreshModeButtons();if(FarmNumberMemory.Instance!=null&&FarmNumberMemory.Instance.IsOpen){gameplayChrome.SetActive(false);pausePanel.SetActive(false);return;} if(FarmRunner.Instance!=null&&FarmRunner.Instance.IsRunning){gameplayChrome.SetActive(false);pausePanel.SetActive(false);return;}
           if(gameplayChrome!=null) gameplayChrome.SetActive(!paused);
           pausePanel.SetActive(paused && (mainMenu==null || !mainMenu.activeSelf) && (settingsPanel==null || !settingsPanel.activeSelf));instructions.SetActive(false);
           if(!paused) { if(mainMenu!=null) mainMenu.SetActive(false);if(settingsPanel!=null) settingsPanel.SetActive(false); } }

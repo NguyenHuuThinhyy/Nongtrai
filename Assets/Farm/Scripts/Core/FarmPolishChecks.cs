@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Object=UnityEngine.Object;
@@ -16,6 +17,11 @@ namespace NongTrai
             var menu=CreativeModeManager.Instance;menu.ReturnToMainMenu();
             Check(menu.RestartConfirmationOpen&&progress.Level==4,"Restart reloaded before confirmation");menu.CancelRestart();
             Check(progress.Level==4&&!menu.RestartConfirmationOpen,"Cancel lost level");
+            CreativeModeManager.EnterFarmAfterNextLoad();
+            Check(CreativeModeManager.ConsumeEnterFarmAfterNextLoad(),"new-game boot handoff missing");
+            Check(!CreativeModeManager.ConsumeEnterFarmAfterNextLoad(),"new-game boot handoff was not one-shot");
+            hud.mainMenu.SetActive(true);player.SetPaused(true);hud.EnterFarmAfterReload();
+            Check(!hud.mainMenu.activeSelf&&!player.Paused,"new-game handoff left the title menu over the farm");
             Check(save.Save(),"Save LV4 failed");progress.Restore(1,0,progress.Day,progress.DayTime,progress.ToolTiers,progress.UnlockedRegions,99);
             Check(save.Load()&&progress.Level==4&&progress.Experience==65,"LV4 save/load regressed");hud.Resume();
             Debug.Log("FARM_LEVEL_RESTART_OK: confirm before reload, cancel keeps LV4, manual save/load preserves LV4 and XP.");
@@ -120,6 +126,19 @@ namespace NongTrai
             FarmNewFeaturesChecks.Capture(hud,Camera.main,"forge-drag-preview.png");hud.Resume();
             Check(inventory.Count(68)==count,"Closing forge lost selected stone");
             Debug.Log("FARM_FORGE_DRAG_OK: 36 bag slots, 2 targets, click/drop validation, no consumption on selection/cancel.");
+            player.Teleport(IslandManager.FarmArrival);hud.mainMenu.SetActive(false);hud.Resume();player.SetPaused(true);
+            var creativeSwitch=hud.pausePanel.transform.Find("Chuyển sang chế độ sáng tạo")?.GetComponent<UnityEngine.UI.Button>();
+            var normalSwitch=hud.pausePanel.transform.Find("Về chế độ thường • tải bản lưu")?.GetComponent<UnityEngine.UI.Button>();
+            Check(creativeSwitch!=null&&creativeSwitch.gameObject.activeInHierarchy,"pause menu lacks Creative switch");
+            int moneyBeforeCreative=hud.interaction.shop.Money;creativeSwitch.onClick.Invoke();
+            yield return null;
+            Check(CreativeModeManager.IsCreative&&CreativeModeManager.IsFlying&&progress.Level==99,"Creative menu action failed");
+            Check(!hud.mainMenu.activeSelf&&!player.Paused&&moneyBeforeCreative==hud.interaction.shop.Money,"Creative switch reopened menu or reverted live progress");
+            Check(normalSwitch!=null&&normalSwitch.gameObject.activeSelf&&!hud.saveButton.interactable,"Creative pause menu/save state incorrect");
+            Debug.Log("FARM_MODE_SWITCH_OK: restart handoff is one-shot; pause-menu Creative starts in-place, preserves live state and disables saving.");
+            var missingControllers=Object.FindObjectsByType<FarmAnimalVisual>(FindObjectsSortMode.None)
+                .Where(v=>v.animator!=null&&v.animator.runtimeAnimatorController==null);
+            Check(missingControllers.All(v=>!v.animator.enabled),"animator without a controller is still enabled");
             save.pathOverride=previousPath;
         }
     }

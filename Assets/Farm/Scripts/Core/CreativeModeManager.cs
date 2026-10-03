@@ -8,6 +8,7 @@ namespace NongTrai
         public static CreativeModeManager Instance { get; private set; }
         public static bool IsCreative { get; private set; }
         public static bool IsFlying { get; private set; }
+        static bool enterFarmAfterNextLoad;
         public FarmHud hud;
         public FarmPlayer player;
         public FarmSave save;
@@ -15,6 +16,14 @@ namespace NongTrai
         GameObject restartPanel;TMPro.TMP_Text restartMessage;UnityEngine.UI.Button saveRestart;
         public bool RestartConfirmationOpen=>restartPanel!=null&&restartPanel.activeSelf;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetSessionState()
+        {
+            Instance=null;IsCreative=false;IsFlying=false;enterFarmAfterNextLoad=false;
+        }
+        public static void EnterFarmAfterNextLoad()=>enterFarmAfterNextLoad=true;
+        public static bool ConsumeEnterFarmAfterNextLoad()
+        {bool enter=enterFarmAfterNextLoad;enterFarmAfterNextLoad=false;return enter;}
         void Awake() => Instance=this;
         void Start()
         {
@@ -34,6 +43,7 @@ namespace NongTrai
             if(IsCreative)
             {
                 IsCreative=false;IsFlying=false;
+                EnterFarmAfterNextLoad();
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
                 return;
             }
@@ -41,7 +51,8 @@ namespace NongTrai
         }
         public void StartCreative()
         {
-            if(save!=null && System.IO.File.Exists(save.SavePath)) save.Load();
+            // FarmSave restores once at startup. A live switch must not roll back
+            // changes made since the last manual save.
             IsCreative=true;IsFlying=true;
             if(expansion!=null) expansion.Restore(99,expansion.Experience,expansion.Day,expansion.DayTime,
                 expansion.ToolTiers,expansion.UnlockedRegions,99);
@@ -67,6 +78,7 @@ namespace NongTrai
             if(save==null||!save.ArchiveForNewGame())
             {restartMessage.text="Không cất được bản lưu cũ. Chưa bắt đầu mới; hãy hủy và thử lại.";return;}
             IsCreative=false;IsFlying=false;
+            EnterFarmAfterNextLoad();
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
         public bool CanTravelWithoutLevel => IsCreative;
