@@ -42,6 +42,18 @@ namespace NongTrai
             gameObject.AddComponent<FarmFishing>().Initialize(Hud);
             FishingArea=gameObject.AddComponent<FishingAreaWorld>();FishingArea.Build();
         }
+#if UNITY_EDITOR
+        // Editor-only preview path: build the same architecture and furniture without
+        // creating gameplay UI, guests, or requiring a running FarmHud.
+        public void BuildScenePreview()
+        {
+            if(Built)return;
+            World=gameObject.AddComponent<RestaurantWorld>();World.Build(this,true);
+            State.furniture=RestaurantWorld.DefaultLayout();State.layoutRevision=RestaurantWorld.LayoutRevision;
+            World.ApplyLayout(State.furniture);
+            FishingArea=gameObject.AddComponent<FishingAreaWorld>();FishingArea.Build();
+        }
+#endif
         void Update(){if(!Built||!Simulating)return;Advance(Time.deltaTime);}
         public void Advance(float seconds)
         {

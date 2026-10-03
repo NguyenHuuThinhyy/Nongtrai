@@ -62,11 +62,11 @@ namespace NongTrai
             for(int i=0;i<defaults.Count;i++){var d=defaults[i];if(old.TryGetValue(d.id,out var previous)){var copy=previous.Copy();copy.id=d.id;copy.kind=d.kind;copy.floor=d.floor;if(copy.size.x<=0||copy.size.y<=0)copy.size=d.size;defaults[i]=copy;}}
             return defaults;
         }
-        public void Build(FarmRestaurant restaurant)
+        public void Build(FarmRestaurant restaurant,bool scenePreview=false)
         {
             owner=restaurant;Shell=new GameObject("Nhà hàng • kiến trúc 3 tầng").transform;Shell.SetParent(transform,false);Shell.position=Center;
             Furnishings=new GameObject("Nội thất nhà hàng").transform;Furnishings.SetParent(transform,false);
-            ExtendFarm();
+            ExtendFarm(!scenePreview);
             var wood=new Color(.58f,.39f,.22f);var wall=new Color(.86f,.82f,.7f);var dark=new Color(.12f,.18f,.18f);
             for(int f=0;f<3;f++){
                 float y=f*4.5f;
@@ -100,15 +100,17 @@ namespace NongTrai
             signGo.GetComponent<RestaurantModule>().Setup(owner,"sign","sign");RestaurantArt.Add(signGo.transform,"standing_chalkboard_01/standing_chalkboard_01",Vector3.zero,1.6f,1.8f,1);
             sign=Label(signGo.transform,"ĐÓNG CỬA",new Vector3(0,1.8f,0),.6f);
         }
-        void ExtendFarm()
+        void ExtendFarm(bool adjustFarmScene=true)
         {
-            foreach(var t in FindObjectsByType<Transform>(FindObjectsSortMode.None)){
-                if(t.name=="Map boundary"){
-                    if(t.position.z< -48&&t.localScale.z<2)t.position=new Vector3(t.position.x,t.position.y,-110);
-                    else if(t.localScale.x<2){t.position=new Vector3(t.position.x,t.position.y,-30);t.localScale=new Vector3(1,6,160);}}
-                if(t.name.StartsWith("Fence ")&&Mathf.Abs(t.position.z+36)<.5f&&t.position.x>=-6&&t.position.x<=10){t.gameObject.SetActive(false);}
+            if(adjustFarmScene){
+                foreach(var t in FindObjectsByType<Transform>(FindObjectsSortMode.None)){
+                    if(t.name=="Map boundary"){
+                        if(t.position.z< -48&&t.localScale.z<2)t.position=new Vector3(t.position.x,t.position.y,-110);
+                        else if(t.localScale.x<2){t.position=new Vector3(t.position.x,t.position.y,-30);t.localScale=new Vector3(1,6,160);}}
+                    if(t.name.StartsWith("Fence ")&&Mathf.Abs(t.position.z+36)<.5f&&t.position.x>=-6&&t.position.x<=10){t.gameObject.SetActive(false);}
+                }
+                foreach(var tree in FindObjectsByType<FarmDecorTree>(FindObjectsSortMode.None))if(tree.transform.position.z<-33&&tree.transform.position.x>-7&&tree.transform.position.x<12)tree.gameObject.SetActive(false);
             }
-            foreach(var tree in FindObjectsByType<FarmDecorTree>(FindObjectsSortMode.None))if(tree.transform.position.z<-33&&tree.transform.position.x>-7&&tree.transform.position.x<12)tree.gameObject.SetActive(false);
             Box(transform,"Nền khu nhà hàng",new Vector3(20,-.25f,-80),new Vector3(140,.5f,60),new Color(.38f,.5f,.24f));
             Box(transform,"Đường vào nhà hàng",new Vector3(7,.025f,-46),new Vector3(18,.05f,25),new Color(.64f,.55f,.39f),"Tiles074");
         }

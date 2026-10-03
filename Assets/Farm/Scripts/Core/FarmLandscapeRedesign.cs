@@ -22,6 +22,16 @@ namespace NongTrai
             root.BuildFarmLandscape();
         }
 
+#if UNITY_EDITOR
+        // A non-persistent editor preview shares the exact pond mesh, bank, rocks,
+        // and water construction used by runtime without repainting saved farm terrain.
+        public void BuildScenePreviewPond()
+        {
+            CreateMaterials();
+            BuildPond();
+        }
+#endif
+
         void BuildFarmLandscape()
         {
             CreateMaterials();

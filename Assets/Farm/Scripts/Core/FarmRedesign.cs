@@ -58,7 +58,7 @@ namespace NongTrai
             return result;
         }
         static T[] All<T>() where T : Object => FindObjectsByType<T>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-        public static void ApplyWorld()
+        public static void ApplyWorld(bool includeLandscape = true)
         {
             foreach (var machine in All<ProcessingMachine>()) {
                 string[] keys = { "survival-kit/workbench-grind", "factory-kit/machine-window", "survival-kit/barrel", "factory-kit/hopper-round", "survival-kit/workbench", "factory-kit/machine-fortified", "survival-kit/box-open" };
@@ -101,7 +101,7 @@ namespace NongTrai
             foreach(var player in All<FarmPlayer>()) Player(player);
             foreach(var canvas in All<Canvas>()) foreach(var img in canvas.GetComponentsInChildren<Image>(true)) Theme(img);
             StaticScenery();
-            FarmLandscapeRedesign.Apply();
+            if(includeLandscape)FarmLandscapeRedesign.Apply();
         }
         static Vector3 InverseScale(Vector3 s) => new Vector3(1/Mathf.Max(.001f,Mathf.Abs(s.x)),1/Mathf.Max(.001f,Mathf.Abs(s.y)),1/Mathf.Max(.001f,Mathf.Abs(s.z)));
         static void Creature(Transform root,string key,float height)

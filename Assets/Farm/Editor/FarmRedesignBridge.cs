@@ -14,6 +14,13 @@ namespace NongTrai.Editor
         static void Tick()
         {
             if(EditorApplication.isCompiling||EditorApplication.isUpdating||EditorApplication.isPlayingOrWillChangePlaymode)return;
+            const string previewRequest="Library/FarmScenePreview.request";
+            if(File.Exists(previewRequest)) {
+                File.Delete(previewRequest);
+                try{FarmSceneViewPreview.RebuildMenu();File.WriteAllText("Logs/FarmScenePreview-result.txt","OK "+DateTime.UtcNow.ToString("O"));}
+                catch(Exception e){File.WriteAllText("Logs/FarmScenePreview-result.txt",e.ToString());Debug.LogException(e);}
+                return;
+            }
             const string buildRequest="Library/FarmRedesign.windows-request";
             if(File.Exists(buildRequest)) {
                 File.Delete(buildRequest);
