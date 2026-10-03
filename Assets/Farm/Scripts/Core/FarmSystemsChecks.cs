@@ -161,10 +161,10 @@ namespace NongTrai
             Debug.Log("FARM_SYSTEMS_ENEMY_OK: actual boss jump over one block, visible numeric HP and health fill.");
 
             inventory.Add(64,2);inventory.Add(71,1);Check(save.Save(),"Legacy migration fixture save failed");money=shop.Money;
-            File.WriteAllText(save.SavePath,File.ReadAllText(save.SavePath).Replace("\"version\": 21","\"version\": 20"));
+            File.WriteAllText(save.SavePath,File.ReadAllText(save.SavePath).Replace("\"version\": 22","\"version\": 20"));
             Check(save.Load()&&inventory.Count(64)==0&&inventory.Count(71)==0&&shop.Money>=money+68,"Old bottle migration lost value or left duplicates");
             File.WriteAllText(save.SavePath,original);Check(save.Load(),"Restore test fixture failed");save.pathOverride=oldPath;hud.Resume();
-            Debug.Log("FARM_SYSTEMS_OK: all new systems and save21 migration passed.");
+            Debug.Log("FARM_SYSTEMS_OK: all new systems and save22 migration passed.");
         }
     }
 }

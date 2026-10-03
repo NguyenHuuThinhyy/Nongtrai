@@ -1,0 +1,570 @@
+{
+  "recipes": [
+    {
+      "index": 0,
+      "output": 122,
+      "name": "Súp cà chua kem",
+      "station": "stove",
+      "seconds": 22,
+      "inputs": [
+        {
+          "item": 1,
+          "count": 2
+        },
+        {
+          "item": 5,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "output": 123,
+      "name": "Súp bí ngô",
+      "station": "stove",
+      "seconds": 26,
+      "inputs": [
+        {
+          "item": 43,
+          "count": 2
+        },
+        {
+          "item": 5,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "output": 124,
+      "name": "Trứng cà chua",
+      "station": "stove",
+      "seconds": 30,
+      "inputs": [
+        {
+          "item": 4,
+          "count": 2
+        },
+        {
+          "item": 1,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "output": 125,
+      "name": "Chả đậu nành",
+      "station": "stove",
+      "seconds": 34,
+      "inputs": [
+        {
+          "item": 2,
+          "count": 2
+        },
+        {
+          "item": 4,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "output": 126,
+      "name": "Bánh mì cà chua",
+      "station": "cold",
+      "seconds": 12,
+      "inputs": [
+        {
+          "item": 9,
+          "count": 1
+        },
+        {
+          "item": 1,
+          "count": 2
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "output": 127,
+      "name": "Bánh mì phô mai",
+      "station": "oven",
+      "seconds": 22,
+      "inputs": [
+        {
+          "item": 9,
+          "count": 1
+        },
+        {
+          "item": 10,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "output": 128,
+      "name": "Pizza nông trại",
+      "station": "oven",
+      "seconds": 26,
+      "inputs": [
+        {
+          "item": 8,
+          "count": 2
+        },
+        {
+          "item": 1,
+          "count": 1
+        },
+        {
+          "item": 10,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "output": 129,
+      "name": "Bí ngô đút lò",
+      "station": "oven",
+      "seconds": 30,
+      "inputs": [
+        {
+          "item": 43,
+          "count": 2
+        },
+        {
+          "item": 10,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "output": 130,
+      "name": "Heo sốt cà chua",
+      "station": "stove",
+      "seconds": 34,
+      "inputs": [
+        {
+          "item": 7,
+          "count": 1
+        },
+        {
+          "item": 1,
+          "count": 2
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "output": 131,
+      "name": "Bít tết bí ngô",
+      "station": "stove",
+      "seconds": 38,
+      "inputs": [
+        {
+          "item": 57,
+          "count": 1
+        },
+        {
+          "item": 43,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 10,
+      "output": 132,
+      "name": "Cừu hầm rau củ",
+      "station": "stove",
+      "seconds": 22,
+      "inputs": [
+        {
+          "item": 58,
+          "count": 1
+        },
+        {
+          "item": 1,
+          "count": 1
+        },
+        {
+          "item": 43,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 11,
+      "output": 133,
+      "name": "Gà sốt kem",
+      "station": "stove",
+      "seconds": 26,
+      "inputs": [
+        {
+          "item": 59,
+          "count": 1
+        },
+        {
+          "item": 5,
+          "count": 1
+        },
+        {
+          "item": 8,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 12,
+      "output": 134,
+      "name": "Burger bò",
+      "station": "stove",
+      "seconds": 30,
+      "inputs": [
+        {
+          "item": 57,
+          "count": 1
+        },
+        {
+          "item": 9,
+          "count": 1
+        },
+        {
+          "item": 10,
+          "count": 1
+        },
+        {
+          "item": 1,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 13,
+      "output": 135,
+      "name": "Sói hầm cà chua",
+      "station": "stove",
+      "seconds": 34,
+      "inputs": [
+        {
+          "item": 118,
+          "count": 1
+        },
+        {
+          "item": 1,
+          "count": 2
+        }
+      ]
+    },
+    {
+      "index": 14,
+      "output": 136,
+      "name": "Cáo nướng sốt táo",
+      "station": "oven",
+      "seconds": 38,
+      "inputs": [
+        {
+          "item": 119,
+          "count": 1
+        },
+        {
+          "item": 3,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 15,
+      "output": 137,
+      "name": "Rắn hầm đậu bí",
+      "station": "stove",
+      "seconds": 22,
+      "inputs": [
+        {
+          "item": 120,
+          "count": 1
+        },
+        {
+          "item": 2,
+          "count": 1
+        },
+        {
+          "item": 43,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 16,
+      "output": 138,
+      "name": "Gấu nướng sốt lê",
+      "station": "oven",
+      "seconds": 26,
+      "inputs": [
+        {
+          "item": 121,
+          "count": 1
+        },
+        {
+          "item": 46,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 17,
+      "output": 139,
+      "name": "Cá chép sốt cà",
+      "station": "stove",
+      "seconds": 30,
+      "inputs": [
+        {
+          "item": 112,
+          "count": 1
+        },
+        {
+          "item": 1,
+          "count": 2
+        }
+      ]
+    },
+    {
+      "index": 18,
+      "output": 140,
+      "name": "Rô phi chiên giòn",
+      "station": "stove",
+      "seconds": 34,
+      "inputs": [
+        {
+          "item": 113,
+          "count": 1
+        },
+        {
+          "item": 8,
+          "count": 1
+        },
+        {
+          "item": 4,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 19,
+      "output": 141,
+      "name": "Cá trê hầm bí",
+      "station": "stove",
+      "seconds": 38,
+      "inputs": [
+        {
+          "item": 114,
+          "count": 1
+        },
+        {
+          "item": 43,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 20,
+      "output": 142,
+      "name": "Cá lóc sốt đậu",
+      "station": "stove",
+      "seconds": 22,
+      "inputs": [
+        {
+          "item": 115,
+          "count": 1
+        },
+        {
+          "item": 2,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 21,
+      "output": 143,
+      "name": "Cá hồi suối đút lò",
+      "station": "oven",
+      "seconds": 26,
+      "inputs": [
+        {
+          "item": 116,
+          "count": 1
+        },
+        {
+          "item": 10,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 22,
+      "output": 144,
+      "name": "Cá rô nướng cà chua",
+      "station": "oven",
+      "seconds": 30,
+      "inputs": [
+        {
+          "item": 117,
+          "count": 1
+        },
+        {
+          "item": 1,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 23,
+      "output": 145,
+      "name": "Bánh táo nhà hàng",
+      "station": "oven",
+      "seconds": 34,
+      "inputs": [
+        {
+          "item": 8,
+          "count": 1
+        },
+        {
+          "item": 3,
+          "count": 2
+        },
+        {
+          "item": 4,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 24,
+      "output": 146,
+      "name": "Bánh dâu sữa",
+      "station": "oven",
+      "seconds": 38,
+      "inputs": [
+        {
+          "item": 8,
+          "count": 1
+        },
+        {
+          "item": 44,
+          "count": 2
+        },
+        {
+          "item": 5,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 25,
+      "output": 147,
+      "name": "Tart việt quất",
+      "station": "oven",
+      "seconds": 22,
+      "inputs": [
+        {
+          "item": 8,
+          "count": 1
+        },
+        {
+          "item": 48,
+          "count": 2
+        },
+        {
+          "item": 4,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 26,
+      "output": 148,
+      "name": "Crêpe đào",
+      "station": "stove",
+      "seconds": 26,
+      "inputs": [
+        {
+          "item": 8,
+          "count": 1
+        },
+        {
+          "item": 47,
+          "count": 1
+        },
+        {
+          "item": 5,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 27,
+      "output": 149,
+      "name": "Pudding lê",
+      "station": "stove",
+      "seconds": 30,
+      "inputs": [
+        {
+          "item": 46,
+          "count": 1
+        },
+        {
+          "item": 5,
+          "count": 1
+        },
+        {
+          "item": 4,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 28,
+      "output": 150,
+      "name": "Sinh tố dâu việt quất",
+      "station": "cold",
+      "seconds": 12,
+      "inputs": [
+        {
+          "item": 44,
+          "count": 1
+        },
+        {
+          "item": 48,
+          "count": 1
+        },
+        {
+          "item": 5,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "index": 29,
+      "output": 151,
+      "name": "Tráng miệng hoàng kim",
+      "station": "cold",
+      "seconds": 12,
+      "inputs": [
+        {
+          "item": 76,
+          "count": 1
+        },
+        {
+          "item": 77,
+          "count": 1
+        },
+        {
+          "item": 5,
+          "count": 1
+        }
+      ]
+    }
+  ]
+}

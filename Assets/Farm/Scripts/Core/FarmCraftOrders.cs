@@ -129,7 +129,7 @@ namespace NongTrai
             var recipe=Recipes[index];string value=recipe.name+": ";
             for(int i=0;i<recipe.inputs.Length;i++) value+=(i>0?" + ":"")+recipe.inputs[i].count+" "+inventory.Name(recipe.inputs[i].item);
             if(recipe.output==64)value+=" + 8 nước";
-            return value+" → "+(recipe.output==63?"5 ":"1 ")+(recipe.output>=100?recipe.name:inventory.Name(recipe.output));
+            return value+" → "+(recipe.output==63?"5 ":"1 ")+(FarmItemCatalog.IsVirtualItem(recipe.output)?recipe.name:inventory.Name(recipe.output));
         }
         void CreateWorldObjects()
         {
@@ -178,13 +178,13 @@ namespace NongTrai
             var recipe=Recipes[index];
             if(recipe.output==64&&(FarmWaterSystem.Instance==null||FarmWaterSystem.Instance.CanWater<8))
             {SayCraft("Cần 8 nước trong bình tưới để đóng một bình nước dự trữ.");return false;}
-            if(recipe.output>=100&&AdventureBag.Instance.Space(recipe.output)<1)
+            if(FarmItemCatalog.IsVirtualItem(recipe.output)&&AdventureBag.Instance.Space(recipe.output)<1)
             {SayCraft("Cần một ô trống trong túi để nhận dụng cụ.");return false;}
             foreach(var input in recipe.inputs) if(inventory.Count(input.item)<input.count)
             { SayCraft("Thiếu "+input.count+" "+inventory.Name(input.item)+".");return false; }
             foreach(var input in recipe.inputs) inventory.Remove(input.item,input.count);
             if(recipe.output==64)FarmWaterSystem.Instance.Consume(8);
-            if(recipe.output>=100)AdventureBag.Instance.Pickup(recipe.output,1);else inventory.Add(recipe.output,recipe.output==63?5:1);
+            if(FarmItemCatalog.IsVirtualItem(recipe.output))AdventureBag.Instance.Pickup(recipe.output,1);else inventory.Add(recipe.output,recipe.output==63?5:1);
             expansion.GainExperience(10);
             SayCraft("Đã chế tạo "+(recipe.output==63?"5 mũi tên":"1 "+recipe.name)+".");FarmAudio.Instance?.Play(FarmAudio.Cue.Harvest);return true;
         }
@@ -206,7 +206,7 @@ namespace NongTrai
             bool craft=slot%2==0;
             if(craft)
             {
-                for(int i=0;i<Recipes.Length;i++) if(CraftUnlocked(i) && Recipes[i].output<100 && Recipes[i].output!=excluded &&
+                for(int i=0;i<Recipes.Length;i++) if(CraftUnlocked(i) && FarmItemCatalog.IsInventoryItem(Recipes[i].output) && Recipes[i].output!=excluded &&
                     (Recipes[i].output<20||Recipes[i].output>=32) && CanMake(Recipes[i]) && !used.Contains(Recipes[i].output)) pool.Add(Recipes[i].output);
             }
             else

@@ -108,7 +108,7 @@ namespace NongTrai
                 orders.Orders[0].completed=true;
                 if(!save.Save())throw new Exception("v12 changed save failed");
                 string payload=File.ReadAllText(save.SavePath);
-                if(!payload.Contains("\"version\": 21")||!payload.Contains("\"mutated\": true")||
+                if(!payload.Contains("\"version\": 22")||!payload.Contains("\"mutated\": true")||
                     !payload.Contains("\"weatherRemaining\""))
                     throw new Exception("v12 save fields missing");
                 plot.Restore(PlotState.Untilled,null,0,0);

@@ -217,7 +217,7 @@ namespace NongTrai
             portable.Add(result);return result;
         }
         public bool TryPlacePortable(Vector3 point)
-        {if(shop.inventory.Count(56)<1||!shop.inventory.Remove(56,1))return false;PlacePortable(point,TimeManager.DayLengthSeconds);return true;}
+        {if(RestaurantWorld.Protected(point))return false;if(shop.inventory.Count(56)<1||!shop.inventory.Remove(56,1))return false;PlacePortable(point,TimeManager.DayLengthSeconds);return true;}
         public bool DismantlePortable(IrrigationStation sprinkler)
         {if(sprinkler==null||!sprinkler.portable||!portable.Remove(sprinkler))return false;
          sprinkler.gameObject.SetActive(false);Destroy(sprinkler.gameObject);Refresh();return true;}

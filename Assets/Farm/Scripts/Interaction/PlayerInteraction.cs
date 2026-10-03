@@ -55,6 +55,7 @@ namespace NongTrai
                 if(keyboard.pKey.wasPressedThisFrame) { shop.barn?.Open();return; }
                 if(keyboard.tabKey.wasPressedThisFrame) { IslandManager.Instance?.OpenMap();return; }
             }
+            if(Mouse.current!=null&&carry.Held==null&&Mouse.current.rightButton.wasPressedThisFrame&&TryRestaurantInteraction(FarmAim.Ray(viewCamera)))return;
             if(Mouse.current!=null&&carry.Held==null&&(Mouse.current.leftButton.wasPressedThisFrame||Mouse.current.rightButton.wasPressedThisFrame))
                 if(TryTntInteraction(FarmAim.Ray(viewCamera)))return;
             if(Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame&&TryWaterCanInteraction(FarmAim.Ray(viewCamera)))return;
@@ -134,7 +135,7 @@ namespace NongTrai
             {
                 var collider=nearby[i];if(collider==null) continue;
                 var item=FindTarget(collider);
-                if(item==null || !item.CanInteract(player)) continue;
+                if(item==null || IsRestaurantTarget(item) || !item.CanInteract(player)) continue;
                 Vector3 point=collider.ClosestPoint(transform.position+Vector3.up*1.2f);
                 float distance=Vector3.Distance(point,transform.position);
                 if(distance>4.1f) continue;
@@ -176,6 +177,13 @@ namespace NongTrai
             if(AdventureBag.Instance?.Item==69){FarmTnt.TryPlace(this,ray);return true;}
             return false;
         }
+        static bool IsRestaurantTarget(IInteractable target)=>target is RestaurantModule||target is RestaurantGuest||target is RestaurantSeat;
+        public bool TryRestaurantInteraction(Ray ray)
+        {
+            if(player.Paused||FarmHud.WorldClickSuppressed||!Physics.Raycast(ray,out var hit,24,~(1<<8),QueryTriggerInteraction.Ignore)||Vector3.Distance(hit.point,player.transform.position+Vector3.up)>5)return false;
+            var target=FindTarget(hit.collider);if(!IsRestaurantTarget(target))return false;
+            if(target.CanInteract(player))target.Interact(this);return true;
+        }
         public bool TryLeftInteractRay(Ray ray)
         {
             if(player.Paused||player.transform.position.y>500||
@@ -185,7 +193,7 @@ namespace NongTrai
             if(target is FarmAnimal animal)
             {if(animal.ProductReady){animal.TryCollect(inventory,out string message);Say(message);}
              else if(carry.Pickup(animal)){Say(carry.LastMessage);ClearSelection();}return true;}
-            if(target==null||!target.CanInteract(player))return false;
+            if(target==null||IsRestaurantTarget(target)||!target.CanInteract(player))return false;
             player.TriggerAnimation("Work");target.Interact(this);return true;
         }
         void SetSelection(IInteractable best,Collider bestCollider)

@@ -23,6 +23,8 @@ namespace NongTrai
             var hud = FindFirstObjectByType<FarmHud>();
             if (player == null || hud == null || Camera.main == null)
                 throw new InvalidOperationException("Missing milestone 1 scene dependencies.");
+            if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmRestaurantOnly")>=0)
+            {yield return FarmRestaurantChecks.Run(hud.save,player,hud);Application.Quit(0);yield break;}
             if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmNumberMemoryOnly")>=0)
             {yield return new WaitForSeconds(2);yield return FarmNumberMemoryChecks.Run(hud.save,player,hud);Application.Quit(0);yield break;}
             if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmRedesignOnly")>=0)
@@ -62,7 +64,8 @@ namespace NongTrai
             jumpBlock.transform.position=new Vector3(0,.5f,-32.8f);jumpBlock.transform.localScale=new Vector3(3,1,1);
             player.Teleport(new Vector3(0,.05f,-35));Physics.SyncTransforms();
             for(int n=0;n<10;n++)yield return null;
-            var keyboard=UnityEngine.InputSystem.Keyboard.current;
+            // Windows headless smoke runs may not expose a physical HID keyboard.
+            var keyboard=UnityEngine.InputSystem.Keyboard.current??UnityEngine.InputSystem.InputSystem.AddDevice<UnityEngine.InputSystem.Keyboard>();
             UnityEngine.InputSystem.InputSystem.QueueStateEvent(keyboard,new UnityEngine.InputSystem.LowLevel.KeyboardState(UnityEngine.InputSystem.Key.W,UnityEngine.InputSystem.Key.Space));
             float jumpEnd=Time.time+1.3f,maxJumpY=0;
             while(Time.time<jumpEnd){player.SetPaused(false);maxJumpY=Mathf.Max(maxJumpY,player.transform.position.y);yield return null;}
@@ -405,12 +408,12 @@ namespace NongTrai
             inventory.Add(0,2);inventory.Add(2,2);int feed=inventory.Count(34);
             if(!orders.Craft(11)||inventory.Count(34)!=feed+1)throw new InvalidOperationException("Premium animal feed recipe failed.");
             building.Toggle();
-            if(!building.TryPlaceSelected(new Vector3(0,.5f,-35),0) || inventory.Count(26)!=0 || !building.HasPlacedTable)
+            if(!building.TryPlaceSelected(new Vector3(20,.5f,-35),0) || inventory.Count(26)!=0 || !building.HasPlacedTable)
                 throw new InvalidOperationException("Crafting table placement failed.");
             building.Select(0);
             inventory.Add(20,1);
             int woodForBuilding=inventory.Count(20);
-            if(!building.TryPlaceSelected(new Vector3(2,.5f,-35),0) || inventory.Count(20)!=woodForBuilding-1 ||
+            if(!building.TryPlaceSelected(new Vector3(22,.5f,-35),0) || inventory.Count(20)!=woodForBuilding-1 ||
                 building.Snapshot().blocks.Length!=2)
                 throw new InvalidOperationException("Block placement did not consume one block.");
             building.Toggle();
@@ -594,7 +597,7 @@ namespace NongTrai
             string modernSave=File.ReadAllText(save.SavePath);
             player.Teleport(new Vector3(200,.4f,-20));
             if(!save.Save())throw new InvalidOperationException("Migration fixture save failed.");
-            string oldSave=File.ReadAllText(save.SavePath).Replace("\"version\": 21","\"version\": 7");
+            string oldSave=File.ReadAllText(save.SavePath).Replace("\"version\": 22","\"version\": 7");
             File.WriteAllText(save.SavePath,oldSave);
             if(!save.Load()||Mathf.Abs(player.transform.position.y-1000.4f)>1)throw new InvalidOperationException("Legacy player position migration failed.");
             File.WriteAllText(save.SavePath,modernSave);if(!save.Load())throw new InvalidOperationException("Modern restore failed.");

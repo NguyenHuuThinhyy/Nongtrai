@@ -25,9 +25,9 @@ namespace NongTrai
             Check(sprintRate>normalRate*3,"Sprinting hunger="+sprintRate+" normal="+normalRate);Keys();yield return null;
             Debug.Log("FARM_FEEDBACK_MOVEMENT_OK: normal speed 6; sprint hunger four times baseline.");
 
-            player.Teleport(new Vector3(0,1.4f,-35));building.EquipBlock(1);inventory.Add(21,8);Physics.SyncTransforms();
+            player.Teleport(new Vector3(20,1.4f,-35));building.EquipBlock(1);inventory.Add(21,8);Physics.SyncTransforms();
             Check(!building.TryPlaceSelected(player.transform.position+Vector3.up*.5f,0),"Block allowed inside player");
-            Check(building.TryPlaceSelected(new Vector3(0,.5f,-35),0),"Pillar block underneath airborne player rejected");
+            Check(building.TryPlaceSelected(new Vector3(20,.5f,-35),0),"Pillar block underneath airborne player rejected");
             building.EquipBlock(-1);bag.Select(4);player.cameraRig.ReadLook(new Vector2(0,-10000));yield return new WaitForEndOfFrame();yield return new WaitForEndOfFrame();
             Check(FarmAim.Ray(Camera.main).direction.y<-.995f,"Camera cannot aim vertically down");
             var cell=new Vector3Int(12,world.SurfaceHeight(12,14)-1,14);player.Teleport(ExplorationWorld.Origin+(Vector3)cell+new Vector3(.5f,1.1f,.5f));

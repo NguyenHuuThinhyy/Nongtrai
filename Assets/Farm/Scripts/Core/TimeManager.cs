@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 namespace NongTrai
@@ -95,7 +95,7 @@ namespace NongTrai
             if(NormalizedTime>=1f) { NormalizedTime-=1f;NewDay(); }
             if(Weather==FarmWeather.Rain || Weather==FarmWeather.Storm)
             {
-                rain.transform.position=player.transform.position+Vector3.up*10;
+                if(!RestaurantWorld.Indoors(player.transform.position))rain.transform.position=player.transform.position+Vector3.up*10;
                 rainTick+=elapsed;
                 if(rainTick>=1f) { WaterFields(.045f*rainTick);rainTick=0; }
             }
@@ -128,7 +128,7 @@ namespace NongTrai
         {
             bool wet=Weather==FarmWeather.Rain || Weather==FarmWeather.Storm;
             if(rain!=null)
-            { if(wet && !rain.isPlaying) rain.Play();if(!wet && rain.isPlaying) rain.Stop(); }
+            { if(wet && !RestaurantWorld.Indoors(player.transform.position) && !rain.isPlaying) rain.Play();if((!wet || RestaurantWorld.Indoors(player.transform.position)) && rain.isPlaying) rain.Stop(); }
             if(rainSound!=null)
             { if(wet && !rainSound.isPlaying) rainSound.Play();if(!wet && rainSound.isPlaying) rainSound.Stop(); }
             RenderSettings.fog=true;RenderSettings.fogMode=FogMode.Linear;

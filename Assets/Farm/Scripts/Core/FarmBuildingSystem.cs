@@ -130,6 +130,7 @@ namespace NongTrai
         public bool TryPlaceSelected(Vector3 position,float yAngle)
         {
             if(!IsBuilding)return false;
+            if(RestaurantWorld.Protected(position)){hud.Notify("Bố trí đồ nhà hàng qua bảng nội thất khi đóng cửa.");return false;}
             int item=ItemForType(SelectedType);
             if(SelectedType==14&&(position.y<500||FarmTravelPortal.Active!=null))
             {hud.Notify(position.y<500?"Cổng hồi sinh chỉ đặt ở map khám phá.":"Đã có cổng hồi sinh. Phá, nhặt lại cổng cũ để chuyển vị trí.");return false;}

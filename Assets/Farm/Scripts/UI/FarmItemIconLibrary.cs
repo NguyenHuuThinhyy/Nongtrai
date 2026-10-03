@@ -7,7 +7,7 @@ namespace NongTrai
     // không phụ thuộc font hay asset bên ngoài.
     public static class FarmItemIconLibrary
     {
-        public static int ForItem(int item)=>item==72?35:item==73?31:item==74?73:item==75?74:item==76?76:item==77?77:item==71?119:item==70?118:item==66?114:item==67?115:item==68?116:item==69?117:item==111?110:item==63?111:item==64?112:item==65?113:item==104?21:item==105?22:item==106?23:item==107?24:item==108?25:item==26?100:item==27?54:item>=28&&item<=37?40+item-28:item==38?55:item==39?56:item>=40&&item<=55?73+item-40:item>=56&&item<=62?89+item-56:item>=20&&item<=25?10+item:item;
+        public static int ForItem(int item)=>item>=112?1000+item:item==72?35:item==73?31:item==74?73:item==75?74:item==76?76:item==77?77:item==71?119:item==70?118:item==66?114:item==67?115:item==68?116:item==69?117:item==111?110:item==63?111:item==64?112:item==65?113:item==104?21:item==105?22:item==106?23:item==107?24:item==108?25:item==26?100:item==27?54:item>=28&&item<=37?40+item-28:item==38?55:item==39?56:item>=40&&item<=55?73+item-40:item>=56&&item<=62?89+item-56:item>=20&&item<=25?10+item:item;
         public static UnityEngine.UI.Image Attach(Transform parent,int item,Vector2 position,Vector2 size)
         {
             var go=new GameObject("Minh họa "+item,typeof(RectTransform),typeof(UnityEngine.UI.Image));
@@ -21,6 +21,7 @@ namespace NongTrai
         public static Sprite Get(int id)
         {
             if(cache.TryGetValue(id,out var sprite)) return sprite;
+            if(id>=1112 && id<1182){sprite=RestaurantArt.Icon(id-1000);if(sprite!=null){cache[id]=sprite;return sprite;}}
             var texture=new Texture2D(64,64,TextureFormat.RGBA32,false) { filterMode=FilterMode.Point,wrapMode=TextureWrapMode.Clamp };
             var pixels=new Color[64*64];for(int i=0;i<pixels.Length;i++) pixels[i]=clear;
             Draw(id,pixels);texture.SetPixels(pixels);texture.Apply();

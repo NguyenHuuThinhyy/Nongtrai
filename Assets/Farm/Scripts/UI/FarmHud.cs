@@ -83,7 +83,7 @@ namespace NongTrai
             overlay.SetActive(true);overlay.transform.SetAsLastSibling();EnsureCloseButton(overlay);
         }
         public bool HandleEscape()
-        { if(FarmNumberMemory.Instance!=null&&FarmNumberMemory.Instance.IsOpen){FarmNumberMemory.Instance.Close();return true;} if(FarmRunner.Instance!=null&&FarmRunner.Instance.IsRunning){FarmRunner.Instance.Finish();return true;} if(settingsPanel!=null && settingsPanel.activeSelf) { CloseSettings();return true; }
+        { if(FarmFishing.Instance!=null&&FarmFishing.Instance.IsOpen){FarmFishing.Instance.Close();return true;} if(FarmRestaurant.Instance!=null&&FarmRestaurant.Instance.UI!=null&&FarmRestaurant.Instance.UI.IsOpen){FarmRestaurant.Instance.UI.Close();return true;} if(FarmNumberMemory.Instance!=null&&FarmNumberMemory.Instance.IsOpen){FarmNumberMemory.Instance.Close();return true;} if(FarmRunner.Instance!=null&&FarmRunner.Instance.IsRunning){FarmRunner.Instance.Finish();return true;} if(settingsPanel!=null && settingsPanel.activeSelf) { CloseSettings();return true; }
           if(AdventureWolves.Instance!=null&&AdventureWolves.Instance.IsAwaitingRespawn)return true;
           if(CloseOverlay()) return true;
           return mainMenu!=null && mainMenu.activeSelf; }
@@ -99,6 +99,8 @@ namespace NongTrai
         public bool CloseOverlay()
         {
             if(AdventureWolves.Instance!=null&&AdventureWolves.Instance.IsAwaitingRespawn)return false;
+            if(FarmFishing.Instance!=null&&FarmFishing.Instance.IsOpen){FarmFishing.Instance.Close();return true;}
+            if(FarmRestaurant.Instance!=null&&FarmRestaurant.Instance.UI!=null&&FarmRestaurant.Instance.UI.IsOpen){FarmRestaurant.Instance.UI.Close();return true;}
             var overlay=ActiveOverlay();
             if(overlay==null)return false;
             overlay.SetActive(false);Resume();return true;

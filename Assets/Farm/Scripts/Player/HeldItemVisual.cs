@@ -27,7 +27,7 @@ namespace NongTrai
             bool nextBuilding=FarmBuildingSystem.Instance!=null&&FarmBuildingSystem.Instance.IsBuilding;
             int next=nextBuilding?30+FarmBuildingSystem.Instance.SelectedType:(FarmHudV2.Instance==null?0:FarmHudV2.Instance.SelectedSlot);
             if(!nextBuilding&&AdventureBag.Instance!=null)
-            {int item=AdventureBag.Instance.Item;next=item<0?-1:item>=100?item-100:200+item;}
+            {int item=AdventureBag.Instance.Item;next=item<0?-1:FarmItemCatalog.IsVirtualItem(item)?item-100:200+item;}
             bool full=FarmWaterSystem.Instance!=null&&FarmWaterSystem.Instance.CanWater>0;
             if(next==current&&nextBuilding==building&&(next!=5||full==bucketFull))return;bucketFull=full;current=next;building=nextBuilding;Rebuild();
         }

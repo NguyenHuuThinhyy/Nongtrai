@@ -52,7 +52,7 @@ namespace NongTrai
          if(FarmForge.Instance!=null)damage=FarmForge.Instance.ResolveMelee(damage,transform.position+Vector3.up);HitRanged(attacker,damage);}
         public void HitRanged(Vector3 attacker,int damage)
         {if(health<=0)return;health-=Mathf.Max(0,damage);FarmActionFeedback.Emit(transform.position+Vector3.up,Color.yellow,12);
-         if(health<=0){record.guardDefeated=true;FarmExpansion.Instance?.GainExperience(Tier*20);FarmEffects.Burst(transform.position+Vector3.up,"ĐÃ HẠ QUÁI CANH",Color.yellow);gameObject.SetActive(false);Destroy(gameObject);}}
+         if(health<=0){if(Tier<4)WorldPickup.Spawn(Tier==1?118:Tier==2?120:121,Tier==1?2:Tier==2?1:3,transform.position);record.guardDefeated=true;FarmExpansion.Instance?.GainExperience(Tier*20);FarmEffects.Burst(transform.position+Vector3.up,"ĐÃ HẠ QUÁI CANH",Color.yellow);gameObject.SetActive(false);Destroy(gameObject);}}
         void Update()
         {
             var player=TimeManager.Instance==null?null:TimeManager.Instance.player;

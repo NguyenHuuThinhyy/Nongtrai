@@ -63,9 +63,13 @@ namespace NongTrai
              bagIcons[i]=FarmItemIconLibrary.Attach(cell.transform,0,new Vector2(11,-5),new Vector2(49,49));
              bagRows[i]=FarmUi.TmpLabel(cell.transform,"",new Vector2(3,-54),new Vector2(67,20),13);
              cell.AddComponent<FarmStorageSlotDrag>().Initialize(this,true,slot);}
-            for(int i=0;i<FarmInventory.ItemCount;i++)
-            {int item=i;var cell=FarmUi.Panel(Panel.transform,"Kho "+i,new Vector2(72,60));var rect=cell.GetComponent<RectTransform>();
-             rect.anchorMin=rect.anchorMax=rect.pivot=new Vector2(0,1);rect.anchoredPosition=new Vector2(750+i%9*78,-185-i/9*65);
+            var viewport=FarmUi.Panel(Panel.transform,"Ngăn kho cuộn",new Vector2(710,590));
+            var vr=viewport.GetComponent<RectTransform>();vr.anchorMin=vr.anchorMax=vr.pivot=new Vector2(0,1);vr.anchoredPosition=new Vector2(745,-180);viewport.AddComponent<RectMask2D>();
+            var content=new GameObject("Hàng hóa",typeof(RectTransform)).GetComponent<RectTransform>();content.SetParent(viewport.transform,false);content.anchorMin=new Vector2(0,1);content.anchorMax=new Vector2(1,1);content.pivot=new Vector2(0,1);content.sizeDelta=new Vector2(0,1105);
+            var scroll=viewport.AddComponent<ScrollRect>();scroll.viewport=vr;scroll.content=content;scroll.horizontal=false;scroll.scrollSensitivity=38;scroll.movementType=ScrollRect.MovementType.Clamped;
+            int index=0;foreach(int i in FarmItemCatalog.InventoryIds)
+            {int item=i;var cell=FarmUi.Panel(content,"Kho "+i,new Vector2(72,60));var rect=cell.GetComponent<RectTransform>();
+             rect.anchorMin=rect.anchorMax=rect.pivot=new Vector2(0,1);rect.anchoredPosition=new Vector2(5+index%9*78,-5-index++/9*65);
              storeIcons[i]=FarmItemIconLibrary.Attach(cell.transform,item,new Vector2(14,-2),new Vector2(44,44));
              storeRows[i]=FarmUi.TmpLabel(cell.transform,"",new Vector2(3,-41),new Vector2(66,17),13);
              cell.AddComponent<FarmStorageSlotDrag>().Initialize(this,false,item);}
@@ -80,14 +84,14 @@ namespace NongTrai
         {
             if(dragIndex<0||draggingFromBag==toBag)return;
             int item=draggingFromBag?AdventureBag.Instance.Slots[dragIndex].item:dragIndex;
-            if(item<0||item>=FarmInventory.ItemCount){status.text="Dụng cụ đang cầm không thể cất ở ngăn hàng hóa.";return;}
+            if(!FarmItemCatalog.IsInventoryItem(item)){status.text="Dụng cụ đang cầm không thể cất ở ngăn hàng hóa.";return;}
             int amount=draggingFromBag?AdventureBag.Instance.Slots[dragIndex].count:Current[item];
             if(dragHalf)amount=Mathf.Max(1,(amount+1)/2);
             Transfer(item,amount,draggingFromBag);
         }
         public void ClickGrid(bool fromBag,int index,bool quick)
         {int item=fromBag?AdventureBag.Instance.Slots[index].item:index;
-         if(item<0||item>=FarmInventory.ItemCount)return;Transfer(item,quick?int.MaxValue:1,fromBag);}
+         if(!FarmItemCatalog.IsInventoryItem(item))return;Transfer(item,quick?int.MaxValue:1,fromBag);}
         int[] Current=>current==null?Warehouse:current.items;
         int[] CurrentMutated=>current==null?WarehouseMutated:current.mutated;
         int Capacity=>current==null?36*64:18*64;
@@ -110,13 +114,13 @@ namespace NongTrai
         public void TakeAll()
         {
             if(Panel==null||!Panel.activeSelf||chestSession&&current==null)return;
-            for(int item=0;item<FarmInventory.ItemCount;item++)if(Current[item]>0)Transfer(item,int.MaxValue,false);
+            foreach(int item in FarmItemCatalog.InventoryIds)if(Current[item]>0)Transfer(item,int.MaxValue,false);
             status.text=Total(Current)==0?"Đã lấy hết đồ.":"Túi đã đầy; đồ còn lại vẫn nằm trong rương / kho.";
         }
         public bool Transfer(int item,int amount,bool deposit)
         {
             if(chestSession&&current==null){hud.Resume();return false;}
-            if(Panel==null||!Panel.activeSelf||item<0||item>=FarmInventory.ItemCount||amount<=0)return false;
+            if(Panel==null||!Panel.activeSelf||!FarmItemCatalog.IsInventoryItem(item)||amount<=0)return false;
             AdventureBag.Instance?.Sync();
             var slots=Current;int available=deposit?inventory.Count(item):slots[item];
             int space=deposit?Capacity-Total(slots):AdventureBag.Instance.Space(item);
@@ -141,7 +145,7 @@ namespace NongTrai
             for(int i=0;i<36;i++)
             {var slot=bag.Slots[i];bagIcons[i].enabled=slot.count>0;if(slot.count>0)bagIcons[i].sprite=FarmItemIconLibrary.Get(bag.Icon(slot.item));
              bagRows[i].text=slot.count>0?""+slot.count:"";}
-            for(int i=0;i<FarmInventory.ItemCount;i++){storeIcons[i].enabled=slots[i]>0;storeRows[i].text=slots[i]>0?slots[i].ToString():"";}
+            foreach(int i in FarmItemCatalog.InventoryIds){storeIcons[i].enabled=slots[i]>0;storeRows[i].text=slots[i]>0?slots[i].ToString():"";}
         }
         public StorageState Snapshot()
         {

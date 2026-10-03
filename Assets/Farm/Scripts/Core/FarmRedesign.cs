@@ -28,7 +28,7 @@ namespace NongTrai
         }
         public static GameObject Model(string key)
         {
-            if (!cache.TryGetValue(key, out var prefab)) { prefab = Resources.Load<GameObject>(Root + key); cache[key] = prefab; }
+            if (!cache.TryGetValue(key, out var prefab)) { prefab = Resources.Load<GameObject>(key.StartsWith("Restaurant/")?key:Root + key); cache[key] = prefab; }
             return prefab;
         }
         public static Transform Add(Transform parent, string key, Vector3 position, float height, float maxWidth = 0, float maxDepth = 0)
@@ -233,6 +233,7 @@ namespace NongTrai
         }
         public static string ItemKey(int item)
         {
+            if(item>=112&&item<182)return "Restaurant/Items/item_"+item;
             switch(item) {
                 case 0:return "nature-kit/crops_wheatStageB";
                 case 1:return "food-kit/tomato";case 2:return "food-kit/bag";case 3:return "food-kit/apple";
@@ -254,7 +255,7 @@ namespace NongTrai
         {
             if(building)return false;
             int item=current>=200?current-200:current+100;var key=ItemKey(item);if(key==null)return false;
-            return Add(root,key,new Vector3(0,-.06f,0),item>=100?.72f:.25f,item>=100?.5f:.3f)!=null;
+            return Add(root,key,new Vector3(0,-.06f,0),FarmItemCatalog.IsVirtualItem(item)?.72f:.25f,FarmItemCatalog.IsVirtualItem(item)?.5f:.3f)!=null;
         }
         public static void Tnt(FarmTnt tnt)
         {

@@ -145,11 +145,11 @@ namespace NongTrai
                 {
                     var choices=new List<int>();
                     for(int i=0;i<bag.Slots.Length;i++)if(bag.Slots[i].count>0&&
-                        (bag.Slots[i].item<100||bag.Slots[i].item>=104))choices.Add(i);
+                        (FarmItemCatalog.IsInventoryItem(bag.Slots[i].item)||FarmItemCatalog.IsTool(bag.Slots[i].item)))choices.Add(i);
                     if(choices.Count==0)break;
-                    int slot=choices[Random.Range(0,choices.Count)];int item=bag.Slots[slot].item;var weapon=item>=104?bag.Slots[slot].Copy():null;
+                    int slot=choices[Random.Range(0,choices.Count)];int item=bag.Slots[slot].item;var weapon=FarmItemCatalog.IsTool(item)?bag.Slots[slot].Copy():null;
                     int crop=item==38?hud.interaction.inventory.FirstMutantCrop():-1;
-                    if(item<100)hud.interaction.inventory.Remove(item,1);
+                    if(FarmItemCatalog.IsInventoryItem(item))hud.interaction.inventory.Remove(item,1);
                     else{bag.Slots[slot].count--;if(bag.Slots[slot].count<=0)bag.Slots[slot]=new BagSlot();}
                     WorldPickup.Spawn(item,1,hud.player.transform.position+Vector3.up,crop,weapon);
                     bag.Sync();
@@ -194,12 +194,12 @@ namespace NongTrai
         {var go=GameObject.CreatePrimitive(PrimitiveType.Sphere);go.name=name;go.transform.SetParent(parent,false);go.transform.localPosition=pos;go.transform.localScale=scale;
          Destroy(go.GetComponent<Collider>());var material=new Material(Shader.Find("Universal Render Pipeline/Lit"));material.color=color;go.GetComponent<Renderer>().material=material;}
         public void Hit(Vector3 attacker)
-        {var bag=AdventureBag.Instance;int tool=bag==null?-1:bag.Item;if((tool==104||tool==106||tool==107)&&!bag.DamageTool())return;
+        {if(health<=0)return;var bag=AdventureBag.Instance;int tool=bag==null?-1:bag.Item;if((tool==104||tool==106||tool==107)&&!bag.DamageTool())return;
          health-=FarmForge.Instance==null?(tool==106?24+(FarmForge.Instance==null?0:FarmForge.Instance.SwordDamageBonus):tool==107?16+(FarmForge.Instance==null?0:FarmForge.Instance.AxeDamageBonus):6):FarmForge.Instance.ResolveMelee((tool==106?24+(FarmForge.Instance==null?0:FarmForge.Instance.SwordDamageBonus):tool==107?16+(FarmForge.Instance==null?0:FarmForge.Instance.AxeDamageBonus):6),transform.position+Vector3.up);knockback=transform.position-attacker;knockback.y=0;knockback=knockback.normalized*3;
-         alert=8;if(health<=0){FarmExpansion.Instance?.GainExperience(12);FarmEffects.Burst(transform.position+Vector3.up,"+12 XP",Color.yellow);Destroy(gameObject);}}
+         alert=8;if(health<=0){WorldPickup.Spawn(snake?120:119,1,transform.position);FarmExpansion.Instance?.GainExperience(12);FarmEffects.Burst(transform.position+Vector3.up,"+12 XP",Color.yellow);Destroy(gameObject);}}
         public void HitRanged(Vector3 attacker,int damage)
-        {health-=damage;knockback=(transform.position-attacker).normalized*2.2f;knockback.y=0;alert=8;
-         if(health<=0){FarmExpansion.Instance?.GainExperience(12);FarmEffects.Burst(transform.position+Vector3.up,"+12 XP",Color.yellow);Destroy(gameObject);}}
+        {if(health<=0)return;health-=damage;knockback=(transform.position-attacker).normalized*2.2f;knockback.y=0;alert=8;
+         if(health<=0){WorldPickup.Spawn(snake?120:119,1,transform.position);FarmExpansion.Instance?.GainExperience(12);FarmEffects.Burst(transform.position+Vector3.up,"+12 XP",Color.yellow);Destroy(gameObject);}}
         void Update()
         {if(owner==null||TimeManager.Instance.player.Paused)return;var player=TimeManager.Instance.player.transform;
          if(healthCanvas!=null&&Camera.main!=null)
@@ -272,15 +272,15 @@ namespace NongTrai
         }
         public void Hit(Vector3 attacker)
         {
-            var bag=AdventureBag.Instance;int item=bag==null?-1:bag.Item;
+            if(health<=0)return;var bag=AdventureBag.Instance;int item=bag==null?-1:bag.Item;
             if((item==104||item==106||item==107)&&!bag.DamageTool())return;
             health-=FarmForge.Instance==null?(item==106?24+(FarmExpansion.Instance==null?0:FarmExpansion.Instance.ToolTiers[2]*6)+(FarmForge.Instance==null?0:FarmForge.Instance.SwordDamageBonus):item==107?18+(FarmForge.Instance==null?0:FarmForge.Instance.AxeDamageBonus):6):FarmForge.Instance.ResolveMelee((item==106?24+(FarmExpansion.Instance==null?0:FarmExpansion.Instance.ToolTiers[2]*6)+(FarmForge.Instance==null?0:FarmForge.Instance.SwordDamageBonus):item==107?18+(FarmForge.Instance==null?0:FarmForge.Instance.AxeDamageBonus):6),transform.position+Vector3.up);
             knockback=(transform.position-attacker).normalized*3.5f;knockback.y=0;
-            if(health<=0){WorldPickup.Spawn(7,1,transform.position);Destroy(gameObject);}
+            if(health<=0){WorldPickup.Spawn(118,2,transform.position);Destroy(gameObject);}
         }
         public void HitRanged(Vector3 attacker,int damage)
-        {health-=damage;knockback=(transform.position-attacker).normalized*2.2f;knockback.y=0;
-         if(health<=0){WorldPickup.Spawn(7,1,transform.position);Destroy(gameObject);}}
+        {if(health<=0)return;health-=damage;knockback=(transform.position-attacker).normalized*2.2f;knockback.y=0;
+         if(health<=0){WorldPickup.Spawn(118,2,transform.position);Destroy(gameObject);}}
         void OnDestroy(){if(den!=null)Destroy(den);}
         public void Retreat(){retreating=true;}
         static void Part(Transform parent, string name, Vector3 position, Vector3 scale, Color color)

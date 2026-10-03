@@ -13,6 +13,16 @@
 !/Builds/Windows-NumberMemory/NongTrai_Data/
 !/Builds/Windows-NumberMemory/MonoBleedingEdge/
 !/Builds/Windows-NumberMemory/D3D12/
+
+# Delivered Windows build with the restaurant expansion.
+!/Builds/Windows-Restaurant/
+/Builds/Windows-Restaurant/*
+!/Builds/Windows-Restaurant/NongTrai.exe
+!/Builds/Windows-Restaurant/UnityPlayer.dll
+!/Builds/Windows-Restaurant/UnityCrashHandler64.exe
+!/Builds/Windows-Restaurant/NongTrai_Data/
+!/Builds/Windows-Restaurant/MonoBleedingEdge/
+!/Builds/Windows-Restaurant/D3D12/
 *.csproj
 *.sln
 *.slnx

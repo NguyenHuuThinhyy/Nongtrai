@@ -14,7 +14,7 @@ namespace NongTrai
         [Serializable] sealed class ResourceRecord { public int id; public float remaining; }
         [Serializable] sealed class SaveData
         {
-            public int version=21,money,fruit,treeCount,selected,feed,level,xp,day,weather,levelCap,shopPurchaseDay,questStage;
+            public int version=22,money,fruit,treeCount,selected,feed,level,xp,day,weather,levelCap,shopPurchaseDay,questStage;
             public int[] shopPurchases;
             public float dayTime,musicVolume,effectsVolume,weatherRemaining;
             public bool expanded,tutorialDone;
@@ -31,6 +31,7 @@ namespace NongTrai
             public StorageState storage;
             public DeliveryRushState deliveryRush;
             public NumberMemoryState numberMemory;
+            public RestaurantState restaurant;
             public int swordEnhancementLevel;public int[] weaponLevels;public RunnerState runner;public VoxelWaterState voxelWater;public float[] machineFuel;public int preferredFuel=66;
             public float playerHealth=100;
             public ExplorationState exploration;
@@ -60,6 +61,7 @@ namespace NongTrai
         IEnumerator Start()
         {
             yield return null;
+            FarmRestaurant.Ensure();
             if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmSmokeCheck")<0) Load();
         }
 
@@ -94,7 +96,7 @@ namespace NongTrai
                     water=water==null?null:water.Snapshot(),orders=orders==null?null:orders.Snapshot(),
                     bag=AdventureBag.Instance?.Snapshot(),drops=WorldPickup.Snapshot(),wildlife=AdventureWildlife.Instance?.Snapshot(),exploration=ExplorationWorld.Instance?.Snapshot(),building=building==null?null:building.Snapshot(),
                     storage=FarmStorage.Instance?.Snapshot(),deliveryRush=FarmDeliveryRush.Instance?.Snapshot(),swordEnhancementLevel=FarmForge.Instance==null?0:FarmForge.Instance.SwordLevel,
-                    numberMemory=FarmNumberMemory.Instance?.Snapshot(),runner=FarmRunner.Instance?.Snapshot(),weaponLevels=FarmForge.Instance==null?null:(int[])FarmForge.Instance.Levels.Clone(),voxelWater=FarmVoxelWater.Instance?.Snapshot(),tnt=FarmTnt.Snapshot(),machineFuel=(float[])processing.FuelSeconds.Clone(),preferredFuel=processing.PreferredFuel,
+                    restaurant=FarmRestaurant.Ensure().Snapshot(),numberMemory=FarmNumberMemory.Instance?.Snapshot(),runner=FarmRunner.Instance?.Snapshot(),weaponLevels=FarmForge.Instance==null?null:(int[])FarmForge.Instance.Levels.Clone(),voxelWater=FarmVoxelWater.Instance?.Snapshot(),tnt=FarmTnt.Snapshot(),machineFuel=(float[])processing.FuelSeconds.Clone(),preferredFuel=processing.PreferredFuel,
                     playerHealth=AdventureWolves.Instance==null?100:AdventureWolves.Instance.Health,
                     cutDecorTrees=FarmDecorTree.SnapshotCuts(),pendingPen=FarmPenPlacement.Instance==null?-1:FarmPenPlacement.Instance.Pending };
                 var plots=FindObjectsByType<FarmPlot>(FindObjectsSortMode.None);
@@ -164,7 +166,7 @@ namespace NongTrai
             try
             {
                 var data=JsonUtility.FromJson<SaveData>(File.ReadAllText(SavePath));
-                if(data==null || data.version<2 || data.version>21 || data.seeds==null || data.seeds.Length!=3 ||
+                if(data==null || data.version<2 || data.version>22 || data.seeds==null || data.seeds.Length!=3 ||
                     data.harvested==null || data.harvested.Length<3 || data.products==null || data.products.Length<4)
                     throw new InvalidDataException("Phiên bản dữ liệu lưu không phù hợp.");
                 if(data.version<21)MigrateBuckets(data);
@@ -241,6 +243,7 @@ namespace NongTrai
                             if(resource.id==item.id) resource.remaining=Mathf.Max(0,item.remaining);
                     if(data.version<18&&data.exploration!=null)data.exploration.generatorVersion=4;
                     ExplorationWorld.Instance?.Restore(data.exploration);
+                    FarmRestaurant.Ensure().Restore(data.restaurant);
                     player.Teleport(data.version<7 && data.playerPosition.x>100?IslandManager.ExploreArrival:data.playerPosition);
                 }
                 if(water!=null) water.Restore(data.version>=5?data.water:null,data.version<15);

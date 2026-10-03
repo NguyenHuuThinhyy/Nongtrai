@@ -89,7 +89,7 @@ namespace NongTrai
         static Vector2 MapPoint(Vector3 world,RectTransform map,bool explore,Vector3 center)
         {
             float x=explore?(world.x-center.x+32)/64f:(world.x+50)/140f;
-            float z=explore?(world.z-center.z+32)/64f:(world.z+50)/100f;
+            float z=explore?(world.z-center.z+32)/64f:(world.z+110)/160f;
             return new Vector2(Mathf.Clamp01(x)*map.rect.width,-(1-Mathf.Clamp01(z))*map.rect.height);
         }
         void Landmark(Transform parent,RectTransform map,string label,Vector3 world,Color color,bool explore,Vector3 center)
@@ -100,7 +100,7 @@ namespace NongTrai
         }
         static void MapShape(Transform parent,RectTransform map,string label,Vector3 center,float width,float depth,Color color)
         {
-            var shape=FarmUi.Panel(parent,label,new Vector2(width*map.rect.width/140f,depth*map.rect.height/100f));
+            var shape=FarmUi.Panel(parent,label,new Vector2(width*map.rect.width/140f,depth*map.rect.height/160f));
             var rect=shape.GetComponent<RectTransform>();rect.anchorMin=rect.anchorMax=rect.pivot=new Vector2(0,1);
             rect.anchoredPosition=MapPoint(center,map,false,Vector3.zero)+new Vector2(-rect.sizeDelta.x*.5f,rect.sizeDelta.y*.5f);
             shape.GetComponent<Image>().color=color;
@@ -108,6 +108,7 @@ namespace NongTrai
         }
         static void DrawFarmGeometry(Transform parent,RectTransform map)
         {
+            MapShape(parent,map,"Nhà hàng 3 tầng",RestaurantWorld.Center,48,40,new Color(.76f,.48f,.25f,.95f));
             MapShape(parent,map,"Khu vườn LV3",new Vector3(68,0,0),29,75,new Color(.52f,.68f,.35f,.8f));
             MapShape(parent,map,"Hồ sâu 1 khối",new Vector3(32,0,-15),13,20,new Color(.23f,.65f,.79f,.9f));
             MapShape(parent,map,"Nhà ở",new Vector3(0,0,28),12,11,new Color(.57f,.29f,.21f,.95f));
