@@ -69,6 +69,9 @@ namespace NongTrai
             pose.positionInput=new InputActionProperty(new InputAction("AR position",InputActionType.Value,"<XRHMD>/centerEyePosition"));
             pose.rotationInput=new InputActionProperty(new InputAction("AR rotation",InputActionType.Value,"<XRHMD>/centerEyeRotation"));
             var origin=originObject.GetComponent<XROrigin>();origin.CameraFloorOffsetObject=floor;origin.Camera=cameraAR;
+            // Handheld AR poses already contain the phone's height relative to
+            // tracked planes. Applying the default VR eye offset misaligns them.
+            origin.CameraYOffset=0;
             originObject.GetComponent<ARPlaneManager>().requestedDetectionMode=PlaneDetectionMode.Horizontal;rays=originObject.GetComponent<ARRaycastManager>();anchors=originObject.GetComponent<ARAnchorManager>();status.text="Quét bàn hoặc sàn, rồi chạm để đặt nông trại.";
         }
         void BuildUI()
