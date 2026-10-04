@@ -1,6 +1,7 @@
 /Library/
 /Temp/
 /Obj/
+/.utmp/
 /Logs/
 /UserSettings/
 # Checked-in playable release; other build outputs remain local.
