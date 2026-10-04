@@ -29,7 +29,8 @@ namespace NongTrai.Editor
             {settings=ScriptableObject.CreateInstance<XRGeneralSettingsPerBuildTarget>();AssetDatabase.CreateAsset(settings,"Assets/XR/Settings/XRGeneralSettings.asset");EditorBuildSettings.AddConfigObject(XRGeneralSettings.k_SettingsKey,settings,true);}
             if(!settings.HasSettingsForBuildTarget(BuildTargetGroup.Android))settings.CreateDefaultSettingsForBuildTarget(BuildTargetGroup.Android);
             if(!settings.HasManagerSettingsForBuildTarget(BuildTargetGroup.Android))settings.CreateDefaultManagerSettingsForBuildTarget(BuildTargetGroup.Android);
-            var general=settings.SettingsForBuildTarget(BuildTargetGroup.Android);general.InitManagerOnStart=true;
+            // Normal farming must not start the camera/XR subsystems at launch.
+            var general=settings.SettingsForBuildTarget(BuildTargetGroup.Android);general.InitManagerOnStart=false;
             if(!XRPackageMetadataStore.AssignLoader(general.Manager,"UnityEngine.XR.ARCore.ARCoreLoader",BuildTargetGroup.Android))throw new Exception("Cannot assign ARCore loader. Install Android Build Support first.");
             var arcore=ARCoreSettings.GetOrCreateSettings();arcore.requirement=ARCoreSettings.Requirement.Optional;arcore.depth=ARCoreSettings.Requirement.Optional;
             var renderer=AssetDatabase.LoadAssetAtPath<UniversalRendererData>("Assets/Farm/Settings/FarmRenderer.asset");

@@ -22,8 +22,8 @@ function Install-ZipModule($entry){
     New-Item -ItemType Directory -Path $destination -Force | Out-Null
     Expand-Archive -LiteralPath $archive -DestinationPath $destination -Force
     if($entry.extractedPathRename){
-        $from=$entry.extractedPathRename.from.Replace('{UNITY_PATH}',$EditorDirectory)
-        $to=$entry.extractedPathRename.to.Replace('{UNITY_PATH}',$EditorDirectory)
+        $from=[IO.Path]::GetFullPath($entry.extractedPathRename.from.Replace('{UNITY_PATH}',$EditorDirectory))
+        $to=[IO.Path]::GetFullPath($entry.extractedPathRename.to.Replace('{UNITY_PATH}',$EditorDirectory))
         $root=[IO.Path]::GetFullPath($EditorDirectory)+[IO.Path]::DirectorySeparatorChar
         if(![IO.Path]::GetFullPath($from).StartsWith($root,[StringComparison]::OrdinalIgnoreCase) -or ![IO.Path]::GetFullPath($to).StartsWith($root,[StringComparison]::OrdinalIgnoreCase)){throw 'Module target outside editor'}
         if($to -eq $destination -and (Test-Path -LiteralPath $from)){

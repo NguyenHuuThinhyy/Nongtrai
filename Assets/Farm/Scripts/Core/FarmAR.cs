@@ -8,6 +8,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
+using UnityEngine.XR.Management;
 
 namespace NongTrai
 {
@@ -18,6 +19,7 @@ namespace NongTrai
         public bool Active {get;private set;}
         FarmHud hud;GameObject root,ui;Camera cameraAR;ARSession session;ARAnchorManager anchors;ARRaycastManager rays;ARAnchor anchor;
         Transform miniature;TMP_Text status;string selected="";bool placing;int generation;
+        XRManagerSettings manager;
         readonly List<ARRaycastHit> hits=new List<ARRaycastHit>();readonly List<Camera> savedCameras=new List<Camera>();
         float previousDistance,previousAngle;bool gesture;
         void Awake(){Instance=this;hud=FindFirstObjectByType<FarmHud>();}
@@ -33,6 +35,13 @@ namespace NongTrai
         }
         IEnumerator Begin()
         {
+            manager=XRGeneralSettings.Instance?.Manager;
+            if(manager==null){status.text="Thiếu cấu hình ARCore trong bản build. Đóng AR để tiếp tục chơi.";yield break;}
+            // Called from the AR menu after the game/render pipeline has started.
+            // Synchronous loader creation also makes closing during setup safe.
+            if(!manager.isInitializationComplete)manager.InitializeLoaderSync();
+            if(!Active)yield break;
+            if(manager.activeLoader==null){status.text="Chưa khởi tạo được ARCore. Đóng AR để tiếp tục chơi.";yield break;}
             yield return ARSession.CheckAvailability();
             if(!Active)yield break;
             if(ARSession.state==ARSessionState.Unsupported){status.text="Điện thoại không hỗ trợ ARCore. Nhấn Đóng để về game.";yield break;}
@@ -48,6 +57,7 @@ namespace NongTrai
                 if(!UnityEngine.Android.Permission.HasUserAuthorizedPermission(UnityEngine.Android.Permission.Camera)){status.text="Chưa được cấp camera. Đóng AR và cấp quyền trong cài đặt ứng dụng.";yield break;}
             }
 #endif
+            manager.StartSubsystems();
             foreach(var camera in FindObjectsByType<Camera>(FindObjectsSortMode.None))if(camera.enabled){savedCameras.Add(camera);camera.enabled=false;}
             root=new GameObject("AR farm session");var sessionObject=new GameObject("AR Session",typeof(ARSession),typeof(ARInputManager));sessionObject.transform.SetParent(root.transform);session=sessionObject.GetComponent<ARSession>();
             var originObject=new GameObject("XR Origin",typeof(XROrigin),typeof(ARPlaneManager),typeof(ARRaycastManager),typeof(ARAnchorManager));originObject.transform.SetParent(root.transform);
@@ -135,9 +145,9 @@ namespace NongTrai
         public void ResetPlacement(){generation++;gesture=false;selected="";if(anchor!=null)Destroy(anchor.gameObject);anchor=null;miniature=null;if(status!=null)status.text="Chạm lên mặt phẳng để đặt lại.";}
         public void ReturnFromChat(){if(!Active)return;ui.SetActive(true);hud.player.SetPaused(true);hud.pausePanel.SetActive(false);}
         public void Close()
-        {if(!Active)return;Active=false;generation++;StopAllCoroutines();if(root!=null)Destroy(root);if(anchor!=null)Destroy(anchor.gameObject);if(ui!=null)Destroy(ui);foreach(var c in savedCameras)if(c!=null)c.enabled=true;savedCameras.Clear();root=ui=null;anchor=null;miniature=null;rays=null;session=null;gesture=placing=false;FarmControls.ReleaseAll();hud.Resume();}
-        void OnApplicationPause(bool paused){if(session!=null)session.enabled=!paused&&Active;}
-        void OnDestroy(){Close();if(Instance==this)Instance=null;}
+        {if(!Active)return;Active=false;generation++;StopAllCoroutines();if(root!=null)Destroy(root);if(anchor!=null)Destroy(anchor.gameObject);if(ui!=null)Destroy(ui);manager?.StopSubsystems();foreach(var c in savedCameras)if(c!=null)c.enabled=true;savedCameras.Clear();root=ui=null;anchor=null;miniature=null;rays=null;session=null;gesture=placing=false;FarmControls.ReleaseAll();if(hud!=null)hud.Resume();}
+        void OnApplicationPause(bool paused){if(session!=null){session.enabled=!paused&&Active;if(paused)manager?.StopSubsystems();else if(Active)manager?.StartSubsystems();}}
+        void OnDestroy(){Close();manager?.DeinitializeLoader();if(Instance==this)Instance=null;}
     }
     public sealed class FarmARInfo:MonoBehaviour{public string description;}
     public sealed class FarmARMaterialOwner:MonoBehaviour{public Material material;void OnDestroy(){if(material!=null)Destroy(material);}}

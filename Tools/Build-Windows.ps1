@@ -46,7 +46,7 @@ $logPath = Join-Path $logFolder ('build-' + (Get-Date -Format 'yyyyMMdd-HHmmss')
 $previousOutput = $env:FARM_BUILD_OUTPUT
 try {
     $env:FARM_BUILD_OUTPUT = Join-Path $outputPath 'NongTrai.exe'
-    $arguments = @('-batchmode', '-nographics', '-quit', '-projectPath', ('"' + $taskProjectRoot + '"'),
+    $arguments = @('-batchmode', '-nographics', '-quit', '-projectPath', ('"' + $taskProjectRoot + '"'), '-buildTarget', 'StandaloneWindows64',
         '-executeMethod', 'NongTrai.Editor.FarmTechnologyBuild.BuildWindows', '-logFile', ('"' + $logPath + '"'))
     # Wait only for the editor, not background processes inherited by its Windows job.
     $process = Start-Process -FilePath $UnityEditor -ArgumentList $arguments -PassThru -WindowStyle Hidden
