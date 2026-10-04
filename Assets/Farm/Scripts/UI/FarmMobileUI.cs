@@ -72,7 +72,8 @@ namespace NongTrai
         {
             if(hud==null)return;
             var rect=Screen.safeArea;
-            if(rect!=lastSafe||lastWidth!=Screen.width){lastSafe=rect;lastWidth=Screen.width;safe.anchorMin=rect.position/new Vector2(Screen.width,Screen.height);safe.anchorMax=(rect.position+rect.size)/new Vector2(Screen.width,Screen.height);safe.offsetMin=safe.offsetMax=Vector2.zero;}
+            if(rect!=lastSafe||lastWidth!=Screen.width){lastSafe=rect;lastWidth=Screen.width;safe.anchorMin=rect.position/new Vector2(Screen.width,Screen.height);safe.anchorMax=(rect.position+rect.size)/new Vector2(Screen.width,Screen.height);safe.offsetMin=safe.offsetMax=Vector2.zero;
+                var chrome=hud.gameplayChrome.GetComponent<RectTransform>();if(chrome!=null){chrome.anchorMin=safe.anchorMin;chrome.anchorMax=safe.anchorMax;chrome.offsetMin=chrome.offsetMax=Vector2.zero;}}
             bool running=FarmRunner.Instance!=null&&FarmRunner.Instance.IsRunning;
             if(wasPaused!=hud.player.Paused){wasPaused=hud.player.Paused;FarmControls.ReleaseAll();}
             world.SetActive(!hud.player.Paused&&!running);runner.SetActive(running);
