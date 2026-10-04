@@ -13,7 +13,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from .cloud import FarmCloud
-from .retrieval import Knowledge
+from .retrieval import Knowledge, STOP_WORDS, tokens
 
 knowledge = Knowledge(Path(__file__).with_name("knowledge.json"))
 cloud = FarmCloud()
@@ -90,7 +90,12 @@ def pairing():
 @app.post("/v1/chat", dependencies=[Depends(authorize)])
 async def chat(body: Chat):
     # History only assists follow-up retrieval; client text never replaces the game manual.
-    related = knowledge.search(body.question)
+    # Short elliptical follow-ups such as "Giá bao nhiêu?" need the previous
+    # user subject even when the generic price word matches other guide sections.
+    generic = set(tokens("giá bao nhiêu mấy mất tốn lâu giây nữa còn thế vậy nó cái đó tổng thêm như hết lần một phải rồi thì đầy rỗng"))
+    subject = set(tokens(body.question)) - STOP_WORDS - generic
+    previous = next((m.content[:600] for m in reversed(body.history) if m.role == "user"), "")
+    related = knowledge.search(previous + " " + body.question if previous and not subject else body.question)
     if not related and body.history:
         related = knowledge.search(body.question + " " + " ".join(m.content for m in body.history[-2:] if m.role == "user"))
     if not related:

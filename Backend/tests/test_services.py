@@ -115,6 +115,11 @@ class APITests(unittest.TestCase):
         self.assertFalse(observed["think"])
         self.assertLessEqual(observed["options"]["num_predict"], 220)
         self.assertIn("HƯỚNG DẪN", observed["messages"][0]["content"])
+        with patch.object(main.httpx, "AsyncClient", FakeClient):
+            followup = self.client.post("/v1/chat", headers=self.headers, json={"question":"Giá bao nhiêu?","history":[{"role":"user","content":"Cung hỏng sửa thế nào?"}]})
+        self.assertEqual(followup.status_code,200)
+        self.assertIn("bow",observed["format"]["properties"]["section_id"]["enum"])
+        self.assertIn("20 xu",followup.json()["answer"])
 
     def test_thirty_retrieval_questions_and_unity_manual_match(self):
         cases = json.loads(Path(__file__).with_name("chat-evaluation.json").read_text(encoding="utf-8"))
