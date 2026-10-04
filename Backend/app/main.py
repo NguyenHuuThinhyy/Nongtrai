@@ -13,7 +13,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from .cloud import FarmCloud
-from .retrieval import Knowledge
+from .retrieval import Knowledge, STOP_WORDS, tokens
 
 knowledge = Knowledge(Path(__file__).with_name("knowledge.json"))
 cloud = FarmCloud()
@@ -103,6 +103,10 @@ async def chat(body: Chat):
     for section in related:
         for index, sentence in enumerate(re.split(r"(?<=[.!?])\s+", section["text"])):
             facts[f"{section['id']}:{index}"] = (section["title"], sentence)
+    # Put the strongest sentence matches first and bound prompt/schema size.
+    # This improves small-model selection without hard-coding question answers.
+    terms = set(tokens(body.question)) - STOP_WORDS
+    facts = dict(sorted(facts.items(), key=lambda entry: len(terms & set(tokens(" ".join(entry[1])))), reverse=True)[:12])
     guide = "\n".join(f"{key} [{title}] {sentence}" for key, (title, sentence) in facts.items())
     system = ("Bạn chọn các câu hướng dẫn trả lời đúng câu hỏi về game Nông Trại. "
               "Trả JSON fact_ids gồm tối đa 3 mã câu liên quan trực tiếp; không chọn câu khác chủ đề. "

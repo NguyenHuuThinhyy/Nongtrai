@@ -12,6 +12,9 @@ def tokens(text: str) -> list[str]:
     return re.findall(r"[a-z0-9]+", "".join(c for c in normalized if not unicodedata.combining(c)))
 
 
+STOP_WORDS = set(tokens("là gì làm sao thế nào tôi bạn có không trong của cho và với được game hỏi cách"))
+
+
 class Knowledge:
     def __init__(self, path: Path):
         self.sections = json.loads(path.read_text(encoding="utf-8"))["sections"]
@@ -24,7 +27,7 @@ class Knowledge:
         words = set(tokens(query))
         scores = []
         # Common Vietnamese question particles must not retrieve unrelated game facts.
-        words -= set(tokens("là gì làm sao thế nào tôi bạn có không trong của cho và với được game hỏi cách"))
+        words -= STOP_WORDS
         for i, doc in enumerate(self.docs):
             score = 0.0
             for word in words:

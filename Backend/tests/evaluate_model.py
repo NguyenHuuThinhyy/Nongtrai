@@ -19,19 +19,27 @@ from app.main import app
 parser = argparse.ArgumentParser()
 parser.add_argument("--output", required=True)
 parser.add_argument("--limit", type=int, default=30)
+parser.add_argument("--api", help="Call the running API instead of an in-process native diagnostic client")
 args = parser.parse_args()
 cases = json.loads(Path(__file__).with_name("chat-evaluation.json").read_text(encoding="utf-8"))[:args.limit]
 output = Path(args.output)
 output.parent.mkdir(parents=True, exist_ok=True)
-report = {"time_utc": datetime.now(timezone.utc).isoformat(), "runtime": "native Windows Ollama CPU + FastAPI TestClient (not Docker)", "model": "qwen3:1.7b", "results": []}
-with TestClient(app) as client:
+report = {"time_utc": datetime.now(timezone.utc).isoformat(), "runtime": "live API " + args.api if args.api else "native Windows Ollama CPU + FastAPI TestClient (not Docker)", "model": "qwen3:1.7b", "results": []}
+if args.api:
+    import httpx
+    transport = httpx.Client(base_url=args.api,timeout=100)
+    pairing = os.environ.get("FARM_EVAL_KEY", "")
+else:
+    transport = TestClient(app)
+    pairing = "local-evaluation-only"
+with transport as client:
     health = client.get("/health").json()
     report["health"] = health
     if not health["model_ready"]:
         raise SystemExit("Real model is not downloaded or Ollama is not serving")
     for index, case in enumerate(cases):
         start = time.perf_counter()
-        response = client.post("/v1/chat", headers={"X-Farm-Key": "local-evaluation-only"}, json={"question": case["question"]})
+        response = client.post("/v1/chat", headers={"X-Farm-Key": pairing}, json={"question": case["question"]})
         seconds = round(time.perf_counter() - start, 3)
         report["results"].append(dict(case, seconds=seconds, http_status=response.status_code, response=response.json(), content_review=None))
         output.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")

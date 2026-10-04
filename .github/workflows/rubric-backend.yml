@@ -38,6 +38,10 @@ jobs:
           python -c 'import json; r=json.load(open("../Evidence/Rubric/ci/chat.json")); assert r["generated"] and "20 xu" in r["answer"] and r["generation_mode"] == "extractive"'
           docker compose ps > ../Evidence/Rubric/ci/docker-status.txt
           docker compose logs --no-color --tail 100 > ../Evidence/Rubric/ci/docker-log.txt
+      - name: Thirty real model questions over HTTP
+        env:
+          FARM_EVAL_KEY: ci-local-evidence-only
+        run: python Backend/tests/evaluate_model.py --api http://127.0.0.1:8000 --output Evidence/Rubric/ci/chat-30-container.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -111,6 +111,7 @@ class APITests(unittest.TestCase):
         self.assertIn("1 độ bền", response.json()["answer"])
         self.assertEqual(response.json()["generation_mode"], "extractive")
         self.assertIn("bow:1", observed["format"]["properties"]["fact_ids"]["items"]["enum"])
+        self.assertLessEqual(len(observed["format"]["properties"]["fact_ids"]["items"]["enum"]),12)
         self.assertFalse(observed["think"])
         self.assertLessEqual(observed["options"]["num_predict"], 220)
         self.assertIn("HƯỚNG DẪN", observed["messages"][0]["content"])
