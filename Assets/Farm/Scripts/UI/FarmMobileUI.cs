@@ -47,7 +47,7 @@ namespace NongTrai
             Action(world.transform,"Túi",new Vector2(50,-130),new Vector2(82,55),()=>hud.interaction.inventory.Open(),true);
             Action(world.transform,"Bản đồ",new Vector2(150,-130),new Vector2(100,55),()=>IslandManager.Instance?.OpenMap(),true);
             Action(world.transform,"Trợ lý",new Vector2(267,-130),new Vector2(100,55),()=>FarmServices.Instance?.OpenChat(),true);
-            Action(world.transform,"Menu",new Vector2(-65,-130),new Vector2(100,55),OpenMenu,true,true);
+            Action(world.transform,"Menu",new Vector2(-250,-130),new Vector2(100,55),OpenMenu,true,true);
             runner=Root(safe,"Điều khiển Runner").gameObject;
             Action(runner.transform,"←",new Vector2(70,85),new Vector2(110,85),()=>FarmRunner.Instance?.ChangeLane(-1));
             Action(runner.transform,"→",new Vector2(195,85),new Vector2(110,85),()=>FarmRunner.Instance?.ChangeLane(1));

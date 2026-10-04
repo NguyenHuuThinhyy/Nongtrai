@@ -31,6 +31,7 @@ namespace NongTrai
             yield return null;Require(player.Input.Looking==Vector2.zero,"look repeated without drag");
             FarmControls.TouchPosition=new Vector2(220,340);Require(FarmControls.Pointer.position.ReadValue()==FarmControls.TouchPosition,"drag position binding");
             FarmControls.ReleaseAll();FarmControls.ForceTouch=previous;
+            FarmControls.ForceTouch=true;Require(FarmControls.DisplayHint("Chuột trái [R]")=="Dùng [Xoay]","touch hints still use keyboard/mouse");FarmControls.ForceTouch=previous;
             hud.mainMenu.SetActive(false);player.SetPaused(false);var position=player.transform.position;
             services.OpenChat("Xô nước");Require(player.Paused&&services.ChatPanel.activeSelf,"chat did not pause game");
             if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmServicesLive")>=0)
@@ -51,13 +52,20 @@ namespace NongTrai
             yield return null;yield return null;
             var providerOwner=UnityEngine.Object.FindFirstObjectByType<FarmARProviderSetup>();
             Require(providerFinished&&providerOwner!=null&&providerOwner.gameObject.scene.name=="DontDestroyOnLoad","provider setup lifetime/coroutine ownership");
+            hud.player.SetPaused(true);hud.pausePanel.SetActive(false);
+            var plots=UnityEngine.Object.FindObjectsByType<FarmPlot>(FindObjectsSortMode.None);Array.Sort(plots,(a,b)=>a.id.CompareTo(b.id));
+            var sample=plots[0];var oldState=sample.State;var oldCrop=sample.Crop;float oldGrowth=sample.Growth,oldMoisture=sample.Moisture;bool oldMutation=sample.Mutated;
+            sample.Restore(PlotState.Growing,hud.save.field.crops[0],.5f,.65f);
             var holder=new GameObject("AR model test");holder.transform.position=new Vector3(0,2000,0);var miniature=FarmAR.BuildMiniature(holder.transform);
             Require(miniature.GetComponentsInChildren<Renderer>().Length>=20,"miniature imported visuals missing");
             Require(miniature.GetComponentsInChildren<FarmPlot>().Length==0&&miniature.GetComponentsInChildren<FarmAnimal>().Length==0,"miniature duplicated gameplay");
+            var infos=miniature.GetComponentsInChildren<FarmARInfo>();Require(Array.Exists(infos,i=>i.description.StartsWith("Bò:")),"cow visual missing");
+            Require(Array.Exists(infos,i=>i.description.Contains("Lớn 50% • Độ ẩm 65%")),"crop snapshot data not mapped");
             foreach(var child in miniature.GetComponentsInChildren<Transform>())Require(child.gameObject.layer==30,"AR culling layer");
             var main=Camera.main;bool cameraWasEnabled=main.enabled;main.enabled=false;var preview=new GameObject("AR miniature preview camera",typeof(Camera));var camera=preview.GetComponent<Camera>();camera.cullingMask=1<<30;camera.nearClipPlane=.01f;camera.farClipPlane=5;camera.clearFlags=CameraClearFlags.SolidColor;camera.backgroundColor=new Color(.64f,.78f,.86f);preview.transform.position=holder.transform.position+new Vector3(.75f,.65f,-.85f);preview.transform.LookAt(holder.transform.position);
             var canvas=hud.GetComponentInParent<Canvas>();canvas.enabled=false;yield return new WaitForEndOfFrame();Capture("03-miniature-desktop-preview.png",camera);canvas.enabled=true;main.enabled=cameraWasEnabled;UnityEngine.Object.Destroy(preview);UnityEngine.Object.Destroy(holder);yield return null;
-            if(FarmControls.Mobile){hud.Resume();yield return null;Capture("04-touch-desktop-layout.png");}
+            sample.Restore(oldState,oldCrop,oldGrowth,oldMoisture,oldMutation);hud.Resume();
+            if(FarmControls.Mobile){yield return new WaitForSecondsRealtime(6.2f);Capture("04-touch-desktop-layout.png");}
             Debug.Log("FARM_TECHNOLOGY_OK: touch edges, packaged data, manual, pause, cloud fallback and miniature. Physical AR/device/cloud/model acceptance is separate.");
         }
         static IEnumerator ProviderProbe(Action finished){yield return null;finished();}

@@ -19,6 +19,14 @@ namespace NongTrai
             "Ngắm bàn gỗ trước nhà và bấm trái để chế tạo. Ngắm hộp thư đỏ để xem 5 đơn; giao đủ hàng sẽ nhận xu và XP.",
             "Tab mở bản đồ, chọn Khám phá. Giữ trái để đào; chọn khối trong hotbar rồi trái để đặt. Mở túi B và chọn Xây dựng để xem các khối.",
             "Chỉ nút LƯU GAME trong menu Esc mới ghi tiến độ. Chế độ sáng tạo LV99 dành để thử, rời game sẽ bỏ thay đổi."};
+        readonly string[] touchSteps={
+            "Kéo joystick bên trái để đi, vuốt vùng bên phải để nhìn. Giữ Chạy hoặc Nhảy. Dấu + là điểm ngắm; Menu mở các thao tác khác.",
+            "Chạm Túi, kéo đồ vào 9 ô dưới cùng rồi chạm ô để chọn. Tách nửa và Chuyển nhanh có nút riêng trong túi.",
+            "Chọn Cuốc, ngắm đất và chạm Dùng để cày. Chọn hạt rồi Dùng để gieo; cây chín dùng tay hái. Tương tác vào đất vườn để trồng cây ăn quả từ LV3.",
+            "Chọn Xô: Múc/Đặt lấy nước khi rỗng, đặt nước khi đầy. Thuê vòi ở máy bơm; LV3/5/7 mở thêm lượt. Bọt biển trong shop hút nước quanh một ô.",
+            "Ngắm bàn chế tạo hoặc hộp thư và chạm Dùng/Tương tác. Menu có Chế biến; giao đủ đơn nhận xu và XP.",
+            "Chạm Bản đồ → Khám phá. Giữ Dùng để đào, chọn khối rồi Dùng để đặt; Xoay đổi hướng. Nhìn xuống, nhảy để đặt khối dưới chân.",
+            "Menu → Lưu game ghi tiến độ; thoát không tự lưu. Sáng tạo không ghi save. Menu cũng có Nông trại AR, Trợ lý AI và Kết nối cloud."};
         void Awake()=>Instance=this;
         void OnDestroy(){if(Instance==this)Instance=null;}
         public void Initialize(FarmHud hud,Transform parent)
@@ -49,7 +57,7 @@ namespace NongTrai
         void Toggle(){if(panel==null)return;panel.SetActive(!panel.activeSelf);if(panel.activeSelf){autoHide=10;Refresh();}}
         void Next(){if(page<steps.Length-1)page++;else{Completed=true;panel.SetActive(false);}autoHide=10;Refresh();}
         void Skip(){Completed=true;panel.SetActive(false);}
-        void Refresh(){if(title==null)return;title.text=titles[page];body.text=steps[page];}
+        void Refresh(){if(title==null)return;title.text=titles[page];body.text=(FarmControls.Mobile?touchSteps:steps)[page];}
         public void Restore(bool completed){Completed=completed;page=0;autoHide=10;if(panel!=null){panel.SetActive(!completed);Refresh();}}
     }
 }

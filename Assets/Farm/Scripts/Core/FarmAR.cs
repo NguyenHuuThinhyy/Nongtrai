@@ -121,7 +121,7 @@ namespace NongTrai
             Add(farm,"Quaternius_FarmBuildings/Barn",new Vector3(-7,0,4),4,"Chuồng: chăm sóc vật nuôi và thu sản phẩm.");
             Add(farm,"Quaternius_FarmBuildings/BigBarn",new Vector3(6,0,5),4,"Công trình nông trại: mở đất, trồng trọt và chế biến.");
             Add(farm,"nature-kit/tree_oak",new Vector3(-8,0,-6),4,"Cây ăn quả: chăm sóc và thu hoạch theo mùa.");
-            Add(farm,"Quaternius_Animals/Cow",new Vector3(-4,0,2),1.8f,"Bò: cần thức ăn và chuồng phù hợp.");
+            Add(farm,"Quaternius_Animals/Cow",new Vector3(7,0,-4),1.8f,"Bò: cần thức ăn và chuồng phù hợp.");
             var plots=FindObjectsByType<FarmPlot>(FindObjectsSortMode.None);System.Array.Sort(plots,(a,b)=>a.id.CompareTo(b.id));
             for(int i=0;i<Mathf.Min(16,plots.Length);i++)
             {var plot=plots[i];var p=new Vector3(-4+(i%4)*2,0,-6+(i/4)*2);string info=plot.Crop==null?"Ô đất "+plot.id+": "+plot.State:plot.Crop.displayName+" • Lớn "+Mathf.RoundToInt(plot.Growth*100)+"% • Độ ẩm "+Mathf.RoundToInt(plot.Moisture*100)+"%";

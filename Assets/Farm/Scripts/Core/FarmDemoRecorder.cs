@@ -41,7 +41,9 @@ namespace NongTrai
             float until=Time.realtimeSinceStartup+100;while(services.ChatBusy&&Time.realtimeSinceStartup<until)yield return null;
             if(!services.LastReplyFromModel||!services.LastReply.Contains("20 xu")){Fail("Real model reply missing");yield break;}
             yield return new WaitForSecondsRealtime(4);services.Close();player.SetPaused(true);hud.pausePanel.SetActive(false);
-            caption.text="MINIATURE PREVIEW TRÊN PC • CHƯA PHẢI AR TRACKING THẬT";
+            caption.text="MINIATURE PC • RUỘNG MẪU DEMO • CHƯA CÓ AR TRACKING THẬT";
+            var plots=FindObjectsByType<FarmPlot>(FindObjectsSortMode.None);Array.Sort(plots,(a,b)=>a.id.CompareTo(b.id));
+            for(int i=0;i<Mathf.Min(4,plots.Length);i++)plots[i].Restore(PlotState.Growing,hud.save.field.crops[i%3],i*.25f,.65f);
             var holder=new GameObject("Demo miniature");holder.transform.position=new Vector3(0,2000,0);FarmAR.BuildMiniature(holder.transform);
             var main=Camera.main;main.enabled=false;var preview=new GameObject("Demo miniature camera",typeof(Camera));cameraOverride=preview.GetComponent<Camera>();cameraOverride.cullingMask=1<<30;cameraOverride.nearClipPlane=.01f;cameraOverride.farClipPlane=5;cameraOverride.backgroundColor=new Color(.64f,.78f,.86f);cameraOverride.clearFlags=CameraClearFlags.SolidColor;
             preview.transform.position=holder.transform.position+new Vector3(.75f,.65f,-.85f);preview.transform.LookAt(holder.transform.position);hud.GetComponentInParent<Canvas>().enabled=false;

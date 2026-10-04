@@ -141,7 +141,7 @@ namespace NongTrai
           pausePanel.SetActive(paused && (mainMenu==null || !mainMenu.activeSelf) && (settingsPanel==null || !settingsPanel.activeSelf));instructions.SetActive(false);
           if(!paused) { if(mainMenu!=null) mainMenu.SetActive(false);if(settingsPanel!=null) settingsPanel.SetActive(false); } }
         public void ToggleInstructions() => instructions.SetActive(!instructions.activeSelf);
-        void ShowMessage(string text) { toast.text = text; remaining = 6; }
+        void ShowMessage(string text) { toast.text = FarmControls.DisplayHint(text); remaining = 6; }
         public void Notify(string text) => ShowMessage(text);
         void Update()
         {
@@ -171,7 +171,7 @@ namespace NongTrai
                 }
             }
             if(saveButton!=null) saveButton.interactable=!CreativeModeManager.IsCreative;
-            prompt.text = player.Paused?"":interaction.Hint.Replace("[E]","[CHUỘT TRÁI]");
+            prompt.text = player.Paused?"":FarmControls.DisplayHint(interaction.Hint.Replace("[E]","[CHUỘT TRÁI]"));
             if (farmingStatus != null && interaction.field != null)
             {
                 var field = interaction.field;

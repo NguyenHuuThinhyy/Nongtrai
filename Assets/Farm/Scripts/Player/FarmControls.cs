@@ -54,6 +54,13 @@ namespace NongTrai
         public static void AddLook(Vector2 delta)=>pendingLook+=delta;
         public static Vector2 Look {get{if(lookFrame!=Time.frameCount){lookFrame=Time.frameCount;look=pendingLook;pendingLook=Vector2.zero;}return look;}}
         public static void ReleaseAll() { Move=look=pendingLook=Vector2.zero;lookFrame=-1;Pointer.leftButton.Reset();Pointer.rightButton.Reset();Keys.Reset(); }
+        public static string DisplayHint(string text)
+        {
+            if(!Mobile||string.IsNullOrEmpty(text))return text;
+            return text.Replace("CHUỘT TRÁI","DÙNG").Replace("Chuột trái","Dùng").Replace("chuột trái","Dùng")
+                .Replace("Chuột phải","Tương tác").Replace("chuột phải","Tương tác").Replace("click trái","Dùng").Replace("click","Dùng")
+                .Replace("[N]","[Menu → Mở đất]").Replace("[B]","[Túi]").Replace("[R]","[Xoay]").Replace("[F]","[Menu → Cho thú ăn]");
+        }
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void Reset() { ForceTouch=System.Array.IndexOf(System.Environment.GetCommandLineArgs(),"-farmTouch")>=0;ReleaseAll(); }
     }
