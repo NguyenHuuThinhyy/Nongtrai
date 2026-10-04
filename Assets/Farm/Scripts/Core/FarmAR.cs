@@ -47,13 +47,13 @@ namespace NongTrai
             yield return FarmARProviderSetup.Run(ARSession.CheckAvailability());
             if(!Active)yield break;
             if(ARSession.state==ARSessionState.Unsupported){status.text="Điện thoại không hỗ trợ ARCore. Nhấn Đóng để về game.";yield break;}
-            if(ARSession.state==ARSessionState.NeedsInstall){status.text="Đang cài Google Play Services for AR…";yield return FarmARProviderSetup.Run(ARSession.Install());}
+            if(ARSession.state==ARSessionState.NeedsInstall||ARSession.state==ARSessionState.Installing){status.text="Đang cài Google Play Services for AR…";yield return FarmARProviderSetup.Run(ARSession.Install());}
             if(!Active)yield break;
             if(ARSession.state!=ARSessionState.Ready&&ARSession.state!=ARSessionState.SessionTracking){status.text="Chưa khởi tạo được ARCore. Kiểm tra Google Play Services for AR.";yield break;}
 #if UNITY_ANDROID && !UNITY_EDITOR
             if(!UnityEngine.Android.Permission.HasUserAuthorizedPermission(UnityEngine.Android.Permission.Camera))
             {
-                bool resolved=false;var callbacks=new UnityEngine.Android.PermissionCallbacks();callbacks.PermissionGranted+=_=>resolved=true;callbacks.PermissionDenied+=_=>resolved=true;callbacks.PermissionDeniedAndDontAskAgain+=_=>resolved=true;
+                bool resolved=false;var callbacks=new UnityEngine.Android.PermissionCallbacks();callbacks.PermissionGranted+=_=>resolved=true;callbacks.PermissionDenied+=_=>resolved=true;
                 UnityEngine.Android.Permission.RequestUserPermission(UnityEngine.Android.Permission.Camera,callbacks);
                 while(Active&&!resolved)yield return null;if(!Active)yield break;
                 if(!UnityEngine.Android.Permission.HasUserAuthorizedPermission(UnityEngine.Android.Permission.Camera)){status.text="Chưa được cấp camera. Đóng AR và cấp quyền trong cài đặt ứng dụng.";yield break;}

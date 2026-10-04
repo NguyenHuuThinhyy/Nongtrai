@@ -47,6 +47,10 @@ namespace NongTrai
             services.OpenConnection();yield return new WaitForEndOfFrame();Capture("02-connection.png");services.Close();services.DisableCloud();
             Require(!services.CloudConnected&&services.RemotePumpEnabled,"cloud fallback disabled irrigation");
             FarmAR.Instance.Open();Require(!FarmAR.Instance.Active,"desktop incorrectly started physical AR");
+            bool providerFinished=false;FarmARProviderSetup.Run(ProviderProbe(()=>providerFinished=true));
+            yield return null;yield return null;
+            var providerOwner=UnityEngine.Object.FindFirstObjectByType<FarmARProviderSetup>();
+            Require(providerFinished&&providerOwner!=null&&providerOwner.gameObject.scene.name=="DontDestroyOnLoad","provider setup lifetime/coroutine ownership");
             var holder=new GameObject("AR model test");holder.transform.position=new Vector3(0,2000,0);var miniature=FarmAR.BuildMiniature(holder.transform);
             Require(miniature.GetComponentsInChildren<Renderer>().Length>=20,"miniature imported visuals missing");
             Require(miniature.GetComponentsInChildren<FarmPlot>().Length==0&&miniature.GetComponentsInChildren<FarmAnimal>().Length==0,"miniature duplicated gameplay");
@@ -56,6 +60,7 @@ namespace NongTrai
             if(FarmControls.Mobile){hud.Resume();yield return null;Capture("04-touch-desktop-layout.png");}
             Debug.Log("FARM_TECHNOLOGY_OK: touch edges, packaged data, manual, pause, cloud fallback and miniature. Physical AR/device/cloud/model acceptance is separate.");
         }
+        static IEnumerator ProviderProbe(Action finished){yield return null;finished();}
         static void Capture(string name,Camera camera=null)
         {
             // Explicit rendering works for a hidden Windows smoke window too.
