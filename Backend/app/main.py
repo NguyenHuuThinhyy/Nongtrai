@@ -106,7 +106,10 @@ async def chat(body: Chat):
     # Put the strongest sentence matches first and bound prompt/schema size.
     # This improves small-model selection without hard-coding question answers.
     terms = set(tokens(body.question)) - STOP_WORDS
-    facts = dict(sorted(facts.items(), key=lambda entry: len(terms & set(tokens(" ".join(entry[1])))), reverse=True)[:12])
+    ranked = sorted(facts.values(), key=lambda entry: len(terms & set(tokens(" ".join(entry)))), reverse=True)[:12]
+    # Short sequential labels avoid asking the small model to reconcile the
+    # original section/sentence indices with a different ranked position.
+    facts = {f"F{i:02d}": fact for i, fact in enumerate(ranked)}
     guide = "\n".join(f"{key} [{title}] {sentence}" for key, (title, sentence) in facts.items())
     system = ("Bạn chọn các câu hướng dẫn trả lời đúng câu hỏi về game Nông Trại. "
               "Trả JSON fact_ids gồm tối đa 3 mã câu liên quan trực tiếp; không chọn câu khác chủ đề. "

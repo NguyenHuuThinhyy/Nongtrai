@@ -102,7 +102,9 @@ class APITests(unittest.TestCase):
             async def post(self, url, json):
                 observed.update(json)
                 import httpx
-                return httpx.Response(200, request=httpx.Request("POST", url), json={"message": {"content": '{"fact_ids":["bow:1"]}'}})
+                guide = json["messages"][0]["content"]
+                label = next(line.split()[0] for line in guide.splitlines() if "1 độ bền" in line)
+                return httpx.Response(200, request=httpx.Request("POST", url), json={"message": {"content": __import__('json').dumps({"fact_ids":[label]})}})
         with patch.object(main.httpx, "AsyncClient", FakeClient):
             response = self.client.post("/v1/chat", headers=self.headers, json={"question": "Cung có giảm độ bền không?"})
         self.assertEqual(response.status_code, 200)
@@ -110,7 +112,7 @@ class APITests(unittest.TestCase):
         self.assertIn("Cung và mũi tên", response.json()["sources"])
         self.assertIn("1 độ bền", response.json()["answer"])
         self.assertEqual(response.json()["generation_mode"], "extractive")
-        self.assertIn("bow:1", observed["format"]["properties"]["fact_ids"]["items"]["enum"])
+        self.assertTrue(all(i.startswith("F") for i in observed["format"]["properties"]["fact_ids"]["items"]["enum"]))
         self.assertLessEqual(len(observed["format"]["properties"]["fact_ids"]["items"]["enum"]),12)
         self.assertFalse(observed["think"])
         self.assertLessEqual(observed["options"]["num_predict"], 220)
