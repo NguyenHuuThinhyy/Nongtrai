@@ -42,10 +42,12 @@ namespace NongTrai
             if(!manager.isInitializationComplete)manager.InitializeLoaderSync();
             if(!Active)yield break;
             if(manager.activeLoader==null){status.text="Chưa khởi tạo được ARCore. Đóng AR để tiếp tục chơi.";yield break;}
-            yield return ARSession.CheckAvailability();
+            // AR Foundation stores CheckingAvailability/Installing globally. Its
+            // coroutine must finish even if this screen or gameplay scene closes.
+            yield return FarmARProviderSetup.Run(ARSession.CheckAvailability());
             if(!Active)yield break;
             if(ARSession.state==ARSessionState.Unsupported){status.text="Điện thoại không hỗ trợ ARCore. Nhấn Đóng để về game.";yield break;}
-            if(ARSession.state==ARSessionState.NeedsInstall){status.text="Đang cài Google Play Services for AR…";yield return ARSession.Install();}
+            if(ARSession.state==ARSessionState.NeedsInstall){status.text="Đang cài Google Play Services for AR…";yield return FarmARProviderSetup.Run(ARSession.Install());}
             if(!Active)yield break;
             if(ARSession.state!=ARSessionState.Ready&&ARSession.state!=ARSessionState.SessionTracking){status.text="Chưa khởi tạo được ARCore. Kiểm tra Google Play Services for AR.";yield break;}
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -147,7 +149,20 @@ namespace NongTrai
         public void Close()
         {if(!Active)return;Active=false;generation++;StopAllCoroutines();if(root!=null)Destroy(root);if(anchor!=null)Destroy(anchor.gameObject);if(ui!=null)Destroy(ui);manager?.StopSubsystems();foreach(var c in savedCameras)if(c!=null)c.enabled=true;savedCameras.Clear();root=ui=null;anchor=null;miniature=null;rays=null;session=null;gesture=placing=false;FarmControls.ReleaseAll();if(hud!=null)hud.Resume();}
         void OnApplicationPause(bool paused){if(session!=null){session.enabled=!paused&&Active;if(paused)manager?.StopSubsystems();else if(Active)manager?.StartSubsystems();}}
-        void OnDestroy(){Close();manager?.DeinitializeLoader();if(Instance==this)Instance=null;}
+        void OnDestroy(){Close();if(Instance==this)Instance=null;}
+    }
+    // Owns provider setup across UI/scene transitions. The initialized loader is
+    // shared for this app lifetime; Close stops its subsystems (including camera).
+    public sealed class FarmARProviderSetup:MonoBehaviour
+    {
+        static FarmARProviderSetup instance;
+        public static Coroutine Run(IEnumerator task)
+        {
+            if(instance==null){var owner=new GameObject("AR provider setup");DontDestroyOnLoad(owner);instance=owner.AddComponent<FarmARProviderSetup>();}
+            return instance.StartCoroutine(task);
+        }
+        void OnApplicationQuit(){var manager=XRGeneralSettings.Instance?.Manager;manager?.StopSubsystems();manager?.DeinitializeLoader();}
+        void OnDestroy(){if(instance==this)instance=null;}
     }
     public sealed class FarmARInfo:MonoBehaviour{public string description;}
     public sealed class FarmARMaterialOwner:MonoBehaviour{public Material material;void OnDestroy(){if(material!=null)Destroy(material);}}
