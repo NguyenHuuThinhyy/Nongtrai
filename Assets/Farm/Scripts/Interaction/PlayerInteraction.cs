@@ -38,7 +38,7 @@ namespace NongTrai
         public void Say(string text) => Message?.Invoke(text);
         void Update()
         {
-            var keyboard=Keyboard.current;
+            var keyboard=FarmControls.Keys;
             if(player.Paused)
             {
                 if(keyboard!=null && (keyboard.iKey.wasPressedThisFrame||keyboard.bKey.wasPressedThisFrame) && inventory.Panel!=null && inventory.Panel.activeSelf)
@@ -55,11 +55,11 @@ namespace NongTrai
                 if(keyboard.pKey.wasPressedThisFrame) { shop.barn?.Open();return; }
                 if(keyboard.tabKey.wasPressedThisFrame) { IslandManager.Instance?.OpenMap();return; }
             }
-            if(Mouse.current!=null&&carry.Held==null&&Mouse.current.rightButton.wasPressedThisFrame&&TryRestaurantInteraction(FarmAim.Ray(viewCamera)))return;
-            if(Mouse.current!=null&&carry.Held==null&&(Mouse.current.leftButton.wasPressedThisFrame||Mouse.current.rightButton.wasPressedThisFrame))
+            if(FarmControls.Pointer!=null&&carry.Held==null&&FarmControls.Pointer.rightButton.wasPressedThisFrame&&TryRestaurantInteraction(FarmAim.Ray(viewCamera)))return;
+            if(FarmControls.Pointer!=null&&carry.Held==null&&(FarmControls.Pointer.leftButton.wasPressedThisFrame||FarmControls.Pointer.rightButton.wasPressedThisFrame))
                 if(TryTntInteraction(FarmAim.Ray(viewCamera)))return;
-            if(Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame&&TryWaterCanInteraction(FarmAim.Ray(viewCamera)))return;
-            if(Mouse.current!=null&&Mouse.current.rightButton.wasPressedThisFrame&&carry.Held==null)
+            if(FarmControls.Pointer!=null&&FarmControls.Pointer.leftButton.wasPressedThisFrame&&TryWaterCanInteraction(FarmAim.Ray(viewCamera)))return;
+            if(FarmControls.Pointer!=null&&FarmControls.Pointer.rightButton.wasPressedThisFrame&&carry.Held==null)
             {
                 var bag=AdventureBag.Instance;
                 if(bag?.Item==105)return;
@@ -96,9 +96,9 @@ namespace NongTrai
             if(FarmBuildingSystem.Instance!=null&&FarmBuildingSystem.Instance.IsBuilding)
             { ClearSelection();return; }
             ScanNearest();
-            if(Mouse.current!=null)
+            if(FarmControls.Pointer!=null)
             {
-                if(Mouse.current.rightButton.wasPressedThisFrame && carry.Held!=null)
+                if(FarmControls.Pointer.rightButton.wasPressedThisFrame && carry.Held!=null)
                 { carry.Drop();Say(carry.LastMessage);return; }
             }
             if(keyboard!=null && keyboard.fKey.wasPressedThisFrame && selected is FarmAnimal targetAnimal)
@@ -107,11 +107,11 @@ namespace NongTrai
                 if(fed) { FarmExpansion.Instance?.GainExperience(6);FarmAudio.Instance?.Play(FarmAudio.Cue.Buy); }
                 return;
             }
-            if(Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame&&!ExplorationWorld.Instance.IsExploring)
+            if(FarmControls.Pointer!=null&&FarmControls.Pointer.leftButton.wasPressedThisFrame&&!ExplorationWorld.Instance.IsExploring)
                 if(FarmPenPlacement.Instance!=null&&(FarmPenPlacement.Instance.Pending>=0||FarmPenPlacement.Instance.ConsumedFrame==Time.frameCount))return;
-            if(Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame&&FarmWaterSystem.Instance!=null&&
+            if(FarmControls.Pointer!=null&&FarmControls.Pointer.leftButton.wasPressedThisFrame&&FarmWaterSystem.Instance!=null&&
                 (FarmWaterSystem.Instance.PendingPlacement||FarmWaterSystem.Instance.ConsumedFrame==Time.frameCount))return;
-            if(Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame&&AdventureBag.Instance?.Item!=111&&!AdventureBag.IsEdible(AdventureBag.Instance==null?-1:AdventureBag.Instance.Item)&&!ExplorationWorld.Instance.IsExploring)
+            if(FarmControls.Pointer!=null&&FarmControls.Pointer.leftButton.wasPressedThisFrame&&AdventureBag.Instance?.Item!=111&&!AdventureBag.IsEdible(AdventureBag.Instance==null?-1:AdventureBag.Instance.Item)&&!ExplorationWorld.Instance.IsExploring)
                 if(TryLeftInteractRay(FarmAim.Ray(viewCamera)))return;
         }
         static IInteractable FindTarget(Collider collider)

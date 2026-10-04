@@ -1,3 +1,21 @@
+# Bản thử Android / AR / AI / Cloud
+
+© HThinh.yy. Nhánh rubric; chỉ gộp main sau khi bạn tự test và xác nhận.
+
+- Android: joystick di chuyển, vuốt bên phải xoay camera; giữ Chạy, chạm Nhảy.
+  Dùng/Đánh = chuột trái; Tương tác = chuột phải. Cung giữ/thả nút, đào giữ nút,
+  xô múc/đặt bằng một nút, Xoay cho công trình, hotbar9ô có ảnh vật phẩm.
+- Menu chạm: túi/shop/máy/mở đất/chuồng/bản đồ và minigame/cho thú ăn/đổi góc/bay/lưu.
+  Túi có Tách nửa, Chuyển nhanh và kéo thả. Runner/câu cá/nhà hàng dùng nút chạm.
+- Trợ lý / AR / Cloud → Kết nối: địa chỉ PC cùng Wi-Fi và mã backend. Hướng dẫn
+  luôn có sẵn khi backend tắt. Mã Adafruit chỉ nhập ở PC; bạn có thể tạo tài khoản sau.
+- Nông trại AR: AndroidARCore, cho camera, quét bàn/sàn, chạm đặt; hai ngón xoay/phóng;
+  chạm cây/công trình xem thông tin rồi Hỏi trợ lý; ĐóngAR quay về phiên chơi.
+- Cloud mô phỏng: Bậtcloud sau khi đã xây trạm vùng đầu; dashboard ON/OFF điều khiển
+  trạm đó. Mất mạng trở về tưới cục bộ. Không cần mạng để chơi gameplay thường.
+- Cài/build/backend/model: xem Docs/RUBRIC_INTEGRATION.md. Kiểm tra thủ công:
+  Docs/ACCEPTANCE.md. APK đang là bản cài thử; AR/cloud thật cần thiết bị/tài khoản.
+
 # Tìm số 2D — 02-10-2026
 
 - **Tab → Tìm số 2D:** chọn số cần tìm trong lưới 7 × 7. Mỗi lượt có 5 câu, mỗi câu 5 giây. Click sai không cộng điểm; hết giờ chuyển câu tiếp.
@@ -10,7 +28,7 @@
 - Tên bắn từ vị trí cung/tay, hướng về điểm dưới dấu + và bù độ rơi trong tầm lực kéo. Kéo mạnh tăng tốc độ tên từ 16 đến 40 m/s; tên chịu trọng lực 9,81 m/s². Mục tiêu quá xa với lực kéo hiện tại có thông báo, cần kéo mạnh hơn hoặc tiến gần. Quái đang di chuyển vẫn cần ngắm đón.
 - Tường/khối giữa cung và mục tiêu chặn tên. Tên ghim vào vật thể/quái, có thể đến gần nhặt lại như trước.
 - Mỗi lần bắn thành công mất **1 tên + 1 độ bền của đúng chiếc cung đang cầm**. Thả quá sớm, hết tên, tạm dừng hoặc cung hỏng không tiêu hao. Cung còn 0 độ bền không bắn được: mở túi, chọn cung → **Sửa dụng cụ: 20 xu**. Thanh cung hiện ĐB /100.
-- Bản mới: `Builds/Windows-NumberMemory/NongTrai.exe`; chạy `CHAY_GAME.bat` ở gốc hoặc giải nén ZIP Windows NumberMemory trong DongGoi.
+- Bản mới: `Builds/Windows-Rubric/NongTrai.exe`; chạy `CHAY_GAME.bat` ở gốc hoặc giải nén ZIP Windows Rubric trong DongGoi.
 
 ## Rương, hồi sinh và chiến đấu
 

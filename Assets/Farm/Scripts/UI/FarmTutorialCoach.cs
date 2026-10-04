@@ -44,7 +44,7 @@ namespace NongTrai
             if(panel!=null&&panel.activeSelf&&FarmBuildingSystem.Instance!=null&&FarmBuildingSystem.Instance.PaletteOpen)panel.SetActive(false);
             if(panel!=null&&panel.activeSelf&&!hud.player.Paused&&autoHide>0)
             {autoHide-=Time.deltaTime;if(autoHide<=0){Completed=true;panel.SetActive(false);}}
-            if(Keyboard.current!=null&&Keyboard.current.hKey.wasPressedThisFrame&&!hud.player.Paused)Toggle();
+            if(FarmControls.Keys!=null&&FarmControls.Keys.hKey.wasPressedThisFrame&&!hud.player.Paused)Toggle();
         }
         void Toggle(){if(panel==null)return;panel.SetActive(!panel.activeSelf);if(panel.activeSelf){autoHide=10;Refresh();}}
         void Next(){if(page<steps.Length-1)page++;else{Completed=true;panel.SetActive(false);}autoHide=10;Refresh();}

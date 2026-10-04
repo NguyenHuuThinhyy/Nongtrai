@@ -163,7 +163,7 @@ namespace NongTrai
         public void Slide(){slideBuffer=.15f;}
         void Update()
         {
-            if(!IsRunning)return;Cursor.visible=false;var keys=Keyboard.current;
+            if(!IsRunning)return;Cursor.visible=false;var keys=FarmControls.Keys;
             if(keys!=null){if(keys.aKey.wasPressedThisFrame)ChangeLane(-1);if(keys.dKey.wasPressedThisFrame)ChangeLane(1);if(keys.wKey.wasPressedThisFrame||keys.spaceKey.wasPressedThisFrame)Jump();if(keys.sKey.wasPressedThisFrame)Slide();}
             Tick(Time.unscaledDeltaTime);
         }

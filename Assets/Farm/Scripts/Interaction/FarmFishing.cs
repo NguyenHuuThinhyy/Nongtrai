@@ -36,7 +36,7 @@ namespace NongTrai
         {
             if(hud==null)return;if(!hud.player.Paused)cooldown=Mathf.Max(0,cooldown-Time.deltaTime);
             if(!IsOpen)return;var parent=panel.transform.parent as RectTransform;if(parent!=null)panel.transform.localScale=Vector3.one*Mathf.Min(1,(parent.rect.width-20)/640,(parent.rect.height-20)/360);
-            if(!finished&&Application.isFocused){Advance(Time.unscaledDeltaTime);if(Keyboard.current!=null&&Keyboard.current.spaceKey.wasPressedThisFrame)Strike();}
+            if(!finished&&Application.isFocused){Advance(Time.unscaledDeltaTime);if(FarmControls.Keys!=null&&FarmControls.Keys.spaceKey.wasPressedThisFrame)Strike();}
             marker.rectTransform.anchoredPosition=new Vector2(28+584*Marker,-180);Refresh();
         }
         public void Advance(float seconds){if(!IsOpen||finished)return;elapsed+=Mathf.Max(0,seconds);if(elapsed>=25)Finish(false);}

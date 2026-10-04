@@ -1,30 +1,51 @@
-# Bản hiện tại — NumberMemory / 02-10-2026
+# Handoff — nhánh rubric Android / AR / AI / Cloud
 
-## Nhánh và source
+© HThinh.yy. Nền bf7d0b3. Nhánh codex/rubric-mobile-ar-ai-cloud.
+Worktree D:/GAME_NongTrai/Nongtrai-Rubric; dự án cũ D:/GAME_NongTrai giữ nguyên.
+Không merge main trước khi người dùng tự test và xác nhận. Không chạy builder dựng scene.
+Backup trước sửa: Recovery/Before-Rubric-20261004 (ngoài Git/source zip).
 
-Làm việc trên codex/number-memory-rewards từ main ad74f22 (đã chứa VisualRedesign). Chỉ gộp main sau khi build Windows và các smoke đạt. Source live D:/GAME_NongTrai; Git mirror D:/GAME_NongTrai/Nongtrai; remote https://github.com/NguyenHuuThinhyy/Nongtrai.git.
+## Triển khai
 
-Unity 6000.3.22f1, URP, Windows Mono. Scene Farm giữ nguyên: SHA256 d4d1ffaabbeddafe2b86b6732b3598fe518fb61254870cba6a4d79d3244e182d. Không đổi ProductName/EditorBuildSettings, không chạy FarmProjectBuilder.CreateScene hoặc RebuildSceneAndBuildWindows.
+- FarmControls / FarmInput: desktop và cảm ứng, snapshot cạnh nút theo frame;
+  bàn phím/chuột trực tiếp chỉ còn trong wrapper hoặc checks.
+- FarmMobileUI: joystick, look, hold/release, hotbar, menu và Runner; safe area;
+  FarmPanelFit cho modal. Windows -farmTouch xem bố cục. Android runtime URP giảm
+  shadow/renderScale/MSAA; không đổi gameplay.
+- FarmData: desktop StreamingAssets, Android Resources. Configure đồng bộ3JSON.
+- FarmServices: manual/chat/URL/mã/telemetry/control/ack; connection/history độc lập
+  save22. Cloud chỉ trạm0 đã xây; loss/offline trở về local. FarmWaterSystem kiểm gate mới.
+- FarmAR: ARSession/XROrigin/pose/plane/raycast/anchor tạo khi mở; layer30 tách
+  rendering/raycast; pause/camera phục hồi; lightweight licensed models, cây snapshot.
+- FarmTechnologyBuild: saved-scene-only Windows/Android; XR/renderer/config tự cấu hình
+  không sửa scene/prefab. ARFoundation/Core6.3.5, AndroidOptional, ARM64 IL2CPP/API26–36.
+- Backend: FastAPI0.115.12, MQTTpaho2.1TLS, BM25Vietnamese, Ollama0.12.3/Qwen3:1.7b.
+  Model chọn câu hướng dẫn với JSON schema; trả nguyên câu và tên nguồn (extractive QA).
+  Lease/revision/serverID bỏ lệnh cũ/trùng/phiên khác;3feed/20s, max20publishes/min.
+- Docker Compose2services, healthchecks, volume model, nonroot API, key ngoài Git.
+  .github/workflows/rubric-backend.yml kiểm checkout sạch/containers/model.
 
-## Minigame 2D
+## Kiểm tra và thiết bị
 
-Gói nhập thực tế D:/23714291_NguyenHuuThinh/Cau1_2D.unitypackage; tên người dùng ghi ban đầu không tồn tại. Chỉ nhập 9 asset riêng, bỏ 11 asset thuộc Packages để không ghi đè package cài đặt. Bản gốc và source trước sửa nằm Recovery/Before-NumberMemory-20261002.
+FarmTechnologyChecks (-farmSmokeCheck -farmTechnologyOnly) kiểm touch edges, dữ liệu,
+manual/pause/fallback/miniature và render ảnh. Thêm -farmTouch kiểm bố cục chạm;
+-farmServicesLive cần APIlocalhost8000 với mã test local-unity-smoke-only (không ghi prefs).
+Full smoke sửa thứ tự để FarmPolishChecks (cố tình bật Creative) chạy cuối, tránh làm
+các kiểm tra normal Save sau đó sai. Không sửa quy tắc Creative/save để làm test qua.
 
-- Assets/Exam2D/Runtime/NumberMemoryGame.cs: giữ 49 số, 5 câu, 5 giây và click sai không tính điểm. RewardProvider tách ví Farm khỏi assembly Midterm2D; chơi riêng có ví trong phiên.
-- Assets/Scenes/Cau1_NumberMemory.unity: scene chơi độc lập. Assets/Exam2D/Resources/NumberMemory/NumberMemoryUI.prefab: chỉ Canvas/UI, không camera/EventSystem thứ hai.
-- FarmRedesign.Theme bỏ qua Canvas của NumberMemoryGame để giữ màu/độ tương phản gốc.
-- FarmNumberMemory.cs: Tab → Tìm số 2D; 20 xu/câu, +100 xu khi 5/5, tối đa 3 lượt có điểm/ngày, 1 đá item68 cho lần 5/5 đầu/ngày. Luyện tập sau quota/sáng tạo không thưởng. Túi đầy dùng WorldPickup. Esc trở về, giữ vị trí; nông trại tạm dừng.
-- FarmSave schema vẫn 21, thêm trường optional numberMemory, lưu quota/đá/ngày/kỷ lục. Save cũ không có trường này vẫn đọc được. Không sửa ID item hoặc cơ chế lưu thủ công.
-- Exam2DBuilder chỉ dựng riêng UI/scene 2D và giữ scene/config Farm. Export chỉ Assets/Exam2D + scene, không IncludeDependencies. NUMBER_MEMORY_PACKAGE_OUTPUT chọn file xuất; mặc định DongGoi/Cau1_2D.unitypackage.
+Backend/tests/test_services.py:8unit tests + BM2530câu; evaluate_model.py gọi model thật,
+raw response lưu Evidence/Rubric/chat-model-native.json, accuracy do đối chiếu riêng.
+Xem Docs/TEST_RESULTS.md cho kết quả build/test cuối, không suy luận pass từ code có sẵn.
 
-## Kiểm tra và bàn giao
+Máy PC i3-1115G4/UHD/8GB. Android SDK36, NDKr27c, JDK17 đã cài cho Editor.
+Chưa có điện thoại kết nối ADB, chưa có tài khoản Adafruit. Docker tự cài bị auto-review
+chặn "blocked by policy"; native Python/Ollama dùng để chẩn đoán, không tính là Docker.
+Hướng dẫn manualDocker/ARCore/account nằm Docs/RUBRIC_INTEGRATION.md.
 
-Build cuối: Logs/build-20261002-205230.log. FarmNumberMemoryChecks có cờ -farmSmokeCheck -farmNumberMemoryOnly và nằm trong full smoke. Nó kiểm chuột/timer thật/pause/200 xu+đá/quota/không thưởng trùng/lưu tải/thoát/túi đầy/chơi độc lập; ảnh render 1280×720 và 1000×1000 ở temporaryCachePath.
+## Bàn giao và phụ thuộc
 
-Kiểm tra bản Windows bằng -farmSmokeCheck -farmArtCheck; kiểm riêng visual bằng -farmSmokeCheck -farmRedesignOnly. Log hiện tại dưới Logs/smoke-number-memory*.log, kết quả bàn giao ở DongGoi/RELEASE-MANIFEST.json. Log/cache/save không đưa Git. Build scene đang lưu bằng Tools/Build-Windows.ps1 -OutputDirectory Builds/Windows-NumberMemory.
-
-Runtime phát hành Builds/Windows-NumberMemory/NongTrai.exe; ZIP Windows/Unity và gói minigame ở DongGoi. CHAY_GAME.bat trỏ runtime mới. Giữ toàn bộ NongTrai_Data, DLL, D3D12, MonoBleedingEdge. Bản BowPhysics/VisualRedesign trước nằm Recovery/lịch sử Git; không đóng gói cache, debug symbols hay bản thử trùng.
-
-## Hệ thống giữ nguyên
-
-Cung bù trọng lực và mất độ bền mỗi phát; rương mở trực tiếp; một xô nước105; kiếm106/cung111 theo AdventureBag; rèn riêng vũ khí; hồi sinh tại chỗ100xu/miễn phí về cổng; đổi map nhớ vị trí. Inventory ItemCount78, 25 công thức. Creative không lưu dữ liệu thường. Model/nguồn/giấy phép giữ ở Assets/Farm/Models và Assets/ThirdParty; copyright HThinh.yy.
+Save22, item IDs, gameplay/collider, farm scene và licensed assets giữ tương thích.
+Knowledge backend và Unity Resources phải byte-identical. Không track .env, weights,
+Library/Temp/Logs/cache hoặc tải trùng. Cập nhật gói/source/commit/hash ở DongGoi và
+release rubric-preview-20261004. Gói cũ chỉ dọn sau khi bản thay thế được xác minh.
+Xem Docs/ACCEPTANCE.md và DEMO.md cho phần cần chủ dự án tự nghiệm thu/video.

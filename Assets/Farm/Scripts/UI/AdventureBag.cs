@@ -64,6 +64,8 @@ namespace NongTrai
             FarmUi.Button(parent,"Xây dựng",new Vector2(1055,-870),new Vector2(225,54),()=>{inventory.hud.Resume();FarmBuildingSystem.Instance.Toggle();});
             FarmUi.Button(parent,"BÁN TẤT CẢ ĐỒ TRONG TÚI",new Vector2(760,-730),new Vector2(520,45),()=>SellEverything());
             FarmUi.Button(parent,"Bỏ vật phẩm đã chọn",new Vector2(30,-730),new Vector2(350,45),()=>DiscardInspected());
+            FarmUi.Button(parent,"Chuyển nhanh",new Vector2(30,-680),new Vector2(200,45),()=>QuickMove(inspected));
+            FarmUi.Button(parent,"Tách nửa",new Vector2(245,-680),new Vector2(180,45),()=>BeginDrag(inspected,true));
             dragLabel=FarmUi.TmpLabel(parent,"",new Vector2(395,-730),new Vector2(350,45),22);
             var ghost=new GameObject("Vật phẩm đang kéo",typeof(RectTransform),typeof(Image));ghost.transform.SetParent(parent,false);dragGhost=ghost.GetComponent<Image>();dragGhost.raycastTarget=false;dragGhost.rectTransform.sizeDelta=new Vector2(64,64);dragGhost.gameObject.SetActive(false);
             Sync();RefreshView();
@@ -146,6 +148,7 @@ namespace NongTrai
             if(held!=null||Slots[index].count==0)return;dragSource=index;accepted=false;held=Slots[index].Copy();
             if(half&&FarmItemCatalog.IsStackable(held.item)){held.count=(held.count+1)/2;Slots[index].count-=held.count;}else Slots[index]=new BagSlot();
         }
+        public bool HasDrag=>held!=null;
         public void Drop(int index)
         {
             if(held==null)return;var target=Slots[index];
@@ -183,7 +186,7 @@ namespace NongTrai
             if(inventory==null)return;Sync();
             if(Item!=lastItem){lastItem=Item;FarmBuildingSystem.Instance?.EquipBlock(HoldingBlock?FarmBuildingSystem.TypeForItem(Item):-1);}
             if(!inventory.hud.player.Paused)Satiety=Mathf.Max(0,Satiety-Time.deltaTime*inventory.hud.player.HungerRate);
-            if(held!=null&&Mouse.current!=null&&Mouse.current.rightButton.wasPressedThisFrame)SplitDragging();
+            if(held!=null&&FarmControls.Pointer!=null&&FarmControls.Pointer.rightButton.wasPressedThisFrame)SplitDragging();
             if(inventory.Panel.activeSelf)RefreshView();
             else if(held!=null)EndDrag();
         }
@@ -195,7 +198,7 @@ namespace NongTrai
                 dragLabel.text=held==null?"Độ no: "+Mathf.RoundToInt(Satiety)+"%":"Đang kéo: "+Name(held.item)+" ×"+held.count;
                 if(sellLabel!=null)sellLabel.text="Bán: "+Mathf.Min(sellQuantity,Mathf.Max(1,Slots[inspected].count));
             }
-            if(dragGhost!=null){dragGhost.gameObject.SetActive(held!=null);if(held!=null){dragGhost.sprite=FarmItemIconLibrary.Get(Icon(held.item));RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)inventory.Panel.transform,Mouse.current.position.ReadValue(),null,out var point);dragGhost.rectTransform.anchoredPosition=point;}}
+            if(dragGhost!=null){dragGhost.gameObject.SetActive(held!=null);if(held!=null){dragGhost.sprite=FarmItemIconLibrary.Get(Icon(held.item));RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)inventory.Panel.transform,FarmControls.Pointer.position.ReadValue(),null,out var point);dragGhost.rectTransform.anchoredPosition=point;}}
         }
         public static bool IsEdible(int id)=>FarmItemCatalog.IsDish(id)||id>=0&&id<=3||id==7||id>=9&&id<=11||id==32||id==33||id==39||id>=43&&id<=48||id>=57&&id<=62||id==67;
         public bool Eat()
@@ -215,9 +218,9 @@ namespace NongTrai
     {
         public AdventureBag owner;public int index;
         public void OnBeginDrag(PointerEventData e){if(owner.inventory.hud.player.Paused)owner.BeginDrag(index,e.button==PointerEventData.InputButton.Right);}
-        public void OnDrag(PointerEventData e){}
+        public void OnDrag(PointerEventData e){FarmControls.TouchPosition=e.position;}
         public void OnEndDrag(PointerEventData e)=>owner.EndDrag();
         public void OnDrop(PointerEventData e)=>owner.Drop(index);
-        public void OnPointerClick(PointerEventData e){owner.Inspect(index);if(Keyboard.current!=null&&(Keyboard.current.leftShiftKey.isPressed||Keyboard.current.rightShiftKey.isPressed))owner.QuickMove(index);}
+        public void OnPointerClick(PointerEventData e){if(owner.HasDrag){owner.Drop(index);return;}owner.Inspect(index);if(FarmControls.Keys!=null&&(FarmControls.Keys.leftShiftKey.isPressed||FarmControls.Keys.rightShiftKey.isPressed))owner.QuickMove(index);}
     }
 }

@@ -56,3 +56,12 @@ Desktop.ini
 !/DongGoi/Cau1_2D.unitypackage
 /VisualRedesignChecks/
 /Documentation/
+
+# Backend credentials, dependencies and downloaded model weights.
+/Backend/.env
+/Backend/.venv/
+__pycache__/
+*.pyc
+*.gguf
+/Backend/models/
+/Backend/.pytest_cache/

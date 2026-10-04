@@ -101,7 +101,7 @@ namespace NongTrai
             overlay.SetActive(true);overlay.transform.SetAsLastSibling();EnsureCloseButton(overlay);
         }
         public bool HandleEscape()
-        { if(FarmFishing.Instance!=null&&FarmFishing.Instance.IsOpen){FarmFishing.Instance.Close();return true;} if(FarmRestaurant.Instance!=null&&FarmRestaurant.Instance.UI!=null&&FarmRestaurant.Instance.UI.IsOpen){FarmRestaurant.Instance.UI.Close();return true;} if(FarmNumberMemory.Instance!=null&&FarmNumberMemory.Instance.IsOpen){FarmNumberMemory.Instance.Close();return true;} if(FarmRunner.Instance!=null&&FarmRunner.Instance.IsRunning){FarmRunner.Instance.Finish();return true;} if(settingsPanel!=null && settingsPanel.activeSelf) { CloseSettings();return true; }
+        { if(FarmServices.Instance!=null&&FarmServices.Instance.HandleEscape())return true; if(FarmFishing.Instance!=null&&FarmFishing.Instance.IsOpen){FarmFishing.Instance.Close();return true;} if(FarmRestaurant.Instance!=null&&FarmRestaurant.Instance.UI!=null&&FarmRestaurant.Instance.UI.IsOpen){FarmRestaurant.Instance.UI.Close();return true;} if(FarmNumberMemory.Instance!=null&&FarmNumberMemory.Instance.IsOpen){FarmNumberMemory.Instance.Close();return true;} if(FarmRunner.Instance!=null&&FarmRunner.Instance.IsRunning){FarmRunner.Instance.Finish();return true;} if(settingsPanel!=null && settingsPanel.activeSelf) { CloseSettings();return true; }
           if(AdventureWolves.Instance!=null&&AdventureWolves.Instance.IsAwaitingRespawn)return true;
           if(CloseOverlay()) return true;
           return mainMenu!=null && mainMenu.activeSelf; }
@@ -116,6 +116,7 @@ namespace NongTrai
         }
         public bool CloseOverlay()
         {
+            if(FarmServices.Instance!=null&&FarmServices.Instance.HandleEscape())return true;
             if(AdventureWolves.Instance!=null&&AdventureWolves.Instance.IsAwaitingRespawn)return false;
             if(FarmFishing.Instance!=null&&FarmFishing.Instance.IsOpen){FarmFishing.Instance.Close();return true;}
             if(FarmRestaurant.Instance!=null&&FarmRestaurant.Instance.UI!=null&&FarmRestaurant.Instance.UI.IsOpen){FarmRestaurant.Instance.UI.Close();return true;}
@@ -146,21 +147,21 @@ namespace NongTrai
         {
             if(FarmNumberMemory.Instance!=null&&FarmNumberMemory.Instance.IsOpen)return;
             if(FarmRunner.Instance!=null&&FarmRunner.Instance.IsRunning)return;
-            var keysForMap=Keyboard.current;
+            var keysForMap=FarmControls.Keys;
             if(!player.Paused&&keysForMap!=null&&keysForMap.eKey.wasPressedThisFrame)
             {FarmNoticeBoard.Instance?.Open();return;}
             var overlay=ActiveOverlay();
             if(overlay!=null && player.Paused && (AdventureWolves.Instance==null||!AdventureWolves.Instance.IsAwaitingRespawn))
             {
                 EnsureCloseButton(overlay);
-                var keys=Keyboard.current;
+                var keys=FarmControls.Keys;
                 if(keys!=null && keys.xKey.wasPressedThisFrame){CloseOverlay();return;}
                 if(keys!=null && keys.eKey.wasPressedThisFrame)
                 {
                     bool map=FarmNoticeBoard.Instance!=null&&FarmNoticeBoard.Instance.IsOpen;
                     CloseOverlay();if(!map)FarmNoticeBoard.Instance?.Open();return;
                 }
-                var mouse=Mouse.current;
+                var mouse=FarmControls.Pointer;
                 if(mouse!=null&&mouse.leftButton.wasPressedThisFrame)
                 {
                     var canvas=GetComponentInParent<Canvas>();

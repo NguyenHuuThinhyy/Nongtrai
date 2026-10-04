@@ -75,7 +75,7 @@ namespace NongTrai
             try
             {
                 string path=Path.Combine(Application.streamingAssetsPath,"crafting.json");
-                Recipes=JsonUtility.FromJson<CraftBook>(File.ReadAllText(path)).recipes ?? Array.Empty<CraftRecipe>();
+                Recipes=JsonUtility.FromJson<CraftBook>(FarmData.ReadJson("crafting.json")).recipes ?? Array.Empty<CraftRecipe>();
             }
             catch(Exception error) { Debug.LogError("Không đọc được công thức chế tạo: "+error); }
         }

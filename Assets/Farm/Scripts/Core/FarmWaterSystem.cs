@@ -227,7 +227,7 @@ namespace NongTrai
             if(hud==null || hud.player.Paused) return;
             AdvancePump(Time.deltaTime);
             if(Panel!=null&&Panel.activeSelf&&Time.frameCount%30==0)Refresh();
-            if(PendingPlacement&&Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame&&!FarmHud.WorldClickSuppressed)
+            if(PendingPlacement&&FarmControls.Pointer!=null&&FarmControls.Pointer.leftButton.wasPressedThisFrame&&!FarmHud.WorldClickSuppressed)
             {
                 ConsumedFrame=Time.frameCount;
                 if(Camera.main!=null&&FarmAim.Hit(Camera.main,out var hit)&&hit.normal.y>.65f&&
@@ -243,7 +243,7 @@ namespace NongTrai
             var plots=FindObjectsByType<FarmPlot>(FindObjectsSortMode.None);
             for(int region=0;region<4;region++)
             {
-                if(!StationBuilt[region] || stations[region]==null) continue;
+                if(!IsStationRunning(region) || stations[region]==null) continue;
                 foreach(var plot in plots)
                 {
                     if(expansion.RegionFor(plot)!=region || plot.State!=PlotState.Growing || plot.Moisture>=.2f) continue;
@@ -263,6 +263,8 @@ namespace NongTrai
                     Vector3.Distance(tree.transform.position,sprinkler.transform.position)<6.2f)tree.AdvanceWater(1);
             }
         }
+        public bool IsStationRunning(int region)=>region>=0&&region<4&&StationBuilt[region]&&
+            (region!=0||FarmServices.Instance==null||!FarmServices.Instance.CloudConnected||FarmServices.Instance.RemotePumpEnabled);
         public WaterState Snapshot()
         {var records=new List<PortableSprinklerRecord>();foreach(var item in portable)if(item!=null)
             records.Add(new PortableSprinklerRecord{position=item.transform.position-Vector3.up*1.05f,remaining=item.remainingSeconds});
@@ -392,7 +394,7 @@ namespace NongTrai
         }
         void Update()
         {
-            bool active=portable?remainingSeconds>0:FarmWaterSystem.Instance!=null&&FarmWaterSystem.Instance.StationBuilt[region];
+            bool active=portable?remainingSeconds>0:FarmWaterSystem.Instance!=null&&FarmWaterSystem.Instance.IsStationRunning(region);
             if(arms!=null&&active)arms.Rotate(0,42*Time.deltaTime,0,Space.Self);
             if(coverageRing!=null)coverageRing.enabled=true;
             if(spray!=null)

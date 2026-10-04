@@ -1,38 +1,72 @@
-# Nông Trại – First Harvest
+# Nông Trại — First Harvest
 
-**Repo đã có cả bản chơi và gói tải:** [Builds/Windows-NumberMemory](Builds/Windows-NumberMemory) chứa EXE cùng đầy đủ dữ liệu; [DongGoi](DongGoi) chứa ZIP Windows/Unity. Chọn **Code → Download ZIP**, giải nén toàn bộ rồi chạy **CHAY_GAME.bat** ở thư mục gốc. Clone repo cũng có đủ bản chơi và source để build tiếp.
+© HThinh.yy. Unity **6000.3.22f1**, URP, save **22**.
 
-**Tải bản Windows và source Unity đầy đủ:** [GitHub Release Tìm số 2D](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/number-memory-20261002). Hướng dẫn cho thành viên mới: [HUONG_DAN_NHOM.md](HUONG_DAN_NHOM.md). Script build scene hiện tại: [Tools/Build-Windows.ps1](Tools/Build-Windows.ps1).
+## Bản thử Android / AR / AI / Cloud
 
-Game nông trại Unity cho Windows. Trồng cây bằng chuột trái, chăm vật nuôi, chế biến/chế tạo theo JSON, giao đơn tại hộp thư, mở đất, nâng cấp dụng cụ và khám phá địa hình khối sinh liên tục theo seed. Có túi đồ 36 ô dùng chung hotbar 9 ô, minh họa vật phẩm, bản đồ nông trại 2D và thông báo vật nuôi đói. Cả hai map nhớ vị trí khi chuyển qua lại. Khi chết: trả 100 xu để hồi sinh tại chỗ, giữ đồ; lựa chọn miễn phí về cổng và rơi tối đa 3 món. Một ngày game dài 18 phút, có bốn mùa, thời tiết, ngủ qua đêm và câu đố ứng phó bão. Menu chính có chế độ sáng tạo LV99 để bay và kiểm thử mà không sửa bản lưu chơi thường.
+Nhánh **codex/rubric-mobile-ar-ai-cloud**, phát triển từ `bf7d0b3`.
+**Chưa gộp main. Chỉ gộp sau khi chủ dự án tự test và xác nhận.**
 
-**Cung đã sửa:** tên bù độ rơi theo tâm ngắm, tốc độ theo lực kéo, va chạm theo từng đoạn ngắn; mỗi lần bắn mất 1 độ bền, cung hỏng cần sửa.
+- [Tải bản thử Windows, APK và source Unity](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/rubric-preview-20261004).
+- Trong checkout nhánh này, chạy **CHAY_GAME.bat** hoặc `Builds/Windows-Rubric/NongTrai.exe`; giữ nguyên cả thư mục build.
+- [Hướng dẫn cho nhóm](HUONG_DAN_NHOM.md), [cách chơi](CHOI_GAME.md), [nhà hàng](HUONG_DAN_NHA_HANG.md).
+- [Thiết lập Android/AR/chat/cloud/Docker](Docs/RUBRIC_INTEGRATION.md), [kết quả test](Docs/TEST_RESULTS.md), [checklist người dùng](Docs/ACCEPTANCE.md), [kịch bản demo](Docs/DEMO.md).
+- Commit nguồn và SHA256 của các gói ở [DongGoi](DongGoi). ZIP Unity không chứa Library/cache; Unity tự tạo lại khi mở.
 
-**Rương mới:** chuột phải mở thẳng bảng đồ; bấm từng món, Shift + click cả chồng hoặc **Lấy tất cả**. Giữ trái để đập vỡ và thả phần đồ còn lại. Không có câu hỏi; vẫn cần hạ quái canh.
+## Chức năng
 
-**Chiến đấu và hồi sinh:** hồi sinh tại chỗ giá 100 xu; bọt biển đầy hong 10 giây ở đống lửa; kiếm có vòng ngắm rỗng với hỗ trợ đánh hơi lệch tâm, giữ tầm đánh và chặn bởi tường.
+Nông trại 3D, khám phá voxel theo seed, vật nuôi, cây trồng, máy chế biến,
+chế tạo/rèn, nước/xô/bọt biển, cung theo quỹ đạo và độ bền, boss, hồi sinh,
+nhà hàng ba tầng. Minigame Tìm số2D và Farm Runner có thưởng/quota trong save.
+Đổi map nhớ vị trí; chết có lựa chọn trả100xu tại chỗ hoặc miễn phí về cổng.
 
-**Minigame mới:** Tab → **Tìm số 2D**. 5 câu, 5 giây/câu; 20 xu/câu đúng, thêm 100 xu khi đạt 5/5. Tối đa 3 lượt thưởng/ngày; 1 đá nâng cấp cho lần 5/5 đầu tiên/ngày. Esc trở lại nông trại; thoát giữa lượt không nhận thưởng.
+Bản thử bổ sung joystick/vuốt/các nút cảm ứng, giao diện túi tách/chuyển nhanh,
+nông trại AR thu nhỏ theo trạng thái ruộng, trợ lý tiếng Việt, trạm tưới điều khiển
+qua Adafruit IO và backend Docker. Hướng dẫn tĩnh/gameplay vẫn hoạt động offline.
+Cloud ghi rõ dữ liệu mô phỏng; chưa có cảm biến vật lý. Chat dùng model pretrained,
+không huấn luyện lại. Các phần điện thoại/AR/cloud thật còn phải nghiệm thu trên thiết bị/tài khoản.
 
-**Gói mới:** `DongGoi/NongTrai-Windows-NumberMemory-20261002.zip` và `DongGoi/NongTrai-Unity-NumberMemory-20261002.zip`. Gói trước được giữ dự phòng trong Recovery; runtime đang dùng là Windows-NumberMemory.
+## Mở và build
 
-**Chơi ngay:** mở `D:\GAME_NongTrai\Builds\Windows-NumberMemory\NongTrai.exe`; giữ nguyên cả thư mục `Windows-NumberMemory` khi sao chép sang máy khác. Không cần cài Unity để chạy bản Windows. Xem [CHOI_GAME.md](CHOI_GAME.md) để biết điều khiển và vòng chơi.
-
-**Nước và túi đồ:** một xô nước dùng **chuột trái**: rỗng → múc hồ/sông, đầy → đặt nước → rỗng. Shop bán bọt biển hút nước trong 1 ô xung quanh rồi đầy. Hạt hết tự biến mất; bán được tất cả đồ trong túi. Thuê vòi tự tưới 350 xu/ngày, tối đa 3/ngày (LV3/5/7 mở 4/5/6), không nạp nước. Rương boss có bí pha lê và dâu hoàng kim. Quái nhảy qua khối cao 1 ô, thanh máu có số rõ hơn. © HThinh.yy ở góc màn hình.
-
-**Mở dự án:** Unity Hub → Add project from disk → `D:\GAME_NongTrai`, dùng Unity 6000.3.22f1. Scene chính là `Assets/Farm/Scenes/Farm.unity`. Dự án dùng URP, Input System, Cinemachine, uGUI, TextMeshPro và Animation. `Assets/Farm/Editor/FarmProjectBuilder.cs` dựng scene qua `CreateScene`; lệnh `BuildWindows` build scene hiện tại mà không dựng lại. Tạo scene mới sẽ ghi đè `Farm.unity` và các prefab động vật/cây.
-
-**Dữ liệu JSON:** `Assets/StreamingAssets/recipes.json` chứa 11 công thức máy; `Assets/StreamingAssets/crafting.json` chứa 25 công thức ghép tức thì, gồm cung gỗ, 5 mũi tên, bàn rèn và cổng hồi sinh. Mã hàng trong `FarmInventory.cs` từ 0 đến 77. Bản lưu v21 giữ TNT đã đặt/ngòi đang cháy, chỉ số/LV riêng từng vũ khí (kể cả đồ rơi), vé/kỷ lục Runner, lượt thưởng Tìm số 2D, nguồn nước đổ, quái canh rương, nhiên liệu máy và hai boss; đọc bản v2–v20.
-
-**Lưu game:** nút Lưu game trong menu Esc ghi bản lưu. “Chơi lại từ đầu” có xác nhận, cất bản lưu cũ thành `.before-new-game-<thời gian>` và bắt đầu LV1 với map mới; không lưu phiên hiện tại. Đường dẫn trên Windows là `%USERPROFILE%\AppData\LocalLow\Nong Trai Studio\Nong Trai - First Harvest\farm-manual-save.json`. Game tự tải bản lưu này khi khởi động; thoát không tự lưu. Chế độ sáng tạo dùng bản sao trong bộ nhớ, khóa nút lưu và bỏ toàn bộ thay đổi khi về menu hoặc thoát.
-
-Nhân vật hiện dùng Kenney Mini Characters biến thể `character-male-e.fbx` màu da sáng, cao 1,90 m, thêm mũ rơm và chuyển động tay/chân rõ hơn khi đi. Model có clip đi/chạy/nhảy/làm việc/đánh. Bò/heo/cừu dùng Quaternius FBX CC0; gà dùng OBJ CC0. Cây tán/cây ăn quả, bụi việt quất, lúa mì và bí ngô dùng Kenney Nature Kit CC0. Di chuyển của nhân vật tăng/giảm tốc mượt hơn, thú được nội suy khi đi và đứng yên khi tạm dừng. Người chơi mất máu khi rơi quá cao; cáo/rắn/sói lùi ra sau khi cắn. Xem [ASSET_SOURCES.md](Assets/Farm/Models/ASSET_SOURCES.md) để biết nguồn và giấy phép. Nhà/chuồng, máy móc, sói/cáo/rắn và một số cây trồng còn dùng visual dựng trong Unity; voxel vẫn giữ để đào/đặt/phá.
-
-Để build bản Windows đang dùng, đóng Editor đang mở cùng dự án rồi chạy. Lệnh này dùng scene hiện tại và không gọi builder dựng lại:
+Clone đúng nhánh để có các phần công nghệ mới:
 
 ```powershell
-$env:FARM_BUILD_OUTPUT='Builds/Windows-NumberMemory'
-& 'D:\Unity\Editors\6000.3.22f1\Editor\Unity.exe' -batchmode -nographics -quit -projectPath 'D:\GAME_NongTrai' -executeMethod NongTrai.Editor.FarmProjectBuilder.BuildWindowsCurrentScene -logFile 'D:\GAME_NongTrai\Logs\build.log'
+git clone --branch codex/rubric-mobile-ar-ai-cloud https://github.com/NguyenHuuThinhyy/Nongtrai.git
 ```
 
-Ảnh `ChatGPT Image Sep 20, 2026, 07_13_45 PM.png` là tham chiếu bố cục và màu sắc. Một phần visual vẫn được dựng bằng primitive Unity; xem bảng nguồn model để biết các nhóm đã thay và còn lại.
+Unity Hub → Add project from disk → thư mục checkout. Mở
+`Assets/Farm/Scenes/Farm.unity`. Android cần module Android Build Support/SDK/NDK/OpenJDK.
+Không gọi FarmProjectBuilder.CreateScene/RebuildScene: có thể ghi đè scene/prefab.
+Hai lệnh dưới build scene đang lưu:
+
+```powershell
+.\Tools\Build-Windows.ps1 -OutputDirectory Builds/Windows-Rubric
+.\Tools\Build-Android.ps1
+.\Tools\Start-Services.ps1 -DownloadModel
+```
+
+Bản APK ARM64 cài trực tiếp; chưa ký cho Google Play. ARCore Optional:
+điện thoại không hỗ trợ AR vẫn chơi game thường. Chat Android cần PC cùng Wi-Fi;
+Adafruit IO cần Internet và tài khoản tạo sau. Không đưa Backend/.env hoặc API key vào Git.
+
+## Dữ liệu và giấy phép
+
+JSON chuẩn ở `Assets/StreamingAssets`: công thức máy, chế tạo và nhà hàng.
+Android dùng bản Resources được Configure đồng bộ trước build. Lưu thủ công trong menu;
+khởi động đọc save cũ, thoát không tự lưu. Chơi lại từ đầu có xác nhận và cất save dự phòng.
+Creative khóa lưu và bỏ phiên thay đổi khi quay về normal. Cấu hình/chat lưu riêng.
+
+Asset/giấy phép giữ tại [nguồn model gốc](Assets/Farm/Models/ASSET_SOURCES.md)
+và Assets/ThirdParty. Model Qwen3 1.7B Q4_K_M Apache2.0, tải riêng khoảng1,36GB,
+[nguồn Qwen](https://huggingface.co/Qwen/Qwen3-1.7B),
+[phân phối Ollama](https://ollama.com/library/qwen3:1.7b),
+[manifest](Backend/MODEL-MANIFEST.json), [giấy phép](Backend/licenses/Qwen3-Apache-2.0.txt).
+Voxel/collider/gameplay được giữ để đào/đặt/phá hoạt động đúng.
+
+## Rubric và bàn giao
+
+Xem [bảng tiêu chí → chức năng → kiểm thử → minh chứng](Docs/ACCEPTANCE.md).
+Planning, tests, documentation đã chuẩn bị; ảnh/log chọn lọc ở Evidence/Rubric.
+Video camera AR thật, dashboard thật, trải nghiệm Android15phút và người dùng tự test
+phải bổ sung trước nghiệm thu. Kịch bản demo không thay thế video.
+Điểm còn phụ thuộc giảng viên có chấp nhận pretrained model/IoT mô phỏng/uGUI2D hay không.

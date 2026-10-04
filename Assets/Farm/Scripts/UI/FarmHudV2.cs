@@ -141,7 +141,7 @@ namespace NongTrai
         {
             if(hud.player.Paused) return;
             bool building=FarmBuildingSystem.Instance!=null&&FarmBuildingSystem.Instance.PaletteOpen;
-            var keyboard=Keyboard.current;
+            var keyboard=FarmControls.Keys;
             if(keyboard!=null&&!building)
             {
                 for(int i=0;i<9;i++)
@@ -149,9 +149,9 @@ namespace NongTrai
                     if(keyboard[digitKeys[i]].wasPressedThisFrame) { Select(i);break; }
                 }
             }
-            if(Mouse.current!=null&&!building)
+            if(FarmControls.Pointer!=null&&!building)
             {
-                float wheel=Mouse.current.scroll.ReadValue().y;
+                float wheel=FarmControls.Pointer.scroll.ReadValue().y;
                 if(Mathf.Abs(wheel)>.05f) Select(((AdventureBag.Instance==null?selectedSlot:AdventureBag.Instance.Selected)+(wheel<0?1:8))%9);
             }
             displayedMoney=Mathf.MoveTowards(displayedMoney,shop.Money,Time.deltaTime*Mathf.Max(50,Mathf.Abs(shop.Money-displayedMoney)*3));

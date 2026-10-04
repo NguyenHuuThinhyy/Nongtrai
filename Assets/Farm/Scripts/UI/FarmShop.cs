@@ -180,7 +180,7 @@ namespace NongTrai
         public void RestorePending(int species){Pending=species>=0&&species<4?species:-1;}
         void Update()
         {
-            if(Pending<0||shop==null||shop.hud.player.Paused||FarmHud.WorldClickSuppressed||Mouse.current==null||!Mouse.current.leftButton.wasPressedThisFrame)return;
+            if(Pending<0||shop==null||shop.hud.player.Paused||FarmHud.WorldClickSuppressed||FarmControls.Pointer==null||!FarmControls.Pointer.leftButton.wasPressedThisFrame)return;
             ConsumedFrame=Time.frameCount;
             if(shop.hud.player.transform.position.y>500||!FarmAim.Hit(Camera.main,out var hit)||hit.normal.y<.65f)
             {shop.hud.Notify("Hãy ngắm mặt đất phẳng trong nông trại.");return;}
