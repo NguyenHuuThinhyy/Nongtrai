@@ -81,9 +81,10 @@ Nguồn [Qwen](https://huggingface.co/Qwen/Qwen3-1.7B),
 [Ollama](https://ollama.com/library/qwen3:1.7b), giấy phép ở
 `Backend/licenses/Qwen3-Apache-2.0.txt`, digest trong `Backend/MODEL-MANIFEST.json`.
 Dự án không huấn luyện/fine-tune model và không đưa weights vào Git/APK.
-Backend BM25 chọn mục hướng dẫn rồi gửi cho model, `think=false`. Model chọn tối đa
-ba câu liên quan qua JSON schema; server trả nguyên câu đã chọn, không để model
-viết lại số liệu gameplay. API ghi `generation_mode=extractive` để phân biệt cách trả lời.
+Backend BM25 lấy ba mục gần câu hỏi rồi gửi cho model, `think=false`. Qwen chọn
+một mục qua JSON schema; server trả nguyên đoạn hướng dẫn ngắn của mục đó.
+Đoạn đầy đủ giữ điều kiện và ngoại lệ, tránh lỗi model chọn nhầm mã câu hoặc bỏ ý.
+Đây là QA trích xuất, không sinh câu trả lời tự do: API ghi `generation_mode=extractive`.
 Trợ lý chỉ tư vấn, không cấp vật phẩm/đổi save. Kết quả kèm tên mục nguồn.
 Kiến thức nằm `Backend/app/knowledge.json`; bản offline Unity phải giống hệt file này.
 

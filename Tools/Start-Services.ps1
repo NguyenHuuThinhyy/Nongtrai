@@ -10,9 +10,9 @@ try{
         [IO.File]::WriteAllText((Join-Path (Get-Location) '.env'),$config)
         Write-Output 'Created Backend/.env. Read FARM_PAIRING_KEY locally for the game connection screen.'
     }
-    docker compose up -d --build
+    docker compose up -d --build --wait --wait-timeout 180
     if($LASTEXITCODE -ne 0){throw 'Compose startup failed'}
-    if($DownloadModel){docker compose exec ollama ollama pull qwen3:1.7b;if($LASTEXITCODE -ne 0){throw 'Model download failed'}}
+    if($DownloadModel){docker compose exec -T ollama ollama pull qwen3:1.7b;if($LASTEXITCODE -ne 0){throw 'Model download failed'}}
     docker compose ps
     Invoke-RestMethod -Uri 'http://127.0.0.1:8000/health' | ConvertTo-Json
 }finally{Pop-Location}
