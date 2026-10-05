@@ -155,8 +155,12 @@ namespace NongTrai
             {
                 EnsureCloseButton(overlay);
                 var keys=FarmControls.Keys;
-                if(keys!=null && keys.xKey.wasPressedThisFrame){CloseOverlay();return;}
-                if(keys!=null && keys.eKey.wasPressedThisFrame)
+                var selected=UnityEngine.EventSystems.EventSystem.current?.currentSelectedGameObject;
+                var textInput=selected!=null?selected.GetComponentInParent<TMPro.TMP_InputField>():null;
+                var legacyInput=selected!=null?selected.GetComponentInParent<UnityEngine.UI.InputField>():null;
+                bool typing=(textInput!=null&&textInput.isFocused)||(legacyInput!=null&&legacyInput.isFocused);
+                if(!typing && keys!=null && keys.xKey.wasPressedThisFrame){CloseOverlay();return;}
+                if(!typing && keys!=null && keys.eKey.wasPressedThisFrame)
                 {
                     bool map=FarmNoticeBoard.Instance!=null&&FarmNoticeBoard.Instance.IsOpen;
                     CloseOverlay();if(!map)FarmNoticeBoard.Instance?.Open();return;

@@ -3,8 +3,8 @@
 © HThinh.yy. Nhánh `codex/rubric-mobile-ar-ai-cloud`; chưa gộp main.
 
 1. Clone nhánh này hoặc tải Unity ZIP từ release `rubric-preview-20261005`.
-2. Chơi Windows: giải nén trọn ZIP Windows rồi chạy NongTrai.exe. Nếu clone repo,
-   dùng CHAY_GAME.bat ở gốc; không tách EXE khỏi NongTrai_Data/DLL/MonoBleedingEdge/D3D12.
+2. Chơi Windows: giải nén trọn ZIP Windows rồi chạy CHAY_GAME.bat để tự mở backend nhẹ và ghép chatbot.
+   Chơi offline ngay bằng CHAY_GAME_KHONG_TRO_LY.bat. Giữ EXE/Data/DLL và Backend/Tools; xem Docs/ASSISTANT_START.md.
 3. Android: tải NongTrai.apk, cho phép cài ứng dụng từ nguồn tải, cài trên Android8+
    ARM64. AR cần máy hỗ trợ ARCore; game thường không cần ARCore.
 4. Unity: Hub Add project → checkout, Editor6000.3.22f1, scene Farm.

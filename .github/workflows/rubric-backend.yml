@@ -19,6 +19,7 @@ jobs:
         run: |
           python -m pip install -r Backend/requirements.txt
           python Backend/tests/test_services.py
+          python Backend/tests/test_launcher.py
       - name: Clean container startup
         working-directory: Backend
         run: |

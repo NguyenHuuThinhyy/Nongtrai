@@ -8,7 +8,8 @@ Nhánh **codex/rubric-mobile-ar-ai-cloud**, phát triển từ `bf7d0b3`.
 **Chưa gộp main. Chỉ gộp sau khi chủ dự án tự test và xác nhận.**
 
 - [Tải bản thử Windows, APK và source Unity](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/rubric-preview-20261005).
-- Trong checkout nhánh này, chạy **CHAY_GAME.bat** hoặc `Builds/Windows-Rubric/NongTrai.exe`; giữ nguyên cả thư mục build.
+- Chạy **CHAY_GAME.bat** để tự khởi động backend/model, kết nối chatbot rồi mở game. Máy đã chuẩn bị runtime không tải lại. [Hướng dẫn khởi động trợ lý](Docs/ASSISTANT_START.md).
+- Muốn chơi offline ngay: **CHAY_GAME_KHONG_TRO_LY.bat**. Mở trực tiếp EXE không tự mở backend.
 - [Hướng dẫn cho nhóm](HUONG_DAN_NHOM.md), [cách chơi](CHOI_GAME.md), [nhà hàng](HUONG_DAN_NHA_HANG.md).
 - **C** mở chatbot; **H** ẩn/hiện hướng dẫn. Menu **Nông trại AR** mở được trên PC:
   xoay/phóng/đặt thủ công, bật webcam nếu có. Android dùng ARCore để dò bàn/sàn.

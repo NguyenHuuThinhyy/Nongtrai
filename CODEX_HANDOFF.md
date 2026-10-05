@@ -8,6 +8,14 @@ Source cũ và backup trước sửa được cất riêng trong D:/NongTrai_Luu
 
 ## Triển khai
 
+- Launcher PC: CHAY_GAME.bat → Tools/Start-Assistant.ps1 → Backend/launcher.py.
+  Tải/cached runtime, kiểm model digest/health/pair rồi ghi farm-connection.json, mở game.
+  Mặc định không warm model: nạp khi gửi câu hỏi, keep_alive60s. -VerifyModel thử câu hỏi thật trước game.
+  Backend/runtime.local.json trỏ runtime có sẵn trên máy, luôn ignored. .runtime chứa log/thông tin ghép cặp riêng.
+  Chỉ dọn tiến trình do launcher tạo; dùng lại dịch vụ có sẵn nếu đúng mã/model. Native không được tính là Docker.
+  Gói Windows phải chứa Backend, Tools và BAT; chỉ đưa EXE/Data thì chat không thể tự khởi động.
+  FarmHud bỏ hotkey E/X khi input đang focus để gõ câu hỏi không đóng bảng.
+
 - FarmControls / FarmInput: desktop và cảm ứng, snapshot cạnh nút theo frame;
   bàn phím/chuột trực tiếp chỉ còn trong wrapper hoặc checks.
 - FarmMobileUI: joystick, look, hold/release, hotbar, menu và Runner; safe area;

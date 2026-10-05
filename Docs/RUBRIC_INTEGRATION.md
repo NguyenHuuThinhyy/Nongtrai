@@ -3,6 +3,10 @@
 © HThinh.yy. Nhánh `codex/rubric-mobile-ar-ai-cloud`, nền `bf7d0b3`.
 **Chỉ gộp main sau khi chủ dự án tự chơi thử và xác nhận.**
 
+Chơi PC với chatbot: **CHAY_GAME.bat** tự mở backend native nhẹ và ghi kết nối; model chỉ nạp khi hỏi,
+nhả RAM sau60giây không dùng. [Hướng dẫn khởi động](ASSISTANT_START.md). Docker bên dưới vẫn dùng
+để triển khai/đánh giá tiêu chí Docker; bản native không thay bằng chứng Docker.
+
 ## Phạm vi
 
 Game Unity 6000.3.22f1 / URP: nông trại, khám phá, nước, chiến đấu, xây dựng,

@@ -58,3 +58,5 @@ __pycache__/
 *.gguf
 /Backend/models/
 /Backend/.pytest_cache/
+/Backend/.runtime/
+/Backend/runtime.local.json

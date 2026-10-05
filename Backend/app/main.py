@@ -79,7 +79,7 @@ async def health():
             ready = any(m.get("name") == MODEL for m in response.json().get("models", []))
     except (httpx.HTTPError, ValueError):
         pass
-    return {"status": "ok", "model": MODEL, "model_ready": ready, "mqtt_connected": cloud.connected, "simulation": True}
+    return {"status": "ok", "service": "nongtrai", "listen_host": os.getenv("FARM_BIND_HOST", "0.0.0.0"), "model": MODEL, "model_ready": ready, "mqtt_connected": cloud.connected, "simulation": True}
 
 
 @app.get("/v1/pair", dependencies=[Depends(authorize)])
@@ -132,7 +132,7 @@ async def chat(body: Chat):
         try:
             async with httpx.AsyncClient(timeout=httpx.Timeout(90, connect=5)) as client:
                 response = await client.post(OLLAMA + "/api/chat", json={"model": MODEL, "messages": messages, "stream": False,
-                    "think": False, "format": schema, "keep_alive": "5m", "options": {"num_ctx": 4096, "num_predict": 40, "temperature": 0}})
+                    "think": False, "format": schema, "keep_alive": "60s", "options": {"num_ctx": 4096, "num_predict": 40, "temperature": 0}})
                 response.raise_for_status()
                 answer = response.json().get("message", {}).get("content", "")
         except (httpx.HTTPError, ValueError):

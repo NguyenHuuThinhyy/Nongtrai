@@ -2,6 +2,9 @@
 
 © HThinh.yy. Nhánh rubric; chỉ gộp main sau khi bạn tự test và xác nhận.
 
+- **PC: chạy CHAY_GAME.bat** để tự mở backend nhẹ và ghi kết nối. Chờ “BACKEND SAN SANG”, vào game rồi nhấn C; AI chỉ nạp khi gửi câu hỏi, nhả RAM sau60giây không dùng. [Cách khởi động và xử lý lỗi](Docs/ASSISTANT_START.md).
+- **BAT_BACKEND_PC.bat** giữ riêng backend chạy; **CHAY_GAME_KHONG_TRO_LY.bat** chơi offline. AR không cần backend; nút Hỏi trợ lý cần backend.
+
 - **PC: C mở chatbot**, dùng được cả khi đang xem nông trại AR. Chat AI cần backend/model
   đã chạy và mã kết nối; nút Hướng dẫn vẫn đọc được khi mất mạng.
 - **H ẩn/hiện bảng hướng dẫn**. Bảng có ghi phím này ngay trên nút Ẩn hướng dẫn.

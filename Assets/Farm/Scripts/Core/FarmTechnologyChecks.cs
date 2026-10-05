@@ -40,6 +40,17 @@ namespace NongTrai
             FarmControls.ReleaseAll();coach.Restore(completed);
             FarmControls.Keys[Key.C].Set(true);yield return null;yield return null;
             Require(player.Paused&&services.ChatPanel.activeSelf,"C did not open chatbot");
+            // Exercise keyboard focus: typing e/x must not execute the HUD's close/map shortcuts.
+            FarmControls.ReleaseAll();
+            var chatInput=services.ChatPanel.GetComponentInChildren<TMPro.TMP_InputField>(true);
+            UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(chatInput.gameObject);
+            chatInput.ActivateInputField();yield return null;yield return null;
+            Require(chatInput.isFocused,"chat input did not receive focus");
+            FarmControls.Keys[Key.E].Set(true);FarmControls.Keys[Key.X].Set(true);
+            yield return null;yield return null;
+            Require(services.ChatPanel.activeSelf,"typing E/X closed chatbot");
+            FarmControls.ReleaseAll();chatInput.DeactivateInputField();
+            UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(null);
             FarmControls.ReleaseAll();services.Close();yield return null;
             // Capture after the shortcut checks: those intentionally advance normal
             // gameplay frames, during which the initial spawn settles onto the ground.
