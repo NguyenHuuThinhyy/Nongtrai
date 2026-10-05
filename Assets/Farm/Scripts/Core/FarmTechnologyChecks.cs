@@ -32,7 +32,7 @@ namespace NongTrai
             FarmControls.TouchPosition=new Vector2(220,340);Require(FarmControls.Pointer.position.ReadValue()==FarmControls.TouchPosition,"drag position binding");
             FarmControls.ReleaseAll();FarmControls.ForceTouch=previous;
             FarmControls.ForceTouch=true;Require(FarmControls.DisplayHint("Chuột trái [R]")=="Dùng [Xoay]","touch hints still use keyboard/mouse");FarmControls.ForceTouch=previous;
-            hud.mainMenu.SetActive(false);player.SetPaused(false);var position=player.transform.position;
+            hud.mainMenu.SetActive(false);player.SetPaused(false);
             var coach=FarmTutorialCoach.Instance;bool completed=coach.Completed;coach.Restore(false);
             FarmControls.Keys[Key.H].Set(true);yield return null;yield return null;Require(!coach.Visible,"H did not hide tutorial");
             FarmControls.Keys[Key.H].Set(false);yield return null;yield return null;
@@ -41,6 +41,9 @@ namespace NongTrai
             FarmControls.Keys[Key.C].Set(true);yield return null;yield return null;
             Require(player.Paused&&services.ChatPanel.activeSelf,"C did not open chatbot");
             FarmControls.ReleaseAll();services.Close();yield return null;
+            // Capture after the shortcut checks: those intentionally advance normal
+            // gameplay frames, during which the initial spawn settles onto the ground.
+            var position=player.transform.position;
             services.OpenChat("Xô nước");Require(player.Paused&&services.ChatPanel.activeSelf,"chat did not pause game");
             if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmServicesLive")>=0)
             {
