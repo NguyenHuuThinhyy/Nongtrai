@@ -4,25 +4,25 @@
   "unity": "6000.3.22f1",
   "save_version": 22,
   "feature_branch": "codex/rubric-mobile-ar-ai-cloud",
-  "source_git_commit": "b29e1ccaa964f19d059d2ed4d0d96d5039a929eb",
-  "build_source_commit": "a2ed11350329a320d80bba7baed5c5a815d1ce74",
-  "runtime_bytes": 153019378.0,
+  "source_git_commit": "14f9b5303373f53d82493f6ec0c390cdd820282c",
+  "build_source_commit": "896faef59e961085c6dcb0284b9af78fe53b9fce",
+  "runtime_bytes": 153031954.0,
   "farm_scene_sha256": "c6566d428bb42535efeb421c376cf984eec5e761be6da945d10ed251bd179416",
   "packages": [
     {
-      "sha256": "bc77d870456ab9b8bb522331f307eda475298ef08f3a70507a8d34f593c0b44b",
-      "file": "NongTrai-Windows-Rubric-20261005.zip",
-      "bytes": 62703795
+      "bytes": 62708273,
+      "sha256": "57f8553f392d9f51043cf4c11a8144540c10f5497e7417e9c2c438268b33afb1",
+      "file": "NongTrai-Windows-Rubric-20261005.zip"
     },
     {
-      "sha256": "dda438a6e4312ea4cc77985a14dedf5e41e80f089289c189e829627bb612f6e7",
-      "file": "NongTrai-Android-Rubric-20261005.apk",
-      "bytes": 52548958
+      "bytes": 52592078,
+      "sha256": "c0dfdff5c645c9093b1e0c68672f215d84ebcc0d4f0af63fb72f00a0cfea46c3",
+      "file": "NongTrai-Android-Rubric-20261005.apk"
     },
     {
-      "sha256": "40967140a8bf0c283b25e1fba0b7eb7c0b240c4fc4f76531d3803c05151e8894",
-      "file": "NongTrai-Unity-Rubric-20261005.zip",
-      "bytes": 64866448
+      "bytes": 67967590,
+      "sha256": "6eb1be81a7b64e2edf0c5e3e9f04b95803abba8d71b71e66aadf179d18608054",
+      "file": "NongTrai-Unity-Rubric-20261005.zip"
     }
   ],
   "physical_android_ar_cloud_acceptance": "pending",
