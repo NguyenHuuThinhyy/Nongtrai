@@ -99,6 +99,16 @@ async def chat(body: Chat):
     followup = bool(previous and not subject)
     resolved_question = previous + "\nCâu hỏi tiếp theo về cùng chủ đề: " + body.question if followup else body.question
     related = knowledge.search(previous + " " + body.question if followup else body.question)
+    if followup:
+        # A short follow-up stays within the last cited manual chapter. Match
+        # only trusted guide text; client history can never introduce new facts.
+        cited = next((section for message in reversed(body.history) if message.role == "assistant"
+                      for section in knowledge.sections if message.content.startswith(section["text"])), None)
+        subject_sections = knowledge.search(previous)
+        if cited and cited["id"] in {section["id"] for section in subject_sections}:
+            related = [cited]
+        else:
+            related = subject_sections[:1]
     if not related:
         return {"answer": "Chưa có thông tin này trong hướng dẫn game. Bạn có thể hỏi về trồng cây, nước, cung, boss, rèn, nhà hàng hoặc minigame.", "sources": [], "model": MODEL, "generated": False}
     if chat_lock.locked():

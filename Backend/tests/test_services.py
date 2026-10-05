@@ -126,6 +126,7 @@ class APITests(unittest.TestCase):
         self.assertIn("20 xu",followup.json()["answer"])
         self.assertIn("Cung hỏng sửa thế nào?", observed["messages"][-1]["content"])
         self.assertIn("Giá bao nhiêu?", observed["messages"][-1]["content"])
+        self.assertEqual(observed["format"]["properties"]["section_id"]["enum"], ["", "bow"])
         with patch.object(main.httpx, "AsyncClient", FakeClient):
             self.client.post("/v1/chat", headers=self.headers, json={"question": "Tốn bao nhiêu?", "history": [
                 {"role": "user", "content": "Cung hỏng sửa thế nào?"},
