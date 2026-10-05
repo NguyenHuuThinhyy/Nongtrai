@@ -1,54 +1,30 @@
 {
-  "release": "NumberMemory-20261002",
-  "release_url": "https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/number-memory-20261002",
+  "release": "rubric-preview-20261005",
+  "release_url": "https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/rubric-preview-20261005",
   "unity": "6000.3.22f1",
-  "save_version": 21,
-  "git_repository": "https://github.com/NguyenHuuThinhyy/Nongtrai",
-  "feature_branch": "codex/number-memory-rewards",
-  "source_git_commit": "f56926e2841b17c5c0639eba5823f1ccdf086814",
-  "build_git_commit": "1ec8beda5f7ac36ae85bdcb95321e15fefd2c625",
-  "runtime_bytes": 116059527,
-  "runtime_files": 170,
-  "build_log": "Logs/build-20261002-205230.log",
-  "checks": [
-    {
-      "log": "Logs/smoke-number-memory-release-only.log",
-      "exit": 0,
-      "marker": "FARM_NUMBER_MEMORY_OK"
-    },
-    {
-      "log": "Logs/smoke-number-memory-release-full.log",
-      "exit": 0,
-      "marker": "FARM_CROPS_SMOKE_OK"
-    },
-    {
-      "log": "Logs/smoke-number-memory-redesign.log",
-      "exit": 0,
-      "marker": "FARM_REDESIGN_CHECKS_OK"
-    }
-  ],
-  "startup": "alive/responding after 15 seconds; no exceptions",
-  "farm_scene_sha256": "d4d1ffaabbeddafe2b86b6732b3598fe518fb61254870cba6a4d79d3244e182d",
-  "source_files": 1404,
+  "save_version": 22,
+  "feature_branch": "codex/rubric-mobile-ar-ai-cloud",
+  "source_git_commit": "321a6e175f88b7b0d750c20df9df60cd1c3d0b7f",
+  "build_source_commit": "a2ed11350329a320d80bba7baed5c5a815d1ce74",
+  "runtime_bytes": 153019378.0,
+  "farm_scene_sha256": "c6566d428bb42535efeb421c376cf984eec5e761be6da945d10ed251bd179416",
   "packages": [
     {
-      "file": "NongTrai-Windows-NumberMemory-20261002.zip",
-      "bytes": 43143319,
-      "sha256": "89e4f78bb0f9ad099a0b4a17f88b44c8a3ce4d5c4468d588ea8cf7c88f88dcfd",
-      "entries": 175
+      "sha256": "bc77d870456ab9b8bb522331f307eda475298ef08f3a70507a8d34f593c0b44b",
+      "file": "NongTrai-Windows-Rubric-20261005.zip",
+      "bytes": 62703795
     },
     {
-      "file": "NongTrai-Unity-NumberMemory-20261002.zip",
-      "bytes": 19895218,
-      "sha256": "3917af944873ec419373fb1611ced7d0617dc07625a5ba2b4e6aa1e3e8752c26",
-      "entries": 1404
+      "sha256": "dda438a6e4312ea4cc77985a14dedf5e41e80f089289c189e829627bb612f6e7",
+      "file": "NongTrai-Android-Rubric-20261005.apk",
+      "bytes": 52548958
     },
     {
-      "file": "Cau1_2D.unitypackage",
-      "bytes": 50817,
-      "sha256": "024d0229ca0d3771cffb04f900fce35d14fb32da19f7f38376a97fc71d06e708",
-      "asset_records": 13
+      "sha256": "d26dc524cc5517f3fb7334b08fe4b2de0247629a385e71535acb68b9fb9a23e3",
+      "file": "NongTrai-Unity-Rubric-20261005.zip",
+      "bytes": 67183199
     }
   ],
-  "source_changes_since_build": "release download paths and ignore rules only"
+  "physical_android_ar_cloud_acceptance": "pending",
+  "user_merge_approval": "pending"
 }
