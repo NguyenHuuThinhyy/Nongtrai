@@ -92,6 +92,10 @@ class APITests(unittest.TestCase):
         result = self.client.post("/v1/chat", headers=self.headers, json={"question": "quantum astrophysics"}).json()
         self.assertFalse(result["generated"])
         self.assertEqual(result["sources"], [])
+        result = self.client.post("/v1/chat", headers=self.headers,
+            json={"question": "quantum astrophysics", "history": [{"role": "user", "content": "Cung hỏng sửa thế nào?"}]}).json()
+        self.assertFalse(result["generated"])
+        self.assertEqual(result["sources"], [])
 
     def test_model_request_contract_and_sources(self):
         observed = {}
@@ -122,6 +126,12 @@ class APITests(unittest.TestCase):
         self.assertIn("20 xu",followup.json()["answer"])
         self.assertIn("Cung hỏng sửa thế nào?", observed["messages"][-1]["content"])
         self.assertIn("Giá bao nhiêu?", observed["messages"][-1]["content"])
+        with patch.object(main.httpx, "AsyncClient", FakeClient):
+            self.client.post("/v1/chat", headers=self.headers, json={"question": "Tốn bao nhiêu?", "history": [
+                {"role": "user", "content": "Cung hỏng sửa thế nào?"},
+                {"role": "assistant", "content": "Sửa cung trong túi."},
+                {"role": "user", "content": "Giá bao nhiêu?"}]})
+        self.assertIn("Cung hỏng sửa thế nào?", observed["messages"][-1]["content"])
 
     def test_thirty_retrieval_questions_and_unity_manual_match(self):
         cases = json.loads(Path(__file__).with_name("chat-evaluation.json").read_text(encoding="utf-8"))

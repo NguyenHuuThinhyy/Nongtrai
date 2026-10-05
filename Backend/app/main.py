@@ -94,12 +94,11 @@ async def chat(body: Chat):
     # user subject even when the generic price word matches other guide sections.
     generic = set(tokens("giá bao nhiêu mấy mất tốn lâu giây nữa còn thế vậy nó cái đó tổng thêm như hết lần một phải rồi thì đầy rỗng"))
     subject = set(tokens(body.question)) - STOP_WORDS - generic
-    previous = next((m.content[:600] for m in reversed(body.history) if m.role == "user"), "")
+    previous = next((m.content[:600] for m in reversed(body.history)
+                     if m.role == "user" and (set(tokens(m.content)) - STOP_WORDS - generic)), "")
     followup = bool(previous and not subject)
     resolved_question = previous + "\nCâu hỏi tiếp theo về cùng chủ đề: " + body.question if followup else body.question
     related = knowledge.search(previous + " " + body.question if followup else body.question)
-    if not related and body.history:
-        related = knowledge.search(body.question + " " + " ".join(m.content for m in body.history[-2:] if m.role == "user"))
     if not related:
         return {"answer": "Chưa có thông tin này trong hướng dẫn game. Bạn có thể hỏi về trồng cây, nước, cung, boss, rèn, nhà hàng hoặc minigame.", "sources": [], "model": MODEL, "generated": False}
     if chat_lock.locked():

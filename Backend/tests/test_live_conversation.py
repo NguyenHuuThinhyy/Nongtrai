@@ -29,6 +29,18 @@ with httpx.Client(base_url=args.api, timeout=100,
     follow.raise_for_status()
     assert follow.json()["generated"] and "20 xu" in follow.json()["answer"]
     assert "Cung và mũi tên" in follow.json()["sources"]
+    history.extend([{"role": "user", "content": "Giá bao nhiêu?"},
+                    {"role": "assistant", "content": follow.json()["answer"]}])
+    repeat = client.post("/v1/chat", json={"question": "Tốn bao nhiêu?", "history": history})
+    records.append({"question": "Tốn bao nhiêu?", "status": repeat.status_code, "response": repeat.json()})
+    output.write_text(json.dumps(records, ensure_ascii=False, indent=2), encoding="utf-8")
+    repeat.raise_for_status()
+    assert repeat.json()["generated"] and "20 xu" in repeat.json()["answer"]
+    unknown = client.post("/v1/chat", json={"question": "quantum astrophysics", "history": history})
+    records.append({"question": "quantum astrophysics (with previous bow topic)", "status": unknown.status_code, "response": unknown.json()})
+    output.write_text(json.dumps(records, ensure_ascii=False, indent=2), encoding="utf-8")
+    unknown.raise_for_status()
+    assert not unknown.json()["generated"] and not unknown.json()["sources"]
     outside = client.post("/v1/chat", json={"question": "Thời tiết ở Sao Hỏa?"})
     records.append({"question": "Thời tiết ở Sao Hỏa?", "status": outside.status_code, "response": outside.json()})
     output.write_text(json.dumps(records, ensure_ascii=False, indent=2), encoding="utf-8")
