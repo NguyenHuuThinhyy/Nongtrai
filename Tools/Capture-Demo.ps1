@@ -9,7 +9,7 @@ $previousHistory=if(Test-Path -LiteralPath $history){[IO.File]::ReadAllBytes($hi
 try {
     New-Item -ItemType Directory -Path (Split-Path $history -Parent) -Force | Out-Null
     [IO.File]::WriteAllText($history,'{"messages":[]}')
-    $p=Start-Process -FilePath $exe -ArgumentList @('-farmDemo','-farmTouch','-screen-width','1280','-screen-height','720','-screen-fullscreen','0','-logFile',('"'+$log+'"')) -WindowStyle Hidden -PassThru
+    $p=Start-Process -FilePath $exe -ArgumentList @('-farmMute','-farmDemo','-farmTouch','-screen-width','1280','-screen-height','720','-screen-fullscreen','0','-logFile',('"'+$log+'"')) -WindowStyle Hidden -PassThru
     $deadline=(Get-Date).AddMinutes(4)
     while(!$p.HasExited){
         if((Get-Date) -gt $deadline -or ((Test-Path -LiteralPath $log) -and (Select-String -LiteralPath $log -Pattern 'InvalidOperationException|NullReferenceException|FARM_DEMO_ERROR' -Quiet))){$p.Kill();throw 'Demo failed or timed out; read Logs/demo-pc.log'}

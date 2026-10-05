@@ -12,6 +12,16 @@ namespace NongTrai
         static int restartFlowStage;
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void ResetSmokeState()=>restartFlowStage=0;
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void MuteVerificationAudio()
+        {
+            var args=Environment.GetCommandLineArgs();
+            if(Array.IndexOf(args,"-farmMute")<0 && Array.IndexOf(args,"-farmSmokeCheck")<0 &&
+               Array.IndexOf(args,"-farmRestartFlowSmokeCheck")<0 && Array.IndexOf(args,"-farmDemo")<0) return;
+            AudioListener.volume=0f;
+            AudioListener.pause=true;
+            Debug.Log("FARM_TEST_AUDIO_MUTED");
+        }
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Install()
         {
