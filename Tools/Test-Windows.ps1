@@ -23,4 +23,5 @@ while(!$p.HasExited){
     Start-Sleep -Milliseconds 250
 }
 if($p.ExitCode -ne 0 -or !(Select-String -LiteralPath $log -SimpleMatch $marker -Quiet)){throw "Smoke marker missing: $marker. Read $log"}
+if(!(Select-String -LiteralPath $log -SimpleMatch 'FARM_TEST_AUDIO_MUTED' -Quiet)){throw "Verification audio was not muted; use the current build. Read $log"}
 Write-Output "PASS $Suite $marker; log=$log"

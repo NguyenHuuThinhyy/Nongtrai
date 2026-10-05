@@ -20,7 +20,7 @@ Backup trước sửa: Recovery/Before-Rubric-20261004 (ngoài Git/source zip).
 - FarmTechnologyBuild: saved-scene-only Windows/Android; XR/renderer/config tự cấu hình
   không sửa scene/prefab. ARFoundation/Core6.3.5, AndroidOptional, ARM64 IL2CPP/API26–36.
 - Backend: FastAPI0.115.12, MQTTpaho2.1TLS, BM25Vietnamese, Ollama0.12.3/Qwen3:1.7b.
-  Model chọn câu hướng dẫn với JSON schema; trả nguyên câu và tên nguồn (extractive QA).
+  Model chọn mục hướng dẫn với JSON schema; trả nguyên đoạn và tên nguồn (extractive QA).
   Lease/revision/serverID bỏ lệnh cũ/trùng/phiên khác;3feed/20s, max20publishes/min.
 - Docker Compose2services, healthchecks, volume model, nonroot API, key ngoài Git.
   .github/workflows/rubric-backend.yml kiểm checkout sạch/containers/model.
@@ -47,5 +47,10 @@ Hướng dẫn manualDocker/ARCore/account nằm Docs/RUBRIC_INTEGRATION.md.
 Save22, item IDs, gameplay/collider, farm scene và licensed assets giữ tương thích.
 Knowledge backend và Unity Resources phải byte-identical. Không track .env, weights,
 Library/Temp/Logs/cache hoặc tải trùng. Cập nhật gói/source/commit/hash ở DongGoi và
-release rubric-preview-20261004. Gói cũ chỉ dọn sau khi bản thay thế được xác minh.
+release rubric-preview-20261005. Gói cũ chỉ dọn sau khi bản thay thế được xác minh.
+
+Git fetch ngày 05/10 xác minh restaurant-renovation 7633b40 đã là tổ tiên của nhánh
+rubric; remote không có commit nhà hàng mới hơn. Các phiên smoke/demo tự tắt âm
+trước khi nạp scene; có thể dùng -farmMute cho phiên kiểm tra thủ công. Không bật
+âm khi tiếp tục sửa theo yêu cầu chủ dự án. Audio test marker: FARM_TEST_AUDIO_MUTED.
 Xem Docs/ACCEPTANCE.md và DEMO.md cho phần cần chủ dự án tự nghiệm thu/video.

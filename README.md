@@ -7,7 +7,7 @@
 Nhánh **codex/rubric-mobile-ar-ai-cloud**, phát triển từ `bf7d0b3`.
 **Chưa gộp main. Chỉ gộp sau khi chủ dự án tự test và xác nhận.**
 
-- [Tải bản thử Windows, APK và source Unity](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/rubric-preview-20261004).
+- [Tải bản thử Windows, APK và source Unity](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/rubric-preview-20261005).
 - Trong checkout nhánh này, chạy **CHAY_GAME.bat** hoặc `Builds/Windows-Rubric/NongTrai.exe`; giữ nguyên cả thư mục build.
 - [Hướng dẫn cho nhóm](HUONG_DAN_NHOM.md), [cách chơi](CHOI_GAME.md), [nhà hàng](HUONG_DAN_NHA_HANG.md).
 - [Thiết lập Android/AR/chat/cloud/Docker](Docs/RUBRIC_INTEGRATION.md), [kết quả test](Docs/TEST_RESULTS.md), [checklist người dùng](Docs/ACCEPTANCE.md), [kịch bản demo](Docs/DEMO.md).
@@ -66,7 +66,9 @@ Voxel/collider/gameplay được giữ để đào/đặt/phá hoạt động đ
 ## Rubric và bàn giao
 
 Xem [bảng tiêu chí → chức năng → kiểm thử → minh chứng](Docs/ACCEPTANCE.md).
-Planning, tests, documentation đã chuẩn bị; ảnh/log chọn lọc ở Evidence/Rubric.
+Planning, tests, documentation và [video demo tự động trên PC](Evidence/Rubric/demo-pc-automated.mp4)
+đã có; ảnh/log chọn lọc ở Evidence/Rubric. Chatbot đạt 27/30 câu trong lượt kiểm tra PC
+8 GB, trung bình warm 15,49 giây; Docker đã chạy trên GitHub Actions.
 Video camera AR thật, dashboard thật, trải nghiệm Android15phút và người dùng tự test
 phải bổ sung trước nghiệm thu. Kịch bản demo không thay thế video.
 Điểm còn phụ thuộc giảng viên có chấp nhận pretrained model/IoT mô phỏng/uGUI2D hay không.

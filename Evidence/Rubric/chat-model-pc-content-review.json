@@ -1,0 +1,197 @@
+{
+  "source_commit": "1734be78aeee3bf9475f4498229e55b1dac216f3",
+  "run": "native Windows CPU, Unity Editor/game closed",
+  "raw_sha256": "13ad8be0b17ba15b8535a257ec414bb951c7b409b7c42a33caf4295a00a7be1e",
+  "reviewer": "Codex reviewed every raw answer against expected/source-derived guide; owner acceptance pending",
+  "correct": 27,
+  "total": 30,
+  "failed": [
+    3,
+    26,
+    27
+  ],
+  "warm_mean_seconds": 15.494,
+  "warm_over_30_seconds": 0,
+  "cases": [
+    {
+      "index": 1,
+      "question": "Làm sao gieo hạt?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 2,
+      "question": "Phân bón tăng tiến độ bao nhiêu?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 3,
+      "question": "Xô rỗng lấy nước ở hồ thế nào?",
+      "correct": false,
+      "reason": "Selected exploration instead of bucket; missing how to fill empty bucket"
+    },
+    {
+      "index": 4,
+      "question": "Xô đầy đặt nước xong còn đầy không?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 5,
+      "question": "Bọt biển hút rộng bao nhiêu?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 6,
+      "question": "Hong bọt biển đầy mất bao lâu?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 7,
+      "question": "Thuê vòi giá bao nhiêu?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 8,
+      "question": "LV5 thuê tối đa mấy vòi mỗi ngày?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 9,
+      "question": "Cung kéo đầy mất mấy giây?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 10,
+      "question": "Cung mỗi lần bắn giảm độ bền không?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 11,
+      "question": "Cung hỏng sửa bao nhiêu xu?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 12,
+      "question": "Kiếm hồi chiêu gốc bao nhiêu?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 13,
+      "question": "Đổi chỉ số rèn tốn gì?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 14,
+      "question": "Kiếm LV5 có hiệu ứng nào?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 15,
+      "question": "Hồi sinh tại chỗ tốn bao nhiêu?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 16,
+      "question": "Chết hồi sinh miễn phí mất gì?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 17,
+      "question": "Công thức cổng hồi sinh?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 18,
+      "question": "Có thể đặt hai cổng tự chế không?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 19,
+      "question": "Châm TNT dùng vật gì?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 20,
+      "question": "TNT nổ sau bao lâu?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 21,
+      "question": "Mở rương còn câu hỏi không?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 22,
+      "question": "Rương boss có hạt gì?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 23,
+      "question": "Boss Golem có bao nhiêu HP?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 24,
+      "question": "Túi đồ có mấy ô?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 25,
+      "question": "Bình máu hồi bao nhiêu?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 26,
+      "question": "Tìm số 2D đạt 5/5 được bao nhiêu xu?",
+      "correct": false,
+      "reason": "Selected TNT instead of NumberMemory; missing 200 xu/quota/stone reward"
+    },
+    {
+      "index": 27,
+      "question": "Farm Runner mua vé bao nhiêu?",
+      "correct": false,
+      "reason": "Selected animals instead of Runner; missing 500 xu ticket price"
+    },
+    {
+      "index": 28,
+      "question": "Thoát game có tự lưu không?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 29,
+      "question": "Nhà hàng có bao nhiêu bàn và món?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    },
+    {
+      "index": 30,
+      "question": "Cloud có dùng cảm biến thật không?",
+      "correct": true,
+      "reason": "Answer includes expected facts and matches source-derived manual"
+    }
+  ]
+}

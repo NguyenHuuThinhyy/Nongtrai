@@ -1,0 +1,3 @@
+Unity runtime source 0f245e5 (identical in a2ed113); captured 2026-10-05
+FARM_TEST_AUDIO_MUTED
+FARM_RESTAURANT_OK • 30 recipes, inventory/save22/legacy21, serving, layout, stairs, guests and fishing

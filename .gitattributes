@@ -1,4 +1,5 @@
-# Preserve the exact tested bytes of release artifacts, including Mono config files.
-/Builds/** -text
-/DongGoi/** -text
-/CHAY_GAME.bat -text
+# Preserve every byte of generated playable builds during clone and checkout.
+/Builds/** binary
+/DongGoi/*.zip binary
+/DongGoi/*.apk binary
+/DongGoi/*.unitypackage binary

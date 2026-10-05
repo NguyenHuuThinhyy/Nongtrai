@@ -2,7 +2,7 @@
 
 © HThinh.yy. Nhánh `codex/rubric-mobile-ar-ai-cloud`; chưa gộp main.
 
-1. Clone nhánh này hoặc tải Unity ZIP từ release `rubric-preview-20261004`.
+1. Clone nhánh này hoặc tải Unity ZIP từ release `rubric-preview-20261005`.
 2. Chơi Windows: giải nén trọn ZIP Windows rồi chạy NongTrai.exe. Nếu clone repo,
    dùng CHAY_GAME.bat ở gốc; không tách EXE khỏi NongTrai_Data/DLL/MonoBleedingEdge/D3D12.
 3. Android: tải NongTrai.apk, cho phép cài ứng dụng từ nguồn tải, cài trên Android8+

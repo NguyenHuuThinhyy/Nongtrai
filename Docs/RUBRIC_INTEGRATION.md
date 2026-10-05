@@ -83,6 +83,10 @@ Nguồn [Qwen](https://huggingface.co/Qwen/Qwen3-1.7B),
 Dự án không huấn luyện/fine-tune model và không đưa weights vào Git/APK.
 Backend BM25 lấy ba mục gần câu hỏi rồi gửi cho model, `think=false`. Qwen chọn
 một mục qua JSON schema; server trả nguyên đoạn hướng dẫn ngắn của mục đó.
+Với câu tiếp nối ngắn không có chủ đề mới, giữ mục đã tham chiếu ở câu trước
+(chỉ khớp văn bản hướng dẫn có sẵn); nếu chưa có mục, dùng mục gần câu trước nhất.
+Model vẫn xử lý yêu cầu. Các câu hỏi có chủ đề mới tìm lại mục riêng; câu ngoài
+phạm vi không bị kéo về chủ đề của lịch sử chat.
 Đoạn đầy đủ giữ điều kiện và ngoại lệ, tránh lỗi model chọn nhầm mã câu hoặc bỏ ý.
 Đây là QA trích xuất, không sinh câu trả lời tự do: API ghi `generation_mode=extractive`.
 Trợ lý chỉ tư vấn, không cấp vật phẩm/đổi save. Kết quả kèm tên mục nguồn.

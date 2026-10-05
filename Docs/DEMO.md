@@ -1,6 +1,26 @@
 # Kịch bản trình diễn và ghi hình
 
-© HThinh.yy. Đây là kịch bản, chưa thay thế video nghiệm thu.
+© HThinh.yy. Video PC đã có; kịch bản Android/AR/cloud bên dưới chờ thiết bị và tài khoản.
+
+## Minh chứng đã ghi
+
+[demo-pc-automated.mp4](../Evidence/Rubric/demo-pc-automated.mp4): game Windows chạy thật,
+điều khiển chạm giả lập trên PC, Tìm số 2D 5/5 nhận 200 xu + đá trong phiên kiểm tra,
+Unity gọi HTTP → FastAPI native → Qwen3 thật, và miniature với cây ở các giai đoạn.
+Nguồn quay: commit 1734be7, ngày 04/10/2026. Video 1280×720, 5 FPS, 29,4 giây,
+không âm thanh; đã kiểm tra trực quan các khung gameplay, thưởng, chat và miniature.
+Phiên demo không ghi save gameplay; trạng thái ruộng trong preview là dữ liệu mẫu.
+Đây không phải phép đo FPS, tracking AR trên điện thoại hoặc Adafruit thật.
+
+Để quay lại, khởi động backend chẩn đoán localhost:8000 với mã test
+`local-unity-smoke-only` và model đã tải, rồi chạy:
+
+```powershell
+.\Tools\Capture-Demo.ps1 -Ffmpeg 'duong-dan/ffmpeg.exe'
+```
+
+Script tắt âm trước khi nạp game, cất và phục hồi lịch sử chat, ghi PNG vào Temp rồi
+mã hóa MP4. Không chạy script khi đang dùng lịch sử chat trong một phiên game khác.
 
 ## Chuẩn bị
 

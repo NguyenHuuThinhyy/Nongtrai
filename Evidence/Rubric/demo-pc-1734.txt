@@ -1,0 +1,2 @@
+Source 1734be7; captured 2026-10-04; native backend, not Docker
+FARM_DEMO_OK frames=147 folder=C:/Users/dell/AppData/Local/Temp/Nong Trai Studio/Nong Trai - First Harvest\RubricDemo\20261004-201558 • automated PC footage; no physical AR/cloud claim; gameplay not saved.

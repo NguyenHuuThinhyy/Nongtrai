@@ -1,52 +1,24 @@
-# Tải game và tiếp tục phát triển — HThinh.yy
+# Mở bản thử và phát triển tiếp
 
-## Chơi ngay từ repo
+© HThinh.yy. Nhánh `codex/rubric-mobile-ar-ai-cloud`; chưa gộp main.
 
-Bấm **Code → Download ZIP**, giải nén toàn bộ, mở **CHAY_GAME.bat** ở thư mục gốc. Khi dùng `git clone`, có thể chạy ngay file này. Bản EXE và mọi thư mục đi kèm ở `Builds/Windows-NumberMemory`; gói Windows/Unity ở `DongGoi`.
+1. Clone nhánh này hoặc tải Unity ZIP từ release `rubric-preview-20261005`.
+2. Chơi Windows: giải nén trọn ZIP Windows rồi chạy NongTrai.exe. Nếu clone repo,
+   dùng CHAY_GAME.bat ở gốc; không tách EXE khỏi NongTrai_Data/DLL/MonoBleedingEdge/D3D12.
+3. Android: tải NongTrai.apk, cho phép cài ứng dụng từ nguồn tải, cài trên Android8+
+   ARM64. AR cần máy hỗ trợ ARCore; game thường không cần ARCore.
+4. Unity: Hub Add project → checkout, Editor6000.3.22f1, scene Farm.
+   Unity tạo Library khi import; cần Internet để tải packages. Không chạy builder dựng scene.
+5. Build: Tools/Build-Windows.ps1 và Build-Android.ps1. Backend: Start-Services.ps1.
+   Xem Docs/RUBRIC_INTEGRATION.md để cài Docker và tạo dashboard.
 
-## Chơi bản Windows từ Releases
+Giữ Assets + tất cả .meta, Packages + packages-lock, ProjectSettings, Backend, Tools,
+Docs, Evidence và giấy phép. Không chia sẻ cache/log tạm, Backend/.env, model weights
+hoặc save cá nhân. Source zip chứa đầy đủ các mục phát triển, bỏ runtime build để giảm trùng;
+Windows ZIP và APK là các gói chơi riêng.
 
-1. Mở [Release Tìm số 2D](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/number-memory-20261002).
-2. Tải `NongTrai-Windows-NumberMemory-20261002.zip`, giải nén toàn bộ rồi chạy `CHAY_GAME.bat` hoặc `NongTrai.exe`.
-3. Giữ EXE cùng `NongTrai_Data`, `MonoBleedingEdge`, `D3D12` và các DLL trong gói. Không cần Unity để chơi. Đọc `CHOI_GAME.md` đi kèm.
+Backend/compose.yaml gồm API và OllamaCPU. Model tải vào volume. Chưa có tài khoản
+Adafruit IO thì để username/key trống; không bật cloud. Các chức năng game offline vẫn chạy.
 
-## Lấy đầy đủ source để sửa và build tiếp
-
-```powershell
-git clone https://github.com/NguyenHuuThinhyy/Nongtrai.git
-cd Nongtrai
-```
-
-Hoặc tải `NongTrai-Unity-NumberMemory-20261002.zip` ở Release và giải nén. Git clone phù hợp để làm việc nhóm, cập nhật và gửi thay đổi; ZIP source dành cho mở dự án không cần Git.
-
-- Cài Unity Hub và **Unity 6000.3.22f1** trên Windows; bảo đảm Editor có hỗ trợ build Windows. Dự án dùng URP, bản Windows hiện tại dùng backend Mono.
-- Unity Hub → Add project from disk → chọn thư mục chứa `Assets`, `Packages`, `ProjectSettings`.
-- Chờ import asset và tải package lần đầu (cần mạng), rồi mở `Assets/Farm/Scenes/Farm.unity`, bấm Play.
-- Repo/source ZIP có toàn bộ scene, prefab, script, model, texture, vật liệu, `.meta`, JSON và cấu hình/package lock cần thiết. Giữ giấy phép trong `Assets/Farm/Models` và `COPYRIGHT.md`.
-- `Library`, `Temp`, `Logs`, cấu hình IDE cá nhân do mỗi máy tạo lại, không cần tải từ máy bàn giao.
-
-## Build Windows bằng PowerShell
-
-Lưu scene, đóng Editor của dự án rồi chạy từ thư mục dự án:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\Tools\Build-Windows.ps1 -UnityEditor "C:\Program Files\Unity\Hub\Editor\6000.3.22f1\Editor\Unity.exe"
-```
-
-Thay đường dẫn Unity theo máy của bạn. Script tự tìm vị trí Hub mặc định hoặc `D:\Unity\Editors\6000.3.22f1\Editor\Unity.exe` nếu bỏ `-UnityEditor`. Có thể đặt biến `UNITY_EDITOR_PATH`. Kết quả ở `Builds/Windows/NongTrai.exe`; log có thời gian trong `Logs`.
-
-Script gọi `NongTrai.Editor.FarmProjectBuilder.BuildWindowsCurrentScene`, chỉ build scene đang lưu. **Không chạy `CreateScene` hoặc `RebuildSceneAndBuildWindows`**: hai lệnh đó có thể ghi đè scene/prefab.
-
-Kiểm tra bản build khi cần:
-
-```powershell
-& .\Builds\Windows\NongTrai.exe -farmSmokeCheck -farmArtCheck -screen-fullscreen 0 -screen-width 1280 -screen-height 720 -force-d3d11 -logFile "$PWD\Logs\smoke-team.log"
-```
-
-Smoke dùng save tạm. Bản lưu chơi thường nằm trong `%USERPROFILE%\AppData\LocalLow\Nong Trai Studio\Nong Trai - First Harvest`, không có trong repo/gói tải.
-
-## Gửi thay đổi cho nhóm
-
-Tạo nhánh riêng, sửa và kiểm tra trước khi gửi PR. Commit cả `.meta` mới, source và cấu hình liên quan. Theo yêu cầu bàn giao, bản build và ZIP hiện tại được commit tại Builds/Windows-NumberMemory và DongGoi, đồng thời có trên Releases. Khi cập nhật bản phát hành, đồng bộ EXE, toàn bộ dữ liệu/DLL và checksum cùng nhau. Không commit cache, log, bản build thử hoặc save cá nhân. Đọc `CODEX_HANDOFF.md` để biết hệ thống đang dùng.
-
-Release có `RELEASE-MANIFEST.json` và `SHA256SUMS.txt`. File manifest phân biệt commit build game với commit tài liệu bàn giao; mã gameplay của hai commit được đối chiếu giống nhau.
+Ghi bug/test vào Docs/ACCEPTANCE.md với thiết bị, commit/build, ảnh/video và bước tái hiện.
+Không merge main cho tới khi HThinh.yy tự test và xác nhận.

@@ -1,0 +1,53 @@
+Unity runtime source 0f245e5 (identical in a2ed113); captured 2026-10-05
+FARM_TEST_AUDIO_MUTED
+FARM_JUMP_BLOCK_OK: keyboard SPACE/W crossed a one metre collider.
+FARM_INVENTORY_ANIMALS_OK: separate species pens, five hens per pen, egg production/collection, milk/wool cooldown, meat removes pig, mouse pickup/drop, individual product sales.
+FARM_SAVE_OK: money, seeds, egg production and animals restored from JSON.
+FARM_SHOP_GATE_OK: seed consumption, all purchases, capacity, funds, duplicate purchase, selling, fruit harvest, gate open/close, shop/help/resume.
+FARM_ANIMALS_SIGNS_OK: six animals moved, stayed in paddock, paused correctly; front/back sign and farmer screenshots captured.
+FARM_CHEST_DIRECT_OK: open, take one/all, reopen partial chest, break unopened chest, no duplicate drops.
+FARM_EXPANSION_OK: animal care, pens, JSON processing, region gates, tools and manual save.
+FARM_MINING_RAY_OK: first/third person rays, hold duration and terrain mutation.
+FARM_STREAMING_OK: seeded terrain, distant/negative coordinates, unloading cap, excavated persistence and v7 voxel migration.
+FARM_ISLANDS_TIME_OK: 18-minute day, seasons, rain, storm puzzle, sleep, two portals with remembered positions, voxel mining, level cap, furnace blueprint, hotbar and manual save.
+FARM_ADVENTURE_BAG_OK: stack/split/merge/equip, placement collision, drops, durability, trees/leaf decay, animal feed/breed/combat and save/load.
+FARM_V15_OK: timed pump stock, three carried cans, LV3 orchard, sprinkler, quest, feed, migration and respawn.
+FARM_FALL_DAMAGE_OK: high fall cost health, landing and restore remain safe.
+FARM_FEEDBACK_MOVEMENT_OK: normal speed 6; sprint hunger four times baseline.
+FARM_FEEDBACK_VERTICAL_OK: straight-down aim/dig; close and underfoot blocks; capsule overlap rejected.
+FARM_FEEDBACK_WATER_OK: scoop/pour bottle conservation, water ray hit, excavated bank flow, swim jump and particles.
+FARM_FEEDBACK_COMBAT_OK: .3 cooldown, arm work/place animations, no bites through walls or across floors.
+FARM_FEEDBACK_FORGE_OK: random per-weapon stats; LV5 +12 damage/lifesteal; save/load; separate swords; sell/discard.
+FARM_FEEDBACK_GUARDS_OK: chest locked by guardian, tier HP, persisted defeat flag, direct open/break rewards; four guardian visuals captured.
+FARM_ADVENTURE_FEEDBACK_OK: reset archives old progress, all requested gameplay regression checks passed.
+FARM_TNT_OK: place, no automatic explosion, torch only, no torch consumption, exactly five full flashes, pause, unlit/lit save-load, terrain blast, invalid placement preserves inventory.
+FARM_WATER_CAN_OK: default slot 6; farm pond and river fill; no bottles needed; real left-click pour and spread; invalid aim/occlusion; retrieve sources; save/load both maps; crop watering preserved.
+FARM_BOW_PHYSICS_OK: 28 arcs at 15/30/60/144 FPS; vertical aim, two camera rays, thin wall, charge, per-bow wear, broken/no-ammo/tap/pause.
+FARM_NUMBER_MEMORY_OK: Tab/49 cells/mouse/timer/pause/rewards/one payout/day cap/stone cap/save/replay/exit/overflow/standalone.
+FARM_SYSTEMS_BAG_OK: empty seeds removed/rebought; all items sellable; no respawn; bucket/shovel repurchase.
+FARM_SYSTEMS_SPONGE_OK: shop/place/radius-one absorption/full state/collect/save-load.
+FARM_PAID_REVIVE_OK: in-place on both maps, exact 100 coins, inventory preserved, no double charge, insufficient funds blocked.
+FARM_SPONGE_DRY_OK: nearby fire, 10 seconds, dry state saved, collect/reuse, held sponge accepted by campfire.
+FARM_SWORD_AIM_OK: off-center hit, wall and range checks, cooldown, circle/tool switch.
+FARM_SYSTEMS_RENTAL_OK: 3/6 caps, daily reset, auto irrigation without water, expiry, save-load.
+FARM_SYSTEMS_BOSS_LOOT_OK: direct boss chest access, partial withdrawal, save-load and streaming, breaking drops remaining seeds, planting and harvest.
+FARM_SYSTEMS_ENEMY_OK: actual boss jump over one block, visible numeric HP and health fill.
+FARM_SYSTEMS_OK: all new systems and save22 migration passed.
+FARM_LEVEL_RESTART_OK: confirm before reload, cancel keeps LV4, manual save/load preserves LV4 and XP.
+FARM_RUN_SPEED_OK: Shift run measured 9,000008 m/s; target 9, walk 6.
+FARM_RIG_ATTACHMENT_OK: hat attached; palm socket tracks Jump/Work/Attack after bone updates; jump root clamped.
+FARM_RIVER_SEA_ORE_OK: natural river/sea, water occupancy and swim detection; minerals=180 / rock=5489
+FARM_PORTAL_OK: craft/place/save/load; map travel remembers positions with/without gate, distant terrain remains loaded; death uses crafted/original gate; post-death travel remembers respawn position.
+FARM_FORGE_DRAG_OK: 36 bag slots, 2 targets, click/drop validation, no consumption on selection/cancel.
+FARM_MODE_SWITCH_OK: restart handoff is one-shot; pause-menu Creative starts in-place, preserves live state and disables saving.
+FARM_WATER_ORDERS_CREATIVE_OK: finite water, irrigation, JSON craft, daily orders, v8 seeded chunk/terrain/building save and discard-only creative mode.
+FARM_RUNNER_INPUT_OK: 200ms frame time preserved, lane settled within 250ms.
+FARM_RUNNER_OK: independent full-screen scene, farmer, lane/jump, six pooled segments, tickets, escalating reward, one-time settlement.
+FARM_ART_CHECK_OK: animated chibi, hand sockets, four species, six crops/four stages, orchard, tree alignment, URP materials, farm dawn/day/night and exploration captures.
+FARM_BOW_WATER_OK: bow and five arrows crafted; unified bucket, old bottle recipes removed.
+FARM_FORGE_BOSS_OK: craftable forge, sword enhancement, deep cave and persistent boss reward.
+FARM_CHEST_ISOLATION_OK: deposit, withdrawal, closed panel, save clone and restore.
+FARM_CONSUMPTION_OK: 3-second hold, healing, one item per press, release/change cancel.
+FARM_WATER_COAL_OK: surface lake, pour, bounded flow, restore, displacement, cave resources, 30s wood/120s coal, flat arena and pit.
+FARM_NEW_FEATURES_OK: arrow recovery, forge UI/selection, scaled stones/chance, landmark captures.
+FARM_CROPS_SMOKE_OK: grounded, cameras, pause, 80 plots, three crops, dry growth blocked, watering, harvest inventory, replant, screenshot.

@@ -1,5 +1,5 @@
 # © HThinh.yy. Run only after builds and smoke checks pass.
-param([Parameter(Mandatory=$true)][string]$BuildSourceCommit,[string]$Label='20261004')
+param([Parameter(Mandatory=$true)][string]$BuildSourceCommit,[string]$Label='20261005')
 $ErrorActionPreference='Stop'
 $project=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 Set-Location -LiteralPath $project

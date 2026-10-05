@@ -6,7 +6,7 @@ Không tự quy đổi các mục dưới đây thành 100/100; giảng viên ch
 | Thành phần rubric | Chức năng/code | Kiểm tra phải đạt | Minh chứng cần nộp |
 |---|---|---|---|
 | Unity 2D/3D /20 | Farm + NumberMemory + Runner + nhà hàng | Full smoke; nhận thưởng một lần; chơi cảm ứng | Log smoke + video liền mạch |
-| AR + deep learning /20 | FarmAR, AR Foundation/Core6.3.5; Qwen3/Ollama/BM25 | Tracking Android thật; model sinh câu; ≥27/30 câu đúng | Video AR camera thật + raw 30 câu + thời gian |
+| AR + deep learning /20 | FarmAR, AR Foundation/Core6.3.5; Qwen3/Ollama/BM25 | Tracking Android thật; model chọn mục hướng dẫn; ≥27/30 câu đúng | Video AR camera thật + raw 30 câu + thời gian |
 | Mobile /20 | FarmControls/FarmInput/MobileUI; APK ARM64 | Toàn bộ luồng chạm, 15 phút trung bình≥30FPS | APK + thiết bị/OS + screen recording + đo FPS |
 | IO cloud /20 | FarmServices + FarmCloud, Adafruit IO TLS | Telemetry/dashboard/lệnh thật, offline/trùng/phiên | Video dashboard và game cùng lúc |
 | Docker /20 | Dockerfile, compose, Start-Services | Checkout sạch → Compose → model → API từ điện thoại | docker compose ps/log, health, video |
@@ -19,7 +19,7 @@ Không tự quy đổi các mục dưới đây thành 100/100; giảng viên ch
 | Testing | TEST_RESULTS.md, bộ test Unity/backend, bộ 30 câu |
 | Evidence of integration | Evidence/Rubric + video theo DEMO.md; phần chưa thực hiện ghi pending |
 | Documentation | README, CHOI_GAME, CODEX_HANDOFF, hướng dẫn kết nối/build |
-| Demonstration | DEMO.md chuẩn bị luồng; cần bổ sung video thật, không coi kịch bản là video |
+| Demonstration | demo-pc-automated.mp4 đã ghi game/model thật trên PC; DEMO.md hướng dẫn video Android/AR/cloud còn thiếu |
 
 ## Checklist chủ dự án (chưa đánh dấu tự động)
 

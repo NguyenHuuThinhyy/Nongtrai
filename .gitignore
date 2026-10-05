@@ -6,32 +6,23 @@
 /UserSettings/
 # Checked-in playable release; other build outputs remain local.
 /Builds/*
-!/Builds/Windows-NumberMemory/
-/Builds/Windows-NumberMemory/*
-!/Builds/Windows-NumberMemory/NongTrai.exe
-!/Builds/Windows-NumberMemory/UnityPlayer.dll
-!/Builds/Windows-NumberMemory/UnityCrashHandler64.exe
-!/Builds/Windows-NumberMemory/NongTrai_Data/
-!/Builds/Windows-NumberMemory/MonoBleedingEdge/
-!/Builds/Windows-NumberMemory/D3D12/
-
-# Delivered Windows build with the restaurant expansion.
-!/Builds/Windows-Restaurant/
-/Builds/Windows-Restaurant/*
-!/Builds/Windows-Restaurant/NongTrai.exe
-!/Builds/Windows-Restaurant/UnityPlayer.dll
-!/Builds/Windows-Restaurant/UnityCrashHandler64.exe
-!/Builds/Windows-Restaurant/NongTrai_Data/
-!/Builds/Windows-Restaurant/MonoBleedingEdge/
-!/Builds/Windows-Restaurant/D3D12/
+!/Builds/Windows-Rubric/
+/Builds/Windows-Rubric/*
+!/Builds/Windows-Rubric/NongTrai.exe
+!/Builds/Windows-Rubric/UnityPlayer.dll
+!/Builds/Windows-Rubric/UnityCrashHandler64.exe
+!/Builds/Windows-Rubric/NongTrai_Data/
+!/Builds/Windows-Rubric/MonoBleedingEdge/
+!/Builds/Windows-Rubric/D3D12/
+!/Builds/Android/
+/Builds/Android/*
+!/Builds/Android/NongTrai.apk
 *.csproj
 *.sln
 *.slnx
 
 /Recovery/
 /DongGoi/*
-!/DongGoi/NongTrai-Windows-NumberMemory-20261002.zip
-!/DongGoi/NongTrai-Unity-NumberMemory-20261002.zip
 !/DongGoi/RELEASE-MANIFEST.json
 !/DongGoi/SHA256SUMS.txt
 !/DongGoi/HUONG_DAN_NHOM.md
