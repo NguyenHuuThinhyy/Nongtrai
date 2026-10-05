@@ -42,6 +42,10 @@ jobs:
         env:
           FARM_EVAL_KEY: ci-local-evidence-only
         run: python Backend/tests/evaluate_model.py --api http://127.0.0.1:8000 --output Evidence/Rubric/ci/chat-30-container.json
+      - name: Real follow-up and out-of-scope response
+        env:
+          FARM_EVAL_KEY: ci-local-evidence-only
+        run: python Backend/tests/test_live_conversation.py --api http://127.0.0.1:8000 --output Evidence/Rubric/ci/conversation.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
