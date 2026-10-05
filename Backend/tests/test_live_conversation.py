@@ -46,4 +46,14 @@ with httpx.Client(base_url=args.api, timeout=100,
     output.write_text(json.dumps(records, ensure_ascii=False, indent=2), encoding="utf-8")
     outside.raise_for_status()
     assert not outside.json()["sources"] and "Chưa có thông tin" in outside.json()["answer"]
-print("PASS real model follow-up and out-of-scope fallback")
+    for question,source,facts in [
+        ("AR PC dùng webcam thế nào?","Nông trại AR",["PC","webcam","thủ công"]),
+        ("Phím nào mở chatbot và ẩn hướng dẫn?","Trợ lý AI và kết nối",["C","H","backend"]),
+    ]:
+        answer=client.post("/v1/chat",json={"question":question})
+        records.append({"question":question,"status":answer.status_code,"response":answer.json()})
+        output.write_text(json.dumps(records,ensure_ascii=False,indent=2),encoding="utf-8")
+        answer.raise_for_status()
+        assert answer.json()["generated"] and source in answer.json()["sources"]
+        assert all(fact in answer.json()["answer"] for fact in facts)
+print("PASS real model follow-up, out-of-scope fallback and PC AR/C/H instructions")

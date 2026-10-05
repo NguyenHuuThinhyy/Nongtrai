@@ -143,6 +143,9 @@ class APITests(unittest.TestCase):
         for case in cases:
             with self.subTest(case["question"]):
                 self.assertIn(case["section"], [s["id"] for s in main.knowledge.search(case["question"])])
+        for question,section in [("AR PC dùng webcam thế nào?","ar"),("Phím nào mở chatbot và ẩn hướng dẫn?","chat")]:
+            with self.subTest(question):
+                self.assertIn(section,[s["id"] for s in main.knowledge.search(question)])
         unity = Path(__file__).resolve().parents[2] / "Assets/Farm/Resources/FarmTechnology/knowledge.json"
         self.assertEqual(unity.read_bytes(), Path(main.__file__).with_name("knowledge.json").read_bytes())
 
