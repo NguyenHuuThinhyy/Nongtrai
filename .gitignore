@@ -27,6 +27,7 @@
 !/DongGoi/SHA256SUMS.txt
 !/DongGoi/HUONG_DAN_NHOM.md
 /Nongtrai/
+/Nongtrai-*/
 
 # Unity/IDE files regenerated on each machine.
 /.vs/

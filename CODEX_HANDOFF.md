@@ -1,10 +1,10 @@
 # Handoff — nhánh rubric Android / AR / AI / Cloud
 
 © HThinh.yy. Nền bf7d0b3. Nhánh codex/rubric-mobile-ar-ai-cloud.
-Worktree D:/GAME_NongTrai/Nongtrai-Rubric; dự án cũ D:/GAME_NongTrai giữ nguyên.
-Clone sạch để chủ dự án test: D:/GAME_NongTrai/Nongtrai-Moi, cùng nhánh rubric.
+Dự án đang dùng: D:/GAME_NongTrai, cùng nhánh rubric. Chạy CHAY_GAME.bat tại đây.
+Các clone lồng Nongtrai/Nongtrai-Moi/Nongtrai-Rubric đã được hợp nhất thành một checkout.
 Không merge main trước khi người dùng tự test và xác nhận. Không chạy builder dựng scene.
-Backup trước sửa: Recovery/Before-Rubric-20261004 (ngoài Git/source zip).
+Source cũ và backup trước sửa được cất riêng trong D:/NongTrai_LuuTru (ngoài Git/source zip).
 
 ## Triển khai
 

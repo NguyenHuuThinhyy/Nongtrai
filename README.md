@@ -28,6 +28,10 @@ không huấn luyện lại. Các phần điện thoại/AR/cloud thật còn ph
 
 ## Mở và build
 
+Trên máy chủ dự án, chỉ dùng **D:\GAME_NongTrai**: mở thư mục này trong Unity Hub
+hoặc chạy `CHAY_GAME.bat`. Source cũ được cất riêng tại `D:\NongTrai_LuuTru`;
+không chép đè vào dự án đang dùng. Các gói trong `DongGoi` đều là bản thử ngày 05/10/2026.
+
 Clone đúng nhánh để có các phần công nghệ mới:
 
 ```powershell
