@@ -4,7 +4,7 @@ $ErrorActionPreference='Stop'
 $project=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $exe=Join-Path $project 'Builds/Windows-Rubric/NongTrai.exe'
 New-Item -ItemType Directory -Path (Join-Path $project 'Logs') -Force | Out-Null
-$log=Join-Path $project ('Logs/smoke-'+$Suite.ToLowerInvariant()+$(if($Touch){'-touch'})+'.log')
+$log=Join-Path $project ('Logs/smoke-'+$Suite.ToLowerInvariant()+$(if($Touch){'-touch'})+'-'+(Get-Date -Format 'yyyyMMdd-HHmmss')+'.log')
 $arguments=@('-farmMute','-farmSmokeCheck','-screen-width','1280','-screen-height','720','-screen-fullscreen','0','-logFile',('"'+$log+'"'))
 $marker=switch($Suite){
     'Full'{$arguments+='-farmArtCheck';'FARM_CROPS_SMOKE_OK'}

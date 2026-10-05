@@ -58,7 +58,7 @@ namespace NongTrai
             yield return new WaitForEndOfFrame();Capture("01-chat.png");services.Close();Require(!player.Paused&&Vector3.Distance(position,player.transform.position)<.05f,"chat changed player state");
             services.OpenConnection();yield return new WaitForEndOfFrame();Capture("02-connection.png");services.Close();services.DisableCloud();
             Require(!services.CloudConnected&&services.RemotePumpEnabled,"cloud fallback disabled irrigation");
-            var ar=FarmAR.Instance;var gameplayCamera=Camera.main;
+            var ar=FarmAR.Instance;var gameplayCamera=Camera.main;var arPosition=player.transform.position;
             ar.Open();Require(ar.Active&&ar.DesktopPreview&&player.Paused&&!gameplayCamera.enabled,"PC AR view did not open/pause/isolate camera");
             Require(!ar.WebcamActive,"PC AR opened webcam without explicit button");
             var pcCamera=Array.Find(UnityEngine.Object.FindObjectsByType<Camera>(FindObjectsSortMode.None),c=>c.name=="PC farm AR camera");
@@ -69,7 +69,7 @@ namespace NongTrai
             ar.ResetPlacement();yield return new WaitForEndOfFrame();Capture("05-ar-pc.png",pcCamera);
             FarmControls.Keys[Key.C].Set(true);yield return null;yield return null;Require(services.ChatPanel.activeSelf&&ar.Active,"C from PC AR lost AR state");
             FarmControls.ReleaseAll();services.Close();Require(ar.Active&&player.Paused&&!gameplayCamera.enabled,"return from chatbot resumed game behind AR");
-            ar.Close();yield return null;Require(!ar.Active&&gameplayCamera.enabled&&!player.Paused&&Vector3.Distance(position,player.transform.position)<.05f,"PC AR close changed gameplay state");
+            ar.Close();Require(!ar.Active&&gameplayCamera.enabled&&!player.Paused&&Vector3.Distance(arPosition,player.transform.position)<.001f,"PC AR close changed gameplay state");yield return null;
             ar.Open();Require(ar.Active&&ar.DesktopPreview,"PC AR failed reopening");ar.Close();yield return null;
             bool providerFinished=false;FarmARProviderSetup.Run(ProviderProbe(()=>providerFinished=true));
             yield return null;yield return null;
