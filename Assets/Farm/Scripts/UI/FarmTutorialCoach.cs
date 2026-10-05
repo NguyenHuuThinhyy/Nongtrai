@@ -8,6 +8,7 @@ namespace NongTrai
     {
         public static FarmTutorialCoach Instance {get;private set;}
         public bool Completed {get;private set;}
+        public bool Visible=>panel!=null&&panel.activeSelf;
         GameObject panel;TextMeshProUGUI title,body;FarmHud hud;int page;float autoHide;
         readonly string[] titles={"1/7 • DI CHUYỂN","2/7 • CHỌN DỤNG CỤ","3/7 • TRỒNG CÂY","4/7 • NƯỚC & VẬT NUÔI",
             "5/7 • CHẾ TẠO & ĐƠN HÀNG","6/7 • KHÁM PHÁ & XÂY DỰNG","7/7 • LƯU TIẾN ĐỘ"};
@@ -38,12 +39,13 @@ namespace NongTrai
             var help=FarmUi.Button(parent," ",new Vector2(-90,-340),new Vector2(58,58),Toggle);
             var hr=help.GetComponent<RectTransform>();hr.anchorMin=hr.anchorMax=hr.pivot=new Vector2(1,1);hr.anchoredPosition=new Vector2(-90,-340);
             FarmItemIconLibrary.Attach(help.transform,0,new Vector2(8,-8),new Vector2(42,42)).sprite=FarmItemIconLibrary.Get(58);
-            panel=FarmUi.Panel(parent,"Hướng dẫn từng bước",new Vector2(650,245));
+            panel=FarmUi.Panel(parent,"Hướng dẫn từng bước",new Vector2(650,278));
             var r=panel.GetComponent<RectTransform>();r.anchorMin=r.anchorMax=r.pivot=new Vector2(1,1);r.anchoredPosition=new Vector2(-24,-410);
             title=FarmUi.TmpLabel(panel.transform,"",new Vector2(20,-14),new Vector2(610,42),24);
             body=FarmUi.TmpLabel(panel.transform,"",new Vector2(20,-68),new Vector2(610,102),20);
-            FarmUi.Button(panel.transform,"Tiếp ▶",new Vector2(395,-184),new Vector2(230,48),Next);
-            FarmUi.Button(panel.transform,"Ẩn hướng dẫn",new Vector2(20,-184),new Vector2(355,48),Skip);
+            FarmUi.TmpLabel(panel.transform,FarmControls.Mobile?"Chạm Ẩn hướng dẫn để đóng bảng này.":"H: ẩn/hiện bảng hướng dẫn • C: mở chatbot",new Vector2(20,-174),new Vector2(610,30),17);
+            FarmUi.Button(panel.transform,"Tiếp ▶",new Vector2(395,-216),new Vector2(230,48),Next);
+            FarmUi.Button(panel.transform,FarmControls.Mobile?"Ẩn hướng dẫn":"Ẩn hướng dẫn [H]",new Vector2(20,-216),new Vector2(355,48),Skip);
             Refresh();
         }
         void Update()

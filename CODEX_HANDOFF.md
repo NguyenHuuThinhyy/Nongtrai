@@ -18,6 +18,10 @@ Source cũ và backup trước sửa được cất riêng trong D:/NongTrai_Luu
   save22. Cloud chỉ trạm0 đã xây; loss/offline trở về local. FarmWaterSystem kiểm gate mới.
 - FarmAR: ARSession/XROrigin/pose/plane/raycast/anchor tạo khi mở; layer30 tách
   rendering/raycast; pause/camera phục hồi; lightweight licensed models, cây snapshot.
+  PC mở miniature trực tiếp, đặt thủ công/xoay/phóng, nền WebCamTexture chỉ khi bấm Bật webcam;
+  không coi PC mode là ARCore plane tracking. C mở chat và quay về AR giữ trạng thái.
+  H ẩn/hiện tutorial, phím được ghi trong bảng. Sàn nhà hàng tách nền hiển thị khỏi collider,
+  các slab/chiếu nghỉ không chồng mặt; có regression checks, độ cao tầng/save giữ nguyên.
 - FarmTechnologyBuild: saved-scene-only Windows/Android; XR/renderer/config tự cấu hình
   không sửa scene/prefab. ARFoundation/Core6.3.5, AndroidOptional, ARM64 IL2CPP/API26–36.
 - Backend: FastAPI0.115.12, MQTTpaho2.1TLS, BM25Vietnamese, Ollama0.12.3/Qwen3:1.7b.

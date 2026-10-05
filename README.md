@@ -10,6 +10,8 @@ Nhánh **codex/rubric-mobile-ar-ai-cloud**, phát triển từ `bf7d0b3`.
 - [Tải bản thử Windows, APK và source Unity](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/rubric-preview-20261005).
 - Trong checkout nhánh này, chạy **CHAY_GAME.bat** hoặc `Builds/Windows-Rubric/NongTrai.exe`; giữ nguyên cả thư mục build.
 - [Hướng dẫn cho nhóm](HUONG_DAN_NHOM.md), [cách chơi](CHOI_GAME.md), [nhà hàng](HUONG_DAN_NHA_HANG.md).
+- **C** mở chatbot; **H** ẩn/hiện hướng dẫn. Menu **Nông trại AR** mở được trên PC:
+  xoay/phóng/đặt thủ công, bật webcam nếu có. Android dùng ARCore để dò bàn/sàn.
 - [Thiết lập Android/AR/chat/cloud/Docker](Docs/RUBRIC_INTEGRATION.md), [kết quả test](Docs/TEST_RESULTS.md), [checklist người dùng](Docs/ACCEPTANCE.md), [kịch bản demo](Docs/DEMO.md).
 - Commit nguồn và SHA256 của các gói ở [DongGoi](DongGoi). ZIP Unity không chứa Library/cache; Unity tự tạo lại khi mở.
 

@@ -33,6 +33,14 @@ namespace NongTrai
             FarmControls.ReleaseAll();FarmControls.ForceTouch=previous;
             FarmControls.ForceTouch=true;Require(FarmControls.DisplayHint("Chuột trái [R]")=="Dùng [Xoay]","touch hints still use keyboard/mouse");FarmControls.ForceTouch=previous;
             hud.mainMenu.SetActive(false);player.SetPaused(false);var position=player.transform.position;
+            var coach=FarmTutorialCoach.Instance;bool completed=coach.Completed;coach.Restore(false);
+            FarmControls.Keys[Key.H].Set(true);yield return null;yield return null;Require(!coach.Visible,"H did not hide tutorial");
+            FarmControls.Keys[Key.H].Set(false);yield return null;yield return null;
+            FarmControls.Keys[Key.H].Set(true);yield return null;yield return null;Require(coach.Visible,"H did not reopen tutorial");
+            FarmControls.ReleaseAll();coach.Restore(completed);
+            FarmControls.Keys[Key.C].Set(true);yield return null;yield return null;
+            Require(player.Paused&&services.ChatPanel.activeSelf,"C did not open chatbot");
+            FarmControls.ReleaseAll();services.Close();yield return null;
             services.OpenChat("Xô nước");Require(player.Paused&&services.ChatPanel.activeSelf,"chat did not pause game");
             if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmServicesLive")>=0)
             {
@@ -47,7 +55,19 @@ namespace NongTrai
             yield return new WaitForEndOfFrame();Capture("01-chat.png");services.Close();Require(!player.Paused&&Vector3.Distance(position,player.transform.position)<.05f,"chat changed player state");
             services.OpenConnection();yield return new WaitForEndOfFrame();Capture("02-connection.png");services.Close();services.DisableCloud();
             Require(!services.CloudConnected&&services.RemotePumpEnabled,"cloud fallback disabled irrigation");
-            FarmAR.Instance.Open();Require(!FarmAR.Instance.Active,"desktop incorrectly started physical AR");
+            var ar=FarmAR.Instance;var gameplayCamera=Camera.main;
+            ar.Open();Require(ar.Active&&ar.DesktopPreview&&player.Paused&&!gameplayCamera.enabled,"PC AR view did not open/pause/isolate camera");
+            Require(!ar.WebcamActive,"PC AR opened webcam without explicit button");
+            var pcCamera=Array.Find(UnityEngine.Object.FindObjectsByType<Camera>(FindObjectsSortMode.None),c=>c.name=="PC farm AR camera");
+            Require(pcCamera!=null&&pcCamera.enabled&&pcCamera.cullingMask==(1<<30),"PC AR camera missing");
+            var oldView=pcCamera.transform.position;ar.RotateDesktop(30,10);ar.ZoomDesktop(-.15f);
+            Require(Vector3.Distance(oldView,pcCamera.transform.position)>.1f,"PC rotate/zoom did not move view");
+            var pcModel=pcCamera.transform.parent.Find("Nông trại AR thu nhỏ");ar.PlaceDesktop(new Vector3(.2f,8,.1f));Require(pcModel.localPosition==new Vector3(.2f,0,.1f),"PC manual placement did not keep model on plane");
+            ar.ResetPlacement();yield return new WaitForEndOfFrame();Capture("05-ar-pc.png",pcCamera);
+            FarmControls.Keys[Key.C].Set(true);yield return null;yield return null;Require(services.ChatPanel.activeSelf&&ar.Active,"C from PC AR lost AR state");
+            FarmControls.ReleaseAll();services.Close();Require(ar.Active&&player.Paused&&!gameplayCamera.enabled,"return from chatbot resumed game behind AR");
+            ar.Close();yield return null;Require(!ar.Active&&gameplayCamera.enabled&&!player.Paused&&Vector3.Distance(position,player.transform.position)<.05f,"PC AR close changed gameplay state");
+            ar.Open();Require(ar.Active&&ar.DesktopPreview,"PC AR failed reopening");ar.Close();yield return null;
             bool providerFinished=false;FarmARProviderSetup.Run(ProviderProbe(()=>providerFinished=true));
             yield return null;yield return null;
             var providerOwner=UnityEngine.Object.FindFirstObjectByType<FarmARProviderSetup>();
@@ -66,20 +86,20 @@ namespace NongTrai
             var canvas=hud.GetComponentInParent<Canvas>();canvas.enabled=false;yield return new WaitForEndOfFrame();Capture("03-miniature-desktop-preview.png",camera);canvas.enabled=true;main.enabled=cameraWasEnabled;UnityEngine.Object.Destroy(preview);UnityEngine.Object.Destroy(holder);yield return null;
             sample.Restore(oldState,oldCrop,oldGrowth,oldMoisture,oldMutation);hud.Resume();
             if(FarmControls.Mobile){yield return new WaitForSecondsRealtime(6.2f);Capture("04-touch-desktop-layout.png");}
-            Debug.Log("FARM_TECHNOLOGY_OK: touch edges, packaged data, manual, pause, cloud fallback and miniature. Physical AR/device/cloud/model acceptance is separate.");
+            Debug.Log("FARM_TECHNOLOGY_OK: touch edges, C chatbot, H tutorial, PC AR view/rotate/zoom/reopen/chat return, packaged data, pause, cloud fallback and miniature. Webcam/physical AR/device/cloud/model acceptance is separate.");
         }
         static IEnumerator ProviderProbe(Action finished){yield return null;finished();}
         static void Capture(string name,Camera camera=null)
         {
             // Explicit rendering works for a hidden Windows smoke window too.
             camera=camera??Camera.main;string folder=Path.Combine(Application.temporaryCachePath,"TechnologyChecks");Directory.CreateDirectory(folder);
-            var canvases=new System.Collections.Generic.List<(Canvas canvas,RenderMode mode,Camera camera,float distance)>();
+            int oldMask=camera.cullingMask;var canvases=new System.Collections.Generic.List<(Canvas canvas,RenderMode mode,Camera camera,float distance)>();
             foreach(var canvas in UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None))
                 if(canvas.enabled&&canvas.gameObject.activeInHierarchy&&canvas.renderMode==RenderMode.ScreenSpaceOverlay)
-                {canvases.Add((canvas,canvas.renderMode,canvas.worldCamera,canvas.planeDistance));canvas.renderMode=RenderMode.ScreenSpaceCamera;canvas.worldCamera=camera;canvas.planeDistance=.1f+camera.nearClipPlane;}
+                {canvases.Add((canvas,canvas.renderMode,canvas.worldCamera,canvas.planeDistance));canvas.renderMode=RenderMode.ScreenSpaceCamera;canvas.worldCamera=camera;canvas.planeDistance=.1f+camera.nearClipPlane;camera.cullingMask|=1<<canvas.gameObject.layer;}
             Canvas.ForceUpdateCanvases();var target=new RenderTexture(1280,720,24);var oldTarget=camera.targetTexture;var oldActive=RenderTexture.active;
             camera.targetTexture=target;camera.Render();RenderTexture.active=target;var texture=new Texture2D(1280,720,TextureFormat.RGB24,false);texture.ReadPixels(new Rect(0,0,1280,720),0,0);texture.Apply();File.WriteAllBytes(Path.Combine(folder,name),texture.EncodeToPNG());
-            camera.targetTexture=oldTarget;RenderTexture.active=oldActive;foreach(var saved in canvases){saved.canvas.renderMode=saved.mode;saved.canvas.worldCamera=saved.camera;saved.canvas.planeDistance=saved.distance;}
+            camera.targetTexture=oldTarget;camera.cullingMask=oldMask;RenderTexture.active=oldActive;foreach(var saved in canvases){saved.canvas.renderMode=saved.mode;saved.canvas.worldCamera=saved.camera;saved.canvas.planeDistance=saved.distance;}
             target.Release();UnityEngine.Object.Destroy(target);UnityEngine.Object.Destroy(texture);
         }
     }

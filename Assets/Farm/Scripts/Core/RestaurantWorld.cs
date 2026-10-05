@@ -111,7 +111,10 @@ namespace NongTrai
                 }
                 foreach(var tree in FindObjectsByType<FarmDecorTree>(FindObjectsSortMode.None))if(tree.transform.position.z<-33&&tree.transform.position.x>-7&&tree.transform.position.x<12)tree.gameObject.SetActive(false);
             }
-            Box(transform,"Nền khu nhà hàng",new Vector3(20,-.25f,-80),new Vector3(140,.5f,60),new Color(.38f,.5f,.24f));
+            // Separate the visible foundation from the ground floor, while retaining
+            // the original collider surface at y=0 for the surrounding approach.
+            var foundation=Box(transform,"Nền khu nhà hàng",new Vector3(20,-.30f,-80),new Vector3(140,.5f,60),new Color(.38f,.5f,.24f));
+            foundation.GetComponent<BoxCollider>().center=Vector3.up*.1f;
             Box(transform,"Đường vào nhà hàng",new Vector3(7,.025f,-46),new Vector3(18,.05f,25),new Color(.64f,.55f,.39f),"Tiles074");
         }
         void FloorAroundStair(int floor,float y,Color wood)
@@ -119,11 +122,13 @@ namespace NongTrai
             if(floor==0){Box(Shell,"Sàn trệt",new Vector3(0,y-.15f,0),new Vector3(48,.3f,40),wood,"WoodFloor023");return;}
             // The wide U-stair opening is cut from each upper slab. A shared landing strip
             // reconnects the top of one flight to the bottom of the next.
-            Box(Shell,"Sàn phía tây",new Vector3(-23.65f,y-.15f,0),new Vector3(.7f,.3f,40),wood,"WoodFloor023");
+            Box(Shell,"Sàn phía tây",new Vector3(-23.5f,y-.15f,0),new Vector3(1,.3f,40),wood,"WoodFloor023");
             Box(Shell,"Sàn phía đông",new Vector3(3.5f,y-.15f,0),new Vector3(41,.3f,40),wood,"WoodFloor023");
-            Box(Shell,"Sàn dưới cầu thang",new Vector3(-20,y-.15f,-15),new Vector3(6,.3f,10),wood,"WoodFloor023");
+            const float landingDepth=1.35f;
+            float lowerEdge=StairBottomZ-landingDepth*.5f;
+            Box(Shell,"Sàn dưới cầu thang",new Vector3(-20,y-.15f,(-20+lowerEdge)*.5f),new Vector3(6,.3f,lowerEdge+20),wood,"WoodFloor023");
             Box(Shell,"Sàn trên cầu thang",new Vector3(-20,y-.15f,8),new Vector3(6,.3f,24),wood,"WoodFloor023");
-            Box(Shell,"Chiếu nghỉ nối tầng",new Vector3(-20,y-.15f,StairBottomZ),new Vector3(6.2f,.3f,1.35f),wood,"WoodFloor023");
+            Box(Shell,"Chiếu nghỉ nối tầng",new Vector3(-20,y-.15f,StairBottomZ),new Vector3(6,.3f,landingDepth),wood,"WoodFloor023");
         }
         void DiningLights(int floor,float y)
         {

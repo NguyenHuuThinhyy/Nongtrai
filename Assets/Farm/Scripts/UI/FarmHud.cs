@@ -136,7 +136,7 @@ namespace NongTrai
         void OnEnable() { interaction.Message += ShowMessage; player.PauseChanged += OnPause; }
         void OnDisable() { interaction.Message -= ShowMessage; player.PauseChanged -= OnPause; }
         void OnPause(bool paused)
-        { RefreshModeButtons();if(FarmNumberMemory.Instance!=null&&FarmNumberMemory.Instance.IsOpen){gameplayChrome.SetActive(false);pausePanel.SetActive(false);return;} if(FarmRunner.Instance!=null&&FarmRunner.Instance.IsRunning){gameplayChrome.SetActive(false);pausePanel.SetActive(false);return;}
+        { RefreshModeButtons();if(FarmAR.Instance!=null&&FarmAR.Instance.Active){gameplayChrome.SetActive(false);pausePanel.SetActive(false);return;}if(FarmNumberMemory.Instance!=null&&FarmNumberMemory.Instance.IsOpen){gameplayChrome.SetActive(false);pausePanel.SetActive(false);return;} if(FarmRunner.Instance!=null&&FarmRunner.Instance.IsRunning){gameplayChrome.SetActive(false);pausePanel.SetActive(false);return;}
           if(gameplayChrome!=null) gameplayChrome.SetActive(!paused);
           pausePanel.SetActive(paused && (mainMenu==null || !mainMenu.activeSelf) && (settingsPanel==null || !settingsPanel.activeSelf));instructions.SetActive(false);
           if(!paused) { if(mainMenu!=null) mainMenu.SetActive(false);if(settingsPanel!=null) settingsPanel.SetActive(false); } }

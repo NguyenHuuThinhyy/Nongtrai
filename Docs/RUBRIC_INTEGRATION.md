@@ -156,7 +156,19 @@ Runner có nút trái/phải/nhảy/trượt. Câu cá và nhà hàng dùng nút
 UI lớn tự co theo màn hình; điều khiển world dùng safe area.
 Windows có thể xem bố cục chạm bằng `NongTrai.exe -farmTouch`.
 
-### AR thật
+### AR trên PC
+
+Menu → **Nông trại AR** mở mô hình của ruộng hiện tại. Giữ chuột phải xoay,
+lăn chuột phóng, click nền trống để đặt mô hình trên mặt phẳng ảo; click cây/công trình
+để xem thông tin. Có nút xoay/phóng thay chuột, **Đặt lại**, **Hỏi trợ lý [C]** và **Đóng AR**.
+**Bật webcam** ghép nông trại lên hình camera, **Tắt webcam** giải phóng thiết bị.
+Không tự mở webcam khi vào màn hình; mất quyền, thiếu camera hoặc camera bận có thông báo.
+Mô hình PC đặt thủ công, không dò mặt phẳng/tracking chuyển động camera.
+Xử lý luồng camera dùng [Unity WebCamTexture](https://docs.unity3d.com/6000.3/Documentation/ScriptReference/WebCamTexture.html).
+Phiên chơi tạm dừng; đóng AR phục hồi camera/vị trí. **C** mở chatbot trong game hoặc AR,
+chat cần backend như phần thiết lập trên; **H** ẩn/hiện bảng hướng dẫn khi chơi.
+
+### AR tracking trên Android
 
 Dùng thiết bị trong [danh sách ARCore](https://developers.google.com/ar/devices).
 Menu → **Nông trại AR** → cho phép camera → quét bàn/sàn → chạm đặt.
