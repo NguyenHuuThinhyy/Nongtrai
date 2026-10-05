@@ -95,7 +95,9 @@ async def chat(body: Chat):
     generic = set(tokens("giá bao nhiêu mấy mất tốn lâu giây nữa còn thế vậy nó cái đó tổng thêm như hết lần một phải rồi thì đầy rỗng"))
     subject = set(tokens(body.question)) - STOP_WORDS - generic
     previous = next((m.content[:600] for m in reversed(body.history) if m.role == "user"), "")
-    related = knowledge.search(previous + " " + body.question if previous and not subject else body.question)
+    followup = bool(previous and not subject)
+    resolved_question = previous + "\nCâu hỏi tiếp theo về cùng chủ đề: " + body.question if followup else body.question
+    related = knowledge.search(resolved_question)
     if not related and body.history:
         related = knowledge.search(body.question + " " + " ".join(m.content for m in body.history[-2:] if m.role == "user"))
     if not related:
@@ -116,7 +118,7 @@ async def chat(body: Chat):
     messages = [{"role": "system", "content": system}]
     # Bound the context on the 8 GB demo PC; the full history remains in the UI.
     messages.extend({"role": m.role, "content": m.content[:600]} for m in body.history[-4:])
-    messages.append({"role": "user", "content": body.question + ("\nNgữ cảnh hiện tại: " + body.context if body.context else "")})
+    messages.append({"role": "user", "content": resolved_question + ("\nNgữ cảnh hiện tại: " + body.context if body.context else "")})
     async with chat_lock:
         try:
             async with httpx.AsyncClient(timeout=httpx.Timeout(90, connect=5)) as client:

@@ -120,6 +120,8 @@ class APITests(unittest.TestCase):
         self.assertEqual(followup.status_code,200)
         self.assertIn("bow",observed["format"]["properties"]["section_id"]["enum"])
         self.assertIn("20 xu",followup.json()["answer"])
+        self.assertIn("Cung hỏng sửa thế nào?", observed["messages"][-1]["content"])
+        self.assertIn("Giá bao nhiêu?", observed["messages"][-1]["content"])
 
     def test_thirty_retrieval_questions_and_unity_manual_match(self):
         cases = json.loads(Path(__file__).with_name("chat-evaluation.json").read_text(encoding="utf-8"))

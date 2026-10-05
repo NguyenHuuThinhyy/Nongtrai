@@ -33,5 +33,5 @@ with httpx.Client(base_url=args.api, timeout=100,
     records.append({"question": "Thời tiết ở Sao Hỏa?", "status": outside.status_code, "response": outside.json()})
     output.write_text(json.dumps(records, ensure_ascii=False, indent=2), encoding="utf-8")
     outside.raise_for_status()
-    assert not outside.json()["generated"] and not outside.json()["sources"]
+    assert not outside.json()["sources"] and "Chưa có thông tin" in outside.json()["answer"]
 print("PASS real model follow-up and out-of-scope fallback")
