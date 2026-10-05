@@ -4,7 +4,7 @@
   "unity": "6000.3.22f1",
   "save_version": 22,
   "feature_branch": "codex/rubric-mobile-ar-ai-cloud",
-  "source_git_commit": "321a6e175f88b7b0d750c20df9df60cd1c3d0b7f",
+  "source_git_commit": "b29e1ccaa964f19d059d2ed4d0d96d5039a929eb",
   "build_source_commit": "a2ed11350329a320d80bba7baed5c5a815d1ce74",
   "runtime_bytes": 153019378.0,
   "farm_scene_sha256": "c6566d428bb42535efeb421c376cf984eec5e761be6da945d10ed251bd179416",
@@ -20,9 +20,9 @@
       "bytes": 52548958
     },
     {
-      "sha256": "d26dc524cc5517f3fb7334b08fe4b2de0247629a385e71535acb68b9fb9a23e3",
+      "sha256": "40967140a8bf0c283b25e1fba0b7eb7c0b240c4fc4f76531d3803c05151e8894",
       "file": "NongTrai-Unity-Rubric-20261005.zip",
-      "bytes": 67183199
+      "bytes": 64866448
     }
   ],
   "physical_android_ar_cloud_acceptance": "pending",
