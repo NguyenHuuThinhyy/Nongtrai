@@ -1,9 +1,9 @@
 {
   "windows_runtime_files": 182,
-  "windows_runtime_bytes": 153019378.0,
-  "android_apk_bytes": 52548958,
-  "android_apk_sha256": "dda438a6e4312ea4cc77985a14dedf5e41e80f089289c189e829627bb612f6e7",
-  "unity_source_commit": "a2ed11350329a320d80bba7baed5c5a815d1ce74",
-  "backend_source_commit": "d8f91b7e53b8938ac044fe498aae277533cc29d0",
-  "physical_device": "none connected; adb devices empty on 2026-10-05"
+  "windows_runtime_bytes": 153031954.0,
+  "android_apk_bytes": 52592078,
+  "android_apk_sha256": "c0dfdff5c645c9093b1e0c68672f215d84ebcc0d4f0af63fb72f00a0cfea46c3",
+  "unity_source_commit": "896faef59e961085c6dcb0284b9af78fe53b9fce",
+  "backend_source_commit": "a7dcc3b6ad56f2daa101f0ddad8bd8c6a45e6731",
+  "physical_device": "none connected; physical Android and webcam testing pending"
 }

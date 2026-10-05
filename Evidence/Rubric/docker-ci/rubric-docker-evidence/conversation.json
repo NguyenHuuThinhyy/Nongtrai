@@ -57,5 +57,31 @@
       "model": "qwen3:1.7b",
       "generated": false
     }
+  },
+  {
+    "question": "AR PC dùng webcam thế nào?",
+    "status": 200,
+    "response": {
+      "answer": "Menu → Nông trại AR mở được trên PC và Android. PC: chuột phải xoay, lăn chuột phóng, click nền trống để đặt mô hình thủ công; click cây/công trình xem thông tin. Bật webcam ghép nông trại lên nền camera; không có webcam vẫn xem mô hình 3D được. PC không dò bàn/sàn hay tracking tự động. Android hỗ trợ ARCore: cho phép camera, quét bàn/sàn rồi chạm để đặt; hai ngón xoay/phóng. C hoặc Hỏi trợ lý mở chat trong AR. Đóng AR trở về phiên chơi đúng vị trí.",
+      "sources": [
+        "Nông trại AR"
+      ],
+      "model": "qwen3:1.7b",
+      "generated": true,
+      "generation_mode": "extractive"
+    }
+  },
+  {
+    "question": "Phím nào mở chatbot và ẩn hướng dẫn?",
+    "status": 200,
+    "response": {
+      "answer": "PC nhấn C để mở chatbot khi chơi hoặc trong AR; H ẩn/hiện bảng hướng dẫn khi chơi. Android mở Trợ lý AI trong Menu. Chatbot dùng Qwen3 1.7B chạy trên PC qua Ollama/Docker. Điện thoại cần cùng Wi-Fi và PC đang chạy backend. Nhập địa chỉ PC và mã trong Cài đặt kết nối. Trợ lý trả lời theo hướng dẫn và không cấp đồ/đổi gameplay. Khi mất kết nối vẫn đọc Hướng dẫn có sẵn. Backend cần tải model trước khi chat.",
+      "sources": [
+        "Trợ lý AI và kết nối"
+      ],
+      "model": "qwen3:1.7b",
+      "generated": true,
+      "generation_mode": "extractive"
+    }
   }
 ]

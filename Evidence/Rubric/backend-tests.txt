@@ -1,3 +1,4 @@
+Source backend: a7dcc3b6ad56f2daa101f0ddad8bd8c6a45e6731
 test_cloud_not_configured_does_not_invent_success (__main__.APITests.test_cloud_not_configured_does_not_invent_success) ... ok
 test_model_request_contract_and_sources (__main__.APITests.test_model_request_contract_and_sources) ... ok
 test_pairing_and_validation (__main__.APITests.test_pairing_and_validation) ... ok
@@ -8,6 +9,6 @@ test_retained_message_reconnect_and_disconnect (__main__.CloudTests.test_retaine
 test_telemetry_rate_limit_and_exclusive_owner (__main__.CloudTests.test_telemetry_rate_limit_and_exclusive_owner) ... ok
 
 ----------------------------------------------------------------------
-Ran 8 tests in 0.134s
+Ran 8 tests in 0.140s
 
 OK

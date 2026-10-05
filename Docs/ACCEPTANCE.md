@@ -24,6 +24,8 @@ Không tự quy đổi các mục dưới đây thành 100/100; giảng viên ch
 ## Checklist chủ dự án (chưa đánh dấu tự động)
 
 - [ ] Windows: toàn bộ gameplay, cung/độ bền/nước/đồ/rương/hồi sinh đúng.
+- [ ] PC: C mở chat; H ẩn/hiện hướng dẫn; AR đặt/xoay/phóng và mở/đóng webcam thật, quay về game giữ vị trí/camera.
+- [ ] Nhà hàng: sàn cả ba tầng không nhấp nháy khi di chuyển camera, đi cầu thang bình thường.
 - [ ] Minigame 2D: 5/5 nhận 200 xu và đá theo quota; không thưởng trùng.
 - [ ] Android: ghi model máy, Android/version, resolution và cài được APK.
 - [ ] Android: joystick+vuốt+nhảy+chạy đa chạm; giữ/thả cung, đào, nước, đặt/xoay, creative.

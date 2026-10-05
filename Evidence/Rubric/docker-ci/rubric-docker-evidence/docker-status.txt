@@ -1,3 +1,3 @@
 NAME               IMAGE                  COMMAND                  SERVICE   CREATED          STATUS                    PORTS
-backend-api-1      backend-api            "uvicorn app.main:ap…"   api       38 seconds ago   Up 32 seconds (healthy)   0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp
-backend-ollama-1   ollama/ollama:0.12.3   "/bin/ollama serve"      ollama    38 seconds ago   Up 38 seconds (healthy)   11434/tcp
+backend-api-1      backend-api            "uvicorn app.main:ap…"   api       33 seconds ago   Up 28 seconds (healthy)   0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp
+backend-ollama-1   ollama/ollama:0.12.3   "/bin/ollama serve"      ollama    33 seconds ago   Up 33 seconds (healthy)   11434/tcp

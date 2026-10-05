@@ -39,7 +39,9 @@ Full smoke sửa thứ tự để FarmPolishChecks (cố tình bật Creative) c
 các kiểm tra normal Save sau đó sai. Không sửa quy tắc Creative/save để làm test qua.
 
 Backend/tests/test_services.py:8unit tests + BM2530câu; evaluate_model.py gọi model thật,
-raw response lưu Evidence/Rubric/chat-model-native.json, accuracy do đối chiếu riêng.
+raw response cuối lưu Evidence/Rubric/docker-ci/rubric-docker-evidence, accuracy do đối chiếu riêng.
+Unity build Windows/Android từ896faef; backend a7dcc3b: Docker CI đạt30/30 câu,
+cùng câu hỏi AR PC/webcam, C/H và hội thoại. Kết quả PC cũ vẫn ghi riêng theo commit.
 Xem Docs/TEST_RESULTS.md cho kết quả build/test cuối, không suy luận pass từ code có sẵn.
 
 Máy PC i3-1115G4/UHD/8GB. Android SDK36, NDKr27c, JDK17 đã cài cho Editor.

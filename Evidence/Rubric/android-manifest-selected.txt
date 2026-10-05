@@ -1,9 +1,14 @@
-      A: android:required(0x0101028e)=(type 0x12)0x0
-      A: android:required(0x0101028e)=(type 0x12)0x0
-      A: android:required(0x0101028e)=(type 0x12)0x0
+      A: android:name(0x01010003)="android.permission.CAMERA" (Raw: "android.permission.CAMERA")
       A: android:name(0x01010003)="android.hardware.camera" (Raw: "android.hardware.camera")
       A: android:required(0x0101028e)=(type 0x12)0x0
       A: android:name(0x01010003)="android.hardware.camera" (Raw: "android.hardware.camera")
+      A: android:required(0x0101028e)=(type 0x12)0x0
+      A: android:name(0x01010003)="android.hardware.camera.autofocus" (Raw: "android.hardware.camera.autofocus")
+      A: android:required(0x0101028e)=(type 0x12)0x0
+      A: android:name(0x01010003)="android.hardware.camera.front" (Raw: "android.hardware.camera.front")
+      A: android:required(0x0101028e)=(type 0x12)0x0
+      A: android:required(0x0101028e)=(type 0x12)0x0
+      A: android:required(0x0101028e)=(type 0x12)0x0
       A: android:required(0x0101028e)=(type 0x12)0x0
         A: android:name(0x01010003)="com.google.ar.core" (Raw: "com.google.ar.core")
       A: android:usesCleartextTraffic(0x010104ec)=(type 0x12)0xffffffff
