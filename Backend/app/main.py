@@ -97,7 +97,7 @@ async def chat(body: Chat):
     previous = next((m.content[:600] for m in reversed(body.history) if m.role == "user"), "")
     followup = bool(previous and not subject)
     resolved_question = previous + "\nCâu hỏi tiếp theo về cùng chủ đề: " + body.question if followup else body.question
-    related = knowledge.search(resolved_question)
+    related = knowledge.search(previous + " " + body.question if followup else body.question)
     if not related and body.history:
         related = knowledge.search(body.question + " " + " ".join(m.content for m in body.history[-2:] if m.role == "user"))
     if not related:
