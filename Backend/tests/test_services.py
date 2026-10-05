@@ -93,6 +93,10 @@ class APITests(unittest.TestCase):
         self.assertFalse(result["generated"])
         self.assertEqual(result["sources"], [])
         result = self.client.post("/v1/chat", headers=self.headers,
+            json={"question": "Thời tiết ở Sao Hỏa?"}).json()
+        self.assertFalse(result["generated"])
+        self.assertEqual(result["sources"], [])
+        result = self.client.post("/v1/chat", headers=self.headers,
             json={"question": "quantum astrophysics", "history": [{"role": "user", "content": "Cung hỏng sửa thế nào?"}]}).json()
         self.assertFalse(result["generated"])
         self.assertEqual(result["sources"], [])

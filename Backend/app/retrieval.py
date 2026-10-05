@@ -12,7 +12,7 @@ def tokens(text: str) -> list[str]:
     return re.findall(r"[a-z0-9]+", "".join(c for c in normalized if not unicodedata.combining(c)))
 
 
-STOP_WORDS = set(tokens("là gì làm sao thế nào tôi bạn có không trong của cho và với được game hỏi cách"))
+STOP_WORDS = set(tokens("là gì làm sao thế nào tôi bạn có không trong của cho và với được game hỏi cách ở khi thì rồi"))
 
 
 class Knowledge:
@@ -29,6 +29,11 @@ class Knowledge:
         # Common Vietnamese question particles must not retrieve unrelated game facts.
         words -= STOP_WORDS
         for i, doc in enumerate(self.docs):
+            # Multi-word questions need more than one coincidental word such
+            # as 'thời' or an accent-normalized 'hỏa/hóa'. Single-item queries
+            # still work; unsupported topics must not gain an unrelated source.
+            if len(words.intersection(doc)) < min(2, len(words)):
+                continue
             score = 0.0
             for word in words:
                 count = doc[word]
