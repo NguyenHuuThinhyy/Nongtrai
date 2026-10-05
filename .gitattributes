@@ -1,5 +1,7 @@
 # Preserve every byte of generated playable builds during clone and checkout.
 /Builds/** binary
+# Evidence hashes refer to captured bytes, including the original line endings.
+/Evidence/** -text
 /DongGoi/*.zip binary
 /DongGoi/*.apk binary
 /DongGoi/*.unitypackage binary

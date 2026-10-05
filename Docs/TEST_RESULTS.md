@@ -16,20 +16,21 @@ Nhánh `codex/rubric-mobile-ar-ai-cloud`; không gộp main trước xác nhận
 | Unity → HTTP → Qwen thật | PASS ngày 04/10 | `windows-services-native-1734.txt`, ảnh/chat/video: source `1734be7`, backend native; không phải Docker |
 | Backend unit + BM25 | PASS | 8 tests; 30 câu có mục đúng trong top3, dữ liệu hướng dẫn Unity/backend giống nhau; model contract dùng mock |
 | Model thật trên PC 8 GB | 27/30 đúng | `chat-model-pc-isolated.json` và review từng câu: Unity/game đã đóng, warm trung bình **15,494 s**, 0 lượt warm >30 s, lượt đầu 22,288 s |
-| Docker / model thật / hội thoại | Đang xác minh bản sửa cuối | Xem minh chứng CI cuối được cập nhật trước phát hành |
+| Docker / model thật / hội thoại | PASS trên CI, 27/30 nội dung đúng | Run37264020925 source d8f91b7: checkout sạch, hai container healthy, HTTP thật, warm **7,751 s**, 0 lượt >30 s; hai câu hỏi tiếp nối và hai câu ngoài phạm vi qua kiểm tra. Runner Ubuntu16GB, không thay thử PC/điện thoại |
 | APK Android ARM64 IL2CPP | PASS build/signature/manifest | 52.548.958 bytes (~50,11 MiB), API26→36, GLES3, ARCore Optional, HTTP LAN; chữ ký v2 hợp lệ. Chưa cài/chơi trên điện thoại |
+| Clone sạch / đủ runtime / khởi động | PASS | Nongtrai-Moi clone từ remote; 183 file EXE/data/APK có SHA256 giống bản đã test, Technology touch qua kiểm tra khi backend tắt |
 | Video PC tự động | PASS | MP4 1280×720/5FPS/29,4s: gameplay → thưởng 2D → HTTP/model → preview miniature. Preview cây dùng trạng thái mẫu, không ghi save |
 | Scene và save | PASS | Farm.unity giống main; SHA256 `c6566d428bb42535efeb421c376cf984eec5e761be6da945d10ed251bd179416`; save giữ22 và đọc21 |
 
 Các file minh chứng ở `Evidence/Rubric`. Mã build Unity và mã backend được ghi riêng;
-backend thay đổi tiếp nối hội thoại sau lượt đo PC, các câu độc lập trong bộ30 không đổi đường xử lý.
+Lượt PC đo ở source1734be7. Backend05/10 bổ sung xử lý hội thoại và lọc khớp từ đơn lẻ; thời gian trên PC của bản backend cuối chưa đo lại, CI kiểm riêng.
 PC: Intel i3-1115G4 / Intel UHD / khoảng8GB, Windows11; Python3.12.10,
 Ollama0.12.3, Qwen3:1.7b Q4_K_M (digest trong Backend/MODEL-MANIFEST.json).
 Chat là QA trích xuất: model chọn mục, API trả đoạn hướng dẫn có nguồn; không huấn luyện model.
 
 ## Giới hạn chất lượng chatbot
 
-Lượt PC sai câu3 (xô rỗng),26 (thưởng Tìm số),27 (giá Runner). Đã đối chiếu toàn bộ
+Lượt PC cũ và lượt Docker cuối đều sai câu3 (xô rỗng),26 (thưởng Tìm số),27 (giá Runner). Đã đối chiếu toàn bộ
 30 câu với đáp án và source-derived manual; không coi HTTP200 là câu trả lời đúng.
 27/30 đạt ngưỡng kế hoạch nhưng chưa tuyệt đối. Review là của Codex, không phải giảng viên.
 Câu ngoài phạm vi phải báo thiếu thông tin; hướng dẫn tĩnh vẫn đọc được khi backend tắt.
@@ -62,3 +63,5 @@ Câu ngoài phạm vi phải báo thiếu thông tin; hướng dẫn tĩnh vẫn
 
 Bản build/ZIP cũ được chuyển vào Recovery cục bộ sau khi bản Windows thay thế đã qua
 kiểm tra; không đưa cache, log tạm, bí mật hay bản tải trùng vào Git/source ZIP.
+
+CI cuối: https://github.com/NguyenHuuThinhyy/Nongtrai/actions/runs/37264020925; raw response, review và conversation trong Evidence/Rubric/docker-ci.

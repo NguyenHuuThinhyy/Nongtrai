@@ -8,6 +8,6 @@ test_retained_message_reconnect_and_disconnect (__main__.CloudTests.test_retaine
 test_telemetry_rate_limit_and_exclusive_owner (__main__.CloudTests.test_telemetry_rate_limit_and_exclusive_owner) ... ok
 
 ----------------------------------------------------------------------
-Ran 8 tests in 0.087s
+Ran 8 tests in 0.134s
 
 OK

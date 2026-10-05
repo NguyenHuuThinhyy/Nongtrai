@@ -1,0 +1,61 @@
+[
+  {
+    "question": "Cung hỏng sửa bao nhiêu xu?",
+    "status": 200,
+    "response": {
+      "answer": "Giữ nút Dùng/Bắn để kéo cung, thả để bắn; kéo đầy cơ bản 0,8 giây. Mỗi phát thành công mất 1 mũi tên và 1 độ bền của đúng chiếc cung đang cầm. Không mất khi thả quá sớm, hết tên, pause hoặc cung hỏng. Cung hỏng sửa trong túi giá 20 xu. Tên chịu trọng lực, bù độ rơi về tâm trong tầm lực kéo; tường chặn tên và quái di chuyển cần ngắm đón.",
+      "sources": [
+        "Cung và mũi tên"
+      ],
+      "model": "qwen3:1.7b",
+      "generated": true,
+      "generation_mode": "extractive"
+    }
+  },
+  {
+    "question": "Giá bao nhiêu?",
+    "status": 200,
+    "response": {
+      "answer": "Giữ nút Dùng/Bắn để kéo cung, thả để bắn; kéo đầy cơ bản 0,8 giây. Mỗi phát thành công mất 1 mũi tên và 1 độ bền của đúng chiếc cung đang cầm. Không mất khi thả quá sớm, hết tên, pause hoặc cung hỏng. Cung hỏng sửa trong túi giá 20 xu. Tên chịu trọng lực, bù độ rơi về tâm trong tầm lực kéo; tường chặn tên và quái di chuyển cần ngắm đón.",
+      "sources": [
+        "Cung và mũi tên"
+      ],
+      "model": "qwen3:1.7b",
+      "generated": true,
+      "generation_mode": "extractive"
+    }
+  },
+  {
+    "question": "Tốn bao nhiêu?",
+    "status": 200,
+    "response": {
+      "answer": "Giữ nút Dùng/Bắn để kéo cung, thả để bắn; kéo đầy cơ bản 0,8 giây. Mỗi phát thành công mất 1 mũi tên và 1 độ bền của đúng chiếc cung đang cầm. Không mất khi thả quá sớm, hết tên, pause hoặc cung hỏng. Cung hỏng sửa trong túi giá 20 xu. Tên chịu trọng lực, bù độ rơi về tâm trong tầm lực kéo; tường chặn tên và quái di chuyển cần ngắm đón.",
+      "sources": [
+        "Cung và mũi tên"
+      ],
+      "model": "qwen3:1.7b",
+      "generated": true,
+      "generation_mode": "extractive"
+    }
+  },
+  {
+    "question": "quantum astrophysics (with previous bow topic)",
+    "status": 200,
+    "response": {
+      "answer": "Chưa có thông tin này trong hướng dẫn game. Bạn có thể hỏi về trồng cây, nước, cung, boss, rèn, nhà hàng hoặc minigame.",
+      "sources": [],
+      "model": "qwen3:1.7b",
+      "generated": false
+    }
+  },
+  {
+    "question": "Thời tiết ở Sao Hỏa?",
+    "status": 200,
+    "response": {
+      "answer": "Chưa có thông tin này trong hướng dẫn game. Bạn có thể hỏi về trồng cây, nước, cung, boss, rèn, nhà hàng hoặc minigame.",
+      "sources": [],
+      "model": "qwen3:1.7b",
+      "generated": false
+    }
+  }
+]

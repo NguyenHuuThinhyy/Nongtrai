@@ -1,8 +1,8 @@
 {
-  "source_commit": "1734be78aeee3bf9475f4498229e55b1dac216f3",
-  "run": "native Windows CPU, Unity Editor/game closed",
-  "raw_sha256": "13ad8be0b17ba15b8535a257ec414bb951c7b409b7c42a33caf4295a00a7be1e",
-  "reviewer": "Codex reviewed every raw answer against expected/source-derived guide; owner acceptance pending",
+  "source_commit": "d8f91b7e53b8938ac044fe498aae277533cc29d0",
+  "ci_run": "https://github.com/NguyenHuuThinhyy/Nongtrai/actions/runs/37264020925",
+  "reviewer": "Codex reviewed all raw responses against expected/source-derived manual; owner acceptance pending",
+  "raw_sha256": "800e94c33c2a2734b59ee15053bc9a6aeab4fc7d7c2d5663cbe4dfe12496c454",
   "correct": 27,
   "total": 30,
   "failed": [
@@ -10,188 +10,189 @@
     26,
     27
   ],
-  "warm_mean_seconds": 15.494,
+  "warm_mean_seconds": 7.751,
   "warm_over_30_seconds": 0,
+  "conversation": "PASS: two follow-ups remain on bow topic; unsupported topics return no sources",
   "cases": [
     {
       "index": 1,
       "question": "Làm sao gieo hạt?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 2,
       "question": "Phân bón tăng tiến độ bao nhiêu?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 3,
       "question": "Xô rỗng lấy nước ở hồ thế nào?",
       "correct": false,
-      "reason": "Selected exploration instead of bucket; missing how to fill empty bucket"
+      "reason": "Exploration chapter selected; missing empty-bucket filling instructions"
     },
     {
       "index": 4,
       "question": "Xô đầy đặt nước xong còn đầy không?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 5,
       "question": "Bọt biển hút rộng bao nhiêu?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 6,
       "question": "Hong bọt biển đầy mất bao lâu?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 7,
       "question": "Thuê vòi giá bao nhiêu?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 8,
       "question": "LV5 thuê tối đa mấy vòi mỗi ngày?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 9,
       "question": "Cung kéo đầy mất mấy giây?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 10,
       "question": "Cung mỗi lần bắn giảm độ bền không?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 11,
       "question": "Cung hỏng sửa bao nhiêu xu?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 12,
       "question": "Kiếm hồi chiêu gốc bao nhiêu?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 13,
       "question": "Đổi chỉ số rèn tốn gì?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 14,
       "question": "Kiếm LV5 có hiệu ứng nào?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 15,
       "question": "Hồi sinh tại chỗ tốn bao nhiêu?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 16,
       "question": "Chết hồi sinh miễn phí mất gì?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 17,
       "question": "Công thức cổng hồi sinh?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 18,
       "question": "Có thể đặt hai cổng tự chế không?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 19,
       "question": "Châm TNT dùng vật gì?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 20,
       "question": "TNT nổ sau bao lâu?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 21,
       "question": "Mở rương còn câu hỏi không?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 22,
       "question": "Rương boss có hạt gì?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 23,
       "question": "Boss Golem có bao nhiêu HP?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 24,
       "question": "Túi đồ có mấy ô?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 25,
       "question": "Bình máu hồi bao nhiêu?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 26,
       "question": "Tìm số 2D đạt 5/5 được bao nhiêu xu?",
       "correct": false,
-      "reason": "Selected TNT instead of NumberMemory; missing 200 xu/quota/stone reward"
+      "reason": "TNT chapter selected; missing 200 xu/stone/quota reward"
     },
     {
       "index": 27,
       "question": "Farm Runner mua vé bao nhiêu?",
       "correct": false,
-      "reason": "Selected animals instead of Runner; missing 500 xu ticket price"
+      "reason": "Animals chapter selected; missing 500 xu Runner ticket price"
     },
     {
       "index": 28,
       "question": "Thoát game có tự lưu không?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 29,
       "question": "Nhà hàng có bao nhiêu bàn và món?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     },
     {
       "index": 30,
       "question": "Cloud có dùng cảm biến thật không?",
       "correct": true,
-      "reason": "Answer includes expected facts and matches source-derived manual"
+      "reason": "Expected facts present; answer matches source-derived guide"
     }
   ]
 }

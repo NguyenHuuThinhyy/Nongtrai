@@ -2,6 +2,7 @@
 
 © HThinh.yy. Nền bf7d0b3. Nhánh codex/rubric-mobile-ar-ai-cloud.
 Worktree D:/GAME_NongTrai/Nongtrai-Rubric; dự án cũ D:/GAME_NongTrai giữ nguyên.
+Clone sạch để chủ dự án test: D:/GAME_NongTrai/Nongtrai-Moi, cùng nhánh rubric.
 Không merge main trước khi người dùng tự test và xác nhận. Không chạy builder dựng scene.
 Backup trước sửa: Recovery/Before-Rubric-20261004 (ngoài Git/source zip).
 

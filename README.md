@@ -67,8 +67,9 @@ Voxel/collider/gameplay được giữ để đào/đặt/phá hoạt động đ
 
 Xem [bảng tiêu chí → chức năng → kiểm thử → minh chứng](Docs/ACCEPTANCE.md).
 Planning, tests, documentation và [video demo tự động trên PC](Evidence/Rubric/demo-pc-automated.mp4)
-đã có; ảnh/log chọn lọc ở Evidence/Rubric. Chatbot đạt 27/30 câu trong lượt kiểm tra PC
-8 GB, trung bình warm 15,49 giây; Docker đã chạy trên GitHub Actions.
+đã có; ảnh/log chọn lọc ở Evidence/Rubric. Chatbot đạt 27/30 câu trong lượt kiểm tra
+Docker cuối (warm 7,75 giây trên runner Ubuntu16GB). Lượt PC8GB trước đó đạt27/30,
+warm15,49 giây. Ba câu chọn nhầm mục được ghi trong kết quả test.
 Video camera AR thật, dashboard thật, trải nghiệm Android15phút và người dùng tự test
 phải bổ sung trước nghiệm thu. Kịch bản demo không thay thế video.
 Điểm còn phụ thuộc giảng viên có chấp nhận pretrained model/IoT mô phỏng/uGUI2D hay không.

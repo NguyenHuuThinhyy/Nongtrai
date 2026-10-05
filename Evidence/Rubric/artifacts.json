@@ -4,6 +4,6 @@
   "android_apk_bytes": 52548958,
   "android_apk_sha256": "dda438a6e4312ea4cc77985a14dedf5e41e80f089289c189e829627bb612f6e7",
   "unity_source_commit": "a2ed11350329a320d80bba7baed5c5a815d1ce74",
-  "backend_source_commit": "e855aec1d498dd44f5f1f5c19981cd85bae86dcb",
+  "backend_source_commit": "d8f91b7e53b8938ac044fe498aae277533cc29d0",
   "physical_device": "none connected; adb devices empty on 2026-10-05"
 }
