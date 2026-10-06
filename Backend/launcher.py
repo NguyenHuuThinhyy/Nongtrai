@@ -92,7 +92,7 @@ def wait_ready(url, child, seconds=45):
 
 
 def find_game(project):
-    for relative in ("Builds/Windows-Rubric/NongTrai.exe", "NongTrai.exe"):
+    for relative in ("Builds/Windows-LocalAI/NongTrai.exe", "NongTrai.exe"):
         candidate = project / relative
         if candidate.is_file():
             return candidate

@@ -4,19 +4,8 @@
 /.utmp/
 /Logs/
 /UserSettings/
-# Checked-in playable release; other build outputs remain local.
-/Builds/*
-!/Builds/Windows-Rubric/
-/Builds/Windows-Rubric/*
-!/Builds/Windows-Rubric/NongTrai.exe
-!/Builds/Windows-Rubric/UnityPlayer.dll
-!/Builds/Windows-Rubric/UnityCrashHandler64.exe
-!/Builds/Windows-Rubric/NongTrai_Data/
-!/Builds/Windows-Rubric/MonoBleedingEdge/
-!/Builds/Windows-Rubric/D3D12/
-!/Builds/Android/
-/Builds/Android/*
-!/Builds/Android/NongTrai.apk
+# Playable packages and supplied weights are distributed via GitHub Release.
+/Builds/
 *.csproj
 *.sln
 *.slnx

@@ -2,26 +2,17 @@
 
 © HThinh.yy. Unity **6000.3.22f1**, URP, save **22**.
 
-## Bản đang sửa: AI chạy trực tiếp trên EXE / APK
+## Bản mới: AI offline trên Windows / Android
 
-Nhánh `codex/bundled-chat-model`, **chưa đẩy/gộp main**, chờ chủ dự án kiểm tra.
-Model được chủ dự án cung cấp trong `Backend/models`, đóng kèm gói LocalAI.
-Mở EXE/APK rồi nhấn **C** hoặc nút Chat: AI chỉ nạp khi chat mở. Đóng chat sẽ hủy tác vụ và nhả bộ nhớ model; không cần PC/server/Internet.
-Xem [hướng dẫn AI offline và build](Docs/LOCAL_CHAT.md). Gói đang kiểm tra nằm trong `DongGoi/LocalAI`, tách khỏi bản GitHub đã phát hành bên dưới.
+Chủ dự án đã cho phép đẩy và gộp `codex/bundled-chat-model` vào **main** ngày 06/10/2026.
 
-## Bản thử Android / AR / AI / Cloud
-
-Nhánh **codex/rubric-mobile-ar-ai-cloud**, phát triển từ `bf7d0b3`.
-**Chủ dự án đã xác nhận gộp bản này vào main ngày 06/10/2026.**
-
-- [Tải bản thử Windows, APK và source Unity](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/rubric-preview-20261006).
-- Bản LocalAI: chạy **CHAY_GAME.bat** để mở game, nhấn C để nạp AI. Dịch vụ PC cũ dùng **CHAY_GAME_TRO_LY_PC.bat** và lựa chọn AI qua PC. [Hướng dẫn khởi động trợ lý](Docs/ASSISTANT_START.md).
-- Muốn chơi offline ngay: **CHAY_GAME_KHONG_TRO_LY.bat**. Mở trực tiếp EXE không tự mở backend.
-- [Hướng dẫn cho nhóm](HUONG_DAN_NHOM.md), [cách chơi](CHOI_GAME.md), [nhà hàng](HUONG_DAN_NHA_HANG.md).
-- **J** mở/đóng nông trại thu nhỏ; **C** mở chatbot; **H** ẩn/hiện hướng dẫn. Menu **Nông trại AR** mở được trên PC:
-  xoay/phóng/đặt thủ công, bật webcam nếu có. Android cũng mở mô hình local bằng kéo/hai ngón phóng; camera tùy chọn.
-- [Thiết lập Android/mô hình local/chat/cloud](Docs/RUBRIC_INTEGRATION.md), [kết quả test](Docs/TEST_RESULTS.md), [checklist người dùng](Docs/ACCEPTANCE.md), [kịch bản demo](Docs/DEMO.md).
-- Commit nguồn và SHA256 của các gói ở [DongGoi](DongGoi). ZIP Unity không chứa Library/cache; Unity tự tạo lại khi mở.
+- [Tải Windows ZIP có EXE, APK Android và source Unity kèm model](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/localai-20261006).
+- Mở `CHAY_GAME.bat` hoặc EXE; nhấn **C** / Chat mới nạp AI. Đóng/ẩn chat hoặc chuyển ứng dụng sẽ hủy xử lý và giải phóng model. Không cần backend, PC khác hay Internet để chat.
+- APK khoảng **1,16 GB**, gồm Qwen3 1.7B do chủ dự án cung cấp. Lần mở chat đầu trên Android chuẩn bị model từ APK; cần thêm khoảng 1,2 GB trống. Khuyến nghị ARM64, 6 GB RAM.
+- **J** mở mô hình nông trại local, **H** ẩn/hiện hướng dẫn. Camera tùy chọn.
+- [AI offline](Docs/LOCAL_CHAT.md), [hướng dẫn cho nhóm](HUONG_DAN_NHOM.md), [cách chơi](CHOI_GAME.md), [nhà hàng](HUONG_DAN_NHA_HANG.md).
+- Source Git giữ Assets/.meta, Packages, ProjectSettings, Backend, Tools, Docs và Evidence. Gói chơi/model ở Release; `DongGoi/RELEASE-MANIFEST.json` và `SHA256SUMS.txt` ghi commit và checksum.
+- Build Windows/Android thành công; việc duyệt gộp của chủ dự án không thay thế kiểm tra runtime. Chưa đo CPU/RAM hay chạy chatbot trên điện thoại thật.
 
 ## Chức năng
 
@@ -32,7 +23,7 @@ nhà hàng ba tầng. Minigame Tìm số2D và Farm Runner có thưởng/quota t
 
 Bản thử bổ sung joystick/vuốt/các nút cảm ứng, giao diện túi tách/chuyển nhanh,
 nông trại AR thu nhỏ theo trạng thái ruộng, trợ lý tiếng Việt, trạm tưới điều khiển
-qua Adafruit IO và backend chạy local bằng Python/Ollama. Hướng dẫn tĩnh/gameplay vẫn hoạt động offline.
+qua Adafruit IO (backend tùy chọn). Chat mặc định chạy trực tiếp trong game. Hướng dẫn tĩnh/gameplay vẫn hoạt động offline.
 Cloud ghi rõ dữ liệu mô phỏng; chưa có cảm biến vật lý. Chat dùng model pretrained,
 không huấn luyện lại. Các phần điện thoại/AR/cloud thật còn phải nghiệm thu trên thiết bị/tài khoản.
 
@@ -48,19 +39,20 @@ Clone main để có bản đã được chủ dự án duyệt:
 git clone --branch main https://github.com/NguyenHuuThinhyy/Nongtrai.git
 ```
 
+GGUF không nằm trong Git. Tải source Unity ZIP ở Release để có model và license; nếu dùng checkout Git, lấy thư mục `Backend/models` từ ZIP vào checkout.
+
 Unity Hub → Add project from disk → thư mục checkout. Mở
 `Assets/Farm/Scenes/Farm.unity`. Android cần module Android Build Support/SDK/NDK/OpenJDK.
 Không gọi FarmProjectBuilder.CreateScene/RebuildScene: có thể ghi đè scene/prefab.
 Hai lệnh dưới build scene đang lưu:
 
 ```powershell
-.\Tools\Build-Windows.ps1 -OutputDirectory Builds/Windows-Rubric
+.\Tools\Build-Windows.ps1
 .\Tools\Build-Android.ps1
-.\Tools\Start-Services.ps1 -DownloadModel
 ```
 
 Bản APK ARM64 cài trực tiếp; chưa ký cho Google Play. ARCore Optional:
-điện thoại không hỗ trợ AR vẫn chơi game thường. Chat Android cần PC cùng Wi-Fi;
+điện thoại không hỗ trợ AR vẫn chơi game thường. Chat mặc định offline trên Android; chỉ lựa chọn AI qua PC cần Wi-Fi.
 Adafruit IO cần Internet và tài khoản tạo sau. Không đưa Backend/.env hoặc API key vào Git.
 
 ## Dữ liệu và giấy phép

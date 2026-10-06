@@ -1,4 +1,4 @@
-param([string]$Ffmpeg='ffmpeg', [string]$Game='Builds/Windows-Rubric/NongTrai.exe')
+param([string]$Ffmpeg='ffmpeg', [string]$Game='Builds/Windows-LocalAI/NongTrai.exe')
 $ErrorActionPreference='Stop'
 $project=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $exe=[IO.Path]::GetFullPath((Join-Path $project $Game))

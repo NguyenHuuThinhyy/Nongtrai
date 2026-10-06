@@ -2,7 +2,7 @@
 
 ## Chạy bản Windows
 
-Giải nén hoặc giữ nguyên toàn bộ thư mục `Builds/Windows-Rubric`, sau đó chạy `CHAY_GAME.bat` ở thư mục gốc project hoặc mở `Builds/Windows-Rubric/NongTrai.exe`. Không di chuyển riêng file `.exe` ra khỏi thư mục build.
+Giải nén hoặc giữ nguyên toàn bộ thư mục `Builds/Windows-LocalAI`, sau đó chạy `CHAY_GAME.bat` ở thư mục gốc project hoặc mở `Builds/Windows-LocalAI/NongTrai.exe`. Không di chuyển riêng file `.exe` ra khỏi thư mục build.
 
 ## Mở và vận hành nhà hàng
 

@@ -52,7 +52,7 @@ namespace NongTrai.Editor
         [MenuItem("Nong Trai/Technology/Build Android APK")]
         public static void BuildAndroid(){Configure();Build(BuildTarget.Android,Environment.GetEnvironmentVariable("FARM_ANDROID_OUTPUT")??"Builds/Android/NongTrai.apk");}
         [MenuItem("Nong Trai/Technology/Build Windows technology preview")]
-        public static void BuildWindows(){Configure();UnityEditor.PlayerSettings.SetScriptingBackend(NamedBuildTarget.Standalone,ScriptingImplementation.Mono2x);Build(BuildTarget.StandaloneWindows64,Environment.GetEnvironmentVariable("FARM_BUILD_OUTPUT")??"Builds/Windows-Rubric/NongTrai.exe");}
+        public static void BuildWindows(){Configure();UnityEditor.PlayerSettings.SetScriptingBackend(NamedBuildTarget.Standalone,ScriptingImplementation.Mono2x);Build(BuildTarget.StandaloneWindows64,Environment.GetEnvironmentVariable("FARM_BUILD_OUTPUT")??"Builds/Windows-LocalAI/NongTrai.exe");}
         static void Build(BuildTarget target,string output)
         {
             FarmLocalModelBuild.Stage();

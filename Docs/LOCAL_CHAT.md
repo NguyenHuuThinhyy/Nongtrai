@@ -1,6 +1,7 @@
-# Chat AI offline — bản chờ chủ dự án kiểm tra
+# Chat AI offline — bản được chủ dự án cho phép phát hành
 
-© HThinh.yy. Nhánh `codex/bundled-chat-model`, không đẩy/gộp main cho đến khi chủ dự án xác nhận.
+© HThinh.yy. Chủ dự án đã yêu cầu đẩy và gộp `codex/bundled-chat-model` vào main ngày 06/10/2026.
+[Tải Windows, APK và source Unity kèm model](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/localai-20261006).
 
 ## Chơi
 
@@ -17,7 +18,7 @@ Máy PC 8 GB RAM nên đóng Unity Editor khi chơi EXE để dành bộ nhớ c
 
 ## Bản build local 06/10/2026
 
-Windows và Android đã build thành công với 0 lỗi build, sau thay đổi chỉ nạp khi mở chat và giải phóng khi đóng. Windows runtime: 1.265.433.848 byte; APK: 1.161.665.701 byte. Chưa mở EXE để hỏi model, chưa cài/thử APK trên thiết bị thật và chưa đo CPU/RAM sau đóng chat. Không bật âm thanh hay đẩy/gộp main. Gói bàn giao có commit nguồn và SHA256 trong MANIFEST.json/SHA256SUMS.txt; chờ chủ dự án kiểm tra.
+Windows và Android đã build thành công với 0 lỗi build, sau thay đổi chỉ nạp khi mở chat và giải phóng khi đóng. Windows runtime: 1.265.433.848 byte; APK: 1.161.665.701 byte. Chưa mở EXE để hỏi model, chưa cài/thử APK trên thiết bị thật và chưa đo CPU/RAM sau đóng chat. Không bật âm thanh trong quá trình sửa/build. Chủ dự án đã cho phép phát hành/gộp main. Gói bàn giao có commit nguồn và SHA256 trong MANIFEST.json/SHA256SUMS.txt; kiểm tra runtime vẫn chưa được xác nhận.
 
 ## Build / phát triển
 
@@ -29,12 +30,12 @@ Khi mở Source ZIP lần đầu, chọn **Nong Trai → Technology → Prepare 
 - Tắt mạng trên PC, mở EXE → C → hỏi “Xin chào”, rồi hỏi cách lấy nước hoặc sửa cung. Kiểm tra có câu trả lời từ model, không chỉ bảng hướng dẫn.
 - Hủy khi đang trả lời, gửi câu mới; đóng chat lúc lấy model/kiểm hash/nạp/trả lời, theo dõi CPU và RAM giảm sau khi tác vụ dừng; mở lại nhanh không nạp hai model; J vào mô hình → Hỏi trợ lý → đóng chat trở lại mô hình.
 - Android bật chế độ máy bay, mở APK → Chat và chờ chuẩn bị lần đầu; hỏi bằng tiếng Việt, thoát/mở lại để xác nhận không lấy lại model mỗi lần. Thử chuyển ứng dụng khi đang trả lời.
-- Ghi thiết bị/RAM, thời gian chuẩn bị, thời gian trả lời, lỗi/ảnh. Build thành công không thay thế những kiểm tra runtime này. Chủ dự án chưa duyệt đẩy/gộp bản LocalAI này.
+- Ghi thiết bị/RAM, thời gian chuẩn bị, thời gian trả lời, lỗi/ảnh. Build thành công không thay thế những kiểm tra runtime này. Chủ dự án đã cho phép đẩy/gộp; các kiểm tra runtime này vẫn cần thực hiện.
 
 - `Tools/Build-LocalChat.ps1`: biên dịch plugin Windows x64 và Android ARM64 từ llama.cpp b7199 (commit `8c32d9d96d9ae345a0150cae8572859e9aafea0b`), nguồn/ZIP kiểm SHA256. Dùng CMake/NDK của Unity; Windows dùng llvm-mingw tải riêng. Cache compiler/source nằm ngoài dự án.
 - `FarmLocalModelBuild.Stage`: kiểm checksum GGUF, chuẩn bị StreamingAssets và giấy phép; chọn platform/CPU đúng cho plugin. Build Windows/Android gọi Stage, không dựng lại scene.
 - `FarmLocalChat`: lớp C# gọi plugin C ABI trên worker thread. CPU, context 2048 token, tối đa 3 luồng, tối đa 320 token trả lời; không cần GPU hay dịch vụ mạng. Tắt thinking theo template Qwen3 để trả lời gọn.
-- `Tools/Package-LocalChat.ps1`: đóng các gói riêng trong DongGoi/LocalAI; không ghi đè gói đã phát hành. Model không nhân đôi trong source ZIP.
+- `Tools/Package-LocalChat.ps1`: đóng các gói riêng trong DongGoi; không ghi đè gói đã phát hành. Model không nhân đôi trong source ZIP.
 
 Mô hình/nhận dạng ngôn ngữ có thể trả lời sai. Không thay đổi inventory/save/gameplay qua chat. Tư vấn game lấy dữ liệu đọc từ bộ hướng dẫn, cloud tùy chọn vẫn tách riêng.
 

@@ -2,7 +2,7 @@
 [CmdletBinding()]
 param(
     [string]$UnityEditor,
-    [string]$OutputDirectory = 'Builds/Windows-Rubric'
+    [string]$OutputDirectory = 'Builds/Windows-LocalAI'
 )
 
 $ErrorActionPreference = 'Stop'

@@ -1,4 +1,4 @@
-param([string]$UnityExe='D:\Unity\Editors\6000.3.22f1\Editor\Unity.exe',[string]$Output='Builds/Android/NongTrai.apk')
+param([string]$UnityExe='D:\Unity\Editors\6000.3.22f1\Editor\Unity.exe',[string]$Output='Builds/Android-LocalAI/NongTrai.apk')
 $ErrorActionPreference='Stop'
 $project=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 New-Item -ItemType Directory -Path (Join-Path $project 'Logs') -Force | Out-Null
