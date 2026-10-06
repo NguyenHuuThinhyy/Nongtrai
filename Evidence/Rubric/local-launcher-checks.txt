@@ -1,0 +1,6 @@
+Source: 54b8a1f72f4c6a70d874461337c72f6d0ea2f8d0
+Date: 2026-10-06 (client timezone Asia/Saigon)
+Backend: 8 tests PASS. Launcher: 7 tests PASS, mocked child processes and model HTTP.
+Windows PowerShell5 and PowerShell7 PrepareOnly: PASS; existing runtimes imported, no service/game started.
+CI: https://github.com/NguyenHuuThinhyy/Nongtrai/actions/runs/37469098481
+Actual local service startup and owner acceptance: PENDING.

@@ -1,6 +1,6 @@
 # Chơi với chatbot trên PC
 
-© HThinh.yy. Cập nhật 05/10/2026.
+© HThinh.yy. Cập nhật 06/10/2026.
 
 ## Trên PC
 

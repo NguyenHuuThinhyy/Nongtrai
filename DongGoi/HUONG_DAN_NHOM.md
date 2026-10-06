@@ -6,7 +6,7 @@
 2. Chơi Windows: giải nén trọn ZIP Windows rồi chạy CHAY_GAME.bat để tự mở backend nhẹ và ghép chatbot.
    Chơi offline ngay bằng CHAY_GAME_KHONG_TRO_LY.bat. Giữ EXE/Data/DLL và Backend/Tools; xem Docs/ASSISTANT_START.md.
 3. Android: tải NongTrai.apk, cho phép cài ứng dụng từ nguồn tải, cài trên Android8+
-   ARM64. AR cần máy hỗ trợ ARCore; game thường không cần ARCore.
+   ARM64. Nông trại thu nhỏ local mở được không cần ARCore; camera là tùy chọn.
 4. Unity: Hub Add project → checkout, Editor6000.3.22f1, scene Farm.
    Unity tạo Library khi import; cần Internet để tải packages. Không chạy builder dựng scene.
 5. Build: Tools/Build-Windows.ps1 và Build-Android.ps1. Backend: Start-Services.ps1.
