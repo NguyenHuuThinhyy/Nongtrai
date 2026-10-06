@@ -1,58 +1,24 @@
-name: Rubric backend and Docker
+name: Local assistant checks
 on:
   push:
     branches: [codex/rubric-mobile-ar-ai-cloud]
-    paths: ["Backend/**", "Assets/Farm/Resources/FarmTechnology/knowledge.json", ".github/workflows/rubric-backend.yml"]
+    paths: ["Backend/**", "Tools/Start-Assistant.ps1", "Assets/Farm/Resources/FarmTechnology/knowledge.json", ".github/workflows/rubric-backend.yml"]
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
   verify:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
+    runs-on: windows-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Unit and retrieval tests
+      - name: Local backend and launcher tests
         run: |
           python -m pip install -r Backend/requirements.txt
           python Backend/tests/test_services.py
+          if ($LASTEXITCODE -ne 0) { throw 'Backend tests failed' }
           python Backend/tests/test_launcher.py
-      - name: Clean container startup
-        working-directory: Backend
-        run: |
-          cp .env.example .env
-          sed -i 's/change-this-pairing-code/ci-local-evidence-only/' .env
-          docker compose up -d --build --wait --wait-timeout 180
-          docker compose exec -T ollama ollama pull qwen3:1.7b
-      - name: Real HTTP and model in containers
-        working-directory: Backend
-        run: |
-          mkdir -p ../Evidence/Rubric/ci
-          curl --fail http://127.0.0.1:8000/health > ../Evidence/Rubric/ci/health.json
-          python -c 'import json; r=json.load(open("../Evidence/Rubric/ci/health.json")); assert r["model_ready"] and not r["mqtt_connected"]'
-          curl --fail -H 'X-Farm-Key: ci-local-evidence-only' http://127.0.0.1:8000/v1/pair
-          printf '%s' '{"question":"Cung hỏng sửa bao nhiêu xu?"}' > /tmp/farm-question.json
-          curl --fail --max-time 100 -H 'X-Farm-Key: ci-local-evidence-only' -H 'Content-Type: application/json' --data-binary @/tmp/farm-question.json http://127.0.0.1:8000/v1/chat > ../Evidence/Rubric/ci/chat.json
-          python -c 'import json; r=json.load(open("../Evidence/Rubric/ci/chat.json")); assert r["generated"] and "20 xu" in r["answer"] and r["generation_mode"] == "extractive"'
-          docker compose ps > ../Evidence/Rubric/ci/docker-status.txt
-          docker compose logs --no-color --tail 100 > ../Evidence/Rubric/ci/docker-log.txt
-      - name: Thirty real model questions over HTTP
-        env:
-          FARM_EVAL_KEY: ci-local-evidence-only
-        run: python Backend/tests/evaluate_model.py --api http://127.0.0.1:8000 --output Evidence/Rubric/ci/chat-30-container.json
-      - name: Real follow-up and out-of-scope response
-        env:
-          FARM_EVAL_KEY: ci-local-evidence-only
-        run: python Backend/tests/test_live_conversation.py --api http://127.0.0.1:8000 --output Evidence/Rubric/ci/conversation.json
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: rubric-docker-evidence
-          path: Evidence/Rubric/ci
-      - name: Stop services
-        if: always()
-        working-directory: Backend
-        run: docker compose down
+          if ($LASTEXITCODE -ne 0) { throw 'Launcher tests failed' }

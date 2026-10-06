@@ -7,13 +7,13 @@
 Nhánh **codex/rubric-mobile-ar-ai-cloud**, phát triển từ `bf7d0b3`.
 **Chưa gộp main. Chỉ gộp sau khi chủ dự án tự test và xác nhận.**
 
-- [Tải bản thử Windows, APK và source Unity](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/rubric-preview-20261005).
+- [Tải bản thử Windows, APK và source Unity](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/rubric-preview-20261006).
 - Chạy **CHAY_GAME.bat** để tự khởi động backend/model, kết nối chatbot rồi mở game. Máy đã chuẩn bị runtime không tải lại. [Hướng dẫn khởi động trợ lý](Docs/ASSISTANT_START.md).
 - Muốn chơi offline ngay: **CHAY_GAME_KHONG_TRO_LY.bat**. Mở trực tiếp EXE không tự mở backend.
 - [Hướng dẫn cho nhóm](HUONG_DAN_NHOM.md), [cách chơi](CHOI_GAME.md), [nhà hàng](HUONG_DAN_NHA_HANG.md).
 - **C** mở chatbot; **H** ẩn/hiện hướng dẫn. Menu **Nông trại AR** mở được trên PC:
-  xoay/phóng/đặt thủ công, bật webcam nếu có. Android dùng ARCore để dò bàn/sàn.
-- [Thiết lập Android/AR/chat/cloud/Docker](Docs/RUBRIC_INTEGRATION.md), [kết quả test](Docs/TEST_RESULTS.md), [checklist người dùng](Docs/ACCEPTANCE.md), [kịch bản demo](Docs/DEMO.md).
+  xoay/phóng/đặt thủ công, bật webcam nếu có. Android cũng mở mô hình local bằng kéo/hai ngón phóng; camera tùy chọn.
+- [Thiết lập Android/mô hình local/chat/cloud](Docs/RUBRIC_INTEGRATION.md), [kết quả test](Docs/TEST_RESULTS.md), [checklist người dùng](Docs/ACCEPTANCE.md), [kịch bản demo](Docs/DEMO.md).
 - Commit nguồn và SHA256 của các gói ở [DongGoi](DongGoi). ZIP Unity không chứa Library/cache; Unity tự tạo lại khi mở.
 
 ## Chức năng
@@ -25,7 +25,7 @@ nhà hàng ba tầng. Minigame Tìm số2D và Farm Runner có thưởng/quota t
 
 Bản thử bổ sung joystick/vuốt/các nút cảm ứng, giao diện túi tách/chuyển nhanh,
 nông trại AR thu nhỏ theo trạng thái ruộng, trợ lý tiếng Việt, trạm tưới điều khiển
-qua Adafruit IO và backend Docker. Hướng dẫn tĩnh/gameplay vẫn hoạt động offline.
+qua Adafruit IO và backend chạy local bằng Python/Ollama. Hướng dẫn tĩnh/gameplay vẫn hoạt động offline.
 Cloud ghi rõ dữ liệu mô phỏng; chưa có cảm biến vật lý. Chat dùng model pretrained,
 không huấn luyện lại. Các phần điện thoại/AR/cloud thật còn phải nghiệm thu trên thiết bị/tài khoản.
 
@@ -33,7 +33,7 @@ không huấn luyện lại. Các phần điện thoại/AR/cloud thật còn ph
 
 Trên máy chủ dự án, chỉ dùng **D:\GAME_NongTrai**: mở thư mục này trong Unity Hub
 hoặc chạy `CHAY_GAME.bat`. Source cũ được cất riêng tại `D:\NongTrai_LuuTru`;
-không chép đè vào dự án đang dùng. Các gói trong `DongGoi` đều là bản thử ngày 05/10/2026.
+không chép đè vào dự án đang dùng. Manifest trong `DongGoi` ghi commit nguồn/build của từng gói hiện tại.
 
 Clone đúng nhánh để có các phần công nghệ mới:
 
@@ -75,8 +75,8 @@ Voxel/collider/gameplay được giữ để đào/đặt/phá hoạt động đ
 Xem [bảng tiêu chí → chức năng → kiểm thử → minh chứng](Docs/ACCEPTANCE.md).
 Planning, tests, documentation và [video demo tự động trên PC](Evidence/Rubric/demo-pc-automated.mp4)
 đã có; ảnh/log chọn lọc ở Evidence/Rubric. Chatbot đạt 30/30 câu trong lượt kiểm tra
-Docker mới nhất (warm 5,35 giây trên runner Ubuntu16GB), cùng kiểm tra hội thoại và AR PC/C/H.
+CI lịch sử ngày05/10 (warm5,35giây), trước khi bỏ container và đổi hướng dẫn local ngày06/10.
 Lượt PC8GB trước đó ở bản cũ đạt27/30, warm15,49 giây; bản backend cuối chưa đo lại trên PC.
-Video camera AR thật, dashboard thật, trải nghiệm Android15phút và người dùng tự test
+Camera thật, dashboard thật, trải nghiệm Android15phút và người dùng tự test
 phải bổ sung trước nghiệm thu. Kịch bản demo không thay thế video.
 Điểm còn phụ thuộc giảng viên có chấp nhận pretrained model/IoT mô phỏng/uGUI2D hay không.

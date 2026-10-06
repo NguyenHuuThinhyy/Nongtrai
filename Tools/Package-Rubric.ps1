@@ -29,7 +29,7 @@ function Write-Package([string]$destination,[object[]]$entries){
 $runtimeFiles=Get-ChildItem -LiteralPath $windows -File -Recurse | Where-Object {$_.FullName -notmatch 'DoNotShip|\.png$|\.log$'}
 $windowsEntries=@($runtimeFiles | ForEach-Object {@{Path=$_.FullName;Name='NongTrai-Windows/'+$_.FullName.Substring($windows.Length+1)}})
 # The playable package must include the assistant, not just a UI pointing at an absent server.
-$companionFiles=@(& git ls-files | Where-Object {$_ -match '^Backend/(app/|licenses/|launcher\.py$|run\.py$|requirements\.txt$|MODEL-MANIFEST\.json$|Dockerfile$|compose\.yaml$|\.dockerignore$|\.env\.example$)' -or $_ -in @('Tools/Start-Assistant.ps1','Tools/Start-Services.ps1','CHAY_GAME.bat','CHAY_GAME_CO_TRO_LY.bat','CHAY_GAME_KHONG_TRO_LY.bat','BAT_BACKEND_PC.bat','BAT_BACKEND_CHO_DIEN_THOAI.bat','Docs/ASSISTANT_START.md')})
+$companionFiles=@(& git ls-files | Where-Object {$_ -match '^Backend/(app/|licenses/|launcher\.py$|run\.py$|requirements\.txt$|MODEL-MANIFEST\.json$|\.env\.example$)' -or $_ -in @('Tools/Start-Assistant.ps1','Tools/Start-Services.ps1','CHAY_GAME.bat','CHAY_GAME_CO_TRO_LY.bat','CHAY_GAME_KHONG_TRO_LY.bat','BAT_BACKEND_PC.bat','BAT_BACKEND_CHO_DIEN_THOAI.bat','Docs/ASSISTANT_START.md')})
 $windowsEntries+=@($companionFiles | ForEach-Object {@{Path=(Join-Path $project $_);Name='NongTrai-Windows/'+$_}})
 $windowsZip=Join-Path $output "NongTrai-Windows-Rubric-$Label.zip"
 Write-Package $windowsZip $windowsEntries

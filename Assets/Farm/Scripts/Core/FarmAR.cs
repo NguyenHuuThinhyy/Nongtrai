@@ -32,11 +32,8 @@ namespace NongTrai
         {
             if(Active||hud==null)return;
             Active=true;generation++;FarmControls.ReleaseAll();hud.player.SetPaused(true);hud.pausePanel.SetActive(false);
-#if !UNITY_ANDROID || UNITY_EDITOR
+            // Local miniature is the default on every platform; no server or tracking is required.
             DesktopPreview=true;BuildUI();BeginDesktop();
-#else
-            DesktopPreview=false;BuildUI();StartCoroutine(Begin());
-#endif
         }
         void SaveCameras()
         {foreach(var camera in FindObjectsByType<Camera>(FindObjectsSortMode.None))if(camera.enabled){savedCameras.Add(camera);camera.enabled=false;}}
@@ -51,7 +48,7 @@ namespace NongTrai
             var light=lightObject.GetComponent<Light>();light.type=LightType.Directional;light.intensity=.8f;light.cullingMask=1<<30;light.shadows=LightShadows.None;
             UpdateDesktopCamera();status.text=DesktopHelp;
         }
-        const string DesktopHelp="NÔNG TRẠI AR • PC (đặt thủ công)\nChuột phải xoay, lăn chuột phóng. Click nền trống để đặt, cây/công trình để xem thông tin. C mở chatbot. Bật webcam để xem trên nền camera.";
+        const string DesktopHelp="NÔNG TRẠI THU NHỎ • LOCAL\nPC: chuột phải xoay, lăn chuột phóng. Điện thoại: kéo để xoay, hai ngón phóng. Chạm cây/công trình xem thông tin. Camera tùy chọn; mô hình không cần mạng. C mở chatbot.";
         void UpdateDesktopCamera()
         {
             if(cameraAR==null||root==null)return;
@@ -65,12 +62,32 @@ namespace NongTrai
         {if(!DesktopPreview||!Active)return;desktopDistance=Mathf.Clamp(desktopDistance+amount,.7f,2.6f);UpdateDesktopCamera();}
         void UpdateDesktop()
         {
+            if(UpdateLocalTouches()){UpdateWebcamFrame();return;}
             UpdateWebcamFrame();var pointer=FarmControls.Pointer;var position=pointer.position.ReadValue();
             bool overUI=EventSystem.current!=null&&EventSystem.current.IsPointerOverGameObject();
             if(pointer.rightButton.isPressed&&!overUI)
             {if(desktopDragging){var delta=position-desktopPointer;RotateDesktop(delta.x*.3f,-delta.y*.25f);}desktopPointer=position;desktopDragging=true;}
             else desktopDragging=false;
             if(!overUI){ZoomDesktop(-pointer.scroll.ReadValue().y*.0015f);if(pointer.leftButton.wasPressedThisFrame)SelectInfo(position);}
+        }
+        bool UpdateLocalTouches()
+        {
+            var screen=Touchscreen.current;if(screen==null)return false;
+            UnityEngine.InputSystem.Controls.TouchControl first=null,second=null;
+            foreach(var touch in screen.touches)if(touch.press.isPressed&&!OverUI(touch.touchId.ReadValue()))
+            {if(first==null)first=touch;else{second=touch;break;}}
+            if(first==null){gesture=false;return false;}
+            var point=first.position.ReadValue();
+            if(second!=null)
+            {
+                Vector2 delta=second.position.ReadValue()-point;float distance=delta.magnitude;
+                float angle=Mathf.Atan2(delta.y,delta.x)*Mathf.Rad2Deg;
+                if(gesture&&previousDistance>1&&distance>1){ZoomDesktop(desktopDistance*(previousDistance/distance-1));RotateDesktop(Mathf.DeltaAngle(previousAngle,angle));}
+                previousDistance=distance;previousAngle=angle;gesture=true;desktopDragging=false;return true;
+            }
+            if(first.press.wasPressedThisFrame){SelectInfo(point);desktopDragging=false;}
+            if(!gesture&&desktopDragging){var delta=point-desktopPointer;RotateDesktop(delta.x*.25f,-delta.y*.2f);}
+            desktopPointer=point;desktopDragging=true;gesture=false;return true;
         }
         void SelectInfo(Vector2 position)
         {
@@ -110,7 +127,8 @@ namespace NongTrai
             {
                 var devices=WebCamTexture.devices;
                 if(devices.Length==0){status.text="Không tìm thấy webcam. Cắm camera rồi bấm Bật webcam; vẫn xem nông trại 3D được.";return false;}
-                webcam=new WebCamTexture(devices[0].name,1280,720,30);webcam.Play();return true;
+                int selectedDevice=0;if(Application.isMobilePlatform)for(int i=0;i<devices.Length;i++)if(!devices[i].isFrontFacing){selectedDevice=i;break;}
+                webcam=new WebCamTexture(devices[selectedDevice].name,640,480,24);webcam.Play();return true;
             }
             catch(System.Exception e){StopWebcam();status.text="Chưa mở được webcam ("+e.GetType().Name+"). Kiểm tra quyền camera hoặc ứng dụng đang dùng camera.";return false;}
         }

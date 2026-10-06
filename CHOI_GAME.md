@@ -19,8 +19,7 @@
   Túi có Tách nửa, Chuyển nhanh và kéo thả. Runner/câu cá/nhà hàng dùng nút chạm.
 - Trợ lý / AR / Cloud → Kết nối: địa chỉ PC cùng Wi-Fi và mã backend. Hướng dẫn
   luôn có sẵn khi backend tắt. Mã Adafruit chỉ nhập ở PC; bạn có thể tạo tài khoản sau.
-- Nông trại AR: AndroidARCore, cho camera, quét bàn/sàn, chạm đặt; hai ngón xoay/phóng;
-  chạm cây/công trình xem thông tin rồi Hỏi trợ lý; ĐóngAR quay về phiên chơi.
+- Nông trại AR: mô hình local mở ngay trên PC/Android; điện thoại kéo xoay, hai ngón phóng. Camera tùy chọn; chạm cây/công trình xem thông tin, Hỏi trợ lý cần backend; ĐóngAR quay về game.
 - Cloud mô phỏng: Bậtcloud sau khi đã xây trạm vùng đầu; dashboard ON/OFF điều khiển
   trạm đó. Mất mạng trở về tưới cục bộ. Không cần mạng để chơi gameplay thường.
 - Cài/build/backend/model: xem Docs/RUBRIC_INTEGRATION.md. Kiểm tra thủ công:

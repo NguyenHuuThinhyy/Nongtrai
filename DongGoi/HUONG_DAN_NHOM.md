@@ -2,7 +2,7 @@
 
 © HThinh.yy. Nhánh `codex/rubric-mobile-ar-ai-cloud`; chưa gộp main.
 
-1. Clone nhánh này hoặc tải Unity ZIP từ release `rubric-preview-20261005`.
+1. Clone nhánh này hoặc tải Unity ZIP từ release `rubric-preview-20261006`.
 2. Chơi Windows: giải nén trọn ZIP Windows rồi chạy CHAY_GAME.bat để tự mở backend nhẹ và ghép chatbot.
    Chơi offline ngay bằng CHAY_GAME_KHONG_TRO_LY.bat. Giữ EXE/Data/DLL và Backend/Tools; xem Docs/ASSISTANT_START.md.
 3. Android: tải NongTrai.apk, cho phép cài ứng dụng từ nguồn tải, cài trên Android8+
@@ -10,14 +10,14 @@
 4. Unity: Hub Add project → checkout, Editor6000.3.22f1, scene Farm.
    Unity tạo Library khi import; cần Internet để tải packages. Không chạy builder dựng scene.
 5. Build: Tools/Build-Windows.ps1 và Build-Android.ps1. Backend: Start-Services.ps1.
-   Xem Docs/RUBRIC_INTEGRATION.md để cài Docker và tạo dashboard.
+   Xem Docs/ASSISTANT_START.md để mở trợ lý local; dashboard Adafruit là tùy chọn.
 
 Giữ Assets + tất cả .meta, Packages + packages-lock, ProjectSettings, Backend, Tools,
 Docs, Evidence và giấy phép. Không chia sẻ cache/log tạm, Backend/.env, model weights
 hoặc save cá nhân. Source zip chứa đầy đủ các mục phát triển, bỏ runtime build để giảm trùng;
 Windows ZIP và APK là các gói chơi riêng.
 
-Backend/compose.yaml gồm API và OllamaCPU. Model tải vào volume. Chưa có tài khoản
+Backend local gồm FastAPI và OllamaCPU. Model/cache lưu trên PC. Chưa có tài khoản
 Adafruit IO thì để username/key trống; không bật cloud. Các chức năng game offline vẫn chạy.
 
 Ghi bug/test vào Docs/ACCEPTANCE.md với thiết bị, commit/build, ảnh/video và bước tái hiện.

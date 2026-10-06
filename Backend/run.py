@@ -1,4 +1,4 @@
-"""Desktop companion API; Docker remains the rubric deployment option."""
+"""Local companion API. Save files and model cache remain on the user's PC."""
 import sys
 import os
 from pathlib import Path

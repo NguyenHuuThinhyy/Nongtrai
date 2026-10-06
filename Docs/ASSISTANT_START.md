@@ -21,7 +21,7 @@
 - Trên PC chạy **BAT_BACKEND_CHO_DIEN_THOAI.bat**, giữ cửa sổ mở. PC và điện thoại cùng Wi-Fi.
 - Trong game điện thoại → Kết nối: nhập `http://IP-LAN-CUA-PC:8000`; mã nằm trong file **Backend/.runtime/connection.txt** trên PC. Không gửi file này lên Git/chat.
 - Cho phép Python trên mạng Private trong Windows Firewall nếu Windows hỏi. Script không tự đổi tường lửa.
-- Lưu & kiểm tra rồi mở chat. AR camera cần máy Android hỗ trợ ARCore; backend không bổ sung cảm biến AR cho máy không hỗ trợ.
+- Lưu & kiểm tra rồi mở chat. Mô hình nông trại local trên điện thoại không cần backend hoặc ARCore; camera chỉ là tùy chọn nền.
 
 ## Khi có lỗi
 
@@ -35,8 +35,8 @@ Runtime/model được lưu riêng, không đưa weights hay mã kết nối và
 
 ## Công nghệ và kiểm tra
 
-Launcher PC dùng Python/Ollama native để người chơi không phải cài Docker. Bản Docker vẫn nằm Backend/compose.yaml, chạy qua Tools/Start-Services.ps1 để trình diễn tiêu chí Docker; native không được tính là Docker.
+Launcher PC dùng Python/Ollama native. Đã bỏ Docker/Compose theo yêu cầu06/10. Save/game/model cache đều nằm trên máy; Start-Services.ps1 là lối gọi tương thích tới launcher local.
 
 Nguồn tải: [Python3.12.10](https://www.python.org/downloads/release/python-31210/), [Ollama0.12.3](https://github.com/ollama/ollama/releases/tag/v0.12.3), [pip zipapp](https://pip.pypa.io/en/stable/installation/#standalone-zip-application). Hai ZIP runtime kiểm SHA256; model kiểm digest theo Backend/MODEL-MANIFEST.json.
 
-Kiểm tra launcher tự động chỉ dùng tiến trình giả và thư mục tạm; không chứng minh backend đã chạy trên PC. Lần khởi chạy native từ công cụ Codex trước đây bị duyệt tự động từ chối “blocked by policy”, nên cần chủ dự án tự chạy BAT để kiểm tra kết nối thật. Docker/model đã có minh chứng CI riêng trong Docs/TEST_RESULTS.md.
+Kiểm tra launcher tự động chỉ dùng tiến trình giả và thư mục tạm; không chứng minh backend đã chạy trên PC. Lần khởi chạy native từ công cụ Codex trước đây bị duyệt tự động từ chối “blocked by policy”, nên cần chủ dự án tự chạy BAT để kiểm tra kết nối thật. Các lượt model trước có minh chứng lịch sử riêng trong Docs/TEST_RESULTS.md.
