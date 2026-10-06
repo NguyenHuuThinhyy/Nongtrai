@@ -6,14 +6,14 @@ Nhánh `codex/rubric-mobile-ar-ai-cloud`; không gộp main trước xác nhận
 ## Đợt local ngày06/10/2026
 
 - Phạm vi mới: bỏ Dockerfile/Compose/CI container, miniature local mặc định PC/Android.
-- Source `54b8a1f`: 8 backend tests + 7 launcher tests PASS, gồm ghép cặp/bảo toàn save,
+- Source `1a8a786`: 8 backend tests + 7 launcher tests PASS, gồm ghép cặp/bảo toàn save,
   không nạp model lúc mở game, chỉ dọn tiến trình do launcher tạo. Tiến trình/model trong launcher tests là mock.
 - Windows PowerShell5 và PowerShell7: Start-Assistant -PrepareOnly PASS trên runtime sẵn có; không khởi chạy dịch vụ.
-- CI Windows native: https://github.com/NguyenHuuThinhyy/Nongtrai/actions/runs/37469098481 — PASS15tests; không chạy container.
+- CI Windows native: https://github.com/NguyenHuuThinhyy/Nongtrai/actions/runs/37471133514 — PASS15tests; không chạy container.
 - Backend local thực tế chưa được khởi chạy lại: auto-review từng từ chối native startup “blocked by policy”.
   Chủ dự án cần chạy CHAY_GAME.bat để kiểm kết nối thật; không suy luận từ mock/prepare-only.
-- Windows54b8a1f: build PASS153.034.482bytes; Technology/touch PASS cả nhập E/X, C/H, miniature local và phục hồi camera/vị trí. Log mới: windows-build-local-20261006.txt và windows-technology-local-20261006.txt; ảnh06-local-miniature.png đã kiểm trực quan.
-- Android54b8a1f: build PASS52.597.442bytes (~50,16MiB), chữ kýv2 hợp lệ, ARM64/API26–36. Log/manifest/signature có hậu tố local-20261006; chưa nghiệm thu thiết bị thật.
+- Windows1a8a786: build PASS153.035.026bytes; Technology PC (chuột khóa) và touch PASS cả nhập E/X, C/H, phím J mở/đóng miniature local và phục hồi camera/vị trí. Log mới: windows-build-local-20261006.txt và windows-technology-local-20261006.txt; ảnh06-local-miniature.png đã kiểm trực quan.
+- Android1a8a786: build PASS52.593.854bytes (~50,16MiB), chữ kýv2 hợp lệ, ARM64/API26–36. Log/manifest/signature có hậu tố local-20261006; chưa nghiệm thu thiết bị thật.
 - Điện thoại/camera thật, cloud/account, tốc độ chơi và người dùng tự test: vẫn pending.
 - Mô hình local không chứng minh AR plane tracking; Docker đã được bỏ theo yêu cầu, ngoài phạm vi nghiệm thu hiện tại.
 
