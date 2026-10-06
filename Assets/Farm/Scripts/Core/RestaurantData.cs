@@ -43,7 +43,7 @@ namespace NongTrai
         {
             get {
                 if(recipes==null){string path=Path.Combine(Application.streamingAssetsPath,"restaurant-recipes.json");
-                    recipes=JsonUtility.FromJson<RestaurantRecipeBook>(File.ReadAllText(path)).recipes;
+                    recipes=JsonUtility.FromJson<RestaurantRecipeBook>(FarmData.ReadJson("restaurant-recipes.json")).recipes;
                     if(recipes==null||recipes.Length!=30)throw new InvalidDataException("Cần 30 công thức nhà hàng.");
                     var outputs=new HashSet<int>();
                     for(int n=0;n<recipes.Length;n++){var r=recipes[n];if(r.index!=n||r.output!=122+n||!outputs.Add(r.output)||r.inputs==null||r.inputs.Length==0)throw new InvalidDataException("Công thức nhà hàng không hợp lệ");

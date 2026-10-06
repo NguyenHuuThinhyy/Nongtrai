@@ -34,6 +34,7 @@ namespace NongTrai
             var r=go.GetComponent<RectTransform>(); r.SetParent(parent,false);
             r.anchorMin=r.anchorMax=r.pivot=new Vector2(.5f,.5f);r.sizeDelta=size;
             go.GetComponent<Image>().color=new Color(.065f,.145f,.12f,.98f);
+            go.AddComponent<FarmPanelFit>();
             return go;
         }
         public static Text Label(Transform parent,string value,Vector2 pos,Vector2 size,int fontSize)

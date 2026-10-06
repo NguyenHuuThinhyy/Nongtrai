@@ -37,7 +37,7 @@ namespace NongTrai
             Instance=this;hud=owner;
             compact=FarmUi.Panel(parent,"Bản đồ nhỏ nông trại",new Vector2(329,165));
             var cr=compact.GetComponent<RectTransform>();cr.anchorMin=cr.anchorMax=cr.pivot=new Vector2(1,1);cr.anchoredPosition=new Vector2(-24,-150);
-            FarmUi.TmpLabel(compact.transform,"BẢN ĐỒ • [E] MỞ RỘNG",new Vector2(8,-5),new Vector2(310,25),15);
+            FarmUi.TmpLabel(compact.transform,FarmControls.Mobile?"BẢN ĐỒ • CHẠM XEM VIỆC":"BẢN ĐỒ • [E] MỞ RỘNG",new Vector2(8,-5),new Vector2(310,25),15);
             smallMap=MapBase(compact.transform,new Vector2(8,-32),new Vector2(150,108));
             DrawFarmGeometry(smallMap,smallMap);
             SmallLandmark("NHÀ",new Vector3(0,0,28),new Color(.8f,.5f,.2f));

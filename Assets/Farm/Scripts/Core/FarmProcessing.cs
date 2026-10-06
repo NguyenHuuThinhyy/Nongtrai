@@ -39,7 +39,7 @@ namespace NongTrai
         void Start()
         {
             string path=Path.Combine(Application.streamingAssetsPath,"recipes.json");
-            try { Recipes=JsonUtility.FromJson<FarmRecipeBook>(File.ReadAllText(path)).recipes; }
+            try { Recipes=JsonUtility.FromJson<FarmRecipeBook>(FarmData.ReadJson("recipes.json")).recipes; }
             catch(Exception ex) { Debug.LogError("Không đọc được công thức JSON: "+ex); Recipes=Array.Empty<FarmRecipe>(); }
             Panel=FarmUi.Panel(hud.transform,"Xưởng chế biến",new Vector2(1020,1015));
             header=FarmUi.Label(Panel.transform,"XƯỞNG CHẾ BIẾN",new Vector2(30,-20),new Vector2(920,50),30);

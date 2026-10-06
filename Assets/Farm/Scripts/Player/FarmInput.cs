@@ -15,6 +15,15 @@ namespace NongTrai
         public InputAction FlyToggle { get; private set; }
         public InputAction Descend { get; private set; }
         InputActionMap map;
+        public Vector2 Movement => FarmControls.Mobile ? FarmControls.Move : Move.ReadValue<Vector2>();
+        public Vector2 Looking => FarmControls.Mobile ? FarmControls.Look : Look.ReadValue<Vector2>();
+        public bool Sprint => FarmControls.Mobile ? FarmControls.Keys.leftShiftKey.isPressed : Run.IsPressed();
+        public bool JumpHeld => FarmControls.Mobile ? FarmControls.Keys.spaceKey.isPressed : Jump.IsPressed();
+        public bool JumpPressed => FarmControls.Mobile ? FarmControls.Keys.spaceKey.wasPressedThisFrame : Jump.WasPressedThisFrame();
+        public bool PausePressed => Pause.WasPressedThisFrame() || (FarmControls.Mobile && FarmControls.Keys[Key.Escape].wasPressedThisFrame);
+        public bool ViewPressed => FarmControls.Mobile ? FarmControls.Keys[Key.V].wasPressedThisFrame : View.WasPressedThisFrame();
+        public bool FlyPressed => FarmControls.Mobile ? FarmControls.Keys[Key.F8].wasPressedThisFrame : FlyToggle.WasPressedThisFrame();
+        public bool Descending => FarmControls.Mobile ? FarmControls.Keys[Key.LeftCtrl].isPressed : Descend.IsPressed();
 
         void Awake()
         {

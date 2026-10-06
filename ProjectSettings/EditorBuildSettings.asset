@@ -8,5 +8,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Farm/Scenes/Farm.unity
     guid: 76cb2283e163aed4fab7caf97e15c13c
-  m_configObjects: {}
+  m_configObjects:
+    UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 8210c46b37b12e844ba3fd23d157e3fc, type: 2}
+    com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 3a594276a6cd2a6409db7ea24a0d012d, type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 08075ad3318d2b04e8cd3a4391797084, type: 2}
   m_UseUCBPForAssetBundles: 0

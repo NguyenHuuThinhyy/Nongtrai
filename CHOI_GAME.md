@@ -1,3 +1,30 @@
+# Bản thử Android / AR / AI / Cloud
+
+© HThinh.yy. Bản local được chủ dự án duyệt gộp main ngày 06/10/2026.
+
+- **PC: chạy CHAY_GAME.bat** để tự mở backend nhẹ và ghi kết nối. Chờ “BACKEND SAN SANG”, vào game rồi nhấn C; AI chỉ nạp khi gửi câu hỏi, nhả RAM sau60giây không dùng. [Cách khởi động và xử lý lỗi](Docs/ASSISTANT_START.md).
+- **BAT_BACKEND_PC.bat** giữ riêng backend chạy; **CHAY_GAME_KHONG_TRO_LY.bat** chơi offline. AR không cần backend; nút Hỏi trợ lý cần backend.
+
+- **PC: C mở chatbot**, dùng được cả khi đang xem nông trại AR. Chat AI cần backend/model
+  đã chạy và mã kết nối; nút Hướng dẫn vẫn đọc được khi mất mạng.
+- **H ẩn/hiện bảng hướng dẫn**. Bảng có ghi phím này ngay trên nút Ẩn hướng dẫn.
+- **AR trên PC: nhấn J để mở/đóng**, hoặc Trợ lý / AR / Cloud → Nông trại AR. Chuột phải xoay, lăn chuột phóng,
+  click nền trống đặt mô hình thủ công, click cây/công trình xem thông tin.
+  Bật webcam ghép hình camera với nông trại; thiếu webcam vẫn xem mô hình được.
+  Đặt lại trả mô hình về giữa; Đóng AR/Esc tiếp tục chơi đúng vị trí cũ.
+- Android: joystick di chuyển, vuốt bên phải xoay camera; giữ Chạy, chạm Nhảy.
+  Dùng/Đánh = chuột trái; Tương tác = chuột phải. Cung giữ/thả nút, đào giữ nút,
+  xô múc/đặt bằng một nút, Xoay cho công trình, hotbar9ô có ảnh vật phẩm.
+- Menu chạm: túi/shop/máy/mở đất/chuồng/bản đồ và minigame/cho thú ăn/đổi góc/bay/lưu.
+  Túi có Tách nửa, Chuyển nhanh và kéo thả. Runner/câu cá/nhà hàng dùng nút chạm.
+- Trợ lý / AR / Cloud → Kết nối: địa chỉ PC cùng Wi-Fi và mã backend. Hướng dẫn
+  luôn có sẵn khi backend tắt. Mã Adafruit chỉ nhập ở PC; bạn có thể tạo tài khoản sau.
+- Nông trại AR: mô hình local mở ngay trên PC/Android; điện thoại kéo xoay, hai ngón phóng. Camera tùy chọn; chạm cây/công trình xem thông tin, Hỏi trợ lý cần backend; ĐóngAR quay về game.
+- Cloud mô phỏng: Bậtcloud sau khi đã xây trạm vùng đầu; dashboard ON/OFF điều khiển
+  trạm đó. Mất mạng trở về tưới cục bộ. Không cần mạng để chơi gameplay thường.
+- Cài/build/backend/model: xem Docs/RUBRIC_INTEGRATION.md. Kiểm tra thủ công:
+  Docs/ACCEPTANCE.md. APK đang là bản cài thử; AR/cloud thật cần thiết bị/tài khoản.
+
 # Tìm số 2D — 02-10-2026
 
 - **Tab → Tìm số 2D:** chọn số cần tìm trong lưới 7 × 7. Mỗi lượt có 5 câu, mỗi câu 5 giây. Click sai không cộng điểm; hết giờ chuyển câu tiếp.
@@ -10,7 +37,7 @@
 - Tên bắn từ vị trí cung/tay, hướng về điểm dưới dấu + và bù độ rơi trong tầm lực kéo. Kéo mạnh tăng tốc độ tên từ 16 đến 40 m/s; tên chịu trọng lực 9,81 m/s². Mục tiêu quá xa với lực kéo hiện tại có thông báo, cần kéo mạnh hơn hoặc tiến gần. Quái đang di chuyển vẫn cần ngắm đón.
 - Tường/khối giữa cung và mục tiêu chặn tên. Tên ghim vào vật thể/quái, có thể đến gần nhặt lại như trước.
 - Mỗi lần bắn thành công mất **1 tên + 1 độ bền của đúng chiếc cung đang cầm**. Thả quá sớm, hết tên, tạm dừng hoặc cung hỏng không tiêu hao. Cung còn 0 độ bền không bắn được: mở túi, chọn cung → **Sửa dụng cụ: 20 xu**. Thanh cung hiện ĐB /100.
-- Bản mới: `Builds/Windows-NumberMemory/NongTrai.exe`; chạy `CHAY_GAME.bat` ở gốc hoặc giải nén ZIP Windows NumberMemory trong DongGoi.
+- Bản mới: `Builds/Windows-Rubric/NongTrai.exe`; chạy `CHAY_GAME.bat` ở gốc hoặc giải nén ZIP Windows Rubric trong DongGoi.
 
 ## Rương, hồi sinh và chiến đấu
 

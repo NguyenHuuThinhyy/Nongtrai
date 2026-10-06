@@ -13,6 +13,7 @@ namespace NongTrai
         {
             yield return new WaitForSecondsRealtime(2);var r=FarmRestaurant.Ensure();player.SetPaused(true);
             Check(r.Built,"world missing");Check(RestaurantRecipes.All.Length==30,"recipes");Check(r.State.furniture.Count(f=>f.kind=="table")==24,"24 dining groups");
+            CheckFloorSurfaces(r.World);
             Check(new[]{0,1,2}.All(f=>r.State.furniture.Count(x=>x.kind=="table"&&x.floor==f)==new[]{8,10,6}[f]),"table distribution 8/10/6");
             Check(r.State.furniture.Count(f=>f.kind=="toilet")==4&&r.State.furniture.Count(f=>f.kind=="wash")==4,"separate men's/women's restrooms");
             Check(r.State.layoutRevision==RestaurantWorld.LayoutRevision,"layout revision initialized");
@@ -118,6 +119,24 @@ namespace NongTrai
             r.UI.Open("prep0","prep");yield return null;CaptureUI(camera,hud,folder,"03-recipes",1280,720);r.UI.Close();
             player.SetPaused(false);yield return new WaitForSecondsRealtime(3.1f);FarmFishing.Instance.Open();yield return null;CaptureUI(camera,hud,folder,"04-fishing",1280,720);CaptureUI(camera,hud,folder,"05-fishing",1920,1080);FarmFishing.Instance.Close();
             Object.Destroy(cameraGo);Debug.Log("FARM_RESTAURANT_OK • 30 recipes, inventory/save22/legacy21, serving, layout, stairs, guests and fishing");
+        }
+        static void CheckFloorSurfaces(RestaurantWorld world)
+        {
+            string[] names={"Sàn trệt","Sàn phía tây","Sàn phía đông","Sàn dưới cầu thang","Sàn trên cầu thang","Chiếu nghỉ nối tầng"};
+            var slabs=world.Shell.GetComponentsInChildren<Renderer>().Where(r=>names.Contains(r.name)).ToArray();
+            var foundation=world.transform.Find("Nền khu nhà hàng");
+            Check(foundation!=null,"foundation missing");
+            var ground=slabs.First(r=>r.name=="Sàn trệt").bounds;
+            Check(foundation.GetComponent<Renderer>().bounds.max.y<ground.max.y-.04f,"foundation coplanar with ground floor");
+            Check(Mathf.Abs(foundation.GetComponent<Collider>().bounds.max.y)<.001f,"foundation collider height changed");
+            for(int i=0;i<slabs.Length;i++)for(int j=i+1;j<slabs.Length;j++)
+            {
+                var a=slabs[i].bounds;var b=slabs[j].bounds;
+                float overlapX=Mathf.Min(a.max.x,b.max.x)-Mathf.Max(a.min.x,b.min.x);
+                float overlapZ=Mathf.Min(a.max.z,b.max.z)-Mathf.Max(a.min.z,b.min.z);
+                Check(Mathf.Abs(a.max.y-b.max.y)>.001f||overlapX<.001f||overlapZ<.001f,"coplanar floor overlap: "+slabs[i].name+" / "+slabs[j].name);
+            }
+            Debug.Log("FARM_RESTAURANT_FLOORS_OK: foundation separated; floor/landing surfaces do not overlap; collider support unchanged.");
         }
         static IEnumerator Fishing(FarmHud hud,FarmPlayer player)
         {

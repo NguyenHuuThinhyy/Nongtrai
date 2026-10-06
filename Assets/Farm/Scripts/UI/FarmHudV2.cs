@@ -117,7 +117,10 @@ namespace NongTrai
             if(bag==null){tooltip.text=names[selectedSlot];return;}
             bool farm=hud.player.transform.position.y<500;
             string action;
-            if(bag.HoldingBlock)action="Chuột trái: đặt khối cạnh mặt đang ngắm";
+            if(bag.Item==105)action="Chuột trái: múc khi xô rỗng / đặt nước khi xô đầy";
+            else if(bag.Item==111)action="Giữ chuột trái để kéo cung; thả để bắn";
+            else if(FarmControls.Mobile&&AdventureBag.IsEdible(bag.Item))action="Giữ Dùng / Ăn 3 giây";
+            else if(bag.HoldingBlock)action="Chuột trái: đặt khối cạnh mặt đang ngắm";
             else if(farm&&bag.Item>=40&&bag.Item<=42)action="Chuột trái: gieo trên ô đã xới";
             else if(farm&&bag.Item>=49&&bag.Item<=51)action="Chuột phải vào đất vườn: trồng cây";
             else if(bag.Item>=52&&bag.Item<=55)action="Đến máng ăn chuồng và click để cho cả chuồng ăn";
@@ -134,14 +137,14 @@ namespace NongTrai
             else if(bag.Item==27)action="Chuột phải vào đất trống: trồng cây";
             else if(bag.Item>=0&&bag.Item<=3||bag.Item>=9&&bag.Item<=11||bag.Item==32||bag.Item==33||bag.Item==39||bag.Item>=43&&bag.Item<=48||bag.Item>=60&&bag.Item<=62)action="Chuột phải: ăn";
             else action=farm?"Ngắm vật thể • chuột trái tương tác":"Giữ trái: đào/đánh • chuột phải: dùng";
-            tooltip.text="["+(selectedSlot+1)+"] "+bag.Name(bag.Item)+" • "+action;
+            tooltip.text=FarmControls.DisplayHint("["+(selectedSlot+1)+"] "+bag.Name(bag.Item)+" • "+action);
         }
         public void ShowTooltip(string value) { if(string.IsNullOrEmpty(value)) ShowSelected();else if(tooltip!=null) tooltip.text=value; }
         void Update()
         {
             if(hud.player.Paused) return;
             bool building=FarmBuildingSystem.Instance!=null&&FarmBuildingSystem.Instance.PaletteOpen;
-            var keyboard=Keyboard.current;
+            var keyboard=FarmControls.Keys;
             if(keyboard!=null&&!building)
             {
                 for(int i=0;i<9;i++)
@@ -149,9 +152,9 @@ namespace NongTrai
                     if(keyboard[digitKeys[i]].wasPressedThisFrame) { Select(i);break; }
                 }
             }
-            if(Mouse.current!=null&&!building)
+            if(FarmControls.Pointer!=null&&!building)
             {
-                float wheel=Mouse.current.scroll.ReadValue().y;
+                float wheel=FarmControls.Pointer.scroll.ReadValue().y;
                 if(Mathf.Abs(wheel)>.05f) Select(((AdventureBag.Instance==null?selectedSlot:AdventureBag.Instance.Selected)+(wheel<0?1:8))%9);
             }
             displayedMoney=Mathf.MoveTowards(displayedMoney,shop.Money,Time.deltaTime*Mathf.Max(50,Mathf.Abs(shop.Money-displayedMoney)*3));
@@ -166,7 +169,7 @@ namespace NongTrai
             if(survivalText!=null)survivalText.text="MÁU "+Mathf.CeilToInt(health)+"/100    NO "+Mathf.CeilToInt(hunger)+"%";
             if(healthFill!=null)healthFill.rectTransform.sizeDelta=new Vector2(165*Mathf.Clamp01(health/100),22);
             if(hungerFill!=null)hungerFill.rectTransform.sizeDelta=new Vector2(165*Mathf.Clamp01(hunger/100),22);
-            creativeControls.text=CreativeModeManager.IsCreative?
+            creativeControls.text=FarmControls.Mobile?(CreativeModeManager.IsCreative?"SÁNG TẠO • Menu: bật/tắt bay\nNhảy: lên • Hạ / Bay: xuống":""):CreativeModeManager.IsCreative?
                 (CreativeModeManager.IsFlying?"ĐANG BAY • Space lên, X xuống\nShift nhanh • F8 tắt bay":"SÁNG TẠO • F8 bật bay\nB: túi đồ và xây dựng"):
                 "E: bản đồ việc • TAB: đổi map\nB: túi/xây • lăn chuột: chọn";
             var bag=AdventureBag.Instance;

@@ -1,0 +1,59 @@
+api-1  | INFO:     Started server process [1]
+api-1  | INFO:     Waiting for application startup.
+api-1  | INFO:     Application startup complete.
+api-1  | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+api-1  | INFO:     127.0.0.1:55608 - "GET /health HTTP/1.1" 200 OK
+api-1  | INFO:     172.18.0.1:52362 - "GET /health HTTP/1.1" 200 OK
+api-1  | INFO:     172.18.0.1:52374 - "GET /v1/pair HTTP/1.1" 200 OK
+api-1  | INFO:     172.18.0.1:52386 - "POST /v1/chat HTTP/1.1" 200 OK
+ollama-1  | Couldn't find '/root/.ollama/id_ed25519'. Generating new private key.
+ollama-1  | Your new public key is: 
+ollama-1  | 
+ollama-1  | ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINQkr+zJLKKc3gw4NvL71TWNtLW6fOKrxJ++b8fTkLQm
+ollama-1  | 
+ollama-1  | time=2026-10-05T06:23:30.242Z level=INFO source=routes.go:1475 msg="server config" env="map[CUDA_VISIBLE_DEVICES: GPU_DEVICE_ORDINAL: HIP_VISIBLE_DEVICES: HSA_OVERRIDE_GFX_VERSION: HTTPS_PROXY: HTTP_PROXY: NO_PROXY: OLLAMA_CONTEXT_LENGTH:4096 OLLAMA_DEBUG:INFO OLLAMA_FLASH_ATTENTION:false OLLAMA_GPU_OVERHEAD:0 OLLAMA_HOST:http://0.0.0.0:11434 OLLAMA_INTEL_GPU:false OLLAMA_KEEP_ALIVE:5m0s OLLAMA_KV_CACHE_TYPE: OLLAMA_LLM_LIBRARY: OLLAMA_LOAD_TIMEOUT:5m0s OLLAMA_MAX_LOADED_MODELS:0 OLLAMA_MAX_QUEUE:512 OLLAMA_MODELS:/root/.ollama/models OLLAMA_MULTIUSER_CACHE:false OLLAMA_NEW_ENGINE:false OLLAMA_NOHISTORY:false OLLAMA_NOPRUNE:false OLLAMA_NUM_PARALLEL:1 OLLAMA_ORIGINS:[http://localhost https://localhost http://localhost:* https://localhost:* http://127.0.0.1 https://127.0.0.1 http://127.0.0.1:* https://127.0.0.1:* http://0.0.0.0 https://0.0.0.0 http://0.0.0.0:* https://0.0.0.0:* app://* file://* tauri://* vscode-webview://* vscode-file://*] OLLAMA_REMOTES:[ollama.com] OLLAMA_SCHED_SPREAD:false ROCR_VISIBLE_DEVICES: http_proxy: https_proxy: no_proxy:]"
+ollama-1  | time=2026-10-05T06:23:30.242Z level=INFO source=images.go:518 msg="total blobs: 0"
+ollama-1  | time=2026-10-05T06:23:30.242Z level=INFO source=images.go:525 msg="total unused blobs removed: 0"
+ollama-1  | time=2026-10-05T06:23:30.242Z level=INFO source=routes.go:1528 msg="Listening on [::]:11434 (version 0.12.3)"
+ollama-1  | time=2026-10-05T06:23:30.242Z level=INFO source=gpu.go:217 msg="looking for compatible GPUs"
+ollama-1  | time=2026-10-05T06:23:30.244Z level=INFO source=gpu.go:396 msg="no compatible GPUs were discovered"
+ollama-1  | time=2026-10-05T06:23:30.244Z level=INFO source=types.go:131 msg="inference compute" id=0 library=cpu variant="" compute="" driver=0.0 name="" total="15.6 GiB" available="14.2 GiB"
+ollama-1  | time=2026-10-05T06:23:30.244Z level=INFO source=routes.go:1569 msg="entering low vram mode" "total vram"="15.6 GiB" threshold="20.0 GiB"
+ollama-1  | [GIN] 2026/10/05 - 06:23:35 | 200 |      49.959µs |       127.0.0.1 | HEAD     "/"
+ollama-1  | [GIN] 2026/10/05 - 06:23:35 | 200 |      213.77µs |       127.0.0.1 | GET      "/api/tags"
+ollama-1  | [GIN] 2026/10/05 - 06:23:41 | 200 |     300.678µs |      172.18.0.3 | GET      "/api/tags"
+ollama-1  | [GIN] 2026/10/05 - 06:23:41 | 200 |      26.645µs |       127.0.0.1 | HEAD     "/"
+ollama-1  | time=2026-10-05T06:23:42.101Z level=INFO source=download.go:177 msg="downloading 3d0b790534fe in 14 100 MB part(s)"
+ollama-1  | [GIN] 2026/10/05 - 06:23:45 | 200 |      24.955µs |       127.0.0.1 | HEAD     "/"
+ollama-1  | [GIN] 2026/10/05 - 06:23:45 | 200 |      87.105µs |       127.0.0.1 | GET      "/api/tags"
+ollama-1  | time=2026-10-05T06:23:45.347Z level=INFO source=download.go:177 msg="downloading ae370d884f10 in 1 1.7 KB part(s)"
+ollama-1  | time=2026-10-05T06:23:46.584Z level=INFO source=download.go:177 msg="downloading d18a5cc71b84 in 1 11 KB part(s)"
+ollama-1  | time=2026-10-05T06:23:47.840Z level=INFO source=download.go:177 msg="downloading cff3f395ef37 in 1 120 B part(s)"
+ollama-1  | time=2026-10-05T06:23:49.098Z level=INFO source=download.go:177 msg="downloading 517ccaff02fe in 1 487 B part(s)"
+ollama-1  | [GIN] 2026/10/05 - 06:23:51 | 200 |   9.62938472s |       127.0.0.1 | POST     "/api/pull"
+ollama-1  | [GIN] 2026/10/05 - 06:23:51 | 200 |     332.302µs |      172.18.0.3 | GET      "/api/tags"
+ollama-1  | time=2026-10-05T06:23:51.549Z level=INFO source=server.go:399 msg="starting runner" cmd="/usr/bin/ollama runner --ollama-engine --model /root/.ollama/models/blobs/sha256-3d0b790534fe4b79525fc3692950408dca41171676ed7e21db57af5c65ef6ab6 --port 35195"
+ollama-1  | time=2026-10-05T06:23:51.549Z level=INFO source=server.go:672 msg="loading model" "model layers"=29 requested=-1
+ollama-1  | time=2026-10-05T06:23:51.549Z level=INFO source=server.go:678 msg="system memory" total="15.6 GiB" free="14.3 GiB" free_swap="3.0 GiB"
+ollama-1  | time=2026-10-05T06:23:51.558Z level=INFO source=runner.go:1252 msg="starting ollama engine"
+ollama-1  | time=2026-10-05T06:23:51.558Z level=INFO source=runner.go:1287 msg="Server listening on 127.0.0.1:35195"
+ollama-1  | time=2026-10-05T06:23:51.560Z level=INFO source=runner.go:1171 msg=load request="{Operation:fit LoraPath:[] Parallel:1 BatchSize:512 FlashAttention:false KvSize:4096 KvCacheType: NumThreads:2 GPULayers:[] MultiUserCache:false ProjectorPath: MainGPU:0 UseMmap:false}"
+ollama-1  | time=2026-10-05T06:23:51.579Z level=INFO source=ggml.go:131 msg="" architecture=qwen3 file_type=Q4_K_M name="Qwen3 1.7B" description="" num_tensors=311 num_key_values=28
+ollama-1  | load_backend: loaded CPU backend from /usr/lib/ollama/libggml-cpu-icelake.so
+ollama-1  | time=2026-10-05T06:23:51.584Z level=INFO source=ggml.go:104 msg=system CPU.0.SSE3=1 CPU.0.SSSE3=1 CPU.0.AVX=1 CPU.0.AVX2=1 CPU.0.F16C=1 CPU.0.FMA=1 CPU.0.BMI2=1 CPU.0.AVX512=1 CPU.0.AVX512_VBMI=1 CPU.0.AVX512_VNNI=1 CPU.0.LLAMAFILE=1 CPU.1.LLAMAFILE=1 compiler=cgo(gcc)
+ollama-1  | time=2026-10-05T06:23:51.587Z level=INFO source=runner.go:1171 msg=load request="{Operation:alloc LoraPath:[] Parallel:1 BatchSize:512 FlashAttention:false KvSize:4096 KvCacheType: NumThreads:2 GPULayers:[] MultiUserCache:false ProjectorPath: MainGPU:0 UseMmap:false}"
+ollama-1  | time=2026-10-05T06:23:51.711Z level=INFO source=runner.go:1171 msg=load request="{Operation:commit LoraPath:[] Parallel:1 BatchSize:512 FlashAttention:false KvSize:4096 KvCacheType: NumThreads:2 GPULayers:[] MultiUserCache:false ProjectorPath: MainGPU:0 UseMmap:false}"
+ollama-1  | time=2026-10-05T06:23:51.711Z level=INFO source=ggml.go:487 msg="offloading 0 repeating layers to GPU"
+ollama-1  | time=2026-10-05T06:23:51.711Z level=INFO source=ggml.go:491 msg="offloading output layer to CPU"
+ollama-1  | time=2026-10-05T06:23:51.711Z level=INFO source=ggml.go:498 msg="offloaded 0/29 layers to GPU"
+ollama-1  | time=2026-10-05T06:23:51.714Z level=INFO source=backend.go:315 msg="model weights" device=CPU size="1.3 GiB"
+ollama-1  | time=2026-10-05T06:23:51.714Z level=INFO source=backend.go:326 msg="kv cache" device=CPU size="448.0 MiB"
+ollama-1  | time=2026-10-05T06:23:51.714Z level=INFO source=backend.go:337 msg="compute graph" device=CPU size="144.0 MiB"
+ollama-1  | time=2026-10-05T06:23:51.714Z level=INFO source=backend.go:342 msg="total memory" size="1.8 GiB"
+ollama-1  | time=2026-10-05T06:23:51.714Z level=INFO source=sched.go:470 msg="loaded runners" count=1
+ollama-1  | time=2026-10-05T06:23:51.714Z level=INFO source=server.go:1251 msg="waiting for llama runner to start responding"
+ollama-1  | time=2026-10-05T06:23:51.715Z level=INFO source=server.go:1285 msg="waiting for server to become available" status="llm server loading model"
+ollama-1  | time=2026-10-05T06:23:51.966Z level=INFO source=server.go:1289 msg="llama runner started in 0.42 seconds"
+ollama-1  | [GIN] 2026/10/05 - 06:23:55 | 200 |      28.473µs |       127.0.0.1 | HEAD     "/"
+ollama-1  | [GIN] 2026/10/05 - 06:23:55 | 200 |     309.763µs |       127.0.0.1 | GET      "/api/tags"
+ollama-1  | [GIN] 2026/10/05 - 06:24:03 | 200 | 12.432248324s |      172.18.0.3 | POST     "/api/chat"

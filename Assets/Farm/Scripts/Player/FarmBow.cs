@@ -47,7 +47,7 @@ namespace NongTrai
         void LateUpdate()
         {
             var bag = AdventureBag.Instance;
-            bool equipped = bag != null && bag.Item == 111 && !player.Paused && Mouse.current != null;
+            bool equipped = bag != null && bag.Item == 111 && !player.Paused && FarmControls.Pointer != null;
             indicator.gameObject.SetActive(equipped); powerBack.SetActive(equipped);
             if (!equipped || FarmHud.WorldClickSuppressed) { CancelDraw(); return; }
             if (drawing && drawnBow != bag.Slots[bag.Selected]) CancelDraw();
@@ -55,18 +55,18 @@ namespace NongTrai
             power.rectTransform.sizeDelta = new Vector2(294*charge,12);
             power.color = Color.Lerp(new Color(.97f,.62f,.17f),new Color(.36f,.86f,.38f),charge);
             indicator.text = Time.time < messageUntil ? message : "CUNG • " + bag.inventory.Count(63) + " tên • ĐB " + bag.Slots[bag.Selected].durability + "/100 • giữ trái kéo " + Mathf.RoundToInt(charge*100) + "% • thả bắn";
-            if (Mouse.current.leftButton.wasPressedThisFrame)
+            if (FarmControls.Pointer.leftButton.wasPressedThisFrame)
             {
                 if (bag.Slots[bag.Selected].durability <= 0) { Tell("Cung đã hỏng • mở túi, chọn cung rồi Sửa dụng cụ."); return; }
                 drawStart = Time.time; drawing = true; drawnBow = bag.Slots[bag.Selected];
             }
             if (!drawing) return;
-            if (Mouse.current.leftButton.wasReleasedThisFrame)
+            if (FarmControls.Pointer.leftButton.wasReleasedThisFrame)
             {
                 CancelDraw();
                 if (Camera.main != null) TryFire(charge, FarmAim.Ray(Camera.main));
             }
-            else if (!Mouse.current.leftButton.isPressed) CancelDraw();
+            else if (!FarmControls.Pointer.leftButton.isPressed) CancelDraw();
         }
         void CancelDraw() { drawing = false; drawnBow = null; }
         void OnDisable() => CancelDraw();

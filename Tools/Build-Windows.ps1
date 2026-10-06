@@ -2,7 +2,7 @@
 [CmdletBinding()]
 param(
     [string]$UnityEditor,
-    [string]$OutputDirectory = 'Builds/Windows'
+    [string]$OutputDirectory = 'Builds/Windows-Rubric'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -45,13 +45,13 @@ New-Item -ItemType Directory -Path $logFolder -Force | Out-Null
 $logPath = Join-Path $logFolder ('build-' + (Get-Date -Format 'yyyyMMdd-HHmmss') + '.log')
 $previousOutput = $env:FARM_BUILD_OUTPUT
 try {
-    $env:FARM_BUILD_OUTPUT = $outputPath
-    $arguments = @('-batchmode', '-nographics', '-quit', '-projectPath', ('"' + $taskProjectRoot + '"'),
-        '-executeMethod', 'NongTrai.Editor.FarmProjectBuilder.BuildWindowsCurrentScene', '-logFile', ('"' + $logPath + '"'))
+    $env:FARM_BUILD_OUTPUT = Join-Path $outputPath 'NongTrai.exe'
+    $arguments = @('-batchmode', '-nographics', '-quit', '-projectPath', ('"' + $taskProjectRoot + '"'), '-buildTarget', 'StandaloneWindows64',
+        '-executeMethod', 'NongTrai.Editor.FarmTechnologyBuild.BuildWindows', '-logFile', ('"' + $logPath + '"'))
     # Wait only for the editor, not background processes inherited by its Windows job.
     $process = Start-Process -FilePath $UnityEditor -ArgumentList $arguments -PassThru -WindowStyle Hidden
     $process.WaitForExit()
-    if ($process.ExitCode -ne 0 -or -not (Select-String -LiteralPath $logPath -Pattern 'FARM_M1_BUILD_OK' -Quiet)) {
+    if ($process.ExitCode -ne 0 -or -not (Select-String -LiteralPath $logPath -Pattern 'FARM_BUILD_RESULT Succeeded' -Quiet)) {
         throw "Unity build failed. Read $logPath"
     }
     Write-Output ('Built: ' + (Join-Path $outputPath 'NongTrai.exe'))

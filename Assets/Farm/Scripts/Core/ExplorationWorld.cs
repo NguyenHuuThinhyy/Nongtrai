@@ -300,8 +300,8 @@ namespace NongTrai
             if(hud.player.Paused||FarmHud.WorldClickSuppressed||FarmBuildingSystem.Instance.IsBuilding||
                 AdventureBag.Instance!=null&&(AdventureBag.Instance.Item==69||AdventureBag.Instance.Item==105||AdventureBag.Instance.Item==111||AdventureBag.IsEdible(AdventureBag.Instance.Item))||
                 FarmWaterSystem.Instance!=null&&(FarmWaterSystem.Instance.PendingPlacement||FarmWaterSystem.Instance.ConsumedFrame==Time.frameCount)){hold=0;return;}
-            var cam=Camera.main;if(cam==null||Mouse.current==null)return;
-            UpdateMiningRay(FarmAim.Ray(cam),Mouse.current.leftButton.isPressed,Time.deltaTime);
+            var cam=Camera.main;if(cam==null||FarmControls.Pointer==null)return;
+            UpdateMiningRay(FarmAim.Ray(cam),FarmControls.Pointer.leftButton.isPressed,Time.deltaTime);
         }
         public bool UpdateMiningRay(Ray ray,bool pressed,float elapsed)
         {
@@ -353,7 +353,7 @@ namespace NongTrai
                     if(forge!=null&&(AdventureBag.Instance==null||AdventureBag.Instance.Item!=107))
                     {hold=0;miningHint="Bàn rèn • chuột trái/phải mở • cầm rìu để phá";if(pressed)forge.Interact(hud.interaction);return false;}
                     var fire=placed.GetComponent<CampfireCooker>();
-                    if(fire!=null&&AdventureBag.Instance!=null&&AdventureBag.Instance.Item==7&&Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame)
+                    if(fire!=null&&AdventureBag.Instance!=null&&AdventureBag.Instance.Item==7&&FarmControls.Pointer!=null&&FarmControls.Pointer.leftButton.wasPressedThisFrame)
                     {fire.Interact(hud.interaction);hold=0;return false;}
                     if(entityTarget!=placed.GetInstanceID()){entityTarget=placed.GetInstanceID();hold=0;}
                     int material=placed.type==0?7:placed.type==1||placed.type==4?3:1;

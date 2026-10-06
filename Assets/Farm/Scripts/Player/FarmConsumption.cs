@@ -15,7 +15,7 @@ namespace NongTrai
         {
             var bag=AdventureBag.Instance;int item=bag==null?-1:bag.Item;
             bool edible=AdventureBag.IsEdible(item);label.gameObject.SetActive(edible&&!player.Paused);
-            bool down=Mouse.current!=null&&Mouse.current.leftButton.isPressed&&!FarmHud.WorldClickSuppressed;
+            bool down=FarmControls.Pointer!=null&&FarmControls.Pointer.leftButton.isPressed&&!FarmHud.WorldClickSuppressed;
             Advance(item,down&&!player.Paused,Time.deltaTime);
             if(edible)label.text=(item==67?"UỐNG BÌNH MÁU":"ĂN "+bag.Name(item))+" • giữ trái 3 giây • "+Mathf.RoundToInt(Progress*100)+"%";
         }

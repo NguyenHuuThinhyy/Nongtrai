@@ -101,7 +101,7 @@ namespace NongTrai
             overlay.SetActive(true);overlay.transform.SetAsLastSibling();EnsureCloseButton(overlay);
         }
         public bool HandleEscape()
-        { if(FarmFishing.Instance!=null&&FarmFishing.Instance.IsOpen){FarmFishing.Instance.Close();return true;} if(FarmRestaurant.Instance!=null&&FarmRestaurant.Instance.UI!=null&&FarmRestaurant.Instance.UI.IsOpen){FarmRestaurant.Instance.UI.Close();return true;} if(FarmNumberMemory.Instance!=null&&FarmNumberMemory.Instance.IsOpen){FarmNumberMemory.Instance.Close();return true;} if(FarmRunner.Instance!=null&&FarmRunner.Instance.IsRunning){FarmRunner.Instance.Finish();return true;} if(settingsPanel!=null && settingsPanel.activeSelf) { CloseSettings();return true; }
+        { if(FarmServices.Instance!=null&&FarmServices.Instance.HandleEscape())return true; if(FarmFishing.Instance!=null&&FarmFishing.Instance.IsOpen){FarmFishing.Instance.Close();return true;} if(FarmRestaurant.Instance!=null&&FarmRestaurant.Instance.UI!=null&&FarmRestaurant.Instance.UI.IsOpen){FarmRestaurant.Instance.UI.Close();return true;} if(FarmNumberMemory.Instance!=null&&FarmNumberMemory.Instance.IsOpen){FarmNumberMemory.Instance.Close();return true;} if(FarmRunner.Instance!=null&&FarmRunner.Instance.IsRunning){FarmRunner.Instance.Finish();return true;} if(settingsPanel!=null && settingsPanel.activeSelf) { CloseSettings();return true; }
           if(AdventureWolves.Instance!=null&&AdventureWolves.Instance.IsAwaitingRespawn)return true;
           if(CloseOverlay()) return true;
           return mainMenu!=null && mainMenu.activeSelf; }
@@ -116,6 +116,7 @@ namespace NongTrai
         }
         public bool CloseOverlay()
         {
+            if(FarmServices.Instance!=null&&FarmServices.Instance.HandleEscape())return true;
             if(AdventureWolves.Instance!=null&&AdventureWolves.Instance.IsAwaitingRespawn)return false;
             if(FarmFishing.Instance!=null&&FarmFishing.Instance.IsOpen){FarmFishing.Instance.Close();return true;}
             if(FarmRestaurant.Instance!=null&&FarmRestaurant.Instance.UI!=null&&FarmRestaurant.Instance.UI.IsOpen){FarmRestaurant.Instance.UI.Close();return true;}
@@ -135,32 +136,36 @@ namespace NongTrai
         void OnEnable() { interaction.Message += ShowMessage; player.PauseChanged += OnPause; }
         void OnDisable() { interaction.Message -= ShowMessage; player.PauseChanged -= OnPause; }
         void OnPause(bool paused)
-        { RefreshModeButtons();if(FarmNumberMemory.Instance!=null&&FarmNumberMemory.Instance.IsOpen){gameplayChrome.SetActive(false);pausePanel.SetActive(false);return;} if(FarmRunner.Instance!=null&&FarmRunner.Instance.IsRunning){gameplayChrome.SetActive(false);pausePanel.SetActive(false);return;}
+        { RefreshModeButtons();if(FarmAR.Instance!=null&&FarmAR.Instance.Active){gameplayChrome.SetActive(false);pausePanel.SetActive(false);return;}if(FarmNumberMemory.Instance!=null&&FarmNumberMemory.Instance.IsOpen){gameplayChrome.SetActive(false);pausePanel.SetActive(false);return;} if(FarmRunner.Instance!=null&&FarmRunner.Instance.IsRunning){gameplayChrome.SetActive(false);pausePanel.SetActive(false);return;}
           if(gameplayChrome!=null) gameplayChrome.SetActive(!paused);
           pausePanel.SetActive(paused && (mainMenu==null || !mainMenu.activeSelf) && (settingsPanel==null || !settingsPanel.activeSelf));instructions.SetActive(false);
           if(!paused) { if(mainMenu!=null) mainMenu.SetActive(false);if(settingsPanel!=null) settingsPanel.SetActive(false); } }
         public void ToggleInstructions() => instructions.SetActive(!instructions.activeSelf);
-        void ShowMessage(string text) { toast.text = text; remaining = 6; }
+        void ShowMessage(string text) { toast.text = FarmControls.DisplayHint(text); remaining = 6; }
         public void Notify(string text) => ShowMessage(text);
         void Update()
         {
             if(FarmNumberMemory.Instance!=null&&FarmNumberMemory.Instance.IsOpen)return;
             if(FarmRunner.Instance!=null&&FarmRunner.Instance.IsRunning)return;
-            var keysForMap=Keyboard.current;
+            var keysForMap=FarmControls.Keys;
             if(!player.Paused&&keysForMap!=null&&keysForMap.eKey.wasPressedThisFrame)
             {FarmNoticeBoard.Instance?.Open();return;}
             var overlay=ActiveOverlay();
             if(overlay!=null && player.Paused && (AdventureWolves.Instance==null||!AdventureWolves.Instance.IsAwaitingRespawn))
             {
                 EnsureCloseButton(overlay);
-                var keys=Keyboard.current;
-                if(keys!=null && keys.xKey.wasPressedThisFrame){CloseOverlay();return;}
-                if(keys!=null && keys.eKey.wasPressedThisFrame)
+                var keys=FarmControls.Keys;
+                var selected=UnityEngine.EventSystems.EventSystem.current?.currentSelectedGameObject;
+                var textInput=selected!=null?selected.GetComponentInParent<TMPro.TMP_InputField>():null;
+                var legacyInput=selected!=null?selected.GetComponentInParent<UnityEngine.UI.InputField>():null;
+                bool typing=(textInput!=null&&textInput.isFocused)||(legacyInput!=null&&legacyInput.isFocused);
+                if(!typing && keys!=null && keys.xKey.wasPressedThisFrame){CloseOverlay();return;}
+                if(!typing && keys!=null && keys.eKey.wasPressedThisFrame)
                 {
                     bool map=FarmNoticeBoard.Instance!=null&&FarmNoticeBoard.Instance.IsOpen;
                     CloseOverlay();if(!map)FarmNoticeBoard.Instance?.Open();return;
                 }
-                var mouse=Mouse.current;
+                var mouse=FarmControls.Pointer;
                 if(mouse!=null&&mouse.leftButton.wasPressedThisFrame)
                 {
                     var canvas=GetComponentInParent<Canvas>();
@@ -170,7 +175,7 @@ namespace NongTrai
                 }
             }
             if(saveButton!=null) saveButton.interactable=!CreativeModeManager.IsCreative;
-            prompt.text = player.Paused?"":interaction.Hint.Replace("[E]","[CHUỘT TRÁI]");
+            prompt.text = player.Paused?"":FarmControls.DisplayHint(interaction.Hint.Replace("[E]","[CHUỘT TRÁI]"));
             if (farmingStatus != null && interaction.field != null)
             {
                 var field = interaction.field;

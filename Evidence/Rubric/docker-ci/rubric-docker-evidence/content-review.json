@@ -1,0 +1,194 @@
+{
+  "source_commit": "a7dcc3b6ad56f2daa101f0ddad8bd8c6a45e6731",
+  "ci_run": "https://github.com/NguyenHuuThinhyy/Nongtrai/actions/runs/37272084372",
+  "reviewer": "Codex reviewed all 30 expected facts and selected source paragraphs; owner acceptance pending",
+  "raw_sha256": "67475f40c64ab9056f0d218861b596fb0c7e73a94989eea1467bcf652ec5648a",
+  "correct": 30,
+  "total": 30,
+  "failed": [],
+  "warm_mean_seconds": 5.353,
+  "warm_over_30_seconds": 0,
+  "conversation": "PASS: bow follow-ups, unsupported topics, real PC AR/webcam and C/H answers",
+  "cases": [
+    {
+      "index": 1,
+      "question": "Làm sao gieo hạt?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 2,
+      "question": "Phân bón tăng tiến độ bao nhiêu?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 3,
+      "question": "Xô rỗng lấy nước ở hồ thế nào?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 4,
+      "question": "Xô đầy đặt nước xong còn đầy không?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 5,
+      "question": "Bọt biển hút rộng bao nhiêu?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 6,
+      "question": "Hong bọt biển đầy mất bao lâu?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 7,
+      "question": "Thuê vòi giá bao nhiêu?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 8,
+      "question": "LV5 thuê tối đa mấy vòi mỗi ngày?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 9,
+      "question": "Cung kéo đầy mất mấy giây?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 10,
+      "question": "Cung mỗi lần bắn giảm độ bền không?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 11,
+      "question": "Cung hỏng sửa bao nhiêu xu?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 12,
+      "question": "Kiếm hồi chiêu gốc bao nhiêu?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 13,
+      "question": "Đổi chỉ số rèn tốn gì?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 14,
+      "question": "Kiếm LV5 có hiệu ứng nào?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 15,
+      "question": "Hồi sinh tại chỗ tốn bao nhiêu?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 16,
+      "question": "Chết hồi sinh miễn phí mất gì?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 17,
+      "question": "Công thức cổng hồi sinh?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 18,
+      "question": "Có thể đặt hai cổng tự chế không?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 19,
+      "question": "Châm TNT dùng vật gì?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 20,
+      "question": "TNT nổ sau bao lâu?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 21,
+      "question": "Mở rương còn câu hỏi không?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 22,
+      "question": "Rương boss có hạt gì?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 23,
+      "question": "Boss Golem có bao nhiêu HP?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 24,
+      "question": "Túi đồ có mấy ô?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 25,
+      "question": "Bình máu hồi bao nhiêu?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 26,
+      "question": "Tìm số 2D đạt 5/5 được bao nhiêu xu?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 27,
+      "question": "Farm Runner mua vé bao nhiêu?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 28,
+      "question": "Thoát game có tự lưu không?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 29,
+      "question": "Nhà hàng có bao nhiêu bàn và món?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    },
+    {
+      "index": 30,
+      "question": "Cloud có dùng cảm biến thật không?",
+      "correct": true,
+      "reason": "Expected facts reviewed against the complete source-derived guide paragraph; response matches the expected chapter"
+    }
+  ]
+}

@@ -1,30 +1,25 @@
-# Bản hiện tại — NumberMemory / 02-10-2026
+# Handoff local — 06/10/2026
 
-## Nhánh và source
+© HThinh.yy. Dự án D:/GAME_NongTrai, nhánh codex/rubric-mobile-ar-ai-cloud.
+Chủ dự án xác nhận gộp bản local vào main ngày 06/10/2026. Không chạy builder dựng scene.
 
-Làm việc trên codex/number-memory-rewards từ main ad74f22 (đã chứa VisualRedesign). Chỉ gộp main sau khi build Windows và các smoke đạt. Source live D:/GAME_NongTrai; Git mirror D:/GAME_NongTrai/Nongtrai; remote https://github.com/NguyenHuuThinhyy/Nongtrai.git.
+- Đã bỏ Dockerfile/Compose và CI container. Workflow hiện tại kiểm backend/launcher trên Windows.
+- CHAY_GAME.bat → Tools/Start-Assistant.ps1 → Backend/launcher.py. Kiểm runtime/model digest/health/pair,
+  ghi farm-connection.json rồi mở game. AI chỉ nạp khi hỏi, keep_alive60s; -VerifyModel thử câu hỏi thật.
+- CHAY_GAME_KHONG_TRO_LY.bat chơi ngay offline. BAT_BACKEND_PC.bat giữ backend, bản CHO_DIEN_THOAI dùng LAN.
+- .env/.runtime/runtime.local.json đều ignored. File runtime.local.json trên máy trỏ cache sẵn trong D:/NongTrai_LuuTru.
+  Không đóng model weights, Python/Ollama binaries hay khóa vào Git. Máy mới launcher tải một lần.
+- FarmAR.Open mở miniature local trên mọi platform, không cần server/XR session. PC chuột phải/lăn chuột;
+  mobile kéo/hai ngón; camera tùy chọn640×480/24FPS, mặc định tắt. Giữ snapshot tối đa16ruộng.
+  Thư viện/provider XR cũ vẫn còn để tương thích build; chế độ mặc định không gọi Begin tracking.
+- FarmServices C mở chat, H ẩn/hiện tutorial. FarmHud không đóng bảng vì E/X khi input focus.
+- Save22 giữ trên máy, đọc21. URL/history chat độc lập save. Farm.unity SHA
+  c6566d428bb42535efeb421c376cf984eec5e761be6da945d10ed251bd179416 không đổi.
+- Cloud Adafruit tùy chọn: chưa có tài khoản, giữ tắt; mất mạng tưới local. Không gửi gameplay save.
+- Gói Windows phải chứa Backend/Tools/BAT bên cạnh EXE/Data/DLL. Source và APK đóng riêng.
+  Release hiện tại rubric-preview-20261006. Manifest ghi nguồn build và nguồn gói riêng.
 
-Unity 6000.3.22f1, URP, Windows Mono. Scene Farm giữ nguyên: SHA256 d4d1ffaabbeddafe2b86b6732b3598fe518fb61254870cba6a4d79d3244e182d. Không đổi ProductName/EditorBuildSettings, không chạy FarmProjectBuilder.CreateScene hoặc RebuildSceneAndBuildWindows.
-
-## Minigame 2D
-
-Gói nhập thực tế D:/23714291_NguyenHuuThinh/Cau1_2D.unitypackage; tên người dùng ghi ban đầu không tồn tại. Chỉ nhập 9 asset riêng, bỏ 11 asset thuộc Packages để không ghi đè package cài đặt. Bản gốc và source trước sửa nằm Recovery/Before-NumberMemory-20261002.
-
-- Assets/Exam2D/Runtime/NumberMemoryGame.cs: giữ 49 số, 5 câu, 5 giây và click sai không tính điểm. RewardProvider tách ví Farm khỏi assembly Midterm2D; chơi riêng có ví trong phiên.
-- Assets/Scenes/Cau1_NumberMemory.unity: scene chơi độc lập. Assets/Exam2D/Resources/NumberMemory/NumberMemoryUI.prefab: chỉ Canvas/UI, không camera/EventSystem thứ hai.
-- FarmRedesign.Theme bỏ qua Canvas của NumberMemoryGame để giữ màu/độ tương phản gốc.
-- FarmNumberMemory.cs: Tab → Tìm số 2D; 20 xu/câu, +100 xu khi 5/5, tối đa 3 lượt có điểm/ngày, 1 đá item68 cho lần 5/5 đầu/ngày. Luyện tập sau quota/sáng tạo không thưởng. Túi đầy dùng WorldPickup. Esc trở về, giữ vị trí; nông trại tạm dừng.
-- FarmSave schema vẫn 21, thêm trường optional numberMemory, lưu quota/đá/ngày/kỷ lục. Save cũ không có trường này vẫn đọc được. Không sửa ID item hoặc cơ chế lưu thủ công.
-- Exam2DBuilder chỉ dựng riêng UI/scene 2D và giữ scene/config Farm. Export chỉ Assets/Exam2D + scene, không IncludeDependencies. NUMBER_MEMORY_PACKAGE_OUTPUT chọn file xuất; mặc định DongGoi/Cau1_2D.unitypackage.
-
-## Kiểm tra và bàn giao
-
-Build cuối: Logs/build-20261002-205230.log. FarmNumberMemoryChecks có cờ -farmSmokeCheck -farmNumberMemoryOnly và nằm trong full smoke. Nó kiểm chuột/timer thật/pause/200 xu+đá/quota/không thưởng trùng/lưu tải/thoát/túi đầy/chơi độc lập; ảnh render 1280×720 và 1000×1000 ở temporaryCachePath.
-
-Kiểm tra bản Windows bằng -farmSmokeCheck -farmArtCheck; kiểm riêng visual bằng -farmSmokeCheck -farmRedesignOnly. Log hiện tại dưới Logs/smoke-number-memory*.log, kết quả bàn giao ở DongGoi/RELEASE-MANIFEST.json. Log/cache/save không đưa Git. Build scene đang lưu bằng Tools/Build-Windows.ps1 -OutputDirectory Builds/Windows-NumberMemory.
-
-Runtime phát hành Builds/Windows-NumberMemory/NongTrai.exe; ZIP Windows/Unity và gói minigame ở DongGoi. CHAY_GAME.bat trỏ runtime mới. Giữ toàn bộ NongTrai_Data, DLL, D3D12, MonoBleedingEdge. Bản BowPhysics/VisualRedesign trước nằm Recovery/lịch sử Git; không đóng gói cache, debug symbols hay bản thử trùng.
-
-## Hệ thống giữ nguyên
-
-Cung bù trọng lực và mất độ bền mỗi phát; rương mở trực tiếp; một xô nước105; kiếm106/cung111 theo AdventureBag; rèn riêng vũ khí; hồi sinh tại chỗ100xu/miễn phí về cổng; đổi map nhớ vị trí. Inventory ItemCount78, 25 công thức. Creative không lưu dữ liệu thường. Model/nguồn/giấy phép giữ ở Assets/Farm/Models và Assets/ThirdParty; copyright HThinh.yy.
+Xem Docs/TEST_RESULTS.md cho kết quả mới và lịch sử riêng theo commit. Không coi test mock là dịch vụ thật.
+Native service startup từ công cụ từng bị auto-review chặn 'blocked by policy'; không thử lại/bypass.
+Đã chuẩn bị runtime/imports, cần chủ dự án chạy BAT và test thực tế. Không bật âm khi sửa/kiểm tra.
+Smoke bằng Tools/Test-Windows.ps1 dùng -farmMute. Việc gộp bản này vào main đã được chủ dự án cho phép.

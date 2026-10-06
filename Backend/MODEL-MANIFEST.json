@@ -1,0 +1,13 @@
+{
+  "name": "qwen3:1.7b",
+  "author": "Qwen / Alibaba Cloud",
+  "format": "GGUF Q4_K_M",
+  "license": "Apache-2.0",
+  "source": "https://huggingface.co/Qwen/Qwen3-1.7B",
+  "distribution": "https://ollama.com/library/qwen3:1.7b",
+  "ollama_version": "0.12.3",
+  "manifest_digest": "8f68893c685c3ddff2aa3fffce2aa60a30bb2da65ca488b61fff134a4d1730e7",
+  "download_bytes": 1359293444,
+  "training": "Pretrained model; this project does not train or fine-tune it.",
+  "weights_in_git": false
+}

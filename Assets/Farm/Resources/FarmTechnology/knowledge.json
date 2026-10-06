@@ -1,0 +1,156 @@
+{
+  "version": 3,
+  "sections": [
+    {
+      "id": "crops",
+      "title": "Trồng và thu hoạch",
+      "keywords": "gieo hạt cuốc ruộng lúa mì cà chua đậu nành",
+      "text": "Chọn cuốc/xẻng và dùng trên đất để cày; chọn hạt giống để gieo. Cây cần độ ẩm để lớn nhanh, dùng vòi tưới hoặc đặt nước cạnh ruộng. Cây chín thì hái. Hạt dùng hết biến mất khỏi ô túi. Phân bón làm cây tăng 12% tiến độ và có 8% cơ hội đột biến."
+    },
+    {
+      "id": "bucket",
+      "title": "Xô nước",
+      "keywords": "bình múc đổ hồ sông nước xô rỗng đầy",
+      "text": "Game dùng một xô nước. Khi rỗng, ngắm hồ/sông trong 6 m và dùng để múc đầy. Khi đầy, dùng lên đất/khối để đặt một nguồn nước; Sau khi đặt nước, xô trở về RỖNG, không còn đầy. PC dùng chuột trái, Android dùng nút Múc/Đặt. Xô có thể mua lại trong shop giá 50 xu."
+    },
+    {
+      "id": "sponge",
+      "title": "Bọt biển hút nước",
+      "keywords": "loại bỏ hút dọn nước khô đầy bọt biển",
+      "text": "Shop bán bọt biển 80 xu. Đặt cạnh nước để hút vùng 3×3×3, một ô mỗi hướng; sau đó bọt biển đầy. Dùng tương tác để thu. Đặt bọt biển đầy gần đống lửa trong 2 m và không có tường chắn, hong 10 giây sẽ khô và dùng lại được."
+    },
+    {
+      "id": "irrigation",
+      "title": "Vòi và trạm tưới",
+      "keywords": "thuê vòi phun mua giới hạn trạm tự tưới",
+      "text": "Vòi thuê giá 350 xu, tưới bán kính 6 m trong một ngày game từ khi đặt, không nạp nước. LV1–2 thuê tối đa 3 vòi/ngày. LV3–4 thuê tối đa 4 vòi/ngày. LV5–6 thuê tối đa 5 vòi/ngày. LV7 trở lên thuê tối đa 6 vòi/ngày. Thu hồi sớm kết thúc thuê, không hoàn xu/lượt/vật phẩm. Cloud chỉ bật/tắt trạm vùng đầu đã xây; không tự mở khóa hoặc tạo vòi."
+    },
+    {
+      "id": "bow",
+      "title": "Cung và mũi tên",
+      "keywords": "cung bắn ngắm tâm kéo quỹ đạo độ bền",
+      "text": "Giữ nút Dùng/Bắn để kéo cung, thả để bắn; kéo đầy cơ bản 0,8 giây. Mỗi phát thành công mất 1 mũi tên và 1 độ bền của đúng chiếc cung đang cầm. Không mất khi thả quá sớm, hết tên, pause hoặc cung hỏng. Cung hỏng sửa trong túi giá 20 xu. Tên chịu trọng lực, bù độ rơi về tâm trong tầm lực kéo; tường chặn tên và quái di chuyển cần ngắm đón."
+    },
+    {
+      "id": "combat",
+      "title": "Đánh kiếm",
+      "keywords": "chém kiếm đánh tấn công hồi chiêu vòng ngắm",
+      "text": "Bấm hoặc giữ nút Dùng/Đánh để chém. Hồi chiêu gốc 0,3 giây. Cầm kiếm hiện vòng ngắm rỗng, hỗ trợ quái hơi lệch tâm; không đánh xuyên tường và không tăng tầm. Cường hóa có thể tăng sát thương, chí mạng và tốc đánh."
+    },
+    {
+      "id": "forge",
+      "title": "Rèn và đổi chỉ số",
+      "keywords": "rèn cường hóa nâng cấp đá kiếm rìu cung lv5 hút máu",
+      "text": "Tương tác bàn rèn đã đặt. Bấm hoặc kéo đúng kiếm/cung/rìu và đá từ túi vào hai ô; bấm Rèn mới trừ tài nguyên. Đổi chỉ số tốn 1 đá + 80 xu, đổi cả ba chỉ số: sát thương 1–12, chí mạng 3–18%, tốc đánh/tốc kéo 0–20%. Chí mạng gây 150% sát thương. Kiếm LV5 có thêm 12 sát thương và hút 3 máu mỗi đòn trúng. Chỉ số thuộc từng vũ khí."
+    },
+    {
+      "id": "respawn",
+      "title": "Chết và hồi sinh",
+      "keywords": "chết hồi sinh 100 xu tại chỗ đồ cổng",
+      "text": "Khi chết, trả 100 xu để hồi sinh tại chỗ, hồi đầy máu và giữ đồ. Không đủ xu thì lựa chọn này bị khóa. Hồi sinh miễn phí về cổng và rơi tối đa 3 món. Nếu chưa đặt cổng hoặc cổng bị chặn thì về cổng gốc. Đổi map bình thường giữ vị trí đứng cuối, không dùng quy tắc hồi sinh."
+    },
+    {
+      "id": "portal",
+      "title": "Cổng hồi sinh",
+      "keywords": "cổng khám phá chế tạo công thức đá kim loại",
+      "text": "Chế tạo cổng bằng 8 khối đá + 3 kim loại + 1 đá nâng cấp. Chỉ đặt ở Khám phá, cần khoảng trống 2,5×3 m. Có tối đa một cổng tự đặt, không tính cổng gốc. Có thể phá, nhặt lại và chuyển chỗ. Tương tác trụ cổng để về trại; lưu thủ công để giữ vị trí cổng."
+    },
+    {
+      "id": "tnt",
+      "title": "Thuốc nổ TNT",
+      "keywords": "thuốc nổ tnt đuốc châm ngòi nhấp nháy",
+      "text": "Chọn TNT và dùng lên khối/đất ở Khám phá để đặt. Đổi sang đuốc, ngắm TNT và dùng hoặc tương tác để châm; không tốn đuốc. TNT nhấp nháy 5 lần, khoảng 5 giây rồi nổ; lùi ít nhất 4 m. Ngòi dừng khi pause/về trại, lưu/tải tiếp tiến độ."
+    },
+    {
+      "id": "chest",
+      "title": "Rương và phần thưởng boss",
+      "keywords": "rương mở đồ đập quái canh hạt đặc biệt",
+      "text": "Tương tác rương để mở thẳng bảng đồ; không có câu hỏi. Chọn món hoặc Lấy tất cả, túi đầy thì đồ còn trong rương. Giữ Dùng/Đánh khoảng 0,8 giây để đập vỡ rương khám phá và thả phần đồ còn lại. Cần hạ quái canh trước. Rương Golem có 2 hạt bí pha lê + 1 hạt dâu hoàng kim; shop không bán các hạt này."
+    },
+    {
+      "id": "boss",
+      "title": "Boss Golem",
+      "keywords": "boss golem máu hp khó đập né hang",
+      "text": "Boss Golem có 2.400 HP, đập gây 38 HP; dưới nửa máu chạy nhanh và đập 52 HP. Né khi thấy báo đòn đập, chuẩn bị bình máu và vũ khí rèn. Quái có thể nhảy qua vật cản cao một ô nếu đủ khoảng trống. Thanh máu hiển thị HP hiện tại/tối đa."
+    },
+    {
+      "id": "inventory",
+      "title": "Túi đồ và hotbar",
+      "keywords": "túi inventory ô hotbar kéo thả tách chuyển bán bỏ",
+      "text": "Túi có 36 ô, trong đó 9 ô hotbar. Kéo thả đổi ô; Chuyển nhanh đưa đồ giữa túi và hotbar, Tách nửa tách chồng. Chạm số 1–9 để chọn đồ dùng. Có thể bán hoặc bỏ đồ đã chọn, kể cả kiếm/rìu/cung. Bán tất cả đồ trong túi cũng bán dụng cụ; dụng cụ cơ bản mua lại được."
+    },
+    {
+      "id": "food",
+      "title": "Ăn uống và độ no",
+      "keywords": "ăn đói độ no bình máu chạy nhanh thức ăn",
+      "text": "Cầm thực phẩm/bình máu rồi giữ nút Dùng/Ăn 3 giây. Thả tay hoặc đổi món hủy. Mỗi lần giữ dùng một món. Bình máu hồi 50 HP. Thịt sống có thể tương tác đống lửa để nướng. Đi bình thường 6 m/s; chạy 9 m/s hao độ no gấp bốn khi thực sự chạy nhanh."
+    },
+    {
+      "id": "minigame",
+      "title": "Tìm số 2D",
+      "keywords": "tìm số 2d thưởng câu lưới đá quota năm câu",
+      "text": "Bản đồ → Tìm số 2D: lưới 7×7, một lượt 5 câu và mỗi câu 5 giây. Bấm sai không cộng điểm. Mỗi câu đúng thưởng 20 xu; đạt 5/5 thêm 100 xu, tổng 200 xu. Tối đa 3 lượt có điểm nhận thưởng/ngày; lần 5/5 đầu ngày thêm một đá nâng cấp. 0 điểm, thoát giữa lượt hoặc sáng tạo không thưởng. Hết quota vẫn luyện tập."
+    },
+    {
+      "id": "runner",
+      "title": "Farm Runner",
+      "keywords": "runner chạy làn vé trượt nhảy km tốc độ",
+      "text": "Bản đồ → Farm Runner. PC dùng A/D đổi làn, W/Space nhảy, S trượt; Android dùng nút tương ứng. Một va chạm kết thúc lượt. Một vé/lượt, khởi đầu 3 vé; giao đơn nhận vé hoặc mua vé 500 xu. Hồi một vé/2 giờ thực, tối đa ba vé hồi. Mốc 1 km có đá, 2 km TNT, 3 km bình máu; khó tăng tại 200/500/900/1400 m, tốc độ tối đa 26 m/s."
+    },
+    {
+      "id": "save",
+      "title": "Lưu, tải và chơi lại",
+      "keywords": "lưu save tải chơi lại từ đầu lv cấp sáng tạo",
+      "text": "Menu → Lưu game ghi bản lưu thủ công. Mở lại game tải bản lưu này; thoát không tự lưu. Chơi lại từ đầu có xác nhận, cất bản lưu cũ và bắt đầu LV1 với map mới. Sáng tạo dùng bản sao trong bộ nhớ, khóa lưu và bỏ thay đổi khi thoát. Phiên bản save gameplay hiện tại là 22."
+    },
+    {
+      "id": "exploration",
+      "title": "Khám phá, xây dựng và nước",
+      "keywords": "map đào khối đặt xây bờ sông biển nhảy chân",
+      "text": "Bản đồ → Khám phá để đào, đặt khối và lấy quặng. Đào bằng giữ Dùng; vuốt camera xuống để đào thẳng đứng. Cầm khối rồi nhảy và dùng để đặt dưới chân, không đặt trùng người. Giữ Nhảy hướng về bờ để ra khỏi nước; có thể đào bậc. PC dùng R, Android dùng Xoay để xoay vật đặt. Map có sông phía tây và biển phía nam."
+    },
+    {
+      "id": "processing",
+      "title": "Chế biến và chế tạo",
+      "keywords": "máy chế biến chế tạo công thức nhiên liệu gỗ than",
+      "text": "Mở máy hoặc menu Chế biến, chọn công thức và nạp nguyên liệu. Gỗ cung cấp 30 giây nhiên liệu, than 120 giây cho máy cần đốt. Bàn chế tạo có cung, mũi tên, bàn rèn và cổng hồi sinh. Công thức cụ thể phải xem bảng trong game; trợ lý không tự đặt công thức."
+    },
+    {
+      "id": "restaurant",
+      "title": "Nhà hàng",
+      "keywords": "nhà hàng khách nấu món bàn bếp phục vụ dọn đĩa",
+      "text": "Nhà hàng có ba tầng, 24 bàn và 30 công thức. Cần nguyên liệu, nhiên liệu, sơ chế/canh lửa, bày món và phục vụ khách. Minigame đúng nhịp dùng nút chạm hoặc Space. Phục vụ nhận xu/tip; dọn vệ sinh và đĩa bẩn để vận hành tiếp. Bố trí nội thất qua bảng khi nhà hàng đóng cửa, giữ lối đi/cầu thang."
+    },
+    {
+      "id": "fishing",
+      "title": "Câu cá",
+      "keywords": "câu cá ao hồ giật cần nhịp nguyên liệu",
+      "text": "Tương tác khu câu cá mở minigame. Chạm Giật cần khi thanh chỉ thị ở vùng đúng; PC cũng có Space. Cá nhận được vào túi, dùng cho công thức nhà hàng. Thao tác quá nhanh bị giới hạn; kết thúc lượt theo bảng kết quả."
+    },
+    {
+      "id": "animals",
+      "title": "Chăm vật nuôi",
+      "keywords": "bò heo cừu gà vật nuôi chuồng thức ăn",
+      "text": "Cho vật nuôi ăn bằng thức ăn phù hợp; có thể chọn thức ăn cao cấp rồi tương tác con vật. Vật nuôi đói có thông báo. Bắt/thả vào đúng loại chuồng bằng thao tác tương tác. Mua và quản lý chuồng qua shop hoặc menu Chuồng."
+    },
+    {
+      "id": "ar",
+      "title": "Nông trại AR",
+      "keywords": "ar camera webcam pc bàn sàn thu nhỏ xoay phóng quyền đặt thủ công",
+      "text": "Menu → Nông trại AR mở mô hình nông trại thu nhỏ local trên PC và Android, không cần backend hay Internet. PC: nhấn J mở/đóng mô hình, chuột phải xoay, lăn chuột phóng, click nền trống để đặt thủ công. Điện thoại: kéo để xoay, hai ngón phóng. Chạm cây/công trình xem thông tin. Bật webcam hoặc camera là tùy chọn; không có camera vẫn xem mô hình được. Chế độ local không dò bàn/sàn hay tracking tự động. C hoặc Hỏi trợ lý mở chat trong AR; riêng chatbot cần backend. Đóng AR trở về phiên chơi đúng vị trí."
+    },
+    {
+      "id": "cloud",
+      "title": "Cloud mô phỏng",
+      "keywords": "cloud io adafruit mqtt tưới kết nối wifi pc",
+      "text": "Cloud dùng dữ liệu mô phỏng trong game, không có cảm biến thật. Kết nối PC backend cùng Wi-Fi bằng địa chỉ và mã kết nối. Adafruit IO hiển thị độ ẩm, tiến độ và trạm tưới; công tắc chỉ điều khiển trạm vùng đầu đã xây. Mất mạng trở về tưới cục bộ. Chỉ một phiên game điều khiển dashboard tại một thời điểm."
+    },
+    {
+      "id": "chat",
+      "title": "Trợ lý AI và kết nối",
+      "keywords": "chat ai chatbot model ollama qwen offline phím hướng dẫn",
+      "text": "PC nhấn C mở chatbot khi chơi hoặc trong AR; H ẩn/hiện hướng dẫn. Chạy CHAY_GAME.bat để tự mở backend local và ghi mã kết nối trước game. Chatbot dùng Qwen3 1.7B qua Ollama trên PC, chỉ nạp model khi hỏi và nhả RAM sau 60 giây không dùng. Điện thoại mở Trợ lý AI trong Menu, cùng Wi-Fi với PC đang chạy backend; nhập IP và mã kết nối. Trợ lý trả lời theo hướng dẫn, không cấp đồ/đổi gameplay. Mất kết nối vẫn đọc Hướng dẫn có sẵn. Save và model lưu trên máy."
+    }
+  ],
+  "source_revision": "local-miniature-20261006"
+}

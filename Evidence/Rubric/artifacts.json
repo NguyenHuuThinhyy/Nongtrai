@@ -1,0 +1,10 @@
+{
+  "windows_runtime_files": 182,
+  "windows_runtime_bytes": 153035026.0,
+  "android_apk_bytes": 52593854,
+  "android_apk_sha256": "2b9ea6f229bddc4e7b10b110030f00a4e830980832d8332b68cba1f12f0d4efd",
+  "unity_source_commit": "1a8a786fb17d84c112661e41e7a6c0f4bf139785",
+  "backend_source_commit": "1a8a786fb17d84c112661e41e7a6c0f4bf139785",
+  "physical_device": "Pending; camera/Android gestures and local service startup not verified",
+  "deployment": "native local; Docker removed"
+}

@@ -33,7 +33,7 @@ namespace NongTrai
             if(!IsOpen&&standAt.HasValue){owner.Hud.player.Teleport(standAt.Value);standAt=null;}
             if(IsOpen){var parent=panel.transform.parent as RectTransform;float scale=parent==null?1:Mathf.Min(1,(parent.rect.width-24)/1120,(parent.rect.height-24)/820);panel.transform.localScale=Vector3.one*scale;
                 if(rhythmBatch>=0&&Application.isFocused){rhythmTime+=Time.unscaledDeltaTime;if(marker!=null)marker.rectTransform.anchoredPosition=new Vector2(20+Mathf.PingPong(rhythmTime*.55f,1)*950,-220);
-                    if(Keyboard.current!=null&&Keyboard.current.spaceKey.wasPressedThisFrame)Strike();if(rhythmTime>=12)FinishRhythm(true);}
+                    if(FarmControls.Keys!=null&&FarmControls.Keys.spaceKey.wasPressedThisFrame)Strike();if(rhythmTime>=12)FinishRhythm(true);}
             }
             tick-=Time.unscaledDeltaTime;if(tick>0)return;tick=.25f;
             if(summary!=null&&IsOpen)summary.text="Đánh giá "+owner.State.rating.ToString("F1")+"/5 • Vệ sinh "+Mathf.RoundToInt(owner.Cleanliness)+"% • Đĩa sạch "+owner.State.cleanPlates+" / bẩn "+owner.State.dirtyPlates+"\nNhiên liệu "+Mathf.CeilToInt(owner.State.fuel)+"s • "+owner.State.served+" món đã phục vụ • Doanh thu "+owner.State.earnings+" xu";

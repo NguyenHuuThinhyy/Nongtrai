@@ -198,8 +198,8 @@ namespace NongTrai
         void Update()
         {
             if(!running||game==null||!game.activeSelf)return;
-            if(Keyboard.current!=null)
-            {if(Keyboard.current.spaceKey.wasPressedThisFrame)BeginPress();if(Keyboard.current.spaceKey.wasReleasedThisFrame)EndPress();}
+            if(FarmControls.Keys!=null)
+            {if(FarmControls.Keys.spaceKey.wasPressedThisFrame)BeginPress();if(FarmControls.Keys.spaceKey.wasReleasedThisFrame)EndPress();}
             float dt=Time.unscaledDeltaTime;
             elapsed+=dt;if(elapsed>75+level*20){Fail("Hết thời gian giao hàng.");return;}
             jumpRemaining=Mathf.Max(0,jumpRemaining-dt);slowRemaining=Mathf.Max(0,slowRemaining-dt);

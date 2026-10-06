@@ -1,0 +1,42 @@
+Source Unity: 896faef59e961085c6dcb0284b9af78fe53b9fce
+Mono path[0] = 'D:/GAME_NongTrai/Builds/Windows-Rubric/NongTrai_Data/Managed'
+Mono config path = 'D:/GAME_NongTrai/Builds/Windows-Rubric/MonoBleedingEdge/etc'
+Input System module state changed to: Initialized.
+[Physics::Module] Initialized fallback backend.
+[Physics::Module] Id: 0xdecafbad
+Initialize engine version: 6000.3.22f1 (1c726e1fb402)
+[Subsystems] Discovering subsystems at path D:/GAME_NongTrai/Builds/Windows-Rubric/NongTrai_Data/UnitySubsystems
+[D3D12 Device Filter] Vendor Name: Intel
+[D3D12 Device Filter] Device Name: Intel(R) UHD Graphics
+[D3D12 Device Filter] Driver Version: 32.0.101.7085
+[D3D12 Device Filter] Feature Level: 12.1
+[D3D12 Device Filter] Graphics Memory: 3963 MB
+[D3D12 Device Filter] Processor Count: 4
+[D3D12 Device Filter] Device Type: Integrated
+[D3D12 Device Filter] D3D12 API denied by user filter: {"Processor Count Comparator": Less Than Or Equal To"Processor Count": "4", "Device Type:": Do Not Care}
+GfxDevice: creating device client; kGfxThreadingModeClientWorkerJobs
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.1]
+    Renderer: Intel(R) UHD Graphics (ID=0x9a78)
+    Vendor:   Intel
+    VRAM:     3963 MB
+    Driver:   32.0.101.7085
+Begin MonoManager ReloadAssembly
+- Loaded All Assemblies, in  0.531 seconds
+- Finished resetting the current domain, in  0.006 seconds
+[Physics::Module] Selected backend.
+[Physics::Module] Name: PhysX
+[Physics::Module] Id: 0xf2b8ea05
+[Physics::Module] SDK Version: 4.1.2
+[Physics::Module] Integration Version: 1.0.0
+[Physics::Module] Threading Mode: Multi-Threaded
+<RI> Initializing input.
+Using Windows.Gaming.Input
+UnloadTime: 4.394900 ms
+FARM_TEST_AUDIO_MUTED
+FARM_TECHNOLOGY_OK: touch edges, C chatbot, H tutorial, PC AR view/rotate/zoom/reopen/chat return, packaged data, pause, cloud fallback and miniature. Webcam/physical AR/device/cloud/model acceptance is separate.
+[Physics::Module] Cleanup current backend.
+[Physics::Module] Id: 0xf2b8ea05
+Input System module state changed to: ShutdownInProgress.
+Input System polling thread exited.
+Input System module state changed to: Shutdown.

@@ -1,0 +1,3 @@
+Source 1734be7; captured 2026-10-04; native backend, not Docker
+FARM_SERVICES_LIVE_OK: Unity UI -> real HTTP FastAPI -> native Ollama/Qwen -> Vietnamese sourced reply. Docker/cloud/device acceptance remains separate.
+FARM_TECHNOLOGY_OK: touch edges, packaged data, manual, pause, cloud fallback and miniature. Physical AR/device/cloud/model acceptance is separate.

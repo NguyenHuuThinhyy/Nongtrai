@@ -75,7 +75,7 @@ namespace NongTrai
         void Update()
         {
             if(hud==null||player.Paused)return;fallTick+=Time.deltaTime;if(fallTick>=.08f){SettleFloatingBlocks(fallTick);fallTick=0;}
-            var keyboard=Keyboard.current;var mouse=Mouse.current;
+            var keyboard=FarmControls.Keys;var mouse=FarmControls.Pointer;
             if(AdventureBag.Instance?.Item==69||AdventureBag.Instance?.Item==29&&FarmTnt.Target(FarmAim.Ray(viewCamera),player)!=null)
             {preview.SetActive(false);return;}
             if(!IsBuilding)return;

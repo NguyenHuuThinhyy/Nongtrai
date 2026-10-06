@@ -214,7 +214,7 @@ namespace NongTrai
         public void OnEndDrag(PointerEventData e)=>owner.EndGridDrag();
         public void OnDrop(PointerEventData e)=>owner.DropGrid(bag,index);
         public void OnPointerClick(PointerEventData e)
-        {var keyboard=UnityEngine.InputSystem.Keyboard.current;owner.ClickGrid(bag,index,keyboard!=null&&(keyboard.leftShiftKey.isPressed||keyboard.rightShiftKey.isPressed));}
+        {var keyboard=FarmControls.Keys;owner.ClickGrid(bag,index,keyboard!=null&&(keyboard.leftShiftKey.isPressed||keyboard.rightShiftKey.isPressed));}
     }
     public sealed class WarehouseDoor:MonoBehaviour,IInteractable
     {

@@ -12,6 +12,16 @@ namespace NongTrai
         static int restartFlowStage;
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void ResetSmokeState()=>restartFlowStage=0;
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void MuteVerificationAudio()
+        {
+            var args=Environment.GetCommandLineArgs();
+            if(Array.IndexOf(args,"-farmMute")<0 && Array.IndexOf(args,"-farmSmokeCheck")<0 &&
+               Array.IndexOf(args,"-farmRestartFlowSmokeCheck")<0 && Array.IndexOf(args,"-farmDemo")<0) return;
+            AudioListener.volume=0f;
+            AudioListener.pause=true;
+            Debug.Log("FARM_TEST_AUDIO_MUTED");
+        }
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Install()
         {
@@ -39,7 +49,9 @@ namespace NongTrai
             if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmRestartFlowSmokeCheck")>=0)
             {yield return RestartFlowSmoke(player,hud);yield break;}
             if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmRestaurantOnly")>=0)
-            {yield return FarmRestaurantChecks.Run(hud.save,player,hud);Application.Quit(0);yield break;}
+                {yield return FarmRestaurantChecks.Run(hud.save,player,hud);Application.Quit(0);yield break;}
+            if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmTechnologyOnly")>=0)
+                {yield return FarmTechnologyChecks.Run(player,hud);Application.Quit(0);yield break;}
             if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmNumberMemoryOnly")>=0)
             {yield return new WaitForSeconds(2);yield return FarmNumberMemoryChecks.Run(hud.save,player,hud);Application.Quit(0);yield break;}
             if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmRedesignOnly")>=0)
@@ -636,13 +648,15 @@ namespace NongTrai
             survival.RestoreHealth(100);
             player.Teleport(beforeFallPosition);
             Debug.Log("FARM_FALL_DAMAGE_OK: high fall cost health, landing and restore remain safe.");
-            yield return FarmPolishChecks.Run(save,player,hud);
             yield return FarmAdventureFeedbackChecks.Run(save,player,hud);
             yield return FarmTntChecks.Run(save,player,hud);
             yield return FarmWaterCanChecks.Run(save,player,hud);
             yield return FarmBowChecks.Run(save,player,hud);
             yield return FarmNumberMemoryChecks.Run(save,player,hud);
             yield return FarmSystemsChecks.Run(save,player,hud);
+            // This check deliberately enters Creative and leaves saving disabled.
+            // Run it after normal save checks, before the explicit Creative checks.
+            yield return FarmPolishChecks.Run(save,player,hud);
             save.pathOverride=Path.Combine(Application.temporaryCachePath,"farm-creative-do-not-save.json");
             if(File.Exists(save.SavePath)) File.Delete(save.SavePath);
             creative.StartCreative();
