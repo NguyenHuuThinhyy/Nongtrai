@@ -52,6 +52,12 @@ namespace NongTrai
             FarmControls.ReleaseAll();chatInput.DeactivateInputField();
             UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(null);
             FarmControls.ReleaseAll();services.Close();yield return null;
+            FarmControls.Keys[Key.J].Set(true);yield return null;yield return null;
+            Require(FarmAR.Instance.Active&&player.Paused,"J did not open local miniature from locked-cursor gameplay");
+            FarmControls.Keys[Key.J].Set(false);yield return null;yield return null;
+            FarmControls.Keys[Key.J].Set(true);yield return null;yield return null;
+            Require(!FarmAR.Instance.Active&&!player.Paused,"J did not close local miniature");
+            FarmControls.ReleaseAll();
             // Capture after the shortcut checks: those intentionally advance normal
             // gameplay frames, during which the initial spawn settles onto the ground.
             var position=player.transform.position;

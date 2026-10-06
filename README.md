@@ -11,7 +11,7 @@ Nhánh **codex/rubric-mobile-ar-ai-cloud**, phát triển từ `bf7d0b3`.
 - Chạy **CHAY_GAME.bat** để tự khởi động backend/model, kết nối chatbot rồi mở game. Máy đã chuẩn bị runtime không tải lại. [Hướng dẫn khởi động trợ lý](Docs/ASSISTANT_START.md).
 - Muốn chơi offline ngay: **CHAY_GAME_KHONG_TRO_LY.bat**. Mở trực tiếp EXE không tự mở backend.
 - [Hướng dẫn cho nhóm](HUONG_DAN_NHOM.md), [cách chơi](CHOI_GAME.md), [nhà hàng](HUONG_DAN_NHA_HANG.md).
-- **C** mở chatbot; **H** ẩn/hiện hướng dẫn. Menu **Nông trại AR** mở được trên PC:
+- **J** mở/đóng nông trại thu nhỏ; **C** mở chatbot; **H** ẩn/hiện hướng dẫn. Menu **Nông trại AR** mở được trên PC:
   xoay/phóng/đặt thủ công, bật webcam nếu có. Android cũng mở mô hình local bằng kéo/hai ngón phóng; camera tùy chọn.
 - [Thiết lập Android/mô hình local/chat/cloud](Docs/RUBRIC_INTEGRATION.md), [kết quả test](Docs/TEST_RESULTS.md), [checklist người dùng](Docs/ACCEPTANCE.md), [kịch bản demo](Docs/DEMO.md).
 - Commit nguồn và SHA256 của các gói ở [DongGoi](DongGoi). ZIP Unity không chứa Library/cache; Unity tự tạo lại khi mở.

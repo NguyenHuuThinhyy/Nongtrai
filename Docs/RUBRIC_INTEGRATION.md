@@ -24,7 +24,7 @@ Model/runtime tải một lần qua nguồn chính thức, các lần sau tái s
 
 ## Nông trại thu nhỏ
 
-PC: chuột phải xoay, lăn chuột phóng, click nền trống đặt, cây/công trình xem thông tin.
+PC: nhấn J mở/đóng; chuột phải xoay, lăn chuột phóng, click nền trống đặt, cây/công trình xem thông tin.
 Android: kéo xoay, hai ngón phóng; nút xoay/phóng vẫn dùng được. Chế độ local mở ngay,
 không gọi ARCore/khởi tạo XR session. Giữ thư viện XR cũ để tương thích source/build hiện tại;
 chúng không phải điều kiện để mở miniature. Camera tùy chọn640×480/24FPS, mặc định tắt.

@@ -8,7 +8,7 @@
 - **PC: C mở chatbot**, dùng được cả khi đang xem nông trại AR. Chat AI cần backend/model
   đã chạy và mã kết nối; nút Hướng dẫn vẫn đọc được khi mất mạng.
 - **H ẩn/hiện bảng hướng dẫn**. Bảng có ghi phím này ngay trên nút Ẩn hướng dẫn.
-- **AR trên PC:** Trợ lý / AR / Cloud → Nông trại AR. Chuột phải xoay, lăn chuột phóng,
+- **AR trên PC: nhấn J để mở/đóng**, hoặc Trợ lý / AR / Cloud → Nông trại AR. Chuột phải xoay, lăn chuột phóng,
   click nền trống đặt mô hình thủ công, click cây/công trình xem thông tin.
   Bật webcam ghép hình camera với nông trại; thiếu webcam vẫn xem mô hình được.
   Đặt lại trả mô hình về giữa; Đóng AR/Esc tiếp tục chơi đúng vị trí cũ.

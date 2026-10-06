@@ -14,7 +14,7 @@
 
 **BAT_BACKEND_PC.bat** chỉ mở trợ lý, giữ dịch vụ chạy đến khi bạn đóng cửa sổ/Ctrl+C. Sau khi thấy sẵn sàng, mở game để đọc kết nối mới. Không cần tải lại model trên máy đã chuẩn bị runtime. Để kiểm tra thêm một câu hỏi thật trước khi mở game: `Tools/Start-Assistant.ps1 -VerifyModel`.
 
-**AR không cần backend:** Trợ lý / AR / Cloud → Nông trại AR → Bật webcam nếu cần. PC đặt mô hình thủ công trên nền webcam, không dò mặt phẳng tự động. Backend chỉ cần cho phần Hỏi trợ lý. H ẩn/hiện hướng dẫn.
+**AR không cần backend: nhấn J mở/đóng trên PC.** Trợ lý / AR / Cloud → Nông trại AR → Bật webcam nếu cần. PC đặt mô hình thủ công trên nền webcam, không dò mặt phẳng tự động. Backend chỉ cần cho phần Hỏi trợ lý. H ẩn/hiện hướng dẫn.
 
 ## Điện thoại
 
