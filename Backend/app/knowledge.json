@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "sections": [
     {
       "id": "crops",
@@ -137,7 +137,7 @@
       "id": "ar",
       "title": "Nông trại AR",
       "keywords": "ar camera webcam pc bàn sàn thu nhỏ xoay phóng quyền đặt thủ công",
-      "text": "Menu → Nông trại AR mở mô hình nông trại thu nhỏ local trên PC và Android, không cần backend hay Internet. PC: nhấn J mở/đóng mô hình, chuột phải xoay, lăn chuột phóng, click nền trống để đặt thủ công. Điện thoại: kéo để xoay, hai ngón phóng. Chạm cây/công trình xem thông tin. Bật webcam hoặc camera là tùy chọn; không có camera vẫn xem mô hình được. Chế độ local không dò bàn/sàn hay tracking tự động. C hoặc Hỏi trợ lý mở chat trong AR; riêng chatbot cần backend. Đóng AR trở về phiên chơi đúng vị trí."
+      "text": "Menu → Nông trại AR mở mô hình nông trại thu nhỏ local trên PC và Android, không cần backend hay Internet. PC: nhấn J mở/đóng mô hình, chuột phải xoay, lăn chuột phóng, click nền trống để đặt thủ công. Điện thoại: kéo để xoay, hai ngón phóng. Chạm cây/công trình xem thông tin. Bật webcam hoặc camera là tùy chọn; không có camera vẫn xem mô hình được. Chế độ local không dò bàn/sàn hay tracking tự động. C hoặc Hỏi trợ lý mở chat trong AR; bản LocalAI dùng model đóng kèm, không cần backend. Đóng AR trở về phiên chơi đúng vị trí."
     },
     {
       "id": "cloud",
@@ -149,8 +149,8 @@
       "id": "chat",
       "title": "Trợ lý AI và kết nối",
       "keywords": "chat ai chatbot model ollama qwen offline phím hướng dẫn",
-      "text": "PC nhấn C mở chatbot khi chơi hoặc trong AR; H ẩn/hiện hướng dẫn. Chạy CHAY_GAME.bat để tự mở backend local và ghi mã kết nối trước game. Chatbot dùng Qwen3 1.7B qua Ollama trên PC, chỉ nạp model khi hỏi và nhả RAM sau 60 giây không dùng. Điện thoại mở Trợ lý AI trong Menu, cùng Wi-Fi với PC đang chạy backend; nhập IP và mã kết nối. Trợ lý trả lời theo hướng dẫn, không cấp đồ/đổi gameplay. Mất kết nối vẫn đọc Hướng dẫn có sẵn. Save và model lưu trên máy."
+      "text": "PC nhấn C mở chatbot khi chơi hoặc trong AR; H ẩn/hiện hướng dẫn. Bản LocalAI đóng kèm Qwen3 1.7B trong EXE/APK, chạy trực tiếp trên CPU của máy hoặc điện thoại. Chỉ mở chat mới nạp AI; đóng/ẩn chat hoặc chuyển ứng dụng sẽ hủy chuẩn bị/trả lời và giải phóng model khỏi RAM, không cần backend, PC khác, Wi-Fi, Internet hoặc mã kết nối. Android lấy model từ APK ra vùng riêng của ứng dụng trong lần mở chat đầu; các lần sau dùng bản đã chuẩn bị. Có thể trò chuyện tiếng Việt; câu hỏi gameplay tham khảo hướng dẫn liên quan, không cấp đồ hoặc đổi save. Nút Hủy dừng câu trả lời khi chat còn mở; đóng chat tắt model. Mở lại nạp từ file đã chuẩn bị, đợi AI cũ dừng xong trước khi nạp. AI qua PC là tùy chọn riêng trong AI / Cloud, chỉ khi chủ động chọn; cloud vẫn cần backend. Lần đầu cần thời gian chuẩn bị và bộ nhớ trống khoảng 1,2 GB trên Android."
     }
   ],
-  "source_revision": "local-miniature-20261006"
+  "source_revision": "bundled-local-chat-20261006"
 }

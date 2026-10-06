@@ -1,24 +1,13 @@
-# Mở bản thử và phát triển tiếp
+# Tải bản mới và phát triển tiếp
 
-© HThinh.yy. Bản local được chủ dự án duyệt gộp vào `main` ngày 06/10/2026.
+© HThinh.yy. Chủ dự án cho phép phát hành và gộp main ngày 06/10/2026.
 
-1. Clone nhánh main hoặc tải Unity ZIP từ release `rubric-preview-20261006`.
-2. Chơi Windows: giải nén trọn ZIP Windows rồi chạy CHAY_GAME.bat để tự mở backend nhẹ và ghép chatbot.
-   Chơi offline ngay bằng CHAY_GAME_KHONG_TRO_LY.bat. Giữ EXE/Data/DLL và Backend/Tools; xem Docs/ASSISTANT_START.md.
-3. Android: tải NongTrai.apk, cho phép cài ứng dụng từ nguồn tải, cài trên Android8+
-   ARM64. Nông trại thu nhỏ local mở được không cần ARCore; camera là tùy chọn.
-4. Unity: Hub Add project → checkout, Editor6000.3.22f1, scene Farm.
-   Unity tạo Library khi import; cần Internet để tải packages. Không chạy builder dựng scene.
-5. Build: Tools/Build-Windows.ps1 và Build-Android.ps1. Backend: Start-Services.ps1.
-   Xem Docs/ASSISTANT_START.md để mở trợ lý local; dashboard Adafruit là tùy chọn.
+1. [GitHub Release LocalAI](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/localai-20261006) có Windows ZIP, APK và source Unity ZIP kèm model/license.
+2. Windows: giải nén toàn bộ ZIP, giữ EXE/Data/DLL; mở CHAY_GAME.bat hoặc NongTrai.exe. C mở chat; J mở mô hình local; H ẩn hướng dẫn. AI chỉ nạp khi chat mở, đóng chat sẽ hủy xử lý và giải phóng model.
+3. Android: cài APK ARM64 trên Android 8+. Gói khoảng 1,16 GB; lần mở chat đầu cần thêm khoảng 1,2 GB trống để chuẩn bị model. Không cần PC/Internet. Khuyến nghị 6 GB RAM; chưa nghiệm thu trên điện thoại thật.
+4. Unity: dùng source ZIP, hoặc clone main rồi lấy Backend/models từ ZIP vào checkout. Editor 6000.3.22f1, Android Build Support/SDK/NDK/OpenJDK; mở Assets/Farm/Scenes/Farm.unity. Chọn Nong Trai → Technology → Prepare local chat model trước khi Play lần đầu. Không chạy FarmProjectBuilder dựng scene.
+5. Build: Tools/Build-Windows.ps1 và Tools/Build-Android.ps1, đầu ra Builds/Windows-LocalAI và Builds/Android-LocalAI. Plugin đã có; muốn biên dịch lại dùng Tools/Build-LocalChat.ps1. Đóng gói bằng Tools/Package-LocalChat.ps1 với commit thực tế dùng build.
 
-Giữ Assets + tất cả .meta, Packages + packages-lock, ProjectSettings, Backend, Tools,
-Docs, Evidence và giấy phép. Không chia sẻ cache/log tạm, Backend/.env, model weights
-hoặc save cá nhân. Source zip chứa đầy đủ các mục phát triển, bỏ runtime build để giảm trùng;
-Windows ZIP và APK là các gói chơi riêng.
+Source Git giữ Assets/.meta, Packages, ProjectSettings, Backend, Tools, Docs, Evidence và giấy phép. Bản chơi/model không commit vào Git; tải từ Release. Manifest/checksum ở DongGoi. Không chia sẻ .env, API key, cache, log hoặc save cá nhân.
 
-Backend local gồm FastAPI và OllamaCPU. Model/cache lưu trên PC. Chưa có tài khoản
-Adafruit IO thì để username/key trống; không bật cloud. Các chức năng game offline vẫn chạy.
-
-Ghi bug/test vào Docs/ACCEPTANCE.md với thiết bị, commit/build, ảnh/video và bước tái hiện.
-Bản local này đã được HThinh.yy xác nhận cho phép gộp vào main.
+AI qua PC và Adafruit IO là tùy chọn riêng; xem Docs/ASSISTANT_START.md. Gameplay và AI mặc định chạy offline. Việc chủ dự án cho phép gộp không xác nhận đã đo tốc độ/CPU/RAM hay chạy APK trên thiết bị thật; ghi kết quả vào Docs/ACCEPTANCE.md.

@@ -1,30 +1,42 @@
 {
-  "release": "rubric-preview-20261006",
-  "release_url": "https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/rubric-preview-20261006",
-  "unity": "6000.3.22f1",
-  "save_version": 22,
-  "feature_branch": "codex/rubric-mobile-ar-ai-cloud",
-  "source_git_commit": "953688b57eeb4be4fb7cfaa9536c5d376b4a486f",
-  "build_source_commit": "1a8a786fb17d84c112661e41e7a6c0f4bf139785",
-  "runtime_bytes": 153035026.0,
-  "farm_scene_sha256": "c6566d428bb42535efeb421c376cf984eec5e761be6da945d10ed251bd179416",
+  "branch": "codex/bundled-chat-model",
+  "build_source_commit": "6e0f6ae4a44835a8f524db65fbeebbf893693e68",
+  "source_git_commit": "c0f786aeb533c2b12081c0d75155d02180ba4bbe",
+  "model": {
+    "name": "Qwen3-1.7B-Q4_K_M",
+    "file": "Qwen3-1.7B-Q4_K_M.gguf",
+    "bytes": 1107409472,
+    "sha256": "b139949c5bd74937ad8ed8c8cf3d9ffb1e99c866c823204dc42c0d91fa181897",
+    "author": "Qwen / Alibaba Cloud; GGUF quantization by Unsloth",
+    "license": "Apache-2.0",
+    "source": "https://huggingface.co/Qwen/Qwen3-1.7B",
+    "quantizer": "https://huggingface.co/unsloth/Qwen3-1.7B-GGUF",
+    "provenance": "GGUF supplied by project owner in Backend/models; architecture/name/quantizer read from its metadata; checksum pins this exact file.",
+    "runtime": "llama.cpp b7199, commit 8c32d9d96d9ae345a0150cae8572859e9aafea0b, MIT",
+    "context_tokens": 2048,
+    "offline": true
+  },
   "packages": [
     {
-      "sha256": "2fa93a29598d7b6824d637724133d0c475ac9e412d957a9c08faf5bacc72e66d",
-      "bytes": 62736891,
-      "file": "NongTrai-Windows-Rubric-20261006.zip"
+      "file": "NongTrai-Windows-LocalAI-20261006-main.zip",
+      "bytes": 1171904092,
+      "sha256": "7dbf584994583b4bdc366bac4009ba60584e7d2ecbfeb5189bc9ef028d0a0eee"
     },
     {
-      "sha256": "2b9ea6f229bddc4e7b10b110030f00a4e830980832d8332b68cba1f12f0d4efd",
-      "bytes": 52593854,
-      "file": "NongTrai-Android-Rubric-20261006.apk"
+      "file": "NongTrai-Android-LocalAI-20261006-main.apk",
+      "bytes": 1161665701,
+      "sha256": "3cc89348d0bb9bd34678d5fed3322da79327923d0f7dfbecf0a0a16276a521f5"
     },
     {
-      "sha256": "7a47ac2943be57746cd65244de3c6e1dcd854964a975625b64932131d69edc1b",
-      "bytes": 68080071,
-      "file": "NongTrai-Unity-Rubric-20261006.zip"
+      "file": "NongTrai-Unity-LocalAI-20261006-main.zip",
+      "bytes": 1187218239,
+      "sha256": "ac11cabb40862b6f04297db796a1b251f93db95679f797a8cd697ec45d6a247a"
     }
   ],
-  "physical_android_ar_cloud_acceptance": "pending",
-  "user_merge_approval": "approved by owner on 2026-10-06"
+  "release": "localai-20261006",
+  "release_url": "https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/localai-20261006",
+  "user_merge_approval": "approved by owner on 2026-10-06",
+  "publication": "owner authorized GitHub publication",
+  "physical_android": "not verified",
+  "runtime_acceptance": "owner test pending"
 }

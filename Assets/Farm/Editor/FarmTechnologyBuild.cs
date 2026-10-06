@@ -52,9 +52,10 @@ namespace NongTrai.Editor
         [MenuItem("Nong Trai/Technology/Build Android APK")]
         public static void BuildAndroid(){Configure();Build(BuildTarget.Android,Environment.GetEnvironmentVariable("FARM_ANDROID_OUTPUT")??"Builds/Android/NongTrai.apk");}
         [MenuItem("Nong Trai/Technology/Build Windows technology preview")]
-        public static void BuildWindows(){Configure();UnityEditor.PlayerSettings.SetScriptingBackend(NamedBuildTarget.Standalone,ScriptingImplementation.Mono2x);Build(BuildTarget.StandaloneWindows64,Environment.GetEnvironmentVariable("FARM_BUILD_OUTPUT")??"Builds/Windows-Rubric/NongTrai.exe");}
+        public static void BuildWindows(){Configure();UnityEditor.PlayerSettings.SetScriptingBackend(NamedBuildTarget.Standalone,ScriptingImplementation.Mono2x);Build(BuildTarget.StandaloneWindows64,Environment.GetEnvironmentVariable("FARM_BUILD_OUTPUT")??"Builds/Windows-LocalAI/NongTrai.exe");}
         static void Build(BuildTarget target,string output)
         {
+            FarmLocalModelBuild.Stage();
             const string scene="Assets/Farm/Scenes/Farm.unity";if(!File.Exists(scene))throw new Exception("Main Farm scene is missing");
             Directory.CreateDirectory(Path.GetDirectoryName(output));
             var report=BuildPipeline.BuildPlayer(new BuildPlayerOptions{scenes=new[]{scene},locationPathName=output,target=target,options=BuildOptions.None});

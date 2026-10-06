@@ -1,0 +1,14 @@
+{
+  "name": "Qwen3-1.7B-Q4_K_M",
+  "file": "Qwen3-1.7B-Q4_K_M.gguf",
+  "bytes": 1107409472,
+  "sha256": "b139949c5bd74937ad8ed8c8cf3d9ffb1e99c866c823204dc42c0d91fa181897",
+  "author": "Qwen / Alibaba Cloud; GGUF quantization by Unsloth",
+  "license": "Apache-2.0",
+  "source": "https://huggingface.co/Qwen/Qwen3-1.7B",
+  "quantizer": "https://huggingface.co/unsloth/Qwen3-1.7B-GGUF",
+  "provenance": "GGUF supplied by project owner in Backend/models; architecture/name/quantizer read from its metadata; checksum pins this exact file.",
+  "runtime": "llama.cpp b7199, commit 8c32d9d96d9ae345a0150cae8572859e9aafea0b, MIT",
+  "context_tokens": 2048,
+  "offline": true
+}

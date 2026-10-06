@@ -1,25 +1,14 @@
-# Handoff local — 06/10/2026
+# Handoff — LocalAI, 06/10/2026
 
-© HThinh.yy. Dự án D:/GAME_NongTrai, nhánh codex/rubric-mobile-ar-ai-cloud.
-Chủ dự án xác nhận gộp bản local vào main ngày 06/10/2026. Không chạy builder dựng scene.
+© HThinh.yy. Chủ dự án yêu cầu dọn bản cũ, đẩy Git và gộp vào main trong lượt hiện tại.
 
-- Đã bỏ Dockerfile/Compose và CI container. Workflow hiện tại kiểm backend/launcher trên Windows.
-- CHAY_GAME.bat → Tools/Start-Assistant.ps1 → Backend/launcher.py. Kiểm runtime/model digest/health/pair,
-  ghi farm-connection.json rồi mở game. AI chỉ nạp khi hỏi, keep_alive60s; -VerifyModel thử câu hỏi thật.
-- CHAY_GAME_KHONG_TRO_LY.bat chơi ngay offline. BAT_BACKEND_PC.bat giữ backend, bản CHO_DIEN_THOAI dùng LAN.
-- .env/.runtime/runtime.local.json đều ignored. File runtime.local.json trên máy trỏ cache sẵn trong D:/NongTrai_LuuTru.
-  Không đóng model weights, Python/Ollama binaries hay khóa vào Git. Máy mới launcher tải một lần.
-- FarmAR.Open mở miniature local trên mọi platform, không cần server/XR session. PC chuột phải/lăn chuột;
-  mobile kéo/hai ngón; camera tùy chọn640×480/24FPS, mặc định tắt. Giữ snapshot tối đa16ruộng.
-  Thư viện/provider XR cũ vẫn còn để tương thích build; chế độ mặc định không gọi Begin tracking.
-- FarmServices C mở chat, H ẩn/hiện tutorial. FarmHud không đóng bảng vì E/X khi input focus.
-- Save22 giữ trên máy, đọc21. URL/history chat độc lập save. Farm.unity SHA
-  c6566d428bb42535efeb421c376cf984eec5e761be6da945d10ed251bd179416 không đổi.
-- Cloud Adafruit tùy chọn: chưa có tài khoản, giữ tắt; mất mạng tưới local. Không gửi gameplay save.
-- Gói Windows phải chứa Backend/Tools/BAT bên cạnh EXE/Data/DLL. Source và APK đóng riêng.
-  Release hiện tại rubric-preview-20261006. Manifest ghi nguồn build và nguồn gói riêng.
+- Code game/build đã tạo từ 6e0f6ae; Windows runtime 1.265.433.848 byte, APK 1.161.665.701 byte, 0 lỗi build. Chưa chạy inference trong EXE, chưa thử APK/đo CPU/RAM thật. Không bật âm thanh khi sửa.
+- FarmLocalChat gọi farm_chat.dll/libfarm_chat.so trong game. Model Qwen3-1.7B-Q4_K_M.gguf do chủ dự án đặt tại Backend/models; SHA256 b139949c5bd74937ad8ed8c8cf3d9ffb1e99c866c823204dc42c0d91fa181897, 1.107.409.472 byte. Apache 2.0; llama.cpp b7199 MIT; giấy phép đi kèm gói.
+- Chỉ mở ChatPanel mới nạp AI. Đóng/ẩn chat, xem hướng dẫn hoặc chuyển ứng dụng hủy chuẩn bị/trả lời và giải phóng native model sau worker kết thúc. Mở lại chờ lần cũ dừng xong. Android giữ file model đã kiểm tra, không lấy lại từ APK mỗi lần.
+- J mở miniature local, camera tùy chọn, không cần server/XR tracking. C mở chat, H ẩn hướng dẫn. Save22 không đổi; URL/history chat riêng.
+- Backend Python/Ollama chỉ dùng nếu chủ động chọn AI qua PC. Adafruit tùy chọn, chưa có tài khoản, mặc định tắt. Không xóa backend/asset/gameplay đang dùng. Docker đã bỏ.
+- Builds chỉ giữ Windows-LocalAI và Android-LocalAI. Package-LocalChat là công cụ đóng gói hiện hành. Build/gói cũ và công cụ đóng gói cũ được cất ngoài dự án ở D:/NongTrai_LuuTru; không ghi đè trở lại.
+- Release mới localai-20261006 gồm Windows ZIP có EXE, APK và Unity source ZIP kèm model. Source Git bỏ build/cache/weights; clone cần lấy Backend/models từ source ZIP. DongGoi giữ manifest/checksum của bản mới.
+- Farm.unity SHA256 c6566d428bb42535efeb421c376cf984eec5e761be6da945d10ed251bd179416 không đổi. Không chạy FarmProjectBuilder.
 
-Xem Docs/TEST_RESULTS.md cho kết quả mới và lịch sử riêng theo commit. Không coi test mock là dịch vụ thật.
-Native service startup từ công cụ từng bị auto-review chặn 'blocked by policy'; không thử lại/bypass.
-Đã chuẩn bị runtime/imports, cần chủ dự án chạy BAT và test thực tế. Không bật âm khi sửa/kiểm tra.
-Smoke bằng Tools/Test-Windows.ps1 dùng -farmMute. Việc gộp bản này vào main đã được chủ dự án cho phép.
+Xem Docs/LOCAL_CHAT.md, HUONG_DAN_NHOM.md và Docs/TEST_RESULTS.md (kết quả lịch sử theo commit). Không ghi các test/runtime chưa chạy là đã đạt. Native Python/Ollama service startup từ công cụ từng bị auto-review chặn; không thử lại/bypass. Nhánh và main chỉ được cập nhật theo yêu cầu đã cho phép của chủ dự án.
