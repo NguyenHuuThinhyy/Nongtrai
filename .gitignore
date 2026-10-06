@@ -60,3 +60,10 @@ __pycache__/
 /Backend/.pytest_cache/
 /Backend/.runtime/
 /Backend/runtime.local.json
+
+# Supplied GGUF is bundled in local test packages, not committed to Git.
+/Assets/StreamingAssets/FarmAI/
+/Builds/Windows-LocalAI/
+/Builds/Android-LocalAI/
+/DongGoi/LocalAI/
+/Assets/StreamingAssets/FarmAI.meta

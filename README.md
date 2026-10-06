@@ -2,13 +2,20 @@
 
 © HThinh.yy. Unity **6000.3.22f1**, URP, save **22**.
 
+## Bản đang sửa: AI chạy trực tiếp trên EXE / APK
+
+Nhánh `codex/bundled-chat-model`, **chưa đẩy/gộp main**, chờ chủ dự án kiểm tra.
+Model được chủ dự án cung cấp trong `Backend/models`, đóng kèm gói LocalAI.
+Mở EXE/APK rồi nhấn **C** hoặc nút Chat: AI chỉ nạp khi chat mở. Đóng chat sẽ hủy tác vụ và nhả bộ nhớ model; không cần PC/server/Internet.
+Xem [hướng dẫn AI offline và build](Docs/LOCAL_CHAT.md). Gói đang kiểm tra nằm trong `DongGoi/LocalAI`, tách khỏi bản GitHub đã phát hành bên dưới.
+
 ## Bản thử Android / AR / AI / Cloud
 
 Nhánh **codex/rubric-mobile-ar-ai-cloud**, phát triển từ `bf7d0b3`.
 **Chủ dự án đã xác nhận gộp bản này vào main ngày 06/10/2026.**
 
 - [Tải bản thử Windows, APK và source Unity](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/rubric-preview-20261006).
-- Chạy **CHAY_GAME.bat** để tự khởi động backend/model, kết nối chatbot rồi mở game. Máy đã chuẩn bị runtime không tải lại. [Hướng dẫn khởi động trợ lý](Docs/ASSISTANT_START.md).
+- Bản LocalAI: chạy **CHAY_GAME.bat** để mở game, nhấn C để nạp AI. Dịch vụ PC cũ dùng **CHAY_GAME_TRO_LY_PC.bat** và lựa chọn AI qua PC. [Hướng dẫn khởi động trợ lý](Docs/ASSISTANT_START.md).
 - Muốn chơi offline ngay: **CHAY_GAME_KHONG_TRO_LY.bat**. Mở trực tiếp EXE không tự mở backend.
 - [Hướng dẫn cho nhóm](HUONG_DAN_NHOM.md), [cách chơi](CHOI_GAME.md), [nhà hàng](HUONG_DAN_NHA_HANG.md).
 - **J** mở/đóng nông trại thu nhỏ; **C** mở chatbot; **H** ẩn/hiện hướng dẫn. Menu **Nông trại AR** mở được trên PC:

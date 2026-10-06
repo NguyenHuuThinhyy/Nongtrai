@@ -13,7 +13,7 @@ namespace NongTrai
     // © HThinh.yy. Connection preferences and chat are independent of gameplay save22.
     public sealed class FarmServices : MonoBehaviour
     {
-        [Serializable] public sealed class Connection { public string url="http://127.0.0.1:8000",key=""; }
+        [Serializable] public sealed class Connection { public string url="http://127.0.0.1:8000",key="";public bool remoteChat; }
         [Serializable] public sealed class ChatMessage { public string role,content; }
         [Serializable] sealed class ChatRequest { public string question,context;public ChatMessage[] history; }
         [Serializable] sealed class ChatResponse { public string answer,model;public string[] sources;public bool generated; }
@@ -37,6 +37,9 @@ namespace NongTrai
         public bool ChatBusy=>busy;
         public string LastReply {get;private set;}="";
         public bool LastReplyFromModel {get;private set;}
+        public bool LocalChatReady=>localChat!=null&&localChat.Ready;
+        FarmLocalChat localChat,retiringChat;bool manualVisible,applicationPaused;
+        Coroutine prepareRoutine;IEnumerator localPreparation;
         FarmHud hud;TMP_InputField input,address,keyInput;TMP_Text chatText,statusText;RectTransform chatContent;ScrollRect chatScroll;
         readonly List<ChatMessage> history=new List<ChatMessage>();
         UnityWebRequest activeChat;Coroutine chatRoutine;string context="",session="",server="";int revision=-1;bool busy,ready;
@@ -53,6 +56,28 @@ namespace NongTrai
             Config??=new Connection();TrimHistory();var data=Resources.Load<TextAsset>("FarmTechnology/knowledge");Manual=data==null?new KnowledgeData{sections=Array.Empty<KnowledgeSection>()}:JsonUtility.FromJson<KnowledgeData>(data.text);
             BuildUI();ready=true;if(FarmControls.Mobile){var mobile=new GameObject("Farm touch UI").AddComponent<FarmMobileUI>();mobile.Initialize(hud);}gameObject.AddComponent<FarmAR>();StartCoroutine(CloudLoop());
         }
+        bool WantsLocalChat=>ready&&isActiveAndEnabled&&!applicationPaused&&!Config.remoteChat&&!manualVisible&&ChatPanel!=null&&ChatPanel.activeInHierarchy;
+        void EnsureLocalChat(){if(WantsLocalChat&&localChat==null&&prepareRoutine==null)prepareRoutine=StartCoroutine(PrepareLocalChat());}
+        void StopLocalChat()
+        {
+            CancelChat();
+            if(localChat!=null){localChat.Dispose();retiringChat=localChat;localChat=null;}
+            (localPreparation as IDisposable)?.Dispose();localPreparation=null;
+            if(prepareRoutine!=null){StopCoroutine(prepareRoutine);prepareRoutine=null;}
+        }
+        IEnumerator PrepareLocalChat()
+        {
+            // Delay one frame so the coroutine handle is assigned even on an immediate exit.
+            yield return null;
+            while(retiringChat!=null&&!retiringChat.Stopped){if(!busy&&WantsLocalChat)RenderChat();yield return null;}
+            retiringChat=null;
+            if(!WantsLocalChat){prepareRoutine=null;yield break;}
+            localChat=new FarmLocalChat();localPreparation=localChat.Prepare();
+            try {while(localPreparation.MoveNext()){if(!busy&&WantsLocalChat)RenderChat();yield return localPreparation.Current;}}
+            finally {(localPreparation as IDisposable)?.Dispose();localPreparation=null;}
+            prepareRoutine=null;
+            if(!busy&&WantsLocalChat)RenderChat();
+        }
         void BuildUI()
         {
             TouchMenu=FarmUi.Panel(hud.transform,"Công nghệ và thao tác",new Vector2(880,680));FarmUi.TmpLabel(TouchMenu.transform,"NÔNG TRẠI • MENU",new Vector2(25,-22),new Vector2(650,45),30);
@@ -67,43 +92,68 @@ namespace NongTrai
             chatScroll=viewport.AddComponent<ScrollRect>();chatScroll.viewport=vr;chatScroll.content=chatContent;chatScroll.horizontal=false;chatScroll.movementType=ScrollRect.MovementType.Clamped;
             input=Input(ChatPanel.transform,"Hỏi về game…",new Vector2(24,-515),new Vector2(730,62),false);FarmUi.Button(ChatPanel.transform,"Gửi",new Vector2(770,-515),new Vector2(200,62),Send);
             string[] samples={"Cách lấy và đặt nước?","Cung hỏng sửa thế nào?","Thưởng tìm số 2D?"};for(int i=0;i<3;i++){string sample=samples[i];FarmUi.Button(ChatPanel.transform,sample,new Vector2(24+i*318,-590),new Vector2(304,45),()=>{input.text=sample;Send();});}
-            FarmUi.Button(ChatPanel.transform,"Kết nối",new Vector2(24,-650),new Vector2(180,48),OpenConnection);FarmUi.Button(ChatPanel.transform,"Hủy trả lời",new Vector2(217,-650),new Vector2(190,48),CancelChat);
+            FarmUi.Button(ChatPanel.transform,"AI / Cloud",new Vector2(24,-650),new Vector2(180,48),OpenConnection);FarmUi.Button(ChatPanel.transform,"Hủy trả lời",new Vector2(217,-650),new Vector2(190,48),CancelChat);
             FarmUi.Button(ChatPanel.transform,"Hướng dẫn",new Vector2(420,-650),new Vector2(190,48),ShowManual);FarmUi.Button(ChatPanel.transform,"Xóa hội thoại",new Vector2(623,-650),new Vector2(180,48),()=>{CancelChat();history.Clear();PersistHistory();RenderChat();});FarmUi.Button(ChatPanel.transform,"Đóng",new Vector2(820,-650),new Vector2(150,48),Close);ChatPanel.SetActive(false);
             ConnectionPanel=FarmUi.Panel(hud.transform,"Kết nối PC và IO cloud",new Vector2(900,650));FarmUi.TmpLabel(ConnectionPanel.transform,"KẾT NỐI PC • CLOUD MÔ PHỎNG",new Vector2(24,-20),new Vector2(740,50),28);
             FarmUi.TmpLabel(ConnectionPanel.transform,"Địa chỉ PC cùng Wi-Fi, ví dụ http://192.168.1.10:8000",new Vector2(24,-90),new Vector2(850,50),22);address=Input(ConnectionPanel.transform,"http://192.168.1.10:8000",new Vector2(24,-145),new Vector2(850,55),false);keyInput=Input(ConnectionPanel.transform,"Mã kết nối từ backend",new Vector2(24,-218),new Vector2(850,55),true);
             FarmUi.Button(ConnectionPanel.transform,"Lưu & kiểm tra",new Vector2(24,-295),new Vector2(270,58),()=>{if(SaveConfig())StartCoroutine(CheckHealth());});FarmUi.Button(ConnectionPanel.transform,"Bật cloud",new Vector2(310,-295),new Vector2(270,58),()=>{if(SaveConfig())EnableCloud();});FarmUi.Button(ConnectionPanel.transform,"Ngắt cloud",new Vector2(595,-295),new Vector2(280,58),DisableCloud);
-            statusText=FarmUi.TmpLabel(ConnectionPanel.transform,"",new Vector2(24,-380),new Vector2(850,130),22);statusText.richText=false;FarmUi.TmpLabel(ConnectionPanel.transform,"Cloud dùng độ ẩm trong game. Chỉ điều khiển trạm vùng đầu đã xây. Khóa Adafruit chỉ nhập ở PC.",new Vector2(24,-500),new Vector2(850,70),20);FarmUi.Button(ConnectionPanel.transform,"Trở lại game / AR",new Vector2(24,-585),new Vector2(850,48),Close);ConnectionPanel.SetActive(false);
+            FarmUi.Button(ConnectionPanel.transform,"AI trên máy (mặc định)",new Vector2(24,-365),new Vector2(410,48),()=>SetChatMode(false));
+            FarmUi.Button(ConnectionPanel.transform,"AI qua PC (tùy chọn)",new Vector2(450,-365),new Vector2(425,48),()=>{if(SaveConfig())SetChatMode(true);});
+            statusText=FarmUi.TmpLabel(ConnectionPanel.transform,"",new Vector2(24,-425),new Vector2(850,70),22);statusText.richText=false;FarmUi.TmpLabel(ConnectionPanel.transform,"AI trên máy không cần địa chỉ/mã. Các ô trên chỉ dùng cho AI qua PC hoặc cloud; khóa Adafruit giữ ở PC.",new Vector2(24,-500),new Vector2(850,70),20);FarmUi.Button(ConnectionPanel.transform,"Trở lại game / AR",new Vector2(24,-585),new Vector2(850,48),Close);ConnectionPanel.SetActive(false);
         }
         void MenuAction(int action)
         {Close();switch(action){case 0:hud.interaction.inventory.Open();break;case 1:hud.interaction.shop.Open();break;case 2:FarmProcessing.Instance?.Open();break;case 3:FarmExpansion.Instance?.Open();break;case 4:hud.interaction.shop.barn?.Open();break;case 5:IslandManager.Instance?.OpenMap();break;case 6:FarmBuildingSystem.Instance?.Toggle();break;case 7:FarmAR.Instance?.Open();break;case 8:OpenChat();break;case 9:OpenConnection();break;case 10:hud.player.cameraRig.ToggleView();break;case 11:StartCoroutine(Pulse(UnityEngine.InputSystem.Key.F));break;case 12:CreativeModeManager.Instance?.ToggleFlight();break;case 13:hud.SaveNow();break;case 14:hud.player.SetPaused(true);break;case 15:OpenChat();ShowManual();break;}}
         IEnumerator Pulse(UnityEngine.InputSystem.Key key){yield return null;yield return null;FarmControls.Keys[key].Set(true);yield return null;yield return null;FarmControls.Keys[key].Set(false);}
         void Update()
         {
-            if(!ready||ChatPanel.activeSelf||ConnectionPanel.activeSelf)return;
+            if(!ready)return;
+            if(!WantsLocalChat&&(localChat!=null||prepareRoutine!=null||busy&&!ChatPanel.activeInHierarchy))StopLocalChat();
+            else if(WantsLocalChat)EnsureLocalChat();
+            if(ChatPanel.activeSelf||ConnectionPanel.activeSelf)return;
             var ar=FarmAR.Instance;if(hud.player.Paused&&(ar==null||!ar.Active))return;
             if(FarmControls.Keys[UnityEngine.InputSystem.Key.C].wasPressedThisFrame){OpenChat();return;}
             if(FarmControls.Keys[UnityEngine.InputSystem.Key.J].wasPressedThisFrame&&ar!=null)
             {if(ar.Active)ar.Close();else ar.Open();}
         }
-        public void OpenChat(string topic=""){if(!ready)return;var ar=FarmAR.Instance;context=topic.Length>0?topic:ar!=null&&ar.Active?ar.ChatContext:CurrentContext();ar?.HideForChat();hud.ShowOverlay(ChatPanel);RenderChat();}
-        public void OpenConnection(){if(!ready)return;address.text=Config.url;keyInput.text=Config.key;hud.ShowOverlay(ConnectionPanel);SetStatus(Status);}
+        public void OpenChat(string topic=""){if(!ready)return;manualVisible=false;var ar=FarmAR.Instance;context=topic.Length>0?topic:ar!=null&&ar.Active?ar.ChatContext:CurrentContext();ar?.HideForChat();hud.ShowOverlay(ChatPanel);EnsureLocalChat();RenderChat();}
+        public void OpenConnection(){if(!ready)return;StopLocalChat();address.text=Config.url;keyInput.text=Config.key;hud.ShowOverlay(ConnectionPanel);SetStatus(Config.remoteChat?"Đang chọn AI qua PC • "+Status:"AI trên máy sẽ nạp khi mở chat");}
         public bool HandleEscape(){if(!ready)return false;if(ChatPanel.activeSelf||ConnectionPanel.activeSelf||TouchMenu.activeSelf){Close();return true;}if(FarmAR.Instance!=null&&FarmAR.Instance.Active){FarmAR.Instance.Close();return true;}return false;}
-        public void Close(){CancelChat();if(ChatPanel!=null)ChatPanel.SetActive(false);if(ConnectionPanel!=null)ConnectionPanel.SetActive(false);if(TouchMenu!=null)TouchMenu.SetActive(false);if(FarmAR.Instance!=null&&FarmAR.Instance.Active)FarmAR.Instance.ReturnFromChat();else hud.Resume();}
+        public void Close(){StopLocalChat();if(ChatPanel!=null)ChatPanel.SetActive(false);if(ConnectionPanel!=null)ConnectionPanel.SetActive(false);if(TouchMenu!=null)TouchMenu.SetActive(false);if(FarmAR.Instance!=null&&FarmAR.Instance.Active)FarmAR.Instance.ReturnFromChat();else hud.Resume();}
         string CurrentContext(){var plot=hud.interaction.Plot;return plot!=null?plot.Description:AdventureBag.Instance==null?"":"Đang cầm: "+AdventureBag.Instance.Name(AdventureBag.Instance.Item);}
-        public void Send(){if(busy||string.IsNullOrWhiteSpace(input.text))return;string question=input.text.Trim();if(question.Length>800){RenderChat("Câu hỏi tối đa 800 ký tự.");return;}input.text="";chatRoutine=StartCoroutine(Chat(question));}
+        public void Send(){if(busy||string.IsNullOrWhiteSpace(input.text))return;manualVisible=false;EnsureLocalChat();string question=input.text.Trim();if(question.Length>800){RenderChat("Câu hỏi tối đa 800 ký tự.");return;}input.text="";chatRoutine=StartCoroutine(Chat(question));}
         IEnumerator Chat(string question)
         {
             busy=true;LastReply="";LastReplyFromModel=false;var payload=new ChatRequest{question=question,context=context,history=history.ToArray()};history.Add(new ChatMessage{role="user",content=question});RenderChat("Đang trả lời…");
+            if(!Config.remoteChat)
+            {
+                while(prepareRoutine!=null||localChat!=null&&localChat.Preparing){RenderChat(localChat?.Status??"Đang chờ AI trước dừng xong…");yield return new WaitForSecondsRealtime(.25f);}
+                if(localChat==null||!localChat.Ready)history.Add(new ChatMessage{role="assistant",content=(localChat?.Status??"AI chưa sẵn sàng")+" Bạn vẫn có thể đọc Hướng dẫn."});
+                else
+                {
+                    string prompt=FarmLocalChat.Prompt(question,context,payload.history,Manual,out var sources);
+                    if(!localChat.Begin(prompt))history.Add(new ChatMessage{role="assistant",content="AI đang dừng câu trả lời trước. Hãy thử lại sau một chút."});
+                    else
+                    {
+                        while(!localChat.Finished){string partial=localChat.Read();RenderChat(partial.Length>0?"Trợ lý: "+partial:"Đang trả lời trên máy…");yield return new WaitForSecondsRealtime(.15f);}
+                        string answer=localChat.Read(),error=localChat.GenerationError;
+                        if(error.Length>0)history.Add(new ChatMessage{role="assistant",content="AI trên máy: "+error});
+                        else if(answer.Length>0){LastReply=answer;LastReplyFromModel=true;history.Add(new ChatMessage{role="assistant",content=answer+(sources.Length>0?"\nHướng dẫn liên quan: "+string.Join(" • ",sources):"")});}
+                        else history.Add(new ChatMessage{role="assistant",content="Chưa tạo được câu trả lời. Bạn hãy hỏi ngắn hơn hoặc thử lại."});
+                    }
+                }
+                busy=false;chatRoutine=null;TrimHistory();PersistHistory();RenderChat();yield break;
+            }
             using(var request=Request("/v1/chat",JsonUtility.ToJson(payload))){activeChat=request;yield return request.SendWebRequest();activeChat=null;if(request.result==UnityWebRequest.Result.Success){var answer=JsonUtility.FromJson<ChatResponse>(request.downloadHandler.text);if(answer!=null&&!string.IsNullOrEmpty(answer.answer)){LastReply=answer.answer;LastReplyFromModel=answer.generated;history.Add(new ChatMessage{role="assistant",content=answer.answer+((answer.sources?.Length??0)>0?"\nTham khảo: "+string.Join(" • ",answer.sources):"")});}}else history.Add(new ChatMessage{role="assistant",content="Chưa kết nối được trợ lý. "+Error(request)+" Bạn vẫn có thể đọc Hướng dẫn."});}
             busy=false;chatRoutine=null;TrimHistory();PersistHistory();RenderChat();
         }
         void TrimHistory(){while(history.Count>6)history.RemoveAt(0);foreach(var m in history)if(m.content.Length>1500)m.content=m.content.Substring(0,1500);}
-        public void CancelChat(){if(activeChat!=null){activeChat.Abort();activeChat=null;}if(chatRoutine!=null){StopCoroutine(chatRoutine);chatRoutine=null;}if(busy){busy=false;if(history.Count>0&&history[history.Count-1].role=="user")history.RemoveAt(history.Count-1);RenderChat("Đã hủy.");}}
-        void RenderChat(string notice=""){if(chatText==null)return;var b=new StringBuilder();if(history.Count==0)b.Append("Hỏi trợ lý về trồng cây, nước, cung, rèn và nhà hàng.\n\n");foreach(var m in history)b.Append(m.role=="user"?"Bạn: ":"Trợ lý: ").Append(m.content).Append("\n\n");b.Append(notice);ShowText(b.ToString(),false);}
+        public void CancelChat(){if(busy)localChat?.Cancel();if(activeChat!=null){activeChat.Abort();activeChat=null;}if(chatRoutine!=null){StopCoroutine(chatRoutine);chatRoutine=null;}if(busy){busy=false;if(history.Count>0&&history[history.Count-1].role=="user")history.RemoveAt(history.Count-1);RenderChat("Đã hủy.");}}
+        void RenderChat(string notice=""){if(chatText==null)return;var b=new StringBuilder();b.Append(Config.remoteChat?"AI qua PC\n\n":(localChat?.Status??(retiringChat!=null&&!retiringChat.Stopped?"Đang dừng AI trước…":"AI chỉ chạy khi mở chat"))+"\n\n");if(history.Count==0)b.Append("Bạn có thể trò chuyện hoặc hỏi về trồng cây, nước, cung, rèn và nhà hàng.\n\n");foreach(var m in history)b.Append(m.role=="user"?"Bạn: ":"Trợ lý: ").Append(m.content).Append("\n\n");b.Append(notice);ShowText(b.ToString(),false);}
         void ShowText(string text,bool top){chatText.text=text;chatText.rectTransform.sizeDelta=new Vector2(925,Mathf.Max(420,chatText.preferredHeight+24));chatContent.sizeDelta=new Vector2(0,chatText.rectTransform.sizeDelta.y);Canvas.ForceUpdateCanvases();chatScroll.verticalNormalizedPosition=top?1:0;}
-        void ShowManual(){CancelChat();var b=new StringBuilder();foreach(var s in Manual.sections)b.Append(s.title).Append(":\n").Append(s.text).Append("\n\n");ShowText(b.ToString(),true);}
+        void ShowManual(){manualVisible=true;StopLocalChat();var b=new StringBuilder();foreach(var s in Manual.sections)b.Append(s.title).Append(":\n").Append(s.text).Append("\n\n");ShowText(b.ToString(),true);}
+        void SetChatMode(bool remote){StopLocalChat();Config.remoteChat=remote;try{File.WriteAllText(PreferencesPath,JsonUtility.ToJson(Config));SetStatus(remote?"AI qua PC đã chọn":"AI trên máy sẽ nạp khi mở chat");}catch(Exception){SetStatus("Không lưu được lựa chọn AI.");}}
         bool SaveConfig()
-        {if(!Uri.TryCreate(address.text.Trim(),UriKind.Absolute,out var uri)||(uri.Scheme!="http"&&uri.Scheme!="https")||!string.IsNullOrEmpty(uri.UserInfo)||uri.AbsolutePath!="/"){SetStatus("Nhập địa chỉ http(s) của PC, không thêm đường dẫn API.");return false;}if(string.IsNullOrWhiteSpace(keyInput.text)){SetStatus("Nhập mã kết nối của backend.");return false;}DisableCloud();Config=new Connection{url=address.text.Trim().TrimEnd('/'),key=keyInput.text.Trim()};try{File.WriteAllText(PreferencesPath,JsonUtility.ToJson(Config));return true;}catch(Exception){SetStatus("Không lưu được cấu hình kết nối.");return false;}}
+        {if(!Uri.TryCreate(address.text.Trim(),UriKind.Absolute,out var uri)||(uri.Scheme!="http"&&uri.Scheme!="https")||!string.IsNullOrEmpty(uri.UserInfo)||uri.AbsolutePath!="/"){SetStatus("Nhập địa chỉ http(s) của PC, không thêm đường dẫn API.");return false;}if(string.IsNullOrWhiteSpace(keyInput.text)){SetStatus("Nhập mã kết nối của backend.");return false;}DisableCloud();Config=new Connection{url=address.text.Trim().TrimEnd('/'),key=keyInput.text.Trim(),remoteChat=Config.remoteChat};try{File.WriteAllText(PreferencesPath,JsonUtility.ToJson(Config));return true;}catch(Exception){SetStatus("Không lưu được cấu hình kết nối.");return false;}}
         IEnumerator CheckHealth(){using(var paired=Request("/v1/pair")){paired.timeout=8;yield return paired.SendWebRequest();if(paired.result!=UnityWebRequest.Result.Success){SetStatus(Error(paired));yield break;}}using(var request=Request("/health")){yield return request.SendWebRequest();if(request.result!=UnityWebRequest.Result.Success){SetStatus(Error(request));yield break;}var health=JsonUtility.FromJson<Health>(request.downloadHandler.text);SetStatus("Mã kết nối đúng • Model "+(health.model_ready?"sẵn sàng":"chưa tải")+" • Adafruit "+(health.mqtt_connected?"đã kết nối":"chưa cấu hình / mất mạng"));}}
         public void EnableCloud(){session=Guid.NewGuid().ToString("N");server="";revision=-1;RemotePumpEnabled=true;CloudEnabled=true;SetStatus("Đang nối cloud mô phỏng…");}
         public void DisableCloud(){string old=session;CloudEnabled=CloudConnected=false;RemotePumpEnabled=true;session="";SetStatus("Cloud tắt • tưới cục bộ");if(!string.IsNullOrEmpty(old))StartCoroutine(Disconnect(old));}
@@ -126,7 +176,9 @@ namespace NongTrai
         UnityWebRequest Request(string path,string body=null,string method=null){var request=new UnityWebRequest(Config.url+path,method??(body==null?"GET":"POST"));request.downloadHandler=new DownloadHandlerBuffer();if(body!=null){request.uploadHandler=new UploadHandlerRaw(Encoding.UTF8.GetBytes(body));request.SetRequestHeader("Content-Type","application/json");}request.SetRequestHeader("X-Farm-Key",Config.key??"");request.timeout=95;return request;}
         static string Error(UnityWebRequest request){if(request.responseCode==401)return "Mã kết nối không đúng.";if(request.responseCode==409)return "Phiên khác đang kết nối hoặc lệnh đã cũ.";if(request.responseCode==429)return "Trợ lý đang bận; hãy thử lại.";return "Kiểm tra địa chỉ PC, backend và Wi-Fi (HTTP "+request.responseCode+").";}
         void PersistHistory(){try{TrimHistory();File.WriteAllText(HistoryPath,JsonUtility.ToJson(new ChatHistory{messages=history.ToArray()}));}catch(Exception){Debug.LogWarning("Chat history could not be saved");}}
-        void OnDestroy(){CancelChat();CloudConnected=CloudEnabled=false;RemotePumpEnabled=true;if(Instance==this)Instance=null;}
+        void OnApplicationPause(bool paused){applicationPaused=paused;if(paused)StopLocalChat();else EnsureLocalChat();}
+        void OnDisable(){StopLocalChat();}
+        void OnDestroy(){StopLocalChat();CloudConnected=CloudEnabled=false;RemotePumpEnabled=true;if(Instance==this)Instance=null;}
         public static TMP_InputField Input(Transform parent,string placeholder,Vector2 position,Vector2 size,bool password)
         {var box=FarmUi.Panel(parent,"Nhập",size);var rect=box.GetComponent<RectTransform>();rect.anchorMin=rect.anchorMax=rect.pivot=new Vector2(0,1);rect.anchoredPosition=position;var field=box.AddComponent<TMP_InputField>();var area=new GameObject("Text area",typeof(RectTransform),typeof(RectMask2D)).GetComponent<RectTransform>();area.SetParent(box.transform,false);area.anchorMin=Vector2.zero;area.anchorMax=Vector2.one;area.offsetMin=new Vector2(12,6);area.offsetMax=new Vector2(-12,-6);var text=FarmUi.TmpLabel(area,"",Vector2.zero,size-new Vector2(24,12),24);var hint=FarmUi.TmpLabel(area,placeholder,Vector2.zero,size-new Vector2(24,12),22);hint.color=new Color(.7f,.75f,.7f);field.textViewport=area;field.textComponent=text;field.placeholder=hint;field.characterLimit=password?200:800;field.contentType=password?TMP_InputField.ContentType.Password:TMP_InputField.ContentType.Standard;return field;}
     }

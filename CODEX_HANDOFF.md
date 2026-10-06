@@ -1,5 +1,13 @@
 # Handoff local — 06/10/2026
 
+Bản đang sửa: `codex/bundled-chat-model`; chủ dự án yêu cầu tự kiểm tra rồi mới quyết định đẩy/gộp main.
+AI local chỉ nạp khi ChatPanel mở; đóng/ẩn chat, xem hướng dẫn hoặc chuyển ứng dụng hủy toàn bộ chuẩn bị/trả lời, giải phóng native model sau worker kết thúc. Mở lại chờ giải phóng cũ. Không preload lúc Start.
+Các thông tin launcher/backend bên dưới mô tả bản phát hành cũ; bản LocalAI dùng CHAY_GAME.bat, AI qua PC tùy chọn dùng CHAY_GAME_TRO_LY_PC.bat.
+GGUF đã được đặt ở Backend/models (không phải Backend0/model), SHA b139949c…fa181897, 1.107.409.472 byte.
+Chat mới mặc định chạy trực tiếp qua FarmLocalChat + farm_chat.dll/libfarm_chat.so. Model bundle riêng với Backend/LOCAL-MODEL.json.
+Build/gói LocalAI tách riêng, xem Docs/LOCAL_CHAT.md. Không đẩy Git hay gộp main trong lần sửa này.
+Các dòng backend/main bên dưới ghi trạng thái bản đã phát hành trước đó.
+
 © HThinh.yy. Dự án D:/GAME_NongTrai, nhánh codex/rubric-mobile-ar-ai-cloud.
 Chủ dự án xác nhận gộp bản local vào main ngày 06/10/2026. Không chạy builder dựng scene.
 

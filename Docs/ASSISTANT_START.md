@@ -1,20 +1,23 @@
 # Chơi với chatbot trên PC
 
+**Bản LocalAI mới:** mở EXE/APK hoặc CHAY_GAME.bat; AI chỉ nạp khi mở C / Chat và giải phóng khi đóng, không cần backend. [Hướng dẫn offline](LOCAL_CHAT.md).
+Phần dưới chỉ áp dụng khi bạn chọn **AI qua PC** trong AI / Cloud.
+
 © HThinh.yy. Cập nhật 06/10/2026.
 
 ## Trên PC
 
-1. Đóng game đang mở. Giải nén **toàn bộ** gói Windows mới, giữ thư mục Backend và Tools cạnh các file BAT/EXE.
-2. Mở **CHAY_GAME.bat** (hoặc CHAY_GAME_CO_TRO_LY.bat).
+1. Đóng game đang mở. Chế độ AI qua PC dùng thư mục dự án có Backend/Tools hoặc gói backend cũ. Gói Windows LocalAI mới không cần hay chứa các dịch vụ này.
+2. Mở **CHAY_GAME_TRO_LY_PC.bat**, chọn **AI qua PC** trong game. CHAY_GAME.bat/CHAY_GAME_CO_TRO_LY.bat mới chỉ mở game với AI offline.
 3. Lần đầu máy mới cần Internet để tải Python, Ollama (~1,91 GB) và Qwen3 (~1,36 GB). Những lần sau dùng dữ liệu đã tải. Đóng Unity Editor trên máy8GB để dành RAM.
 4. Chờ dòng **BACKEND SAN SANG** sau khi kiểm tra kết nối/mã và model đã tải. Game tự mở; **C** để hỏi. Địa chỉ/mã kết nối được ghi tự động. Chế độ mặc định nhẹ: model chỉ nạp vào RAM khi gửi câu hỏi, lần hỏi đầu có thể cần vài chục giây; sau60giây không dùng thì nhả model khỏi RAM. Dòng sẵn sàng chỉ xác nhận backend/ghép cặp, không khẳng định AI đã trả lời thử.
 5. Giữ cửa sổ trình khởi động trong lúc chơi. Thoát game sẽ đóng các dịch vụ do lần khởi động này mở. Dịch vụ có sẵn của bạn không bị tắt.
 
-**CHAY_GAME_KHONG_TRO_LY.bat** mở game offline ngay. Mở trực tiếp NongTrai.exe cũng không tự khởi động backend. Khi đó vẫn chơi và xem AR được, nhưng chat AI cần mở backend riêng.
+**CHAY_GAME_KHONG_TRO_LY.bat** mở game offline ngay. Mở trực tiếp NongTrai.exe cũng không tự khởi động backend. Bản LocalAI chơi, xem AR và chat offline được; chỉ lựa chọn AI qua PC cần backend riêng.
 
 **BAT_BACKEND_PC.bat** chỉ mở trợ lý, giữ dịch vụ chạy đến khi bạn đóng cửa sổ/Ctrl+C. Sau khi thấy sẵn sàng, mở game để đọc kết nối mới. Không cần tải lại model trên máy đã chuẩn bị runtime. Để kiểm tra thêm một câu hỏi thật trước khi mở game: `Tools/Start-Assistant.ps1 -VerifyModel`.
 
-**AR không cần backend: nhấn J mở/đóng trên PC.** Trợ lý / AR / Cloud → Nông trại AR → Bật webcam nếu cần. PC đặt mô hình thủ công trên nền webcam, không dò mặt phẳng tự động. Backend chỉ cần cho phần Hỏi trợ lý. H ẩn/hiện hướng dẫn.
+**AR không cần backend: nhấn J mở/đóng trên PC.** Trợ lý / AR / Cloud → Nông trại AR → Bật webcam nếu cần. PC đặt mô hình thủ công trên nền webcam, không dò mặt phẳng tự động. Bản LocalAI Hỏi trợ lý không cần backend; backend chỉ cần khi chọn AI qua PC. H ẩn/hiện hướng dẫn.
 
 ## Điện thoại
 
@@ -25,7 +28,7 @@
 
 ## Khi có lỗi
 
-- **Failed to connect / chưa kết nối backend:** đóng game, chạy CHAY_GAME.bat và chờ đủ bốn bước. Đừng chỉ mở EXE.
+- **Failed to connect / chưa kết nối backend:** đóng game, chạy CHAY_GAME_TRO_LY_PC.bat và chờ đủ bốn bước nếu chọn AI qua PC. Đừng chỉ mở EXE.
 - **Cổng8000 đang dùng / mã khác / backend cũ:** đóng cửa sổ backend cũ của bạn rồi mở lại launcher mới. Không cần xóa save.
 - **Model chưa sẵn sàng:** kiểm tra Internet trong lần tải đầu; xem lỗi ở cửa sổ và Backend/.runtime/api.log hoặc ollama.log. Launcher không mở game với thông báo sẵn sàng giả.
 - **Đường dẫn runtime không còn tồn tại:** máy phát triển có thể dùng Backend/runtime.local.json để trỏ tới runtime sẵn có. Sửa đúng đường dẫn hoặc đổi tên file cấu hình đó để dùng bản tải mặc định trong `%LOCALAPPDATA%/NongTraiAssistant`.

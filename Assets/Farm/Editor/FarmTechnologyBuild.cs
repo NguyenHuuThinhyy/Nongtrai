@@ -55,6 +55,7 @@ namespace NongTrai.Editor
         public static void BuildWindows(){Configure();UnityEditor.PlayerSettings.SetScriptingBackend(NamedBuildTarget.Standalone,ScriptingImplementation.Mono2x);Build(BuildTarget.StandaloneWindows64,Environment.GetEnvironmentVariable("FARM_BUILD_OUTPUT")??"Builds/Windows-Rubric/NongTrai.exe");}
         static void Build(BuildTarget target,string output)
         {
+            FarmLocalModelBuild.Stage();
             const string scene="Assets/Farm/Scenes/Farm.unity";if(!File.Exists(scene))throw new Exception("Main Farm scene is missing");
             Directory.CreateDirectory(Path.GetDirectoryName(output));
             var report=BuildPipeline.BuildPlayer(new BuildPlayerOptions{scenes=new[]{scene},locationPathName=output,target=target,options=BuildOptions.None});

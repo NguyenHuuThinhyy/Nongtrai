@@ -1,9 +1,11 @@
 # Bản thử Android / AR / AI / Cloud
 
+**Bản LocalAI đang chờ kiểm tra:** mở EXE/APK → C / Chat mới nạp model. Đóng chat hủy xử lý và nhả RAM, khi chơi bình thường AI không chạy. Không cần backend/Wi-Fi; Android lấy model từ APK trong lần mở chat đầu tiên. Xem [AI offline](Docs/LOCAL_CHAT.md). Các hướng dẫn backend dưới đây dành cho lựa chọn **AI qua PC**.
+
 © HThinh.yy. Bản local được chủ dự án duyệt gộp main ngày 06/10/2026.
 
-- **PC: chạy CHAY_GAME.bat** để tự mở backend nhẹ và ghi kết nối. Chờ “BACKEND SAN SANG”, vào game rồi nhấn C; AI chỉ nạp khi gửi câu hỏi, nhả RAM sau60giây không dùng. [Cách khởi động và xử lý lỗi](Docs/ASSISTANT_START.md).
-- **BAT_BACKEND_PC.bat** giữ riêng backend chạy; **CHAY_GAME_KHONG_TRO_LY.bat** chơi offline. AR không cần backend; nút Hỏi trợ lý cần backend.
+- **AI qua PC (tùy chọn): chạy CHAY_GAME_TRO_LY_PC.bat** để mở backend nhẹ và ghi kết nối. Chờ “BACKEND SAN SANG”, vào game rồi nhấn C; AI chỉ nạp khi gửi câu hỏi, nhả RAM sau60giây không dùng. [Cách khởi động và xử lý lỗi](Docs/ASSISTANT_START.md).
+- **BAT_BACKEND_PC.bat** giữ riêng backend chạy; **CHAY_GAME_KHONG_TRO_LY.bat** chơi offline. AR và Hỏi trợ lý trong bản LocalAI không cần backend; chế độ AI qua PC cần backend.
 
 - **PC: C mở chatbot**, dùng được cả khi đang xem nông trại AR. Chat AI cần backend/model
   đã chạy và mã kết nối; nút Hướng dẫn vẫn đọc được khi mất mạng.
