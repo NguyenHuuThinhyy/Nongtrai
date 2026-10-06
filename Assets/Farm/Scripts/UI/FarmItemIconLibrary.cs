@@ -60,6 +60,12 @@ namespace NongTrai
                 case 17: Bag(p,Hex("8FBE58"));Disk(p,26,31,5,green);Disk(p,38,35,5,green);break;
                 case 18: Rect(p,11,13,53,43,brown);Line(p,16,44,25,56,brown,4);Line(p,48,44,39,56,brown,4);for(int i=0;i<3;i++) Disk(p,22+i*10,38,8,red);break;
                 case 19: Rect(p,24,12,40,35,gold);Disk(p,32,43,13,gold);Line(p,32,7,32,16,dark,4);break;
+                case 120:
+                    Oval(p,33,30,27,29,Hex("A56A0A"));Oval(p,30,33,25,28,Hex("FFD84A"));
+                    Oval(p,30,33,20,23,Hex("EDAA13"));Oval(p,30,33,16,19,Hex("F7BE25"));
+                    Line(p,38,43,28,46,Hex("FFE671"),4);Line(p,28,46,21,38,Hex("FFE671"),4);
+                    Line(p,21,38,21,28,Hex("FFE671"),4);Line(p,21,28,29,22,Hex("FFE671"),4);
+                    Line(p,29,22,38,26,Hex("FFE671"),4);Line(p,13,42,17,49,Hex("FFF29B"),2);break;
                 case 20: Bag(p,Hex("B77A3E"));Line(p,22,42,42,42,cream,4);break;
                 case 21: Line(p,18,12,42,52,brown,6);Rect(p,36,45,55,54,gray);break;
                 case 22: Rect(p,13,16,43,43,blue);Rect(p,20,43,38,54,gray);Line(p,43,36,57,28,blue,6);break;

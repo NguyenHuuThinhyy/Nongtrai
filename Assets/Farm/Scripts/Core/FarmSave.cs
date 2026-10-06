@@ -37,6 +37,7 @@ namespace NongTrai
             public ExplorationState exploration;
             public BagState bag;public PickupRecord[] drops;public WildlifeState wildlife;
             public Vector3 playerPosition;
+            public TractorState tractor;
             public PlotRecord[] plots;
             public AnimalRecord[] animals;
             public TreeRecord[] trees;
@@ -65,6 +66,7 @@ namespace NongTrai
                 pathOverride=Path.Combine(Application.temporaryCachePath,"farm-restart-flow-smoke-save.json");
             yield return null;
             FarmRestaurant.Ensure();
+            FarmTractor.Ensure();
             if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmSmokeCheck")<0) Load();
         }
 
@@ -93,7 +95,8 @@ namespace NongTrai
                     level=expansion.Level,xp=expansion.Experience,levelCap=expansion.LevelCap,
                     day=expansion.Day,dayTime=expansion.DayTime,
                     toolTiers=(int[])expansion.ToolTiers.Clone(),regions=(bool[])expansion.UnlockedRegions.Clone(),
-                    processing=processing.Snapshot(),island=islands.Snapshot(),playerPosition=player.transform.position,
+                    processing=processing.Snapshot(),island=islands.Snapshot(),playerPosition=player.Tractor!=null?player.Tractor.SavedPlayerPosition:player.transform.position,
+                    tractor=FarmTractor.Ensure()?.Snapshot(),
                     weather=(int)clock.Weather,weatherRemaining=clock.WeatherRemaining,musicVolume=FarmAudio.Instance.MusicVolume,
                     effectsVolume=FarmAudio.Instance.EffectsVolume,
                     water=water==null?null:water.Snapshot(),orders=orders==null?null:orders.Snapshot(),
@@ -269,6 +272,7 @@ namespace NongTrai
                 WorldPickup.Restore(data.drops);AdventureBag.Instance?.Restore(data.bag,data.version<12);
                 if(data.version<19)FarmForge.Instance?.Restore(data.version>=16?data.swordEnhancementLevel:0,data.weaponLevels);
                 AdventureWildlife.Instance?.Restore(data.wildlife);
+                FarmTractor.Ensure()?.Restore(data.tractor);
                 if(data.version<10)islands?.Snapshot();
                 return true;
             }

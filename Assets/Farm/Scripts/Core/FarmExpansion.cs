@@ -124,7 +124,8 @@ namespace NongTrai
             if(center.State==PlotState.Tilled && seedCrop>=3&&seedCrop<6&&Level<seedCrop)
                 return "Giống "+field.crops[seedCrop].displayName+" mở ở LV"+seedCrop+".";
             if(center.State==PlotState.Growing && slot!=5) return "Hãy chọn Bình tưới trên hotbar trước khi tưới.";
-            int tool=center.State==PlotState.Untilled?0:center.State==PlotState.Growing?1:-1;
+            var actionState=center.State;
+            int tool=actionState==PlotState.Untilled?0:actionState==PlotState.Growing?1:-1;
             if(tool==0&&AdventureBag.Instance!=null&&!AdventureBag.Instance.DamageTool())return "Xẻng đã hỏng. Sửa trong túi hoặc mua xẻng mới.";
             int range=tool<0?1:ToolRadius(tool);
             var plots=FindObjectsByType<FarmPlot>(FindObjectsSortMode.None);
@@ -134,7 +135,7 @@ namespace NongTrai
             foreach(var plot in plots)
             {
                 if(worked>=range) break;
-                if(!IsUnlocked(plot) || plot.State!=center.State ||
+                if(!IsUnlocked(plot) || plot.State!=actionState ||
                     Vector3.Distance(plot.transform.position,center.transform.position)>4.5f) continue;
                 if(plot.State==PlotState.Tilled && (seedCrop<3?!shop.ConsumeSeed(seedCrop):!inventory.Remove(held,1))) break;
                 if(plot.State==PlotState.Growing && (FarmWaterSystem.Instance==null || !FarmWaterSystem.Instance.Consume(1))) break;

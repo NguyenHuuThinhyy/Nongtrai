@@ -22,9 +22,10 @@ namespace NongTrai
         public int LegacySlot=>Item>=100&&Item<=108?Item-100:-1;
         public bool HoldingBlock=>FarmBuildingSystem.TypeForItem(Item)>=0;
         Image[] pictures=new Image[36],backgrounds=new Image[36];TMP_Text[] labels=new TMP_Text[36];TMP_Text status,dragLabel;Image dragGhost;
-        public int dragSource=-1;BagSlot held;bool accepted;int inspected;int sellQuantity=1;int lastItem=int.MinValue;TMP_Text sellLabel;
+        public int dragSource=-1;[SerializeField] BagSlot held;int inspected;int sellQuantity=1;int lastItem=int.MinValue;TMP_Text sellLabel;
         readonly string[] tools={"Hạt lúa mì","Hạt cà chua","Hạt đậu nành","Thức ăn thú","Xẻng","Xô nước","Kiếm","Rìu","Giỏ hái","Xẻng cũ","Xẻng cũ","Cung gỗ"};
         void Awake(){Instance=this;Defaults();}
+        void OnEnable(){Instance=this;}
         void OnDestroy(){if(Instance==this)Instance=null;}
         void Defaults(){for(int i=0;i<36;i++)Slots[i]=new BagSlot();for(int i=0;i<8;i++)Slots[i]=new BagSlot{item=100+i,count=1,durability=i==7?20:i==4||i==6?100:0};}
         public string Name(int id)=>id<0?"Ô trống":id>=100&&id<=111?tools[id-100]:inventory.Name(id);
@@ -145,22 +146,38 @@ namespace NongTrai
         {float seconds=material==3||material==4||material==9?2:material==7?1.6f:material==8?.35f:.8f;return CorrectTool(material)&&Slots[Selected].durability>0?seconds*.4f:seconds;}
         public void BeginDrag(int index,bool half)
         {
-            if(held!=null||Slots[index].count==0)return;dragSource=index;accepted=false;held=Slots[index].Copy();
+            if(!ValidSlot(index)||held!=null||Slots[index].count==0)return;dragSource=index;held=Slots[index].Copy();
             if(half&&FarmItemCatalog.IsStackable(held.item)){held.count=(held.count+1)/2;Slots[index].count-=held.count;}else Slots[index]=new BagSlot();
         }
         public bool HasDrag=>held!=null;
         public void Drop(int index)
         {
-            if(held==null)return;var target=Slots[index];
+            if(held==null)return;if(!ValidSlot(index)){EndDrag();return;}var target=Slots[index];
             if(target.count==0){Slots[index]=held;held=null;}
             else if(target.item==held.item&&FarmItemCatalog.IsStackable(held.item)){int n=Mathf.Min(64-target.count,held.count);target.count+=n;held.count-=n;if(held.count==0)held=null;}
-            else if(Slots[dragSource].count==0){Slots[index]=held;held=target;}
-            accepted=true;EndDrag();
+            else if(ValidSlot(dragSource)&&Slots[dragSource].count==0){Slots[index]=held;held=target;}
+            EndDrag();
         }
         public void SplitDragging()
-        {if(held==null||!FarmItemCatalog.IsStackable(held.item)||held.count<2)return;var source=Slots[dragSource];if(source.count>0&&source.item!=held.item)return;int n=held.count/2;source.item=held.item;source.count+=n;held.count-=n;}
+        {if(held==null||!ValidSlot(dragSource)||!FarmItemCatalog.IsStackable(held.item)||held.count<2)return;var source=Slots[dragSource];if(source.count>0&&source.item!=held.item)return;int n=Mathf.Min(held.count/2,64-source.count);if(n<=0)return;source.item=held.item;source.count+=n;held.count-=n;}
+        bool ValidSlot(int index)=>Slots!=null&&index>=0&&index<Slots.Length&&Slots[index]!=null;
+        void ReturnHeldTo(int index)
+        {
+            if(held==null||!ValidSlot(index))return;
+            var slot=Slots[index];
+            if(slot.count==0){Slots[index]=held;held=null;return;}
+            if(slot.item!=held.item||!FarmItemCatalog.IsStackable(held.item))return;
+            int amount=Mathf.Min(Mathf.Max(0,64-slot.count),held.count);slot.count+=amount;held.count-=amount;
+            if(held.count==0)held=null;
+        }
         public void EndDrag()
-        {if(held!=null){var source=Slots[dragSource];if(source.count==0)Slots[dragSource]=held;else if(source.item==held.item)source.count+=held.count;held=null;}dragSource=-1;Select(Selected);}
+        {
+            ReturnHeldTo(dragSource);
+            if(Slots!=null)for(int i=0;i<Slots.Length&&held!=null;i++)ReturnHeldTo(i);
+            dragSource=-1;
+            if(held!=null)Tell("Túi đầy: hãy tạo ô trống để trả lại vật phẩm đang kéo.");
+            if(inventory!=null&&ValidSlot(Mathf.Clamp(Selected,0,8)))Select(Selected);
+        }
         public void QuickMove(int index)
         {
             var s=Slots[index];if(s.count==0)return;int begin=index<9?9:0,end=index<9?36:9;
@@ -168,7 +185,7 @@ namespace NongTrai
             for(int i=begin;i<end;i++)if(Slots[i].count==0){Slots[i]=s;Slots[index]=new BagSlot();Select(Selected);return;}
             if(s.count==0)Slots[index]=new BagSlot();else Tell("Hotbar đầy: kéo vật phẩm vào ô để đổi chỗ.");Select(Selected);
         }
-        public BagState Snapshot(){EndDrag();Sync();return new BagState{slots=Slots,selected=Selected,satiety=Satiety};}
+        public BagState Snapshot(){EndDrag();if(held!=null)throw new InvalidOperationException("Cần trả vật phẩm đang kéo vào túi trước khi lưu.");Sync();return new BagState{slots=Slots,selected=Selected,satiety=Satiety};}
         public void Restore(BagState state,bool migrateLegacy=false)
         {held=null;dragSource=-1;Defaults();if(state?.slots!=null&&state.slots.Length==36)
          {Slots=state.slots;bool shovelFound=false;int shovelSlot=-1;

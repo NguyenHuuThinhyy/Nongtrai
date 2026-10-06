@@ -14,7 +14,8 @@ namespace NongTrai
         public AnimalCarry carry;
         public FarmPlot Plot { get; private set; }
         public FarmSign Target { get; private set; }
-        public string Hint => carry!=null && carry.Held!=null?"[CHUỘT PHẢI] Thả vật nuôi vào chuồng đúng loại":
+        public string Hint => player.Tractor!=null?"MÁY CÀY • W/S tiến lùi • A/D rẽ • Space phanh • F xuống xe":
+            carry!=null && carry.Held!=null?"[CHUỘT PHẢI] Thả vật nuôi vào chuồng đúng loại":
             AdventureBag.Instance?.Item==105?"Xô nước: TRÁI khi rỗng để múc • TRÁI khi đầy để đặt nước":
             AdventureBag.Instance?.Item==69?"TNT: trái/phải đặt ở Khám phá • cầm đuốc để châm":
             AdventureBag.Instance?.Item==29?"Đuốc: ngắm TNT, trái/phải để châm • ngắm đất, trái để đặt đuốc":
@@ -208,7 +209,7 @@ namespace NongTrai
             Plot=selected as FarmPlot;Target=selected as FarmSign;
             if(worldLabel!=null)
             {
-                bool visible=selected!=null && carry.Held==null;
+                bool visible=selected!=null && !(selected is ProcessingMachine) && !(selected is FarmTractor) && carry.Held==null;
                 worldLabel.gameObject.SetActive(visible);
                 if(visible && selectedCollider!=null)
                 {

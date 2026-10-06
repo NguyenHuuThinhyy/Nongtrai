@@ -29,6 +29,11 @@ namespace NongTrai
         public void Interact(PlayerInteraction actor)
         { actor.Say(FarmExpansion.Instance==null?Work(actor.field.Current,out _):FarmExpansion.Instance.Work(this)); }
         public void SetHighlighted(bool selected) { Highlight(selected);InteractionOutline.Set(this,selected); }
+        public bool TillWithTractor()
+        {
+            if(State!=PlotState.Untilled || (FarmExpansion.Instance!=null&&!FarmExpansion.Instance.IsUnlocked(this)))return false;
+            State=PlotState.Tilled;Refresh();return true;
+        }
         public string Work(CropDefinition selected, out int harvested)
         {
             harvested = 0;

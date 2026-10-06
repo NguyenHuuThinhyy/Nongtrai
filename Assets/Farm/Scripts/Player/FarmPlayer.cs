@@ -9,6 +9,9 @@ namespace NongTrai
         public Transform visual;
         public FarmCamera cameraRig;
         public bool Paused { get; private set; }
+        public FarmTractor Tractor { get; set; }
+        public static bool HudPointerActive=>!FarmControls.Mobile&&(FarmControls.Keys[UnityEngine.InputSystem.Key.LeftAlt].isPressed||FarmControls.Keys[UnityEngine.InputSystem.Key.RightAlt].isPressed);
+        public static bool HudPointerReleased=>!FarmControls.Mobile&&(FarmControls.Keys[UnityEngine.InputSystem.Key.LeftAlt].wasReleasedThisFrame||FarmControls.Keys[UnityEngine.InputSystem.Key.RightAlt].wasReleasedThisFrame);
         public bool IsSprinting=>!Paused && Input!=null && Input.Sprint && controller!=null && new Vector2(controller.velocity.x,controller.velocity.z).magnitude>settings.walkSpeed+.2f;
         public float HungerRate=>IsSprinting?.12f:.03f;
         float swimJumpUntil,nextAttack;
@@ -44,14 +47,14 @@ namespace NongTrai
         public void SetPaused(bool paused)
         {
             Paused = paused;
-            Cursor.lockState = paused || FarmControls.Mobile ? CursorLockMode.None : CursorLockMode.Locked;
-            Cursor.visible = paused || FarmControls.Mobile;
+            Cursor.lockState = paused || FarmControls.Mobile || HudPointerActive ? CursorLockMode.None : CursorLockMode.Locked;
+            Cursor.visible = paused || FarmControls.Mobile || HudPointerActive;
             PauseChanged?.Invoke(paused);
         }
         void OnApplicationFocus(bool focus) { if (!focus) SetPaused(true); }
         void OnDisable() { Cursor.lockState = CursorLockMode.None; Cursor.visible = true; }
         public void Teleport(Vector3 position)
-        { ExplorationWorld.Instance?.EnsureAt(position);controller.enabled=false;transform.position=position;verticalSpeed=0;impactVelocity=Vector3.zero;horizontalVelocity=Vector3.zero;fallApexY=position.y;trackingFall=true;controller.enabled=true;safePoint=IslandSafePoint(position); }
+        { if(Tractor!=null)Tractor.Exit();ExplorationWorld.Instance?.EnsureAt(position);controller.enabled=false;transform.position=position;verticalSpeed=0;impactVelocity=Vector3.zero;horizontalVelocity=Vector3.zero;fallApexY=position.y;trackingFall=true;controller.enabled=true;safePoint=IslandSafePoint(position); }
         public void ApplyImpact(Vector3 away,float strength=3.2f)
         {away.y=0;if(away.sqrMagnitude<.01f)away=-transform.forward;
          impactVelocity=away.normalized*strength;verticalSpeed=Mathf.Max(verticalSpeed,2.8f);cameraRig?.Shake(.18f);}
@@ -75,7 +78,11 @@ namespace NongTrai
                 if(!Cursor.visible) Cursor.visible=true;
                 return;
             }
-            cameraRig.ReadLook(Input.Looking);
+            if(HudPointerActive){Cursor.lockState=CursorLockMode.None;Cursor.visible=true;return;}
+            bool relocking=!FarmControls.Mobile&&Cursor.lockState!=CursorLockMode.Locked;
+            if(relocking){Cursor.lockState=CursorLockMode.Locked;Cursor.visible=false;}
+            if(!relocking&&!HudPointerReleased)cameraRig.ReadLook(Input.Looking);
+            if(Tractor!=null){Tractor.Drive();return;}
             if (Input.ViewPressed) cameraRig.ToggleView();
             if (Input.FlyPressed) CreativeModeManager.Instance?.ToggleFlight();
             Vector2 axes = Vector2.ClampMagnitude(Input.Movement, 1);

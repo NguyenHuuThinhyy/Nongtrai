@@ -127,7 +127,16 @@ namespace NongTrai
     }
     public sealed class FarmPanelFit:MonoBehaviour
     {
-        void LateUpdate(){if(!FarmControls.Mobile)return;var r=transform as RectTransform;var parent=r?.parent as RectTransform;if(parent==null||r.rect.width<200||r.rect.height<150)return;
-            float s=Mathf.Min(1,(parent.rect.width-32)/r.rect.width,(parent.rect.height-32)/r.rect.height);r.localScale=Vector3.one*Mathf.Max(.1f,s);}
+        void OnEnable()=>Fit();
+        void LateUpdate()=>Fit();
+        public void Fit()
+        {
+            var r=transform as RectTransform;var parent=r?.parent as RectTransform;
+            if(parent==null||r.rect.width<200||r.rect.height<150)return;
+            // Only top-level modal panels need desktop viewport fitting; preserve HUD placement.
+            if(!FarmControls.Mobile&&parent.GetComponent<FarmHud>()==null)return;
+            float s=Mathf.Min(1,(parent.rect.width-32)/r.rect.width,(parent.rect.height-32)/r.rect.height);
+            r.localScale=Vector3.one*Mathf.Max(.01f,s);
+        }
     }
 }
