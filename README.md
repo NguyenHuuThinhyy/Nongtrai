@@ -5,7 +5,7 @@
 ## Bản thử Android / AR / AI / Cloud
 
 Nhánh **codex/rubric-mobile-ar-ai-cloud**, phát triển từ `bf7d0b3`.
-**Chưa gộp main. Chỉ gộp sau khi chủ dự án tự test và xác nhận.**
+**Chủ dự án đã xác nhận gộp bản này vào main ngày 06/10/2026.**
 
 - [Tải bản thử Windows, APK và source Unity](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/rubric-preview-20261006).
 - Chạy **CHAY_GAME.bat** để tự khởi động backend/model, kết nối chatbot rồi mở game. Máy đã chuẩn bị runtime không tải lại. [Hướng dẫn khởi động trợ lý](Docs/ASSISTANT_START.md).
@@ -35,10 +35,10 @@ Trên máy chủ dự án, chỉ dùng **D:\GAME_NongTrai**: mở thư mục nà
 hoặc chạy `CHAY_GAME.bat`. Source cũ được cất riêng tại `D:\NongTrai_LuuTru`;
 không chép đè vào dự án đang dùng. Manifest trong `DongGoi` ghi commit nguồn/build của từng gói hiện tại.
 
-Clone đúng nhánh để có các phần công nghệ mới:
+Clone main để có bản đã được chủ dự án duyệt:
 
 ```powershell
-git clone --branch codex/rubric-mobile-ar-ai-cloud https://github.com/NguyenHuuThinhyy/Nongtrai.git
+git clone --branch main https://github.com/NguyenHuuThinhyy/Nongtrai.git
 ```
 
 Unity Hub → Add project from disk → thư mục checkout. Mở

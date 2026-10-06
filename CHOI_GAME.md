@@ -1,6 +1,6 @@
 # Bản thử Android / AR / AI / Cloud
 
-© HThinh.yy. Nhánh rubric; chỉ gộp main sau khi bạn tự test và xác nhận.
+© HThinh.yy. Bản local được chủ dự án duyệt gộp main ngày 06/10/2026.
 
 - **PC: chạy CHAY_GAME.bat** để tự mở backend nhẹ và ghi kết nối. Chờ “BACKEND SAN SANG”, vào game rồi nhấn C; AI chỉ nạp khi gửi câu hỏi, nhả RAM sau60giây không dùng. [Cách khởi động và xử lý lỗi](Docs/ASSISTANT_START.md).
 - **BAT_BACKEND_PC.bat** giữ riêng backend chạy; **CHAY_GAME_KHONG_TRO_LY.bat** chơi offline. AR không cần backend; nút Hỏi trợ lý cần backend.

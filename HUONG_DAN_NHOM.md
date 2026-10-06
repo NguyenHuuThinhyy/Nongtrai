@@ -1,8 +1,8 @@
 # Mở bản thử và phát triển tiếp
 
-© HThinh.yy. Nhánh `codex/rubric-mobile-ar-ai-cloud`; chưa gộp main.
+© HThinh.yy. Bản local được chủ dự án duyệt gộp vào `main` ngày 06/10/2026.
 
-1. Clone nhánh này hoặc tải Unity ZIP từ release `rubric-preview-20261006`.
+1. Clone nhánh main hoặc tải Unity ZIP từ release `rubric-preview-20261006`.
 2. Chơi Windows: giải nén trọn ZIP Windows rồi chạy CHAY_GAME.bat để tự mở backend nhẹ và ghép chatbot.
    Chơi offline ngay bằng CHAY_GAME_KHONG_TRO_LY.bat. Giữ EXE/Data/DLL và Backend/Tools; xem Docs/ASSISTANT_START.md.
 3. Android: tải NongTrai.apk, cho phép cài ứng dụng từ nguồn tải, cài trên Android8+
@@ -21,4 +21,4 @@ Backend local gồm FastAPI và OllamaCPU. Model/cache lưu trên PC. Chưa có 
 Adafruit IO thì để username/key trống; không bật cloud. Các chức năng game offline vẫn chạy.
 
 Ghi bug/test vào Docs/ACCEPTANCE.md với thiết bị, commit/build, ảnh/video và bước tái hiện.
-Không merge main cho tới khi HThinh.yy tự test và xác nhận.
+Bản local này đã được HThinh.yy xác nhận cho phép gộp vào main.

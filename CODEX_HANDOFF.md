@@ -1,7 +1,7 @@
 # Handoff local — 06/10/2026
 
 © HThinh.yy. Dự án D:/GAME_NongTrai, nhánh codex/rubric-mobile-ar-ai-cloud.
-Main giữ bf7d0b3; chỉ gộp sau khi chủ dự án tự test và xác nhận. Không chạy builder dựng scene.
+Chủ dự án xác nhận gộp bản local vào main ngày 06/10/2026. Không chạy builder dựng scene.
 
 - Đã bỏ Dockerfile/Compose và CI container. Workflow hiện tại kiểm backend/launcher trên Windows.
 - CHAY_GAME.bat → Tools/Start-Assistant.ps1 → Backend/launcher.py. Kiểm runtime/model digest/health/pair,
@@ -22,4 +22,4 @@ Main giữ bf7d0b3; chỉ gộp sau khi chủ dự án tự test và xác nhận
 Xem Docs/TEST_RESULTS.md cho kết quả mới và lịch sử riêng theo commit. Không coi test mock là dịch vụ thật.
 Native service startup từ công cụ từng bị auto-review chặn 'blocked by policy'; không thử lại/bypass.
 Đã chuẩn bị runtime/imports, cần chủ dự án chạy BAT và test thực tế. Không bật âm khi sửa/kiểm tra.
-Smoke bằng Tools/Test-Windows.ps1 dùng -farmMute. Không merge main thay chủ dự án.
+Smoke bằng Tools/Test-Windows.ps1 dùng -farmMute. Việc gộp bản này vào main đã được chủ dự án cho phép.
