@@ -105,11 +105,12 @@ namespace NongTrai
                 { MachinePart(go.transform,"Ống khói lớn",PrimitiveType.Cylinder,new Vector3(0,1.35f,.34f),new Vector3(.35f,.72f,.35f),new Color(.35f,.38f,.39f));
                   MachinePart(go.transform,"Lửa lò",PrimitiveType.Sphere,new Vector3(0,-.18f,-.83f),new Vector3(.52f,.58f,.12f),new Color(1,.42f,.07f)); }
                 var labelObject=new GameObject("Tên máy",typeof(TextMeshPro));labelObject.transform.SetParent(go.transform,false);
-                labelObject.transform.localPosition=new Vector3(0,2.15f,0);labelObject.transform.localScale=Vector3.one*.30f;
+                labelObject.transform.localPosition=new Vector3(0,2.75f,0);labelObject.transform.localScale=Vector3.one*.32f;
                 var label=labelObject.GetComponent<TextMeshPro>();label.font=FarmUi.Font;label.text=names[i].ToUpper()+"  [CLICK TRÁI]";
-                label.fontSize=5;label.alignment=TextAlignmentOptions.Center;label.color=Color.white;
-                label.outlineColor=Color.black;label.outlineWidth=.2f;label.rectTransform.sizeDelta=new Vector2(8,1.5f);
-                label.text=names[i].ToUpper()+"  [CHUỘT TRÁI]";machine.worldLabel=labelObject.transform;
+                label.fontSize=14;label.fontStyle=FontStyles.Bold;label.alignment=TextAlignmentOptions.Center;label.color=Color.white;
+                label.outlineColor=Color.black;label.outlineWidth=.28f;label.rectTransform.sizeDelta=new Vector2(26,5);
+                label.textWrappingMode=TextWrappingModes.NoWrap;
+                label.text=names[i].ToUpper()+"\n<size=60%>[CHUỘT TRÁI] SỬ DỤNG</size>";machine.worldLabel=labelObject.transform;
             }
         }
         static GameObject MachinePart(Transform parent,string name,PrimitiveType type,Vector3 position,Vector3 scale,Color color)
@@ -237,7 +238,7 @@ namespace NongTrai
         { if(rotor!=null&&processing!=null&&processing.IsBusy(recipeIndex)&&!processing.hud.player.Paused)
               rotor.Rotate(0,180*Time.deltaTime,0,Space.Self);
           if(worldLabel!=null&&Camera.main!=null)
-          {worldLabel.gameObject.SetActive(Vector3.Distance(worldLabel.position,Camera.main.transform.position)<6);
-           if(worldLabel.gameObject.activeSelf)worldLabel.rotation=Quaternion.LookRotation(worldLabel.position-Camera.main.transform.position);} }
+          {worldLabel.gameObject.SetActive(processing!=null&&!processing.hud.player.Paused&&Vector3.Distance(worldLabel.position,processing.hud.player.transform.position)<5);
+           if(worldLabel.gameObject.activeSelf)worldLabel.rotation=Camera.main.transform.rotation;} }
     }
 }

@@ -25,10 +25,11 @@ namespace NongTrai
         public static readonly Vector3 Origin=new Vector3(175.5f,996,-24.5f);
         readonly HashSet<Vector3Int> removed=new HashSet<Vector3Int>();
         readonly Dictionary<Vector2Int,Chunk> chunks=new Dictionary<Vector2Int,Chunk>();
-        TMPro.TMP_Text miningText,reticle;
-        FarmSwordReticle swordReticle;
+        [SerializeField] TMPro.TMP_Text miningText,reticle;
+        [SerializeField] FarmSwordReticle swordReticle;
         Component swordTarget;
-        UnityEngine.UI.Image breakFill;UnityEngine.GameObject breakBack;string miningHint="";
+        [SerializeField] UnityEngine.UI.Image breakFill;
+        [SerializeField] UnityEngine.GameObject breakBack;string miningHint="";
         readonly List<SaplingRecord> saplings=new List<SaplingRecord>();readonly Dictionary<Vector3Int,int> additions=new Dictionary<Vector3Int,int>();readonly Dictionary<SaplingRecord,GameObject> sprouts=new Dictionary<SaplingRecord,GameObject>();readonly HashSet<Vector3Int> leavesToCheck=new HashSet<Vector3Int>();float leafClock;
         Material[] materials;float hold;float breakDuration=1;int entityTarget;Vector3Int target;bool hasTarget;
         public int MinedCount {get;private set;}
@@ -61,6 +62,7 @@ namespace NongTrai
             for(int i=0;i<colors.Length;i++){materials[i]=new Material(Shader.Find("Universal Render Pipeline/Lit"));materials[i].color=colors[i];}
             Restore(null);
         }
+        void OnEnable()=>Instance=this;
         void Start()
         {
             gameObject.AddComponent<AdventureWildlife>().world=this;
@@ -297,7 +299,7 @@ namespace NongTrai
              {boss=CaveBoss.Create(location,this,hud.player);hud.Notify("Cảm nhận Golem dưới lòng đất gần đây. Đào xuống tầng hang để chiến đấu!");}}
             if(!hud.player.Paused)AdvanceTrees(Time.deltaTime);
             if(IsExploring)Stream(hud.player.transform.position);
-            if(hud.player.Paused||FarmHud.WorldClickSuppressed||FarmBuildingSystem.Instance.IsBuilding||
+            if(hud.player.Paused||FarmHud.WorldClickSuppressed||FarmBuildingSystem.Instance==null||FarmBuildingSystem.Instance.IsBuilding||
                 AdventureBag.Instance!=null&&(AdventureBag.Instance.Item==69||AdventureBag.Instance.Item==105||AdventureBag.Instance.Item==111||AdventureBag.IsEdible(AdventureBag.Instance.Item))||
                 FarmWaterSystem.Instance!=null&&(FarmWaterSystem.Instance.PendingPlacement||FarmWaterSystem.Instance.ConsumedFrame==Time.frameCount)){hold=0;return;}
             var cam=Camera.main;if(cam==null||FarmControls.Pointer==null)return;
@@ -305,7 +307,7 @@ namespace NongTrai
         }
         public bool UpdateMiningRay(Ray ray,bool pressed,float elapsed)
         {
-            if(hud.player.Paused||FarmBuildingSystem.Instance.IsBuilding)return false;
+            if(hud==null||hud.player==null||hud.player.Paused||FarmHud.WorldClickSuppressed||FarmBuildingSystem.Instance==null||FarmBuildingSystem.Instance.IsBuilding)return false;
             miningHint="Nhìn vào khối đất/đá • Giữ CHUỘT TRÁI để đào • V đổi góc nhìn";
             bool swordSwing=pressed && AdventureBag.Instance?.Item==106 && hud.player.TryAttack();
             swordTarget=AdventureBag.Instance?.Item==106?FarmSwordAim.FindTarget(hud.player,ray,Camera.main):null;
@@ -357,7 +359,7 @@ namespace NongTrai
                     {fire.Interact(hud.interaction);hold=0;return false;}
                     if(entityTarget!=placed.GetInstanceID()){entityTarget=placed.GetInstanceID();hold=0;}
                     int material=placed.type==0?7:placed.type==1||placed.type==4?3:1;
-                    var bag=AdventureBag.Instance;breakDuration=bag.BreakSeconds(material);hasTarget=true;hold=pressed?hold+elapsed:0;
+                    var bag=AdventureBag.Instance;if(bag==null)return false;breakDuration=bag.BreakSeconds(material);hasTarget=true;hold=pressed?hold+elapsed:0;
                     if(pressed)hud.player.TriggerAnimation("Work");
                     miningHint="Giữ trái: phá khối • "+Mathf.FloorToInt(hold/breakDuration*100)+"%";
                     if(hold>=breakDuration){hold=0;if(bag.Item==104||bag.Item==107)bag.DamageTool();return FarmBuildingSystem.Instance.BreakPlaced(placed,true);}return false;
@@ -384,8 +386,8 @@ namespace NongTrai
         public bool IsTerrain(Collider collider){foreach(var c in chunks.Values)if(c.collider==collider)return true;return false;}
         void LateUpdate()
         {
-            if(miningText==null)return;
-            bool building=FarmBuildingSystem.Instance.IsBuilding;bool visible=(IsExploring||building||hasTarget)&&!hud.player.Paused;
+            if(hud==null||hud.player==null||miningText==null||reticle==null||swordReticle==null||breakBack==null||breakFill==null)return;
+            bool building=FarmBuildingSystem.Instance!=null&&FarmBuildingSystem.Instance.IsBuilding;bool visible=(IsExploring||building||hasTarget)&&!hud.player.Paused;
             bool sword=AdventureBag.Instance?.Item==106;
             miningText.gameObject.SetActive(visible);reticle.gameObject.SetActive(!hud.player.Paused&&!sword);
             swordReticle.gameObject.SetActive(!hud.player.Paused&&sword);

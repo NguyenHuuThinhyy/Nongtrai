@@ -50,9 +50,26 @@ namespace NongTrai
             var map=CreatePanel(root.transform,"Tab • Đổi bản đồ",new Vector2(24,-260),new Vector2(280,58),new Vector2(0,1));
             map.AddComponent<Button>().onClick.AddListener(()=>IslandManager.Instance.OpenMap());
             FarmUi.TmpLabel(map.transform,"[TAB]  ĐỔI BẢN ĐỒ",new Vector2(14,-12),new Vector2(255,36),22);
-            var right=CreatePanel(root.transform,"Thông tin nông trại",new Vector2(-24,-24),new Vector2(490,106),new Vector2(1,1));
-            coinText=FarmUi.TmpLabel(right.transform,"",new Vector2(12,-8),new Vector2(465,35),23);
-            environmentText=FarmUi.TmpLabel(right.transform,"",new Vector2(12,-48),new Vector2(465,50),16);
+            var right=CreatePanel(root.transform,"Thông tin nông trại",new Vector2(-24,-24),new Vector2(490,128),new Vector2(1,1));
+            var coinBar=CreatePanel(right.transform,"Số dư xu",new Vector2(8,-4),new Vector2(474,44),new Vector2(0,1));
+            var rounded=CoinPanelSprite();coinBar.GetComponent<Image>().sprite=rounded;coinBar.GetComponent<Image>().type=Image.Type.Sliced;
+            coinBar.GetComponent<Image>().color=new Color(0,0,0,.58f);
+            var coinIcon=CreatePanel(coinBar.transform,"Đồng xu vàng",new Vector2(5,-1),new Vector2(42,42),new Vector2(0,1)).GetComponent<Image>();
+            coinIcon.sprite=FarmItemIconLibrary.Get(120);coinIcon.color=Color.white;coinIcon.preserveAspect=true;coinIcon.raycastTarget=false;
+            coinText=FarmUi.TmpLabel(coinBar.transform,"",new Vector2(53,0),new Vector2(365,44),32);
+            coinText.fontStyle=FontStyles.Bold;coinText.alignment=TextAlignmentOptions.MidlineLeft;
+            coinText.enableAutoSizing=true;coinText.fontSizeMin=20;coinText.fontSizeMax=32;
+            var addCoins=CreatePanel(coinBar.transform,"Mở cửa hàng",new Vector2(434,-5),new Vector2(34,34),new Vector2(0,1));
+            addCoins.GetComponent<Image>().sprite=rounded;addCoins.GetComponent<Image>().type=Image.Type.Sliced;
+            addCoins.GetComponent<Image>().color=new Color(1,.78f,.16f);addCoins.AddComponent<Button>().onClick.AddListener(shop.Open);
+            // Draw the plus directly so font clipping cannot hide the symbol.
+            foreach(var size in new[]{new Vector2(20,5),new Vector2(5,20)})
+            {
+                var stroke=CreatePanel(addCoins.transform,"Dấu cộng",new Vector2(17,-17),size,new Vector2(0,1));
+                stroke.GetComponent<RectTransform>().pivot=new Vector2(.5f,.5f);
+                stroke.GetComponent<Image>().color=new Color(.24f,.24f,.16f);stroke.GetComponent<Image>().raycastTarget=false;
+            }
+            environmentText=FarmUi.TmpLabel(right.transform,"",new Vector2(12,-52),new Vector2(465,70),21);
             var survival=CreatePanel(root.transform,"Máu và độ no",new Vector2(24,18),new Vector2(370,98),new Vector2(0,0));
             survivalText=FarmUi.TmpLabel(survival.transform,"",new Vector2(9,-5),new Vector2(350,35),22);
             var healthBack=CreatePanel(survival.transform,"Nền máu",new Vector2(9,-45),new Vector2(169,26),new Vector2(0,1));
@@ -65,7 +82,7 @@ namespace NongTrai
             var tipRect=tooltip.rectTransform;tipRect.anchorMin=tipRect.anchorMax=new Vector2(.5f,0);
             tipRect.pivot=new Vector2(.5f,0);tipRect.anchoredPosition=new Vector2(0,130);
             tooltip.alignment=TextAlignmentOptions.Center;
-            creativeControls=FarmUi.TmpLabel(root.transform,"",new Vector2(24,-328),new Vector2(365,76),17);
+            creativeControls=FarmUi.TmpLabel(root.transform,"",new Vector2(24,-328),new Vector2(420,110),20);
             var cc=creativeControls.rectTransform;cc.anchorMin=cc.anchorMax=new Vector2(0,1);cc.pivot=new Vector2(0,1);cc.anchoredPosition=new Vector2(24,-328);
             creativeControls.alignment=TextAlignmentOptions.TopLeft;
             creativeControls.outlineColor=Color.black;creativeControls.outlineWidth=.2f;
@@ -95,6 +112,19 @@ namespace NongTrai
             hud.gameObject.AddComponent<FarmTutorialCoach>().Initialize(hud,root.transform);
         }
         void OnDestroy() { if(Instance==this) Instance=null; }
+        static Sprite CoinPanelSprite()
+        {
+            const int size=32;
+            var texture=new Texture2D(size,size,TextureFormat.RGBA32,false){filterMode=FilterMode.Bilinear,wrapMode=TextureWrapMode.Clamp,name="Coin panel"};
+            var pixels=new Color[size*size];
+            for(int y=0;y<size;y++)for(int x=0;x<size;x++)
+            {
+                float dx=Mathf.Max(Mathf.Abs(x-15.5f)-5.5f,0),dy=Mathf.Max(Mathf.Abs(y-15.5f)-5.5f,0);
+                pixels[y*size+x]=new Color(1,1,1,Mathf.Clamp01(10.5f-Mathf.Sqrt(dx*dx+dy*dy)));
+            }
+            texture.SetPixels(pixels);texture.Apply();
+            return Sprite.Create(texture,new Rect(0,0,size,size),new Vector2(.5f,.5f),100,0,SpriteMeshType.FullRect,new Vector4(12,12,12,12));
+        }
         static GameObject CreatePanel(Transform parent,string name,Vector2 position,Vector2 size,Vector2 anchor)
         {
             var go=new GameObject(name,typeof(RectTransform),typeof(Image));
@@ -158,7 +188,7 @@ namespace NongTrai
                 if(Mathf.Abs(wheel)>.05f) Select(((AdventureBag.Instance==null?selectedSlot:AdventureBag.Instance.Selected)+(wheel<0?1:8))%9);
             }
             displayedMoney=Mathf.MoveTowards(displayedMoney,shop.Money,Time.deltaTime*Mathf.Max(50,Mathf.Abs(shop.Money-displayedMoney)*3));
-            coinText.text="XU  "+Mathf.RoundToInt(displayedMoney)+" xu";
+            coinText.text=Mathf.RoundToInt(displayedMoney).ToString("N0",System.Globalization.CultureInfo.InvariantCulture);
             levelText.text="CẤP "+progress.Level+"  •  "+progress.Experience+"/"+progress.ExperienceNeeded+" XP";
             xpFill.rectTransform.sizeDelta=new Vector2(420f*progress.Experience/progress.ExperienceNeeded,28);
             var clock=TimeManager.Instance;
@@ -172,6 +202,7 @@ namespace NongTrai
             creativeControls.text=FarmControls.Mobile?(CreativeModeManager.IsCreative?"SÁNG TẠO • Menu: bật/tắt bay\nNhảy: lên • Hạ / Bay: xuống":""):CreativeModeManager.IsCreative?
                 (CreativeModeManager.IsFlying?"ĐANG BAY • Space lên, X xuống\nShift nhanh • F8 tắt bay":"SÁNG TẠO • F8 bật bay\nB: túi đồ và xây dựng"):
                 "E: bản đồ việc • TAB: đổi map\nB: túi/xây • lăn chuột: chọn";
+            if(!FarmControls.Mobile)creativeControls.text+="\nGiữ ALT: bấm nút trên màn hình";
             var bag=AdventureBag.Instance;
             if(bag!=null)
             {

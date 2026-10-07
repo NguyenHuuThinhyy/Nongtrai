@@ -35,10 +35,10 @@ namespace NongTrai
         public void Initialize(FarmHud owner,Transform parent)
         {
             Instance=this;hud=owner;
-            compact=FarmUi.Panel(parent,"Bản đồ nhỏ nông trại",new Vector2(329,165));
-            var cr=compact.GetComponent<RectTransform>();cr.anchorMin=cr.anchorMax=cr.pivot=new Vector2(1,1);cr.anchoredPosition=new Vector2(-24,-150);
-            FarmUi.TmpLabel(compact.transform,FarmControls.Mobile?"BẢN ĐỒ • CHẠM XEM VIỆC":"BẢN ĐỒ • [E] MỞ RỘNG",new Vector2(8,-5),new Vector2(310,25),15);
-            smallMap=MapBase(compact.transform,new Vector2(8,-32),new Vector2(150,108));
+            compact=FarmUi.Panel(parent,"Bản đồ nhỏ nông trại",new Vector2(410,200));
+            var cr=compact.GetComponent<RectTransform>();cr.anchorMin=cr.anchorMax=cr.pivot=new Vector2(1,1);cr.anchoredPosition=new Vector2(-24,-168);
+            FarmUi.TmpLabel(compact.transform,FarmControls.Mobile?"BẢN ĐỒ • CHẠM XEM VIỆC":"BẢN ĐỒ • [E] MỞ RỘNG",new Vector2(10,-6),new Vector2(390,30),20);
+            smallMap=MapBase(compact.transform,new Vector2(10,-42),new Vector2(170,140));
             DrawFarmGeometry(smallMap,smallMap);
             SmallLandmark("NHÀ",new Vector3(0,0,28),new Color(.8f,.5f,.2f));
             SmallLandmark("THƯ",new Vector3(4,0,28),new Color(.9f,.3f,.2f));
@@ -47,8 +47,8 @@ namespace NongTrai
             SmallLandmark("VƯỜN",new Vector3(67,0,0),new Color(.55f,.80f,.35f));
             var water=FindFirstObjectByType<WaterSource>();if(water!=null)SmallLandmark("HỒ",water.transform.position,new Color(.2f,.7f,1));
             smallMarker=Pin(smallMap,"Bạn",new Vector2(0,0),new Color(1,.9f,.2f),14,null);
-            summary=FarmUi.TmpLabel(compact.transform,"",new Vector2(168,-33),new Vector2(150,100),14);
-            FarmUi.Button(compact.transform,"[E] XEM VIỆC",new Vector2(168,-132),new Vector2(150,28),Open);
+            summary=FarmUi.TmpLabel(compact.transform,"",new Vector2(192,-42),new Vector2(208,116),19);
+            FarmUi.Button(compact.transform,"[E] XEM VIỆC",new Vector2(192,-160),new Vector2(208,34),Open);
 
             large=FarmUi.Panel(hud.transform,"Bản đồ nhiệm vụ tương tác",new Vector2(1280,910));
             heading=FarmUi.TmpLabel(large.transform,"",new Vector2(25,-16),new Vector2(1120,50),30);

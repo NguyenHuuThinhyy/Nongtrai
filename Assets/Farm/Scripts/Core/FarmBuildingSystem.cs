@@ -30,6 +30,7 @@ namespace NongTrai
         GameObject overlay,preview;TMP_Text title;Image[] slots;float rotation,fallTick;
 
         void Awake()=>Instance=this;
+        void OnEnable()=>Instance=this;
         void Start(){CreateHud();CreatePreview();}
         void OnDestroy(){if(Instance==this)Instance=null;}
         void CreateHud()
