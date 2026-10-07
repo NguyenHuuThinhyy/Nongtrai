@@ -107,7 +107,7 @@ namespace NongTrai
         }
         void CreateWaterSource()
         {
-            var source=new GameObject("Máy bơm lấy nước hồ - E");source.transform.position=new Vector3(27.5f,.75f,-11);
+            var source=new GameObject("Máy bơm lấy nước hồ - E");source.transform.position=new Vector3(26.2f,.87f,-6.5f);
             var sourceCollider=source.AddComponent<CapsuleCollider>();sourceCollider.center=new Vector3(0,.55f,0);sourceCollider.radius=1.1f;sourceCollider.height=2.5f;
             RuntimePart(source.transform,"Chân bơm",PrimitiveType.Cylinder,new Vector3(0,-.45f,0),new Vector3(.68f,.18f,.68f),new Color(.24f,.42f,.48f));
             RuntimePart(source.transform,"Thân bơm",PrimitiveType.Cylinder,new Vector3(0,.38f,0),new Vector3(.40f,.85f,.40f),new Color(.30f,.62f,.72f));
@@ -135,7 +135,7 @@ namespace NongTrai
             source.AddComponent<WaterSource>();
             FarmRedesign.WaterInfrastructure(source.transform,false);
             var board=GameObject.CreatePrimitive(PrimitiveType.Cube);
-            board.name="Bảng quản lý nước - E";board.transform.position=new Vector3(25.4f,1.45f,-10.4f);
+            board.name="Bảng quản lý nước - E";board.transform.position=new Vector3(22.7f,1.45f,-4.7f);
             board.transform.localScale=new Vector3(2.4f,1.15f,.18f);
             var boardMaterial=new Material(Shader.Find("Universal Render Pipeline/Lit"));
             boardMaterial.color=new Color(.28f,.42f,.32f);board.GetComponent<Renderer>().material=boardMaterial;

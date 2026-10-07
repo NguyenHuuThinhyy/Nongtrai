@@ -199,27 +199,31 @@ namespace NongTrai
         void Stairs(int floor)
         {
             const int stepsPerFlight=14;const float halfWidth=1.5f;
-            float y=floor*4.5f,rise=2.25f/stepsPerFlight,run=(StairLandingZ-StairBottomZ)/stepsPerFlight;
+            // Join the edges of the flat landings, not their centers: otherwise their
+            // vertical sides protrude about 40 cm above the ramp and stop the player.
+            const float landingHalfDepth=.675f;
+            float bottom=StairBottomZ+landingHalfDepth,top=StairLandingZ-landingHalfDepth;
+            float y=floor*4.5f,rise=2.25f/stepsPerFlight,run=(top-bottom)/stepsPerFlight;
             var tread=new Color(.48f,.32f,.2f);var metal=new Color(.2f,.23f,.22f);
             for(int i=0;i<stepsPerFlight;i++){
-                float z=StairBottomZ+(i+.5f)*run,level=y+(i+.5f)*rise;
+                float z=bottom+(i+.5f)*run,level=y+(i+.5f)*rise;
                 var first=Box(Shell,"Bậc gỗ chống trượt • nhịp 1",new Vector3(StairBottomX,level,z),new Vector3(2*halfWidth,rise,run+.035f),tread,"WoodFloor023");first.GetComponent<Collider>().enabled=false;
-                z=StairLandingZ-(i+.5f)*run;level=y+2.25f+(i+.5f)*rise;
+                z=top-(i+.5f)*run;level=y+2.25f+(i+.5f)*rise;
                 var second=Box(Shell,"Bậc gỗ chống trượt • nhịp 2",new Vector3(StairTopX,level,z),new Vector3(2*halfWidth,rise,run+.035f),tread,"WoodFloor023");second.GetComponent<Collider>().enabled=false;
             }
-            Box(Shell,"Chiếu nghỉ chữ U",new Vector3(-20,y+2.25f,StairLandingZ),new Vector3(6.4f,.16f,1.35f),tread,"WoodFloor023");
-            AddRamp(new Vector3(StairBottomX-halfWidth,y,StairBottomZ),new Vector3(StairBottomX+halfWidth,y,StairBottomZ),
-                new Vector3(StairBottomX-halfWidth,y+2.25f,StairLandingZ),new Vector3(StairBottomX+halfWidth,y+2.25f,StairLandingZ),"Collider dốc nhịp 1");
-            AddRamp(new Vector3(StairTopX-halfWidth,y+2.25f,StairLandingZ),new Vector3(StairTopX+halfWidth,y+2.25f,StairLandingZ),
-                new Vector3(StairTopX-halfWidth,y+4.5f,StairBottomZ),new Vector3(StairTopX+halfWidth,y+4.5f,StairBottomZ),"Collider dốc nhịp 2");
+            Box(Shell,"Chiếu nghỉ chữ U",new Vector3(-20,y+2.25f-.08f,StairLandingZ),new Vector3(6.4f,.16f,1.35f),tread,"WoodFloor023");
+            AddRamp(new Vector3(StairBottomX-halfWidth,y,bottom),new Vector3(StairBottomX+halfWidth,y,bottom),
+                new Vector3(StairBottomX-halfWidth,y+2.25f,top),new Vector3(StairBottomX+halfWidth,y+2.25f,top),"Collider dốc nhịp 1");
+            AddRamp(new Vector3(StairTopX-halfWidth,y+2.25f,top),new Vector3(StairTopX+halfWidth,y+2.25f,top),
+                new Vector3(StairTopX-halfWidth,y+4.5f,bottom),new Vector3(StairTopX+halfWidth,y+4.5f,bottom),"Collider dốc nhịp 2");
             // Keep the inner handrail ends clear around the 180-degree landing turn.
-            const float turnClearance=1.0f;float innerZ=StairLandingZ-turnClearance;
-            float t=(innerZ-StairBottomZ)/(StairLandingZ-StairBottomZ);
+            const float turnClearance=.45f;float innerZ=top-turnClearance;
+            float t=(innerZ-bottom)/(top-bottom);
             float lowerInnerY=y+2.25f*t,upperInnerY=y+2.25f+(1-t)*2.25f;
-            StairRail(StairBottomX-halfWidth,y,StairBottomZ,y+2.25f,StairLandingZ,metal);
-            StairRail(StairBottomX+halfWidth,y,StairBottomZ,lowerInnerY,innerZ,metal);
-            StairRail(StairTopX-halfWidth,upperInnerY,innerZ,y+4.5f,StairBottomZ,metal);
-            StairRail(StairTopX+halfWidth,y+2.25f,StairLandingZ,y+4.5f,StairBottomZ,metal);
+            StairRail(StairBottomX-halfWidth,y,bottom,y+2.25f,StairLandingZ,metal);
+            StairRail(StairBottomX+halfWidth,y,bottom,lowerInnerY,innerZ,metal);
+            StairRail(StairTopX-halfWidth,upperInnerY,innerZ,y+4.5f,bottom,metal);
+            StairRail(StairTopX+halfWidth,y+2.25f,StairLandingZ,y+4.5f,bottom,metal);
         }
         void AddRamp(Vector3 a,Vector3 b,Vector3 c,Vector3 d,string name)
         {

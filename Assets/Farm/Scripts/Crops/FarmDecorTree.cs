@@ -10,6 +10,7 @@ namespace NongTrai
         static readonly Dictionary<int,float> scales=new Dictionary<int,float>();
         public int id;
         int hits;
+        public void Relocate(Vector3 position){transform.position=position;positions[id]=position;}
         void Start()
         {positions[id]=transform.position;var renderers=GetComponentsInChildren<Renderer>();var bounds=new Bounds(transform.position,Vector3.zero);foreach(var r in renderers)bounds.Encapsulate(r.bounds);scales[id]=Mathf.Clamp(bounds.size.y/5.4f,.35f,2);}
         public string InteractionHint=>"[Chuột trái] Đốn cây gỗ • rìu 1 nhát, tay 3 nhát";

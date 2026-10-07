@@ -109,7 +109,12 @@ namespace NongTrai.Editor
         {
             foreach (var r in Object.FindObjectsByType<Renderer>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
-                if (r.gameObject.name != "Pond surface - decorative") continue;
+                bool legacyDock=false;
+                for(var parent=r.transform;parent!=null;parent=parent.parent)
+                    if(parent.name=="Pond boardwalk"){legacyDock=true;break;}
+                var tree=r.GetComponentInParent<FarmDecorTree>();
+                bool pondTree=tree!=null&&tree.transform.position.y<10&&tree.transform.position.x>24.5f&&tree.transform.position.x<39.5f&&tree.transform.position.z>-26&&tree.transform.position.z<-4;
+                if (r.gameObject.name != "Pond surface - decorative"&&!legacyDock&&!pondTree) continue;
                 if (!forcedRendererStates.ContainsKey(r)) forcedRendererStates[r] = r.forceRenderingOff;
                 r.forceRenderingOff = true;
             }
