@@ -5,3 +5,4 @@
 /DongGoi/*.zip binary
 /DongGoi/*.apk binary
 /DongGoi/*.unitypackage binary
+/Builds/README.md text diff merge
