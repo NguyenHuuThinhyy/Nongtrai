@@ -2,7 +2,7 @@
 
 © TriForge. Chủ dự án cho phép phát hành và gộp main ngày 08/10/2026.
 
-1. [GitHub Release LocalAI](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/triforge-20261008-280c7dc) có Windows ZIP, APK và source Unity ZIP kèm model/license.
+1. [GitHub Release LocalAI](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/triforge-20261008-0b798d9) có Windows ZIP, APK và source Unity ZIP kèm model/license.
 2. Windows: giải nén toàn bộ ZIP, giữ EXE/Data/DLL; mở CHAY_GAME.bat hoặc NongTrai.exe. C mở chat; J mở mô hình local; H ẩn hướng dẫn. AI chỉ nạp khi chat mở, đóng chat sẽ hủy xử lý và giải phóng model.
 3. Android: cài APK ARM64 trên Android 8+. Gói khoảng 1,16 GB; lần mở chat đầu cần thêm khoảng 1,2 GB trống để chuẩn bị model. Không cần PC/Internet. Khuyến nghị 6 GB RAM; chưa nghiệm thu trên điện thoại thật.
 4. Unity: dùng source ZIP, hoặc clone main rồi lấy Backend/models từ ZIP vào checkout. Editor 6000.3.22f1, Android Build Support/SDK/NDK/OpenJDK; mở Assets/Farm/Scenes/Farm.unity. Chọn Nong Trai → Technology → Prepare local chat model trước khi Play lần đầu. Không chạy FarmProjectBuilder dựng scene.
