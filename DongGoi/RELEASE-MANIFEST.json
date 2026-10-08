@@ -1,7 +1,7 @@
 {
   "branch": "main",
   "build_source_commit": "1adedb73172f9e5c9eda0799a9e6d95f415e5eff",
-  "source_git_commit": "3f812c7bc41e11d1ab07e94f0289cf54faad606a",
+  "source_git_commit": "6d1ce43899646e04efa9b70bf039e8ea54056232",
   "date": "2026-10-08",
   "unity": "6000.3.22f1",
   "windows_build": "Succeeded; 0 errors",
@@ -33,8 +33,8 @@
     },
     {
       "file": "NongTrai-Unity-20261008-TriForge-1adedb7.zip",
-      "bytes": 1191546483,
-      "sha256": "956b4621cbd84bdd8d969d460b5df06a01a478770e8e53353656497e473d6271"
+      "bytes": 1191546588,
+      "sha256": "2a882764773cd563bcb1ded21dc8a051123790a486e5f492ba10e9d14b960086"
     },
     {
       "file": "NongTrai_FirstHarvest_Trailer_30s_1080p.mp4",
