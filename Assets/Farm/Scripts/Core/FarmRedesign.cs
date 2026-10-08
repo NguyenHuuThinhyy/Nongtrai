@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace NongTrai
@@ -12,11 +13,19 @@ namespace NongTrai
         static readonly Dictionary<string, GameObject> cache = new Dictionary<string, GameObject>();
         static readonly Dictionary<string, Material> golemMaterials = new Dictionary<string, Material>();
         static Sprite panel, button;
+        public static bool InitialPassComplete { get; private set; }
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void ResetCache() { cache.Clear(); panel = button = null; }
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void ResetCache() { cache.Clear(); panel = button = null; InitialPassComplete=false; }
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void SubscribeToSceneLoads()
+        {
+            SceneManager.sceneLoaded-=OnSceneLoaded;
+            SceneManager.sceneLoaded+=OnSceneLoaded;
+        }
+        static void OnSceneLoaded(Scene scene,LoadSceneMode mode)=>Install();
         static void Install()
         {
+            InitialPassComplete=false;
             if (FindFirstObjectByType<FarmPlayer>() == null || FindFirstObjectByType<FarmRedesign>() != null) return;
             new GameObject("Visual redesign • CC0 art director").AddComponent<FarmRedesign>();
         }
@@ -98,6 +107,7 @@ namespace NongTrai
             foreach(var canvas in All<Canvas>()) foreach(var img in canvas.GetComponentsInChildren<Image>(true)) Theme(img);
             StaticScenery();
             if(includeLandscape)FarmLandscapeRedesign.Apply();
+            InitialPassComplete=true;
         }
         static Vector3 InverseScale(Vector3 s) => new Vector3(1/Mathf.Max(.001f,Mathf.Abs(s.x)),1/Mathf.Max(.001f,Mathf.Abs(s.y)),1/Mathf.Max(.001f,Mathf.Abs(s.z)));
         static void Creature(Transform root,string key,float height)

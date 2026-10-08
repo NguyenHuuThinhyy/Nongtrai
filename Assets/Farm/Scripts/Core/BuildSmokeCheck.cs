@@ -740,6 +740,8 @@ namespace NongTrai
             }
             if(restartFlowStage==1)
             {
+                if(!hud.save.StartupComplete||!FarmRedesign.InitialPassComplete||FarmServices.Instance==null||!FarmServices.Instance.IsReady)
+                    throw new InvalidOperationException("Fresh farm entered before save setup, services, and visual redesign finished.");
                 if(hud.mainMenu.activeSelf||player.Paused||FarmExpansion.Instance.Level!=1)
                     throw new InvalidOperationException("Confirm restart returned to the title menu or did not start a fresh farm.");
                 player.SetPaused(true);yield return null;
@@ -757,7 +759,17 @@ namespace NongTrai
             {
                 if(CreativeModeManager.IsCreative||hud.mainMenu.activeSelf||player.Paused||FarmExpansion.Instance.Level!=1)
                     throw new InvalidOperationException("Returning from Creative did not resume the saved normal farm directly.");
-                Debug.Log("FARM_RESTART_CREATIVE_FLOW_OK: confirmed restart enters a fresh farm, Creative toggles in-place, and return to normal reloads directly without the title menu.");
+                var manager=CreativeModeManager.Instance;
+                player.SetPaused(true);manager.StartCreative();yield return null;
+                manager.ReturnToMainMenu();if(!manager.RestartConfirmationOpen)throw new InvalidOperationException("Creative restart confirmation did not open.");
+                restartFlowStage=3;manager.ConfirmRestart(true);yield break;
+            }
+            if(restartFlowStage==3)
+            {
+                if(CreativeModeManager.IsCreative||hud.mainMenu.activeSelf||player.Paused||FarmExpansion.Instance.Level!=1||
+                   !hud.save.StartupComplete||!FarmRedesign.InitialPassComplete||FarmServices.Instance==null||!FarmServices.Instance.IsReady)
+                    throw new InvalidOperationException("Restarting from Creative did not restore the initialized fresh farm.");
+                Debug.Log("FARM_RESTART_CREATIVE_FLOW_OK: restart from normal and Creative waits for farm setup and visual redesign; mode switches retain their existing behavior.");
                 Application.Quit(0);yield break;
             }
             throw new InvalidOperationException("Unexpected restart smoke stage: "+restartFlowStage);

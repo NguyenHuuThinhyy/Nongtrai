@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
@@ -38,6 +39,7 @@ namespace NongTrai
         public string LastReply {get;private set;}="";
         public bool LastReplyFromModel {get;private set;}
         public bool LocalChatReady=>localChat!=null&&localChat.Ready;
+        public bool IsReady=>ready;
         FarmLocalChat localChat,retiringChat;bool manualVisible,applicationPaused;
         Coroutine prepareRoutine;IEnumerator localPreparation;
         FarmHud hud;TMP_InputField input,address,keyInput;TMP_Text chatText,statusText;RectTransform chatContent;ScrollRect chatScroll;
@@ -45,7 +47,13 @@ namespace NongTrai
         UnityWebRequest activeChat;Coroutine chatRoutine;string context="",session="",server="";int revision=-1;bool busy,ready;
         string PreferencesPath=>Path.Combine(Application.persistentDataPath,"farm-connection.json");
         string HistoryPath=>Path.Combine(Application.persistentDataPath,"farm-chat-history.json");
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void SubscribeToSceneLoads()
+        {
+            SceneManager.sceneLoaded-=OnSceneLoaded;
+            SceneManager.sceneLoaded+=OnSceneLoaded;
+        }
+        static void OnSceneLoaded(Scene scene,LoadSceneMode mode)=>Install();
         static void Install(){if(FindFirstObjectByType<FarmPlayer>()!=null&&FindFirstObjectByType<FarmServices>()==null)new GameObject("Farm Android AR AI Cloud • TriForge").AddComponent<FarmServices>();}
         void Awake(){Instance=this;}
         IEnumerator Start()
