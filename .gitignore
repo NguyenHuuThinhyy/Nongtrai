@@ -7,6 +7,7 @@
 # Playable packages and supplied weights are distributed via GitHub Release.
 /Builds/*
 !/Builds/README.md
+!/Builds/BUILD-MANIFEST.json
 *.csproj
 *.sln
 *.slnx
@@ -51,7 +52,7 @@ __pycache__/
 /Backend/.runtime/
 /Backend/runtime.local.json
 
-# Supplied GGUF is bundled in local test packages, not committed to Git.
+# Source GGUF stays outside regular Git; playable build copies use Git LFS.
 /Assets/StreamingAssets/FarmAI/
 !/Builds/Windows-LocalAI/
 !/Builds/Android-LocalAI/

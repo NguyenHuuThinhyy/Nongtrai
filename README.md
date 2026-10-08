@@ -6,7 +6,7 @@
 
 Chủ dự án đã cho phép đẩy và gộp bản hiện tại vào **main** ngày 08/10/2026.
 
-- [Tải Windows ZIP có EXE, APK Android và source Unity kèm model](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/localai-20261008).
+- [Tải Windows ZIP có EXE, APK Android và source Unity kèm model](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/localai-20261008-a13f41f).
 - Mở `CHAY_GAME.bat` hoặc EXE; nhấn **C** / Chat mới nạp AI. Đóng/ẩn chat hoặc chuyển ứng dụng sẽ hủy xử lý và giải phóng model. Không cần backend, PC khác hay Internet để chat.
 - APK khoảng **1,16 GB**, gồm Qwen3 1.7B do chủ dự án cung cấp. Lần mở chat đầu trên Android chuẩn bị model từ APK; cần thêm khoảng 1,2 GB trống. Khuyến nghị ARM64, 6 GB RAM.
 - **J** mở mô hình nông trại local, **H** ẩn/hiện hướng dẫn. Camera tùy chọn.
@@ -14,7 +14,7 @@ Chủ dự án đã cho phép đẩy và gộp bản hiện tại vào **main** 
 - Source Git giữ Assets/.meta, Packages, ProjectSettings, Backend, Tools, Docs và Evidence. Bản Windows và APK có sẵn trong Builds qua Git LFS; gói ZIP/model để build tiếp ở Release; `DongGoi/RELEASE-MANIFEST.json` và `SHA256SUMS.txt` ghi commit và checksum.
 - Build Windows/Android thành công; việc duyệt gộp của chủ dự án không thay thế kiểm tra runtime. Chưa đo CPU/RAM hay chạy chatbot trên điện thoại thật.
 
-Bản đóng gói ngày 08/10/2026 được build từ commit `d82e56a`, gồm cập nhật nhà/nông trại, sân và lối đi nhà hàng mới nhất. Các file lớn được tải tại Release liên kết ở trên; tải đủ ZIP Windows để có EXE và dữ liệu đi kèm.
+Bản đóng gói ngày 08/10/2026 được build từ commit `a13f41f`, gồm cập nhật icon túi đồ, trồng lại, tiến độ và hình ảnh cây trồng, cùng nhà/nông trại và nhà hàng. Các file lớn được tải tại Release liên kết ở trên; tải đủ ZIP Windows để có EXE và dữ liệu đi kèm.
 
 [Tải trực tiếp EXE/Windows ZIP, APK và source Unity đầy đủ](Builds/README.md).
 

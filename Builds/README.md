@@ -21,9 +21,9 @@ git lfs pull
 
 | Gói | Tải trực tiếp | Dung lượng |
 |---|---|---|
-| Windows có EXE và toàn bộ dữ liệu/model | [Windows ZIP](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/download/localai-20261008/NongTrai-Windows-20261008-d82e56a.zip) | 1,17 GB |
-| Android ARM64, model offline trong APK | [Android APK](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/download/localai-20261008/NongTrai-Android-20261008-d82e56a.apk) | 1,16 GB |
-| Unity đầy đủ kèm model và giấy phép để build tiếp | [Unity source ZIP](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/download/localai-20261008/NongTrai-Unity-20261008-d82e56a.zip) | 1,19 GB |
+| Windows có EXE và toàn bộ dữ liệu/model | [Windows ZIP](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/download/localai-20261008-a13f41f/NongTrai-Windows-20261008-a13f41f.zip) | 1,17 GB |
+| Android ARM64, model offline trong APK | [Android APK](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/download/localai-20261008-a13f41f/NongTrai-Android-20261008-a13f41f.apk) | 1,16 GB |
+| Unity đầy đủ kèm model và giấy phép để build tiếp | [Unity source ZIP](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/download/localai-20261008-a13f41f/NongTrai-Unity-20261008-a13f41f.zip) | 1,19 GB |
 
 Windows: giải nén toàn bộ ZIP, mở `NongTrai.exe` hoặc `CHAY_GAME.bat`. Giữ thư mục dữ liệu, DLL và model cạnh EXE.
 
@@ -33,6 +33,6 @@ Unity: giải nén source ZIP, mở bằng Unity **6000.3.22f1**. Scene chính: 
 
 Nhấn **C** mở chat, **J** mở nông trại thu nhỏ local, **H** ẩn/hiện hướng dẫn.
 
-[Release và checksum](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/localai-20261008). Build từ commit `d82e56a`: Windows/Android đều thành công, 0 lỗi. Đã đối chiếu kích thước và SHA-256 trên GitHub. Chưa nghiệm thu EXE/chat hoặc APK trên thiết bị thật.
+[Release và checksum](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/localai-20261008-a13f41f). Build từ commit `a13f41f`: Windows/Android đều thành công, 0 lỗi. Đã đối chiếu kích thước và SHA-256 trên GitHub. Chưa nghiệm thu EXE/chat hoặc APK trên thiết bị thật.
 
 Bản Windows/APK có trong main qua Git LFS; Release giữ ZIP tải độc lập và source kèm model. Cache Unity, log tạm và khóa bí mật không thuộc source bàn giao.
