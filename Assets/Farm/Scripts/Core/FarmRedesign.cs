@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace NongTrai
 {
-    // Presentation only. Gameplay roots, serialized references and colliders are never removed.
+    // Imported presentation keeps gameplay roots and references; the home pass also aligns its colliders.
     public sealed class FarmRedesign : MonoBehaviour
     {
         public const string Root = "FarmRedesign/Models/";
@@ -71,14 +71,9 @@ namespace NongTrai
             }
             foreach(var warehouse in All<WarehouseDoor>()) Replace(warehouse.transform,"Quaternius_FarmBuildings/Barn", Vector3.down*1.25f,3.5f,4.2f,3.3f);
             foreach(var chest in All<FarmChest>()) Replace(chest.transform,"survival-kit/chest",Vector3.down*.45f,.9f,1.3f,1.1f);
-            // These roots own the interaction components. Only their primitive renderers
-            // are hidden, so raycasts, labels and menu callbacks remain unchanged.
-            foreach(var table in All<CraftingTable>())
-                Replace(table.transform,"survival-kit/workbench",new Vector3(0,-.5f,0),1.65f,2.7f,1.5f);
-            foreach(var mailbox in All<DeliveryMailbox>()) {
-                var visual=Replace(mailbox.transform,"OpenGameArt_Mailbox/Mailbox",new Vector3(0,-.5f,0),1.85f,1.35f,1.15f);
-                if(visual!=null)visual.localRotation=Quaternion.Euler(0,180,0);
-            }
+            // Keep interaction components while fitting the yard props to their visible models.
+            foreach(var table in All<CraftingTable>())FarmHomePresentation.Workbench(table);
+            foreach(var mailbox in All<DeliveryMailbox>())FarmHomePresentation.Mailbox(mailbox);
             foreach(var block in All<PlacedBlock>()) Building(block);
             foreach(var guard in All<FarmChestGuard>()) {
                 if(guard.Tier==1)Creature(guard.transform,"Quaternius_Animals/Wolf",1.2f);
@@ -188,18 +183,8 @@ namespace NongTrai
                 var dome=GameObject.Find("Silo dome");if(dome!=null) dome.GetComponent<Renderer>().enabled=false;
             }
             var home=GameObject.Find("Nhà ở - vào cửa trước để ngủ");
-            if(home!=null && home.GetComponent<FarmRedesignMarker>()==null) {
-                // Imported art has no gameplay collider. Keep the original floor,
-                // bed and doorway colliders underneath the new visible house.
-                foreach(Transform child in home.transform) {
-                    if(child.name.StartsWith("Tường")||child.name=="Mái nhà") {
-                        var renderer=child.GetComponent<Renderer>();if(renderer!=null)renderer.enabled=false;
-                    }
-                }
-                var house=Add(home.transform,"city-kit-suburban/building-type-n",Vector3.zero,6.2f,9.2f,8.8f);
-                if(house!=null)house.localRotation=Quaternion.Euler(0,180,0);
-                home.AddComponent<FarmRedesignMarker>();
-            }
+            // Edit mode builds a transient copy, so generated roof meshes never enter the saved scene.
+            if(Application.isPlaying&&home!=null)FarmHomePresentation.Apply(home.transform);
             foreach(var r in All<MeshRenderer>()) {
                 if(r.GetComponent<FarmRedesignMarker>()!=null||!r.enabled)continue;
                 switch(r.name) {

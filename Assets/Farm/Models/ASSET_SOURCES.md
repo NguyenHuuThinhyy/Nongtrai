@@ -1,5 +1,11 @@
 # Nguồn model 3D đang dùng
 
+## Nhà ở có thể đi vào — 08/10/2026
+
+- Thay vỏ nhà `building-type-n` bằng căn nhà 10,8 × 9,6 m ghép từ Kenney Building Kit (CC0): `wall-doorway-square`, `wall-window-square`, `door-rotate-square-a`, `roof-flat-center`. Nguồn: https://kenney.nl/assets/building-kit. Model và giấy phép có sẵn tại `Assets/ThirdParty/Restaurant/building-kit`.
+- Phòng ngủ dùng `bedDouble`, `cabinetBedDrawer`, `rugRectangle` từ Kenney Furniture Kit (CC0), giữ giấy phép tại `Assets/ThirdParty/Restaurant/furniture-kit/License.txt`. Hai đầu hồi là mesh tự dựng; va chạm tường/cửa khớp model để đi vào giường ngủ được.
+- Bảng nhà chuyển thành biển gắn bên cửa. Bàn chế tạo Kenney Survival Kit và hộp thư PagDev giữ giấy phép cũ, được chỉnh kích thước thực tế, đặt chân trên mặt đất và cập nhật collider tương ứng.
+
 Chỉ các file có giấy phép CC0 dưới đây được đưa vào `Assets/Farm/Models/Imported`. File giấy phép gốc nằm cạnh từng nhóm. File tải gốc và model cũ đã bỏ nằm trong `Recovery/AssetDownloads` và `Recovery/ArtRepair-20260925/UnusedAssets`, ngoài source và build.
 
 | Nhóm | Tác giả / gói | Nguồn | Giấy phép | Định dạng, gói tải | Đang dùng |

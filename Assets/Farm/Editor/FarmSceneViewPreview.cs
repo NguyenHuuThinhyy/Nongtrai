@@ -68,6 +68,7 @@ namespace NongTrai.Editor
 
             var root = new GameObject(PreviewName);
             SceneManager.MoveGameObjectToScene(root, scene);
+            BuildHomePreview(root.transform);
             var restaurant = root.AddComponent<FarmRestaurant>();
             restaurant.BuildScenePreview();
 
@@ -83,6 +84,21 @@ namespace NongTrai.Editor
                 Debug.Log("FARM_SCENE_PREVIEW_OK: runtime farm art, three-floor restaurant and fishing area are visible in the Scene view; the preview is removed before Play mode.");
             }
             SceneView.RepaintAll();
+        }
+
+        static void BuildHomePreview(Transform parent)
+        {
+            var home=GameObject.Find("Nhà ở - vào cửa trước để ngủ");if(home==null)return;
+            var copy=Object.Instantiate(home.transform,parent,false);copy.name="Home preview";
+            copy.position=home.transform.position;copy.rotation=home.transform.rotation;
+            foreach(var renderer in copy.GetComponentsInChildren<Renderer>(true))renderer.forceRenderingOff=false;
+            FarmHomePresentation.Apply(copy);
+            foreach(var renderer in home.GetComponentsInChildren<Renderer>(true))
+            {
+                // Preview suppression can survive an assembly reload; restore the actual home before Play.
+                forcedRendererStates[renderer]=false;
+                renderer.forceRenderingOff=true;
+            }
         }
 
         static void BakeFarmArtIfNeeded(Scene scene)
