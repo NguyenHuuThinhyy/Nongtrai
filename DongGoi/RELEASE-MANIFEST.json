@@ -1,7 +1,7 @@
 {
   "branch": "main",
-  "build_source_commit": "0b798d9eac4d1d20dc506e5ee97165b3306df92e",
-  "source_git_commit": "c733649ce7e658b299762f644d88115ea642ec03",
+  "build_source_commit": "1adedb73172f9e5c9eda0799a9e6d95f415e5eff",
+  "source_git_commit": "3f812c7bc41e11d1ab07e94f0289cf54faad606a",
   "date": "2026-10-08",
   "unity": "6000.3.22f1",
   "windows_build": "Succeeded; 0 errors",
@@ -22,19 +22,19 @@
   },
   "packages": [
     {
-      "file": "NongTrai-Windows-20261008-TriForge-0b798d9.zip",
-      "bytes": 1171934157,
-      "sha256": "3f68647f2b2a01cc12a7baf387718477d89631bb78ebed42c537c140e0773e22"
+      "file": "NongTrai-Windows-20261008-TriForge-1adedb7.zip",
+      "bytes": 1171982477,
+      "sha256": "464ffc63c237286354f039d31ccf96b51fcdbbaeb8ab70e277676211ff5c4e01"
     },
     {
-      "file": "NongTrai-Android-20261008-TriForge-0b798d9.apk",
-      "bytes": 1161752597,
-      "sha256": "34e914c5085356f49fa77f0d589319b36806a1b6676cb885ebf460c9b17db5a8"
+      "file": "NongTrai-Android-20261008-TriForge-1adedb7.apk",
+      "bytes": 1161801689,
+      "sha256": "49176a6a794a50367e073394454eef375d944e54ad61f72b39a71c28a025489d"
     },
     {
-      "file": "NongTrai-Unity-20261008-TriForge-0b798d9.zip",
-      "bytes": 1191451330,
-      "sha256": "767129807d01c0953cd6c28ec976fdf4cec2f8edc5d092f91deac9b475d4d982"
+      "file": "NongTrai-Unity-20261008-TriForge-1adedb7.zip",
+      "bytes": 1191546483,
+      "sha256": "956b4621cbd84bdd8d969d460b5df06a01a478770e8e53353656497e473d6271"
     },
     {
       "file": "NongTrai_FirstHarvest_Trailer_30s_1080p.mp4",
@@ -47,8 +47,8 @@
       "sha256": "1888911de74f9020a4f20dcf6a4162632f614435fe1fb4cc0ecb9febd0492a8e"
     }
   ],
-  "release": "triforge-20261008-0b798d9",
-  "release_url": "https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/triforge-20261008-0b798d9",
+  "release": "triforge-20261008-1adedb7",
+  "release_url": "https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/triforge-20261008-1adedb7",
   "publication": "owner requested all game copyright renamed to TriForge, obsolete files cleaned and merged into main",
   "runtime_acceptance": "not tested",
   "physical_android": "not verified",
