@@ -129,9 +129,9 @@ namespace NongTrai
                 var plot = plots[i]; var crop = field.crops[i];
                 plot.Work(crop, out _);
                 if (plot.State != PlotState.Tilled) throw new InvalidOperationException("Tilling failed.");
-                plot.Work(crop, out _); plot.Tick(100);
+                plot.Work(crop, out _); plot.Tick(crop.growthSeconds*.1f);
                 if (plot.Growth <= 0 || plot.Growth >= 1) throw new InvalidOperationException("Dry crops must grow at reduced speed.");
-                for(int watering=0;watering<22 && plot.State==PlotState.Growing;watering++)
+                for(int watering=0;watering<Mathf.CeilToInt(crop.growthSeconds/60)+1 && plot.State==PlotState.Growing;watering++)
                 { plot.Work(crop,out _);plot.Tick(60); }
                 if (plot.State != PlotState.Ready) throw new InvalidOperationException("Watered crop did not ripen.");
                 plot.Work(crop, out int harvested); field.Record(crop, harvested);
@@ -233,6 +233,7 @@ namespace NongTrai
             int cropSale=0;for(int crop=0;crop<field.crops.Length;crop++)
                 cropSale+=field.Harvested[crop]*inventory.Price(crop<3?crop:crop+40);
             if(shop.SellHarvest()!=cropSale || shop.SellHarvest()!=0) throw new InvalidOperationException("Selling crops failed.");
+            var appleProgress=FarmExpansion.Instance;appleProgress.Restore(FarmCropBalance.ForTree(0).level,0,appleProgress.Day,appleProgress.DayTime,appleProgress.ToolTiers,appleProgress.UnlockedRegions,99);
             if(!shop.Purchase(8,out _) || shop.BoughtTrees!=1 || inventory.Count(27)<1) throw new InvalidOperationException("Apple seed purchase failed.");
             shop.Credit(500);
             int woodBefore=inventory.Count(20),grassBefore=inventory.Count(25),feedBefore=shop.FeedStock;
@@ -244,7 +245,7 @@ namespace NongTrai
             var apple=Instantiate(shop.treePrefab,new Vector3(-28,0,-5),Quaternion.identity).GetComponent<FruitTree>();
             apple.age=240;
             apple.remaining=0; apple.Harvest(shop); apple.Harvest(shop);
-            if(inventory.Count(3)!=5 || inventory.Sell(3,2)!=30 || inventory.Count(3)!=3 || shop.SellHarvest()!=45)
+            if(inventory.Count(3)!=5 || inventory.Sell(3,2)!=2*inventory.Price(3) || inventory.Count(3)!=3 || shop.SellHarvest()!=3*inventory.Price(3))
                 throw new InvalidOperationException("Individual fruit sales failed.");
             if(inventory.Count(20)!=woodBefore || inventory.Count(25)!=grassBefore)
                 throw new InvalidOperationException("Sell all crops must preserve building blocks.");

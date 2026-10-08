@@ -6,22 +6,28 @@ namespace NongTrai
     {
         public GameObject fruitVisual;
         public GameObject orchardTreeVisual,blueberryBushVisual;
-        public float remaining=30;
+        public float remaining=120;
         public bool planted;
-        public float age=240;
+        public float age=120;
         public bool mutated;
         public int fruitKind; // 0 táo, 1 lê, 2 đào, 3 bụi việt quất
         public string FruitName=>new[]{"Táo","Lê","Đào","Việt quất"}[Mathf.Clamp(fruitKind,0,3)];
         public int FruitItem=>new[]{3,46,47,48}[Mathf.Clamp(fruitKind,0,3)];
-        public float GrowthSeconds=>new[]{240f,360f,480f,180f}[Mathf.Clamp(fruitKind,0,3)];
-        public float FruitSeconds=>new[]{60f,100f,140f,75f}[Mathf.Clamp(fruitKind,0,3)];
-        public bool Ready=>age>=GrowthSeconds&&remaining<=0;
+        public float GrowthSeconds=>FarmCropBalance.ForTree(fruitKind).seconds;
+        public float FruitSeconds=>GrowthSeconds;
+        public bool Ready=>(!planted||age>=GrowthSeconds)&&remaining<=0;
         public int FruitCount=>fruitKind==3?8:5;
         FarmPlayer player;
         Vector3 matureScale;
         Image progressFill;
         Canvas progressCanvas;
         int chopHits;
+        Transform[] fruitParts;
+        Vector3[] fruitScales;
+        Renderer[] fruitRenderers;
+        Color[] ripeColors;
+        MaterialPropertyBlock fruitTint;
+        bool mutationGlowReady;
         void Start()
         {
             FarmRedesign.Orchard(this);
@@ -44,9 +50,14 @@ namespace NongTrai
             var back=FarmUi.Panel(canvas.transform,"Nền",new Vector2(100,12));back.GetComponent<Image>().color=new Color(.1f,.2f,.15f,.9f);
             var fill=FarmUi.Panel(back.transform,"Đã lớn",new Vector2(96,8));progressFill=fill.GetComponent<Image>();progressFill.color=new Color(.5f,.86f,.27f);
             var fr=fill.GetComponent<RectTransform>();fr.anchorMin=fr.anchorMax=fr.pivot=new Vector2(0,.5f);fr.anchoredPosition=new Vector2(2,0);
-            if(fruitVisual!=null&&fruitKind>0)
-            {Color tint=fruitKind==1?new Color(.70f,.85f,.26f):fruitKind==2?new Color(1f,.61f,.34f):new Color(.37f,.37f,.80f);
-             foreach(var renderer in fruitVisual.GetComponentsInChildren<Renderer>())renderer.material.color=tint;}
+            if(fruitVisual!=null)
+            {
+                fruitParts=new Transform[fruitVisual.transform.childCount];fruitScales=new Vector3[fruitParts.Length];
+                for(int i=0;i<fruitParts.Length;i++){fruitParts[i]=fruitVisual.transform.GetChild(i);fruitScales[i]=fruitParts[i].localScale;}
+                fruitRenderers=fruitVisual.GetComponentsInChildren<Renderer>(true);ripeColors=new Color[fruitRenderers.Length];fruitTint=new MaterialPropertyBlock();
+                Color ripe=fruitKind==1?new Color(.75f,.85f,.32f):fruitKind==2?new Color(1,.57f,.43f):fruitKind==3?new Color(.35f,.39f,.76f):new Color(.93f,.23f,.19f);
+                for(int i=0;i<fruitRenderers.Length;i++)ripeColors[i]=ripe;
+            }
             UpdateVisual();
         }
         void Update()
@@ -55,21 +66,47 @@ namespace NongTrai
         void UpdateVisual()
         {
             float growth=planted?Mathf.Clamp01(age/GrowthSeconds):1;
-            transform.localScale=matureScale*Mathf.Lerp(.25f,1,growth);
-            if(fruitVisual!=null)fruitVisual.SetActive(Ready);
+            transform.localScale=matureScale*Mathf.Lerp(.18f,1,Mathf.SmoothStep(0,1,growth));
+            float fruitProgress=growth<1?growth:1-Mathf.Clamp01(remaining/FruitSeconds);
+            float ripeness=Mathf.SmoothStep(0,1,Mathf.InverseLerp(.6f,1,fruitProgress));
+            if(fruitVisual!=null)
+            {
+                fruitVisual.SetActive(Ready||fruitProgress>.6f);
+                if(fruitParts!=null)for(int i=0;i<fruitParts.Length;i++)if(fruitParts[i]!=null)
+                    fruitParts[i].localScale=fruitScales[i]*Mathf.Lerp(.12f,1,ripeness);
+                if(!mutated&&fruitRenderers!=null)for(int i=0;i<fruitRenderers.Length;i++)
+                {
+                    var renderer=fruitRenderers[i];if(renderer==null||!renderer.enabled)continue;
+                    renderer.GetPropertyBlock(fruitTint);fruitTint.SetColor("_BaseColor",Color.Lerp(new Color(.43f,.65f,.24f),ripeColors[i],ripeness));renderer.SetPropertyBlock(fruitTint);
+                }
+            }
             if(progressFill!=null)
             {progressCanvas.gameObject.SetActive(!Ready);
              if(!Ready){progressFill.rectTransform.sizeDelta=new Vector2(96*(growth<1?growth:1-Mathf.Clamp01(remaining/FruitSeconds)),8);
                 if(Camera.main!=null)progressCanvas.transform.rotation=Camera.main.transform.rotation;}}
-            if(mutated&&fruitVisual!=null)
+            if(mutated&&fruitRenderers!=null)
             {var glow=Color.HSVToRGB(Mathf.Repeat(Time.time*.2f,1),.8f,1);
-             foreach(var renderer in fruitVisual.GetComponentsInChildren<Renderer>())
-             {renderer.material.color=glow;renderer.material.SetColor("_EmissionColor",glow*2);renderer.material.EnableKeyword("_EMISSION");}}
+             if(!mutationGlowReady){foreach(var renderer in fruitRenderers)if(renderer!=null)renderer.material.EnableKeyword("_EMISSION");mutationGlowReady=true;}
+             foreach(var renderer in fruitRenderers)if(renderer!=null)
+             {renderer.GetPropertyBlock(fruitTint);fruitTint.SetColor("_BaseColor",glow);fruitTint.SetColor("_EmissionColor",glow*2);renderer.SetPropertyBlock(fruitTint);}}
         }
         int Slot=>FarmHudV2.Instance==null?8:FarmHudV2.Instance.SelectedSlot;
-        public string Hint => Slot==5?"[Chuột trái] Tưới "+FruitName+" • lớn/ra quả nhanh hơn":Slot==7?"[Chuột trái] Rìu hạ cây • nhận 6 khối gỗ":age<GrowthSeconds?"Cây "+FruitName+" "+Mathf.RoundToInt(age/GrowthSeconds*100)+"% • 3 click tay để đốn":
-            (Ready?"[Chuột trái] Hái "+FruitCount+" "+FruitName+(mutated?" đột biến":"")+" • cây vẫn còn":"Còn "+Mathf.CeilToInt(remaining)+"s • 0 quả");
+        public string Hint => Slot==5?"[Chuột trái] Tưới "+FruitName+" • lớn/ra quả nhanh hơn":Slot==7?"[Chuột trái] Rìu hạ cây • nhận 6 khối gỗ":planted&&age<GrowthSeconds?"Cây "+FruitName+" "+Mathf.RoundToInt(age/GrowthSeconds*100)+"% • 3 click tay để đốn":
+            (Ready?"[Chuột trái] Hái "+FruitCount+" "+FruitName+(mutated?" đột biến":"")+" • cây vẫn còn":"Còn "+Mathf.CeilToInt(remaining)+"s • "+(remaining<FruitSeconds*.4f?"quả non đang lớn":"đang chuẩn bị ra quả"));
         public string InteractionHint => Hint;
+        public string GrowthHint
+        {
+            get
+            {
+                string title=FruitName+(mutated?" đột biến":"");
+                if(Ready)return title+"\nCHÍN 100% • "+FruitCount+" quả\n[Chuột trái] Hái";
+                bool growing=planted&&age<GrowthSeconds;
+                float progress=growing?age/GrowthSeconds:1-remaining/FruitSeconds;
+                int seconds=Mathf.CeilToInt((growing?GrowthSeconds-age:0)+remaining);
+                string time=seconds<60?seconds+" giây":seconds/60+" phút "+seconds%60+" giây";
+                return title+"\n"+(growing?"Cây đang lớn: ":"Độ chín: ")+Mathf.FloorToInt(Mathf.Clamp01(progress)*100)+"%\nCòn ~"+time;
+            }
+        }
         public bool CanInteract(FarmPlayer source) => true;
         public void Interact(PlayerInteraction actor)
         {
@@ -83,7 +120,7 @@ namespace NongTrai
             }
             if(!Ready)
             {chopHits++;if(chopHits>=3)Chop(actor);else actor.Say("Cây chưa có quả • còn "+(3-chopHits)+" nhát để đốn bằng tay.");return;}
-            actor.Say(Harvest(actor.shop));FarmExpansion.Instance?.GainExperience(8);
+            actor.Say(Harvest(actor.shop));
         }
         void Chop(PlayerInteraction actor)
         {string fruit=Ready?Harvest(actor.shop)+" • ":"";actor.inventory.Add(20,6);if(transform.position.y<500)actor.shop.TreeCut();FarmExpansion.Instance?.GainExperience(12);
@@ -92,25 +129,27 @@ namespace NongTrai
         public void SetHighlighted(bool selected) => InteractionOutline.Set(this,selected);
         public static bool TryPlantAt(Vector3 point,FarmShop shop,FarmInventory inventory,out string message,int seedItem=27)
         {
-            if(FarmExpansion.Instance==null||FarmExpansion.Instance.Level<3)
-            {message="Khu vườn phía đông mở khi đạt LV3.";return false;}
             if(point.x<54||point.x>82||point.z<-32||point.z>34)
             {message="Chỉ trồng hạt cây ở khu vườn phía đông (X 54–82).";return false;}
             foreach(var tree in FindObjectsByType<FruitTree>(FindObjectsSortMode.None))
                 if(Vector3.Distance(new Vector3(point.x,0,point.z),new Vector3(tree.transform.position.x,0,tree.transform.position.z))<5)
                 {message="Cần cách cây khác ít nhất 5 m.";return false;}
-            int kind=seedItem==27?0:seedItem==49?1:seedItem==50?2:seedItem==51?3:-1;
-            if(kind<0){message="Hãy chọn hạt cây trong hotbar.";return false;}
-            if(!inventory.Remove(seedItem,1)){message="Không còn hạt cây.";return false;}
+            int kind=FarmCropBalance.TreePlantKind(seedItem);
+            if(kind<0){message="Chọn hạt cây hoặc quả trong thanh nhanh để trồng.";return false;}
+            var rule=FarmCropBalance.ForTree(kind);
+            if((FarmExpansion.Instance==null?1:FarmExpansion.Instance.Level)<rule.level){message="Giống cây này mở ở LV"+rule.level+".";return false;}
+            if(!inventory.Remove(seedItem,1)){message="Không còn hạt cây hoặc quả để trồng.";return false;}
             var planted=Instantiate(shop.treePrefab,new Vector3(Mathf.Round(point.x),0,Mathf.Round(point.z)),Quaternion.identity).GetComponent<FruitTree>();
-            planted.fruitKind=kind;planted.planted=true;planted.age=0;planted.remaining=planted.FruitSeconds;
+            planted.fruitKind=kind;planted.planted=true;planted.age=0;planted.remaining=0;
             message="Đã trồng "+planted.FruitName+". Tưới cây để lớn và kết quả sớm hơn.";return true;
         }
         public string Harvest(FarmShop shop)
         {
             if(!Ready) return "Cây chưa có quả chín.";
             if(mutated&&fruitKind==0)shop.inventory.AddMutated(3,FruitCount);else shop.inventory.Add(FruitItem,FruitCount);
-            remaining=FruitSeconds; fruitVisual.SetActive(false); return "+"+FruitCount+" "+FruitName+(mutated&&fruitKind==0?" đột biến • bán giá gấp 3!":".");
+            remaining=FruitSeconds;if(fruitVisual!=null)fruitVisual.SetActive(false);
+            int xp=FarmCropBalance.ForTree(fruitKind).xp;FarmExpansion.Instance?.GainExperience(xp);
+            return "+"+FruitCount+" "+FruitName+(mutated&&fruitKind==0?" đột biến • bán giá gấp 3!":".")+" +"+xp+" XP";
         }
         public void AdvanceWater(float seconds)
         {if(planted&&age<GrowthSeconds)age=Mathf.Min(GrowthSeconds,age+seconds);else remaining=Mathf.Max(0,remaining-seconds);UpdateVisual();}

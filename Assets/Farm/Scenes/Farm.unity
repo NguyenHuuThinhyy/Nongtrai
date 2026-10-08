@@ -84492,7 +84492,7 @@ GameObject:
   - component: {fileID: 1187921107}
   - component: {fileID: 1187921106}
   m_Layer: 0
-  m_Name: "C\u1ED5ng v\u01B0\u1EDDn LV3"
+  m_Name: "C\u1ED5ng v\u01B0\u1EDDn LV1"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -106518,8 +106518,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de77083447dba4847925fca06156eb97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NongTrai.FarmSign
-  title: "V\u01B0\u1EDDn c\xE2y LV3"
-  message: "\u0110\u1EA1t LV3, ch\u1ECDn h\u1EA1t c\xE2y trong t\xFAi v\xE0 chu\u1ED9t
+  title: "V\u01B0\u1EDDn c\xE2y LV1"
+  message: "\u0110\u1EA1t LV1, ch\u1ECDn h\u1EA1t c\xE2y trong t\xFAi v\xE0 chu\u1ED9t
     ph\u1EA3i tr\xEAn \u0111\u1EA5t \u0111\u1EC3 tr\u1ED3ng."
 --- !u!23 &1482278351
 MeshRenderer:
@@ -106767,7 +106767,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1483267423}
   m_Layer: 0
-  m_Name: "Sign - V\u01B0\u1EDDn c\xE2y LV3"
+  m_Name: "Sign - V\u01B0\u1EDDn c\xE2y LV1"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -129825,7 +129825,7 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1827556033}
-  m_Text: "V\u01B0\u1EDDn c\xE2y LV3"
+  m_Text: "V\u01B0\u1EDDn c\xE2y LV1"
   m_OffsetZ: 0
   m_CharacterSize: 0.043
   m_LineSpacing: 1
@@ -146560,7 +146560,7 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2099590525}
-  m_Text: "V\u01B0\u1EDDn c\xE2y LV3"
+  m_Text: "V\u01B0\u1EDDn c\xE2y LV1"
   m_OffsetZ: 0
   m_CharacterSize: 0.043
   m_LineSpacing: 1

@@ -193,9 +193,9 @@ namespace NongTrai.Editor
                 var boundary = Box("Map boundary", p, p.x == -49||p.x==89 ? new Vector3(1, 6, 100) : new Vector3(140, 6, 1), grass, environment);
                 boundary.GetComponent<Renderer>().enabled = false;
             }
-            var orchardGate=Box("Cổng vườn LV3",new Vector3(49.8f,1.3f,0),new Vector3(.35f,2.6f,85),wood,environment);
+            var orchardGate=Box("Cổng vườn LV1",new Vector3(49.8f,1.3f,0),new Vector3(.35f,2.6f,85),wood,environment);
             orchardGate.AddComponent<FarmOrchardGate>();
-            Sign(environment,new Vector3(53,0,35),"Vườn cây LV3","Đạt LV3, chọn hạt cây trong túi và chuột phải trên đất để trồng.");
+            Sign(environment,new Vector3(53,0,35),"Vườn cây LV1","Từ LV1: chọn hạt cây hoặc quả, chuột phải trên đất vườn để trồng.");
             Sign(environment, new Vector3(2.6f, 0, 7), "Chào mừng", "Chọn hạt/công cụ bằng 1–9 hoặc lăn chuột. Ngắm ô đất rồi click trái để cày, gieo, tưới, thu hoạch. E mở bản đồ việc.");
             Sign(environment, new Vector3(-5, 0, -3), "Khu canh tác", "Chọn xẻng để xới, hạt để gieo, bình để tưới. Cây chín click trái để hái, không cần liềm.");
             var sun = new GameObject("Sun - fixed morning light").AddComponent<Light>();
@@ -325,7 +325,7 @@ namespace NongTrai.Editor
                 string path = Root + "Data/Crop" + i + ".asset";
                 var crop = AssetDatabase.LoadAssetAtPath<CropDefinition>(path);
                 if (crop == null) { crop = ScriptableObject.CreateInstance<CropDefinition>(); AssetDatabase.CreateAsset(crop, path); }
-                crop.displayName = cropNames[i]; crop.growthSeconds = new[]{120f,180f,300f,420f,540f,720f}[i];
+                crop.displayName = cropNames[i]; crop.growthSeconds = FarmCropBalance.ForField(i).seconds;
                 crop.yield=new[]{3,3,3,2,2,1}[i];crop.fruitColor = colors[i];
                 crop.stageVisuals=null;crop.fruitVisual=null;
                 if(i==0)

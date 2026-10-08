@@ -13,7 +13,7 @@ namespace NongTrai
             {
                 var crop=UnityEngine.Object.Instantiate(crops[i==0?3:4]);
                 crop.name=i==0?"CrystalPumpkin":"GoldenBerry";crop.displayName=i==0?"Bí pha lê":"Dâu hoàng kim";
-                crop.specialProduct=76+i;crop.growthSeconds=i==0?240:300;crop.yield=3;
+                crop.specialProduct=76+i;crop.growthSeconds=FarmCropBalance.ForField(6+i).seconds;crop.yield=3;
                 crop.fruitColor=i==0?new Color(.2f,.85f,1):new Color(1,.72f,.12f);crops[6+i]=crop;
             }
             field.crops=crops;

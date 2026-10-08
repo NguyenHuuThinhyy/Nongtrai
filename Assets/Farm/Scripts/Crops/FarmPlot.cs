@@ -15,6 +15,7 @@ namespace NongTrai
         static Material green, stem;
         Material fruit;
         Renderer[] importedFruitRenderers;
+        Renderer[] hintRenderers;
         MaterialPropertyBlock fruitBlock;
         void Start() => Highlight(false);
         string RequiredAction => State==PlotState.Untilled?"chọn Cuốc":State==PlotState.Tilled?"chọn Hạt giống":
@@ -25,6 +26,32 @@ namespace NongTrai
             State == PlotState.Ready ? Crop.displayName + (Mutated?" đột biến":"") + " chín • [Chuột trái] để hái" :
             Crop.displayName + " • " + Mathf.FloorToInt(Growth * 100) + "% • Nước " + Mathf.CeilToInt(Moisture * 100) + "% • "+RequiredAction;
         public string InteractionHint => Description;
+        public string GrowthHint
+        {
+            get
+            {
+                if(Crop==null)return Description;
+                string title=Crop.displayName+(Mutated?" đột biến":"");
+                if(State==PlotState.Ready)return title+"\nCHÍN 100% • Có thể thu hoạch\n[Chuột trái] Hái";
+                float work=Mathf.Max(0,(1-Growth)*Crop.growthSeconds),wet=Mathf.Min(work,Moisture*120);
+                int seconds=Mathf.CeilToInt(wet+(work-wet)/.2f);
+                string time=seconds<60?seconds+" giây":seconds/60+" phút "+seconds%60+" giây";
+                return title+"\nĐộ chín: "+Mathf.FloorToInt(Growth*100)+"% • Còn ~"+time+"\nNước: "+Mathf.CeilToInt(Moisture*100)+"%";
+            }
+        }
+        public Vector3 GrowthHintPosition
+        {
+            get
+            {
+                var position=transform.position;float top=GetComponent<Renderer>().bounds.max.y;
+                if(plants!=null)
+                {
+                    if(hintRenderers==null)hintRenderers=plants.GetComponentsInChildren<Renderer>();
+                    foreach(var renderer in hintRenderers)if(renderer!=null&&renderer.enabled)top=Mathf.Max(top,renderer.bounds.max.y);
+                }
+                return new Vector3(position.x,top+.25f,position.z);
+            }
+        }
         public bool CanInteract(FarmPlayer player) => true;
         public void Interact(PlayerInteraction actor)
         { actor.Say(FarmExpansion.Instance==null?Work(actor.field.Current,out _):FarmExpansion.Instance.Work(this)); }
@@ -107,6 +134,7 @@ namespace NongTrai
             int next = Crop == null ? -1 : Mathf.Min(3, Mathf.FloorToInt(Growth * 4));
             if (next == stage) return;
             stage = next;
+            hintRenderers=null;
             importedFruitRenderers=null;
             if (plants != null) { plants.gameObject.SetActive(false); Destroy(plants.gameObject); }
             if (Crop == null) return;
@@ -115,8 +143,8 @@ namespace NongTrai
             plants.SetParent(transform, false);
             // Giữ kích thước cây theo mét, độc lập với tỷ lệ của ô đất.
             plants.localScale = new Vector3(1 / transform.localScale.x, 1 / transform.localScale.y, 1 / transform.localScale.z);
-            plants.gameObject.AddComponent<CropStageAnimation>();
-            if(FarmRedesign.Crops(plants,Crop,stage,out importedFruitRenderers))return;
+            var animation=plants.gameObject.AddComponent<CropStageAnimation>();
+            if(FarmRedesign.Crops(plants,Crop,stage,out importedFruitRenderers)){animation.Configure(importedFruitRenderers,true);return;}
             if(Crop.displayName=="Lúa mì"&&Crop.stageVisuals!=null&&Crop.stageVisuals.Length>stage&&Crop.stageVisuals[stage]!=null)
             {
                 for(int x=0;x<4;x++)for(int z=0;z<3;z++)

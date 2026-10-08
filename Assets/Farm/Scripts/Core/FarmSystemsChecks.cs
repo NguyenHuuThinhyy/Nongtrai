@@ -133,6 +133,7 @@ namespace NongTrai
             Check(chest!=null&&chest.items[68]==2,"Chest items reset after leaving and returning");
             chest.BreakExploration();
             Check(Array.Exists(WorldPickup.Snapshot(),d=>d.item==74)&&Array.Exists(WorldPickup.Snapshot(),d=>d.item==75),"Breaking boss chest did not drop remaining rare seeds");
+            progress.Restore(FarmCropBalance.ForField(6).level,0,progress.Day,progress.DayTime,progress.ToolTiers,progress.UnlockedRegions,99);
             inventory.Add(74,1);Equip(bag,74);plot.Restore(PlotState.Tilled,null,0,0);progress.Work(plot);
             Check(plot.Crop==hud.interaction.field.crops[6],"Exploration seed cannot be planted");
             plot.Restore(PlotState.Ready,hud.interaction.field.crops[6],1,1);int fruit=inventory.Count(76);progress.Work(plot);

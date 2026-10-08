@@ -118,11 +118,12 @@ namespace NongTrai
                 +regionPrices[RegionFor(center)]+" xu. Nhấn N để mua.";
             int slot=FarmHudV2.Instance==null?0:FarmHudV2.Instance.SelectedSlot;
             int held=AdventureBag.Instance==null?-1:AdventureBag.Instance.Item;
-            int seedCrop=held>=74&&held<=75?held-68:held>=40&&held<=42?held-37:field.Selected;
+            int seedCrop=AdventureBag.Instance==null?field.Selected:FarmCropBalance.FieldPlantIndex(held);
             if(center.State==PlotState.Untilled && slot!=4) return "Hãy chọn Xẻng trên hotbar trước khi xới.";
-            if(center.State==PlotState.Tilled && (slot<0 || slot>2) && !(held>=40&&held<=42||held>=74&&held<=75)) return "Hãy chọn hạt giống trong hotbar trước khi gieo.";
-            if(center.State==PlotState.Tilled && seedCrop>=3&&seedCrop<6&&Level<seedCrop)
-                return "Giống "+field.crops[seedCrop].displayName+" mở ở LV"+seedCrop+".";
+            if(center.State==PlotState.Tilled && seedCrop<0) return "Chọn hạt giống hoặc nông sản trong thanh nhanh để trồng lại.";
+            var seedRule=FarmCropBalance.ForField(seedCrop);
+            if(center.State==PlotState.Tilled && seedRule!=null&&Level<seedRule.level)
+                return "Giống "+field.crops[seedCrop].displayName+" mở ở LV"+seedRule.level+".";
             if(center.State==PlotState.Growing && slot!=5) return "Hãy chọn Bình tưới trên hotbar trước khi tưới.";
             var actionState=center.State;
             int tool=actionState==PlotState.Untilled?0:actionState==PlotState.Growing?1:-1;
@@ -131,28 +132,29 @@ namespace NongTrai
             var plots=FindObjectsByType<FarmPlot>(FindObjectsSortMode.None);
             Array.Sort(plots,(a,b)=>Vector3.SqrMagnitude(a.transform.position-center.transform.position)
                 .CompareTo(Vector3.SqrMagnitude(b.transform.position-center.transform.position)));
-            int worked=0, harvestedTotal=0;
+            int worked=0, harvestedTotal=0,harvestXp=0;
             foreach(var plot in plots)
             {
                 if(worked>=range) break;
                 if(!IsUnlocked(plot) || plot.State!=actionState ||
                     Vector3.Distance(plot.transform.position,center.transform.position)>4.5f) continue;
-                if(plot.State==PlotState.Tilled && (seedCrop<3?!shop.ConsumeSeed(seedCrop):!inventory.Remove(held,1))) break;
+                if(plot.State==PlotState.Tilled && (AdventureBag.Instance==null||held>=100&&held<=102?!shop.ConsumeSeed(seedCrop):!inventory.Remove(held,1))) break;
                 if(plot.State==PlotState.Growing && (FarmWaterSystem.Instance==null || !FarmWaterSystem.Instance.Consume(1))) break;
                 CropDefinition crop=plot.Crop;bool mutated=plot.Mutated;
                 plot.Work(plot.State==PlotState.Tilled?field.crops[seedCrop]:field.Current,out int harvest);
                 if(harvest>0) { int cropIndex=Array.IndexOf(field.crops,crop);
                     if(mutated) inventory.AddMutated(cropIndex>=3?cropIndex+1:cropIndex,harvest);
-                    else field.Record(crop,harvest); harvestedTotal+=harvest; GainExperience(8); }
+                    else field.Record(crop,harvest); harvestedTotal+=harvest;
+                    int xp=FarmCropBalance.ForField(cropIndex)?.xp??8;GainExperience(xp);harvestXp+=xp; }
                 worked++;
             }
-            if(worked==0) return center.State==PlotState.Tilled?"Hết hạt giống. Nhấn B để mở shop.":
+            if(worked==0) return center.State==PlotState.Tilled?"Hết hạt giống hoặc nông sản để trồng.":
                 center.State==PlotState.Growing?"Bình đã hết nước. Đến hồ và click trái để lấy nước.":"Chưa thể thao tác.";
             var cue=tool==0?FarmAudio.Cue.Hoe:tool==1?FarmAudio.Cue.Water:tool==2?FarmAudio.Cue.Harvest:FarmAudio.Cue.Buy;
             FarmAudio.Instance?.Play(cue);
             if(tool==1)FarmActionFeedback.Emit(center.transform.position+Vector3.up*.55f,new Color(.3f,.78f,1),30);
             if(harvestedTotal>0) FarmEffects.Burst(center.transform.position+Vector3.up*.4f,"+"+harvestedTotal+" nông sản",new Color(1,.87f,.28f));
-            return (tool==0?"Đã cày ":tool==1?"Đã tưới ":harvestedTotal>0?"Thu hoạch +"+harvestedTotal+" từ ":"Đã gieo ")+worked+" ô.";
+            return (tool==0?"Đã cày ":tool==1?"Đã tưới ":harvestedTotal>0?"Thu hoạch +"+harvestedTotal+" từ ":"Đã gieo ")+worked+" ô."+(harvestXp>0?" +"+harvestXp+" XP":"");
         }
     }
 }

@@ -99,8 +99,9 @@ namespace NongTrai
                 { result="Chuồng "+(item==6?"gà":"loại này")+" đã đầy."; return false; }
             }
             if(item==7 && Expanded) { result="Bạn đã sở hữu chuồng thứ hai."; return false; }
-            if(item>=32&&item<=37&&FarmExpansion.Instance!=null&&FarmExpansion.Instance.Level<new[]{3,4,5,4,5,3}[item-32])
-            {result="Cần lên cấp để mở giống cây này.";return false;}
+            var cropRule=FarmCropBalance.ForSeedOffer(item);
+            if(cropRule!=null&&(FarmExpansion.Instance==null?1:FarmExpansion.Instance.Level)<cropRule.level)
+            {result="Giống cây này mở ở LV"+cropRule.level+".";return false;}
             if(item>=25&&item<=27&&AdventureBag.Instance.Space(item==25?104:item==26?106:107)<1)
             {result="Túi đã đầy, cần một ô trống để mua dụng cụ.";return false;}
             if(item>=28&&item<=31&&penPlacement.Pending>=0){result="Hãy đặt chuồng đang mua trước.";return false;}
@@ -149,7 +150,8 @@ namespace NongTrai
          int minute=left/60,second=left%60;
          if(limitLabel!=null)limitLabel.text="Mỗi món khác hạt/cây giống: 1 lần/ngày • Mở mua tiếp sau "+minute.ToString("00")+":"+second.ToString("00")+" (giờ chơi).";
          for(int i=0;i<offerLabels.Length;i++)if(offerLabels[i]!=null)
-         {offerLabels[i].text=names[i]+" — "+prices[i]+" xu"+(!Unlimited(i)&&purchasedToday[i]>0?" • HẾT LƯỢT":"");offers[i].GetComponent<Button>().interactable=Unlimited(i)||purchasedToday[i]==0;}}
+         {var cropRule=FarmCropBalance.ForSeedOffer(i);string title=names[i];int oldLevel=title.IndexOf(" • LV");if(cropRule!=null&&oldLevel>=0)title=title.Substring(0,oldLevel);
+          offerLabels[i].text=title+(cropRule!=null?" • LV"+cropRule.level:"")+" — "+prices[i]+" xu"+(!Unlimited(i)&&purchasedToday[i]>0?" • HẾT LƯỢT":"");offers[i].GetComponent<Button>().interactable=Unlimited(i)||purchasedToday[i]==0;}}
         void Refresh() { balance.text="CỬA HÀNG NÔNG TRẠI     "+Money+" xu\nBò "+speciesPens[0].AnimalCount()+"/4 • Heo "+speciesPens[1].AnimalCount()+"/4 • Cừu "+speciesPens[2].AnimalCount()+"/4 • Gà "+speciesPens[3].AnimalCount()+"/5"+(Expanded?" (+chuồng gà 2)":"");RefreshOffers(); }
         Text Label(string text,Vector2 p,Vector2 size,int fontSize)
         {

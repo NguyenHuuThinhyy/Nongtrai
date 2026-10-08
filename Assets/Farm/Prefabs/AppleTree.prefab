@@ -295,9 +295,9 @@ MonoBehaviour:
   fruitVisual: {fileID: 1917332861257161325}
   orchardTreeVisual: {fileID: 3523982282099060478}
   blueberryBushVisual: {fileID: 8258037088321616855}
-  remaining: 30
+  remaining: 120
   planted: 0
-  age: 240
+  age: 120
   mutated: 0
   fruitKind: 0
 --- !u!1 &3523982282099060478

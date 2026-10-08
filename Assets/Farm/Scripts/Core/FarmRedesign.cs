@@ -261,22 +261,50 @@ namespace NongTrai
         public static bool Crops(Transform parent,CropDefinition crop,int stage,out Renderer[] renderers)
         {
             renderers=null;string name=crop.displayName;
-            string key=name=="Lúa mì"?"nature-kit/crops_wheatStage"+(stage<2?"A":"B"):name.Contains("Dâu")||name.Contains("dâu")?"Quaternius_Crops/BushBerries_"+(stage+1):name=="Hướng dương"?"nature-kit/flower_yellowC":"nature-kit/crops_leafsStage"+(stage<2?"A":"B");
+            bool wheat=name=="Lúa mì",berry=name.Contains("Dâu")||name.Contains("dâu"),pumpkin=name.Contains("Bí")||name.Contains("bí"),sunflower=name=="Hướng dương";
+            string key=wheat?"nature-kit/crops_wheatStage"+(stage<2?"A":"B"):sunflower&&stage>=2?"nature-kit/flower_yellowC":"nature-kit/crops_leafsStage"+(stage==0?"A":"B");
             if(Model(key)==null)return false;
+            var fruitRenderers=new List<Renderer>();
+            int plotId=parent.GetComponentInParent<FarmPlot>()?.id??0,index=0;
             for(int x=-1;x<=1;x+=2)for(int z=-1;z<=1;z+=2) {
-                var p=new Vector3(x*.42f,.12f,z*.42f);
-                Add(parent,key,p,.18f+stage*.23f,.6f,.6f);
-                if(stage>=2 && name!="Lúa mì" && name!="Hướng dương") {
-                    string fruit=name.Contains("Bí")||name.Contains("bí")?"food-kit/pumpkin":name.Contains("Dâu")||name.Contains("dâu")?"food-kit/strawberry":name=="Cà chua"?"food-kit/tomato":null;
-                    if(fruit!=null)Add(parent,fruit,p+Vector3.up*(fruit.EndsWith("pumpkin")?.05f:.3f),.18f+stage*.035f);
+                // Independent rooted plants, with deterministic variation that survives stage changes.
+                float variation=Mathf.Sin(plotId*2.17f+index*4.3f);
+                var plant=new GameObject("Cây • "+name).transform;plant.SetParent(parent,false);
+                plant.localPosition=new Vector3(x*.43f+variation*.04f,.12f,z*.43f-variation*.03f);
+                plant.localRotation=Quaternion.Euler(0,(plotId*37+index*83)%360,0);
+                float height=pumpkin?.42f:berry?.38f:sunflower?1.3f:wheat?.95f:.85f;
+                var foliage=Add(plant,key,Vector3.zero,height,.68f,.68f);
+                if(wheat&&stage>=2&&foliage!=null)fruitRenderers.AddRange(foliage.GetComponentsInChildren<Renderer>());
+                if(stage>=2 && !wheat && !sunflower) {
+                    string fruit=pumpkin?"food-kit/pumpkin":berry?"food-kit/strawberry":name=="Cà chua"?"food-kit/tomato":null;
+                    if(fruit!=null)
+                    {
+                        int count=pumpkin?1:3;
+                        for(int n=0;n<count;n++)
+                        {
+                            float angle=n*Mathf.PI*2/3;
+                            var pos=pumpkin?new Vector3(.12f,.025f,.06f):new Vector3(Mathf.Cos(angle)*.18f,berry?.09f:.36f+n*.1f,Mathf.Sin(angle)*.18f);
+                            var model=Add(plant,fruit,pos,pumpkin?.38f:berry?.13f:.16f);
+                            if(model!=null)fruitRenderers.AddRange(model.GetComponentsInChildren<Renderer>());
+                        }
+                    }
+                    else if(name=="Đậu nành")
+                        for(int n=0;n<3;n++)
+                        {
+                            var pod=GameObject.CreatePrimitive(PrimitiveType.Capsule);pod.name="Quả đậu nành";
+                            var collider=pod.GetComponent<Collider>();collider.enabled=false;Destroy(collider);
+                            pod.transform.SetParent(plant,false);pod.transform.localPosition=new Vector3(n%2==0?-.16f:.16f,.32f+n*.13f,.06f);
+                            pod.transform.localScale=new Vector3(.075f,.13f,.065f);pod.transform.localRotation=Quaternion.Euler(12,0,n%2==0?25:-25);
+                            var renderer=pod.GetComponent<Renderer>();renderer.sharedMaterial=CropPodMaterial;fruitRenderers.Add(renderer);
+                        }
                 }
+                plant.localScale=Vector3.one*(CropStageAnimation.SizeAt(stage*.25f)*(1+variation*.06f));index++;
             }
-            renderers=parent.GetComponentsInChildren<Renderer>();
-            if(crop.specialProduct>=0) {
-                var tint=new MaterialPropertyBlock();tint.SetColor("_BaseColor",crop.fruitColor);
-                foreach(var renderer in renderers)renderer.SetPropertyBlock(tint);
-            }
+            renderers=fruitRenderers.ToArray();
             return true;
         }
+        static Material cropPodMaterial;
+        static Material CropPodMaterial
+        {get{if(cropPodMaterial==null){cropPodMaterial=new Material(Shader.Find("Universal Render Pipeline/Lit"));cropPodMaterial.color=new Color(.56f,.72f,.24f);cropPodMaterial.enableInstancing=true;}return cropPodMaterial;}}
     }
 }
