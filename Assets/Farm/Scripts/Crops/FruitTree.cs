@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 namespace NongTrai
 {
     public sealed class FruitTree : MonoBehaviour, IInteractable
@@ -27,6 +28,7 @@ namespace NongTrai
         Renderer[] fruitRenderers;
         Color[] ripeColors;
         MaterialPropertyBlock fruitTint;
+        readonly List<Material> mutationMaterials=new List<Material>();
         bool mutationGlowReady;
         void Start()
         {
@@ -86,10 +88,11 @@ namespace NongTrai
                 if(Camera.main!=null)progressCanvas.transform.rotation=Camera.main.transform.rotation;}}
             if(mutated&&fruitRenderers!=null)
             {var glow=Color.HSVToRGB(Mathf.Repeat(Time.time*.2f,1),.8f,1);
-             if(!mutationGlowReady){foreach(var renderer in fruitRenderers)if(renderer!=null)renderer.material.EnableKeyword("_EMISSION");mutationGlowReady=true;}
+             if(!mutationGlowReady){foreach(var renderer in fruitRenderers)if(renderer!=null&&renderer.sharedMaterial!=null){var material=new Material(renderer.sharedMaterial);material.EnableKeyword("_EMISSION");renderer.sharedMaterial=material;mutationMaterials.Add(material);}mutationGlowReady=true;}
              foreach(var renderer in fruitRenderers)if(renderer!=null)
              {renderer.GetPropertyBlock(fruitTint);fruitTint.SetColor("_BaseColor",glow);fruitTint.SetColor("_EmissionColor",glow*2);renderer.SetPropertyBlock(fruitTint);}}
         }
+        void OnDestroy(){foreach(var material in mutationMaterials)if(material!=null){if(Application.isPlaying)Destroy(material);else DestroyImmediate(material);}mutationMaterials.Clear();}
         int Slot=>FarmHudV2.Instance==null?8:FarmHudV2.Instance.SelectedSlot;
         public string Hint => Slot==5?"[Chuột trái] Tưới "+FruitName+" • lớn/ra quả nhanh hơn":Slot==7?"[Chuột trái] Rìu hạ cây • nhận 6 khối gỗ":planted&&age<GrowthSeconds?"Cây "+FruitName+" "+Mathf.RoundToInt(age/GrowthSeconds*100)+"% • 3 click tay để đốn":
             (Ready?"[Chuột trái] Hái "+FruitCount+" "+FruitName+(mutated?" đột biến":"")+" • cây vẫn còn":"Còn "+Mathf.CeilToInt(remaining)+"s • "+(remaining<FruitSeconds*.4f?"quả non đang lớn":"đang chuẩn bị ra quả"));

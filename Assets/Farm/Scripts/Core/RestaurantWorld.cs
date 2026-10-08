@@ -317,21 +317,21 @@ namespace NongTrai
         }
         static void AddUrinal(Transform root,Vector3 p,Color ceramic)
         {
-            var bowl=GameObject.CreatePrimitive(PrimitiveType.Capsule);bowl.name="Bồn tiểu sứ";bowl.transform.SetParent(root,false);bowl.transform.localPosition=p;bowl.transform.localRotation=Quaternion.Euler(90,0,0);bowl.transform.localScale=new Vector3(.38f,.18f,.53f);bowl.GetComponent<Renderer>().sharedMaterial=Mat(Color.white);Object.Destroy(bowl.GetComponent<Collider>());
+            var bowl=GameObject.CreatePrimitive(PrimitiveType.Capsule);bowl.name="Bồn tiểu sứ";bowl.transform.SetParent(root,false);bowl.transform.localPosition=p;bowl.transform.localRotation=Quaternion.Euler(90,0,0);bowl.transform.localScale=new Vector3(.38f,.18f,.53f);bowl.GetComponent<Renderer>().sharedMaterial=Mat(Color.white);var collider=bowl.GetComponent<Collider>();if(Application.isPlaying)Object.Destroy(collider);else Object.DestroyImmediate(collider);
             Box(root,"Ống xả bồn tiểu",p+new Vector3(0,.34f,-.18f),new Vector3(.09f,.36f,.08f),ceramic);
         }
         static string RestroomTitle(string id)=>id.Contains("M")?"WC NAM":"WC NỮ";
         static void Fallback(Transform t,string kind,Vector2 size,float height)
         {
             if(kind=="toilet"){
-                var bowl=GameObject.CreatePrimitive(PrimitiveType.Sphere);bowl.name="Bồn cầu sứ";bowl.transform.SetParent(t,false);bowl.transform.localPosition=new Vector3(0,.48f,0);bowl.transform.localScale=new Vector3(.7f,.48f,1);bowl.GetComponent<Renderer>().sharedMaterial=Mat(Color.white);Object.Destroy(bowl.GetComponent<Collider>());
+                var bowl=GameObject.CreatePrimitive(PrimitiveType.Sphere);bowl.name="Bồn cầu sứ";bowl.transform.SetParent(t,false);bowl.transform.localPosition=new Vector3(0,.48f,0);bowl.transform.localScale=new Vector3(.7f,.48f,1);bowl.GetComponent<Renderer>().sharedMaterial=Mat(Color.white);var collider=bowl.GetComponent<Collider>();if(Application.isPlaying)Object.Destroy(collider);else Object.DestroyImmediate(collider);
                 Box(t,"Bệ",new Vector3(0,.22f,-.1f),new Vector3(.45f,.45f,.5f),Color.white);Box(t,"Bồn nước",new Vector3(0,.8f,-.5f),new Vector3(.7f,.8f,.35f),Color.white);return;
             }
             var metal=new Color(.61f,.65f,.63f);Box(t,"Thân thiết bị",Vector3.up*height*.45f,new Vector3(size.x*.9f,height*.9f,size.y*.9f),kind=="light"?Color.yellow:metal);
             Box(t,"Mặt bàn",Vector3.up*height,new Vector3(size.x,.08f,size.y),new Color(.9f,.88f,.82f));
             if(kind=="oven"||kind=="stove"){
                 Box(t,"Cửa lò",new Vector3(0,.5f,size.y*.46f),new Vector3(size.x*.7f,.55f,.06f),new Color(.09f,.12f,.13f));
-                for(int side=-1;side<=1;side+=2){var burner=GameObject.CreatePrimitive(PrimitiveType.Cylinder);burner.transform.SetParent(t,false);burner.transform.localPosition=new Vector3(side*.55f,height+.06f,0);burner.transform.localScale=new Vector3(.55f,.03f,.55f);burner.GetComponent<Renderer>().sharedMaterial=Mat(Color.black);Destroy(burner.GetComponent<Collider>());}}
+                for(int side=-1;side<=1;side+=2){var burner=GameObject.CreatePrimitive(PrimitiveType.Cylinder);burner.transform.SetParent(t,false);burner.transform.localPosition=new Vector3(side*.55f,height+.06f,0);burner.transform.localScale=new Vector3(.55f,.03f,.55f);burner.GetComponent<Renderer>().sharedMaterial=Mat(Color.black);var collider=burner.GetComponent<Collider>();if(Application.isPlaying)Destroy(collider);else DestroyImmediate(collider);}}
         }
         public static Vector3 SeatLocal(int seat)=>new Vector3(seat%2==0?-.75f:.75f,0,seat<2?1.65f:-1.65f);
         public Vector3 SeatPoint(RestaurantFurniture table,int seat)=>Point(table.position,table.floor)+Quaternion.Euler(0,table.rotation*90,0)*SeatLocal(seat);

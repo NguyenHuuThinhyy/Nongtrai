@@ -220,11 +220,13 @@ namespace NongTrai
         {
             var part=GameObject.CreatePrimitive(shape);part.name=name;part.transform.SetParent(parent,false);
             part.transform.localPosition=position;part.transform.localScale=scale;part.transform.localRotation=rotation;
-            Destroy(part.GetComponent<Collider>());
+            RemoveGeneratedObject(part.GetComponent<Collider>());
             if(shape==PrimitiveType.Sphere)part.GetComponent<MeshFilter>().sharedMesh=FacetedIceRockMesh();
             part.GetComponent<Renderer>().sharedMaterial=GolemMaterial(color,emissive);
         }
         static Mesh facetedIceRockMesh;
+        static void RemoveGeneratedObject(Object generated)
+        {if(generated==null)return;if(Application.isPlaying)Destroy(generated);else DestroyImmediate(generated);}
         static Mesh FacetedIceRockMesh()
         {
             if(facetedIceRockMesh!=null)return facetedIceRockMesh;
@@ -440,7 +442,7 @@ namespace NongTrai
                         for(int n=0;n<3;n++)
                         {
                             var pod=GameObject.CreatePrimitive(PrimitiveType.Capsule);pod.name="Quả đậu nành";
-                            var collider=pod.GetComponent<Collider>();collider.enabled=false;Destroy(collider);
+                            var collider=pod.GetComponent<Collider>();collider.enabled=false;RemoveGeneratedObject(collider);
                             pod.transform.SetParent(plant,false);pod.transform.localPosition=new Vector3(n%2==0?-.16f:.16f,.32f+n*.13f,.06f);
                             pod.transform.localScale=new Vector3(.075f,.13f,.065f);pod.transform.localRotation=Quaternion.Euler(12,0,n%2==0?25:-25);
                             var renderer=pod.GetComponent<Renderer>();renderer.sharedMaterial=CropPodMaterial;fruitRenderers.Add(renderer);

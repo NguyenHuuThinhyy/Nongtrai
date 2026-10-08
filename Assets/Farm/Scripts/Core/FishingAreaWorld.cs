@@ -218,7 +218,7 @@ namespace NongTrai
                 var globe = GameObject.CreatePrimitive(PrimitiveType.Sphere); globe.name = "Đèn lối câu • chụp";
                 globe.transform.SetParent(root, false); globe.transform.position = p + Vector3.up * 1.42f; globe.transform.localScale = Vector3.one * .32f;
                 globe.GetComponent<Renderer>().sharedMaterial = RestaurantWorld.Mat(new Color(1, .83f, .52f));
-                Object.Destroy(globe.GetComponent<Collider>());
+                var collider=globe.GetComponent<Collider>();if(Application.isPlaying)Object.Destroy(collider);else Object.DestroyImmediate(collider);
                 var lightGo = new GameObject("Đèn lối hồ câu", typeof(Light)); lightGo.transform.SetParent(root, false); lightGo.transform.position = p + Vector3.up * 1.42f;
                 var light = lightGo.GetComponent<Light>(); light.type = LightType.Point; light.color = new Color(1, .82f, .58f); light.range = 9; light.intensity = 2.0f; light.shadows = LightShadows.None;
                 pathLights.Add(light);

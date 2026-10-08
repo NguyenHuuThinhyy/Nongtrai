@@ -209,8 +209,10 @@ namespace NongTrai
 
         void OnDestroy()
         {
-            if (waterInstance != null) Destroy(waterInstance);
-            foreach(var material in roadInstances)if(material!=null)Destroy(material);
+            if (waterInstance != null)DisposeMaterial(waterInstance);
+            foreach(var material in roadInstances)if(material!=null)DisposeMaterial(material);
         }
+        static void DisposeMaterial(Material material)
+        {if(Application.isPlaying)Destroy(material);else DestroyImmediate(material);}
     }
 }

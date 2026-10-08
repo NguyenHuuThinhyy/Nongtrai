@@ -6,17 +6,17 @@ namespace NongTrai
     [Serializable] public sealed class PickupRecord{public int item,count,mutatedCrop=-1;public Vector3 position;public BagSlot weapon;}
     public sealed class WorldPickup:MonoBehaviour
     {
-        static readonly List<WorldPickup> all=new List<WorldPickup>();public int item,count,mutatedCrop=-1;public BagSlot weapon;float age;Vector3 resting;
+        static readonly List<WorldPickup> all=new List<WorldPickup>();public int item,count,mutatedCrop=-1;public BagSlot weapon;float age;Vector3 resting;Material pickupMaterial;
         public static void Spawn(int item,int count,Vector3 position,int mutatedCrop=-1,BagSlot weapon=null)
         {
-            if(count<=0)return;var go=GameObject.CreatePrimitive(PrimitiveType.Cube);Destroy(go.GetComponent<Collider>());go.layer=2;
+            if(count<=0)return;var go=GameObject.CreatePrimitive(PrimitiveType.Cube);var collider=go.GetComponent<Collider>();if(Application.isPlaying)Destroy(collider);else DestroyImmediate(collider);go.layer=2;
             go.name="Vật phẩm rơi";go.transform.position=position+Vector3.up*.35f;go.transform.localScale=Vector3.one*.22f;
-            var m=new Material(Shader.Find("Universal Render Pipeline/Lit"));m.color=item==20?new Color(.55f,.3f,.1f):item==21?Color.gray:Color.yellow;go.GetComponent<Renderer>().material=m;
-            var drop=go.AddComponent<WorldPickup>();drop.item=item;drop.count=count;drop.mutatedCrop=mutatedCrop;drop.weapon=weapon?.Copy();drop.resting=go.transform.position;
+            var m=new Material(Shader.Find("Universal Render Pipeline/Lit"));m.color=item==20?new Color(.55f,.3f,.1f):item==21?Color.gray:Color.yellow;go.GetComponent<Renderer>().sharedMaterial=m;
+            var drop=go.AddComponent<WorldPickup>();drop.item=item;drop.count=count;drop.mutatedCrop=mutatedCrop;drop.weapon=weapon?.Copy();drop.resting=go.transform.position;drop.pickupMaterial=m;
             string art=FarmRedesign.ItemKey(item);if(art!=null)FarmRedesign.Replace(go.transform,art,Vector3.down*.6f,1.2f,1.4f,1.4f);
         }
         void OnEnable()=>all.Add(this);void OnDisable()=>all.Remove(this);
-        void OnDestroy(){var r=GetComponent<Renderer>();if(r!=null)Destroy(r.material);}
+        void OnDestroy(){if(pickupMaterial==null)return;if(Application.isPlaying)Destroy(pickupMaterial);else DestroyImmediate(pickupMaterial);pickupMaterial=null;}
         void Update()
         {
             var bag=AdventureBag.Instance;if(bag==null||bag.inventory.hud.player.Paused)return;age+=Time.deltaTime;
