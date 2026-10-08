@@ -11,10 +11,12 @@ Chủ dự án đã cho phép đẩy và gộp bản hiện tại vào **main** 
 - APK khoảng **1,16 GB**, gồm Qwen3 1.7B do chủ dự án cung cấp. Lần mở chat đầu trên Android chuẩn bị model từ APK; cần thêm khoảng 1,2 GB trống. Khuyến nghị ARM64, 6 GB RAM.
 - **J** mở mô hình nông trại local, **H** ẩn/hiện hướng dẫn. Camera tùy chọn.
 - [AI offline](Docs/LOCAL_CHAT.md), [hướng dẫn cho nhóm](HUONG_DAN_NHOM.md), [cách chơi](CHOI_GAME.md), [nhà hàng](HUONG_DAN_NHA_HANG.md).
-- Source Git giữ Assets/.meta, Packages, ProjectSettings, Backend, Tools, Docs và Evidence. Gói chơi/model ở Release; `DongGoi/RELEASE-MANIFEST.json` và `SHA256SUMS.txt` ghi commit và checksum.
+- Source Git giữ Assets/.meta, Packages, ProjectSettings, Backend, Tools, Docs và Evidence. Bản Windows và APK có sẵn trong Builds qua Git LFS; gói ZIP/model để build tiếp ở Release; `DongGoi/RELEASE-MANIFEST.json` và `SHA256SUMS.txt` ghi commit và checksum.
 - Build Windows/Android thành công; việc duyệt gộp của chủ dự án không thay thế kiểm tra runtime. Chưa đo CPU/RAM hay chạy chatbot trên điện thoại thật.
 
 Bản đóng gói ngày 08/10/2026 được build từ commit `d82e56a`, gồm cập nhật nhà/nông trại, sân và lối đi nhà hàng mới nhất. Các file lớn được tải tại Release liên kết ở trên; tải đủ ZIP Windows để có EXE và dữ liệu đi kèm.
+
+[Tải trực tiếp EXE/Windows ZIP, APK và source Unity đầy đủ](Builds/README.md).
 
 ## Chức năng
 
@@ -38,6 +40,7 @@ không chép đè vào dự án đang dùng. Manifest trong `DongGoi` ghi commit
 Clone main để có bản đã được chủ dự án duyệt:
 
 ```powershell
+git lfs install
 git clone --branch main https://github.com/NguyenHuuThinhyy/Nongtrai.git
 ```
 

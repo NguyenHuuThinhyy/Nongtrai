@@ -5,7 +5,8 @@
 /Logs/
 /UserSettings/
 # Playable packages and supplied weights are distributed via GitHub Release.
-/Builds/
+/Builds/*
+!/Builds/README.md
 *.csproj
 *.sln
 *.slnx
@@ -52,7 +53,12 @@ __pycache__/
 
 # Supplied GGUF is bundled in local test packages, not committed to Git.
 /Assets/StreamingAssets/FarmAI/
-/Builds/Windows-LocalAI/
-/Builds/Android-LocalAI/
+!/Builds/Windows-LocalAI/
+!/Builds/Android-LocalAI/
 /DongGoi/LocalAI/
 /Assets/StreamingAssets/FarmAI.meta
+
+# Current playable builds are checked in through Git LFS.
+!/Builds/Windows-LocalAI/NongTrai_Data/StreamingAssets/FarmAI/*.gguf
+/Builds/Android-LocalAI/*
+!/Builds/Android-LocalAI/NongTrai.apk
