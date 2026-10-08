@@ -1,5 +1,5 @@
 {
-  "source_commit": "0b798d9eac4d1d20dc506e5ee97165b3306df92e",
+  "source_commit": "1adedb73172f9e5c9eda0799a9e6d95f415e5eff",
   "date": "2026-10-08",
   "unity": "6000.3.22f1",
   "scene_sha256": "5665c8e132a60757de69258e23db7b108e5a1ce1b968a46ca0b9e5eab7e94231",
@@ -7,8 +7,8 @@
   "windows_result": "Succeeded; 0 errors",
   "android_result": "Succeeded; 0 errors",
   "windows": {
-    "source_commit": "0b798d9eac4d1d20dc506e5ee97165b3306df92e",
-    "bytes": 1265501680.0,
+    "source_commit": "1adedb73172f9e5c9eda0799a9e6d95f415e5eff",
+    "bytes": 1265801324.0,
     "file_count": 188,
     "files": [
       {
@@ -139,12 +139,12 @@
       {
         "path": "NongTrai_Data/boot.config",
         "bytes": 156,
-        "sha256": "a44fa738c0e2a435432b83bffdc653a14338ff0cca5507c83fd06ca1b2840fd1"
+        "sha256": "fcda45c474d12286ab462e7bf131db1373b35c4ed8b32fe33a2aeebb0ed373dc"
       },
       {
         "path": "NongTrai_Data/globalgamemanagers",
         "bytes": 710324,
-        "sha256": "33bfd1b6bb646d77309124c8101aad9e4e08972ac0b6eb5ed42c7d141bedf582"
+        "sha256": "5d3a7c07590dfe8d171bae667592770b5d976450dccaf99735573223377df460"
       },
       {
         "path": "NongTrai_Data/globalgamemanagers.assets",
@@ -163,18 +163,18 @@
       },
       {
         "path": "NongTrai_Data/resources.assets",
-        "bytes": 34393596,
-        "sha256": "8b392d04e8609fd6928fdeae9100a9b3e55cc3de4e9cf82e405cd682a2e17c6c"
+        "bytes": 34394204,
+        "sha256": "931c58c2cdd9d95853e23edca4656f573ecc987a68652b9d77eb85fa2b30670c"
       },
       {
         "path": "NongTrai_Data/resources.assets.resS",
-        "bytes": 15834528,
-        "sha256": "879d3b2d1a86cb84e1e525d4ed93f57692a80bd348aca6b86d61973b8c335598"
+        "bytes": 16129440,
+        "sha256": "0bc74ba39c5bbeb270512df180e5d83bd59dad942cc79fee2bd51dc0127ee396"
       },
       {
         "path": "NongTrai_Data/RuntimeInitializeOnLoads.json",
-        "bytes": 8157,
-        "sha256": "f791ef4ccc823236c092c3e4573d9fbf5083bb2510f4c87bfb23dcd6172c4406"
+        "bytes": 8185,
+        "sha256": "f9627f6511afdc862bf43f9d70e24094ccea7946d01d18de7b851316a13f87f4"
       },
       {
         "path": "NongTrai_Data/ScriptingAssemblies.json",
@@ -193,8 +193,8 @@
       },
       {
         "path": "NongTrai_Data/Managed/Assembly-CSharp.dll",
-        "bytes": 837120,
-        "sha256": "654374c65f09aec2e54d4f38baeb5e4b8d463843cac8ebdc34934ca1ba868860"
+        "bytes": 841216,
+        "sha256": "814a345eaf83200550f16bd27db3273fd899f5095a8f48e4259bd1a7432f304a"
       },
       {
         "path": "NongTrai_Data/Managed/Midterm2D.dll",
@@ -955,8 +955,8 @@
   },
   "android": {
     "path": "Android-LocalAI/NongTrai.apk",
-    "bytes": 1161752597,
-    "sha256": "34e914c5085356f49fa77f0d589319b36806a1b6676cb885ebf460c9b17db5a8"
+    "bytes": 1161801689,
+    "sha256": "49176a6a794a50367e073394454eef375d944e54ad61f72b39a71c28a025489d"
   },
   "runtime_acceptance": "not tested in this branding change",
   "physical_android": "not verified"

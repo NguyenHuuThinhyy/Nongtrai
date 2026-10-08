@@ -1,7 +1,7 @@
 # Chat AI offline — bản được chủ dự án cho phép phát hành
 
 © TriForge. Chủ dự án đã yêu cầu đẩy và gộp bản hiện tại vào main ngày 08/10/2026.
-[Tải Windows, APK và source Unity kèm model](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/triforge-20261008-0b798d9).
+[Tải Windows, APK và source Unity kèm model](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/triforge-20261008-1adedb7).
 
 ## Chơi
 
@@ -18,7 +18,7 @@ Máy PC 8 GB RAM nên đóng Unity Editor khi chơi EXE để dành bộ nhớ c
 
 ## Bản build local 08/10/2026
 
-Windows và Android đã build thành công với 0 lỗi build, sau thay đổi chỉ nạp khi mở chat và giải phóng khi đóng. Windows runtime: 1.265.501.680 byte; APK: 1.161.752.597 byte. Chưa mở EXE để hỏi model, chưa cài/thử APK trên thiết bị thật và chưa đo CPU/RAM sau đóng chat. Không bật âm thanh trong quá trình sửa/build. Chủ dự án đã cho phép phát hành/gộp main. Gói bàn giao có commit nguồn và SHA256 trong MANIFEST.json/SHA256SUMS.txt; kiểm tra runtime vẫn chưa được xác nhận.
+Windows và Android đã build thành công với 0 lỗi build, sau thay đổi chỉ nạp khi mở chat và giải phóng khi đóng. Windows runtime: 1.265.801.324 byte; APK: 1.161.801.689 byte. Chưa mở EXE để hỏi model, chưa cài/thử APK trên thiết bị thật và chưa đo CPU/RAM sau đóng chat. Không bật âm thanh trong quá trình sửa/build. Chủ dự án đã cho phép phát hành/gộp main. Gói bàn giao có commit nguồn và SHA256 trong MANIFEST.json/SHA256SUMS.txt; kiểm tra runtime vẫn chưa được xác nhận.
 
 ## Build / phát triển
 
