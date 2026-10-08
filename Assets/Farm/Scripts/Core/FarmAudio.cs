@@ -4,7 +4,7 @@ namespace NongTrai
 {
     public sealed class FarmAudio : MonoBehaviour
     {
-        public enum Cue { Hoe, Water, Harvest, Buy, Sell, Level }
+        public enum Cue { Hoe, Water, Harvest, Buy, Sell, Level, GolemImpact }
         public static FarmAudio Instance { get; private set; }
         public float MusicVolume { get; private set; } = .28f;
         public float EffectsVolume { get; private set; } = .65f;
@@ -15,8 +15,9 @@ namespace NongTrai
             Instance=this;
             music=gameObject.AddComponent<AudioSource>();music.loop=true;music.playOnAwake=false;
             effects=gameObject.AddComponent<AudioSource>();effects.playOnAwake=false;
-            clips=new AudioClip[6];
+            clips=new AudioClip[7];
             for(int i=0;i<clips.Length;i++) clips[i]=Tone("Farm "+(Cue)i,220+i*90,.14f+i*.025f,i==1);
+            clips[(int)Cue.GolemImpact]=GolemImpact();
             music.clip=Background();music.volume=MusicVolume;music.Play();
             effects.volume=EffectsVolume;
         }
@@ -51,6 +52,27 @@ namespace NongTrai
                 samples[i]=melody+bass;
             }
             var clip=AudioClip.Create("Farm background",length,1,rate,false);clip.SetData(samples,0);return clip;
+        }
+        static AudioClip GolemImpact()
+        {
+            const int rate=22050;const float seconds=.52f;int length=Mathf.CeilToInt(rate*seconds);
+            var samples=new float[length];float[] hits={0,.17f};
+            for(int i=0;i<length;i++)
+            {
+                float time=i/(float)rate,sound=0;
+                for(int hit=0;hit<hits.Length;hit++)
+                {
+                    float t=time-hits[hit];if(t<0)continue;
+                    float envelope=Mathf.Exp(-t*10f)*Mathf.Min(1,t*300f);
+                    float phase=2*Mathf.PI*(72*t-28*t*t);
+                    float grit=Mathf.Sin(2*Mathf.PI*195*t)+.65f*Mathf.Sin(2*Mathf.PI*327*t);
+                    float noise=Mathf.Sin(i*127.1f)*Mathf.Sin(i*311.7f);
+                    float crack=Mathf.Exp(-t*48f)*noise;
+                    sound+=envelope*(Mathf.Sin(phase)*.95f+grit*.17f+noise*.18f)+crack*.45f;
+                }
+                samples[i]=Mathf.Clamp(sound*1.05f,-1,1);
+            }
+            var clip=AudioClip.Create("Golem • đùng đùng",length,1,rate,false);clip.SetData(samples,0);return clip;
         }
     }
 }

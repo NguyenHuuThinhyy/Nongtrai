@@ -7,16 +7,20 @@ namespace NongTrai
     {
         public const int MaxHealth=2400;
         ExplorationWorld world;FarmPlayer player;CharacterController body;TMP_Text label;
-        int health=MaxHealth;float cooldown,verticalVelocity,windup,nextJump;Vector3 knockback,home;bool surface;float territory;
+        int health=MaxHealth;float cooldown,verticalVelocity,windup,nextJump,attackRecover;Vector3 knockback,home;bool surface;float territory;
         public bool Enraged=>health<=MaxHealth/2;
         public int AttackDamage=>Enraged?52:38;
         public int Health=>health;
-        public bool ContainsTerritory(Vector3 point){Vector3 d=point-home;d.y=0;return d.magnitude<territory&&Mathf.Abs(point.y-transform.position.y)<4;}
+        public float AttackWindup=>windup;
+        public float AttackWindupDuration=>Enraged?.5f:.7f;
+        public float AttackRecovery=>attackRecover;
+        public float AttackRecoveryDuration=>.28f;
+        public bool ContainsTerritory(Vector3 point){Vector3 d=point-home;d.y=0;return d.magnitude<territory&&Mathf.Abs(point.y-transform.position.y)<6;}
         public static CaveBoss Create(Vector3 position,ExplorationWorld world,FarmPlayer player,bool surface=false)
         {
             var root=new GameObject("GOLEM HANG SÂU",typeof(CharacterController),typeof(CaveBoss));root.transform.position=position;
             var boss=root.GetComponent<CaveBoss>();boss.world=world;boss.player=player;boss.home=position;boss.surface=surface;boss.territory=surface?14:12;boss.body=root.GetComponent<CharacterController>();
-            boss.body.height=2.4f;boss.body.radius=.64f;boss.body.center=Vector3.up*1.2f;boss.body.stepOffset=.35f;
+            boss.body.height=4.8f;boss.body.radius=1.05f;boss.body.center=Vector3.up*2.4f;boss.body.stepOffset=.35f;
             Color stone=new Color(.37f,.42f,.44f),vein=new Color(.25f,.69f,.80f);
             Part(root.transform,"Thân đá",new Vector3(0,1.25f,0),new Vector3(1.35f,1.35f,.8f),stone);
             Part(root.transform,"Đầu đá",new Vector3(0,2.12f,.08f),new Vector3(.85f,.72f,.75f),stone);
@@ -26,11 +30,11 @@ namespace NongTrai
              Part(root.transform,"Mắt sáng",new Vector3(side*.20f,2.20f,.47f),new Vector3(.16f,.15f,.08f),vein);}
             Part(root.transform,"Quặng trên ngực",new Vector3(0,1.42f,.46f),new Vector3(.36f,.40f,.10f),vein);
             var sign=new GameObject("Máu boss",typeof(TextMeshPro));sign.transform.SetParent(root.transform,false);
-            sign.transform.localPosition=new Vector3(0,2.85f,0);sign.transform.localScale=Vector3.one*.16f;
+            sign.transform.localPosition=new Vector3(0,5.15f,0);sign.transform.localScale=Vector3.one*.16f;
             boss.label=sign.GetComponent<TextMeshPro>();boss.label.font=FarmUi.Font;boss.label.alignment=TextAlignmentOptions.Center;
             boss.label.fontSize=4;boss.label.color=Color.white;boss.label.outlineColor=Color.black;boss.label.outlineWidth=.22f;
             boss.label.rectTransform.sizeDelta=new Vector2(11,2);
-            FarmEnemyHealthBar.Attach(root,surface?"GOLEM TẾ ĐÀN":"GOLEM HANG",MaxHealth,()=>boss.Health,3.55f);
+            FarmEnemyHealthBar.Attach(root,surface?"GOLEM TẾ ĐÀN":"GOLEM HANG",MaxHealth,()=>boss.Health,5.8f);
             FarmRedesign.RockGolem(root.transform);
             return boss;
         }
@@ -41,6 +45,7 @@ namespace NongTrai
         void Update()
         {
             if(world==null||player==null||player.Paused)return;
+            attackRecover=Mathf.Max(0,attackRecover-Time.deltaTime);
             if(label!=null){label.text=(windup>0?"NÉ ĐÒN ĐẬP! ":Enraged?"GOLEM CUỒNG NỘ ":"GOLEM ")+health+"/"+MaxHealth;label.color=windup>0?new Color(1,.4f,.12f):Color.white;if(Camera.main!=null)label.transform.rotation=Camera.main.transform.rotation;}
             cooldown=Mathf.Max(0,cooldown-Time.deltaTime);
             Vector3 toward=player.transform.position-transform.position;toward.y=0;
@@ -57,8 +62,13 @@ namespace NongTrai
             if(windup>0)
             {
                 windup-=Time.deltaTime;
-                if(windup<=0&&inside&&distance<3.5f&&FarmActionFeedback.CanReach(transform,player,3.7f,2))
-                {AdventureWolves.Instance?.Damage(AttackDamage,"Golem đập đất: -"+AttackDamage+" máu!");player.ApplyImpact(player.transform.position-transform.position,Enraged?7:5);}
+                if(windup<=0)
+                {
+                    attackRecover=AttackRecoveryDuration;
+                    FarmAudio.Instance?.Play(FarmAudio.Cue.GolemImpact);
+                    if(inside&&distance<3.5f&&FarmActionFeedback.CanReach(transform,player,3.7f,2))
+                    {AdventureWolves.Instance?.Damage(AttackDamage,"Golem đập đất: -"+AttackDamage+" máu!");player.ApplyImpact(player.transform.position-transform.position,Enraged?7:5);}
+                }
             }
             else if(inside&&distance<2.8f&&cooldown<=0){windup=Enraged?.5f:.7f;cooldown=Enraged?1.65f:2.1f;}
         }
