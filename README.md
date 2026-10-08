@@ -1,6 +1,7 @@
 # Nông Trại — First Harvest
 
 © TriForge. Unity **6000.3.22f1**, URP, save **22**.
+<img width="1448" height="1086" alt="image" src="https://github.com/user-attachments/assets/ae7b9f27-26fd-458c-9210-f87eacb7dbd3" />
 
 ## Bản mới: TriForge — AI offline trên Windows / Android
 
