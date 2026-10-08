@@ -14,6 +14,7 @@ namespace NongTrai
             yield return new WaitForSecondsRealtime(2);var r=FarmRestaurant.Ensure();player.SetPaused(true);
             Check(r.Built,"world missing");Check(RestaurantRecipes.All.Length==30,"recipes");Check(r.State.furniture.Count(f=>f.kind=="table")==24,"24 dining groups");
             CheckFloorSurfaces(r.World);
+            CheckRestroomAccess(r.World,player.GetComponent<CharacterController>());
             Check(new[]{0,1,2}.All(f=>r.State.furniture.Count(x=>x.kind=="table"&&x.floor==f)==new[]{8,10,6}[f]),"table distribution 8/10/6");
             Check(r.State.furniture.Count(f=>f.kind=="toilet")==4&&r.State.furniture.Count(f=>f.kind=="wash")==4,"separate men's/women's restrooms");
             Check(r.State.layoutRevision==RestaurantWorld.LayoutRevision,"layout revision initialized");
@@ -119,6 +120,43 @@ namespace NongTrai
             r.UI.Open("prep0","prep");yield return null;CaptureUI(camera,hud,folder,"03-recipes",1280,720);r.UI.Close();
             player.SetPaused(false);yield return new WaitForSecondsRealtime(3.1f);FarmFishing.Instance.Open();yield return null;CaptureUI(camera,hud,folder,"04-fishing",1280,720);CaptureUI(camera,hud,folder,"05-fishing",1920,1080);FarmFishing.Instance.Close();
             Object.Destroy(cameraGo);Debug.Log("FARM_RESTAURANT_OK • 30 recipes, inventory/save22/legacy21, serving, layout, stairs, guests and fishing");
+        }
+        public static void CheckRestroomAccess(RestaurantWorld world,CharacterController body)
+        {
+            var originalPosition=body.transform.position;bool wasEnabled=body.enabled;
+            try
+            {
+                foreach(var room in world.Modules.Values.Where(m=>m.kind=="toilet"))
+                {
+                    var rotation=room.door.localRotation;
+                    void Place(Vector3 local)
+                    {
+                        body.enabled=false;body.transform.position=room.transform.TransformPoint(local);
+                        body.enabled=true;Physics.SyncTransforms();
+                    }
+                    try
+                    {
+                        room.door.localRotation=Quaternion.Euler(0,100,0);
+                        Place(new Vector3(0,.08f,1.5f));
+                        for(int i=0;i<60;i++)body.Move(room.transform.TransformDirection(new Vector3(0,-.02f,-.05f)));
+                        Check(room.transform.InverseTransformPoint(body.transform.position).z< -1.3f,"cannot enter "+room.id);
+                        for(int i=0;i<60;i++)body.Move(room.transform.TransformDirection(new Vector3(0,-.02f,.05f)));
+                        Check(room.transform.InverseTransformPoint(body.transform.position).z>1.3f,"cannot leave "+room.id);
+                        room.door.localRotation=Quaternion.identity;Physics.SyncTransforms();
+                        var from=room.transform.TransformPoint(new Vector3(0,1.1f,1.5f));
+                        var to=room.transform.TransformPoint(new Vector3(0,1.1f,-1.5f));
+                        Check(Physics.Linecast(from,to,out var hit,~0,QueryTriggerInteraction.Ignore)&&
+                            hit.collider.transform.IsChildOf(room.door)&&hit.collider.GetComponentInParent<RestaurantModule>()==room,
+                            "closed door must block and remain interactable: "+room.id);
+                    }
+                    finally{room.door.localRotation=rotation;}
+                }
+                Debug.Log("FARM_RESTROOM_ACCESS_OK: entered and exited all four restrooms; closed doors remain solid and interactable.");
+            }
+            finally
+            {
+                body.enabled=false;body.transform.position=originalPosition;body.enabled=wasEnabled;Physics.SyncTransforms();
+            }
         }
         static void CheckFloorSurfaces(RestaurantWorld world)
         {

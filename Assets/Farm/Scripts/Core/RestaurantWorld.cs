@@ -312,8 +312,8 @@ namespace NongTrai
             Box(root,"Ký hiệu buồng tiếp cận",new Vector3(-1.08f,2.32f,-6.95f),new Vector3(.34f,.34f,.03f),new Color(.17f,.44f,.63f));
             if(f.id.Contains("M"))AddUrinal(root,new Vector3(1.73f,.83f,-3.7f),metal);
             module.label=Label(root,RestroomTitle(f.id),new Vector3(0,3.25f,.2f),.4f);
-            var target=new GameObject("Tương tác cửa WC",typeof(BoxCollider));target.transform.SetParent(root,false);target.transform.localPosition=new Vector3(0,1.05f,.24f);
-            target.GetComponent<BoxCollider>().size=new Vector3(1.35f,2.2f,.28f);
+            // Door and wall colliders already resolve to the parent RestaurantModule.
+            // Keep the doorway empty so the open door is physically passable.
         }
         static void AddUrinal(Transform root,Vector3 p,Color ceramic)
         {
