@@ -5,7 +5,8 @@
 /Logs/
 /UserSettings/
 # Playable packages and supplied weights are distributed via GitHub Release.
-/Builds/
+/Builds/*
+!/Builds/README.md
 *.csproj
 *.sln
 *.slnx

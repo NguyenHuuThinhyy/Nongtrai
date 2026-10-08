@@ -16,6 +16,8 @@ Chủ dự án đã cho phép đẩy và gộp bản hiện tại vào **main** 
 
 Bản đóng gói ngày 08/10/2026 được build từ commit `d82e56a`, gồm cập nhật nhà/nông trại, sân và lối đi nhà hàng mới nhất. Các file lớn được tải tại Release liên kết ở trên; tải đủ ZIP Windows để có EXE và dữ liệu đi kèm.
 
+[Tải trực tiếp EXE/Windows ZIP, APK và source Unity đầy đủ](Builds/README.md).
+
 ## Chức năng
 
 Nông trại 3D, khám phá voxel theo seed, vật nuôi, cây trồng, máy chế biến,
