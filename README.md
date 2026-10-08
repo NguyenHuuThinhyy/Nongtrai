@@ -4,15 +4,17 @@
 
 ## Bản mới: AI offline trên Windows / Android
 
-Chủ dự án đã cho phép đẩy và gộp `codex/bundled-chat-model` vào **main** ngày 06/10/2026.
+Chủ dự án đã cho phép đẩy và gộp bản hiện tại vào **main** ngày 08/10/2026.
 
-- [Tải Windows ZIP có EXE, APK Android và source Unity kèm model](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/localai-20261006).
+- [Tải Windows ZIP có EXE, APK Android và source Unity kèm model](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/localai-20261008).
 - Mở `CHAY_GAME.bat` hoặc EXE; nhấn **C** / Chat mới nạp AI. Đóng/ẩn chat hoặc chuyển ứng dụng sẽ hủy xử lý và giải phóng model. Không cần backend, PC khác hay Internet để chat.
 - APK khoảng **1,16 GB**, gồm Qwen3 1.7B do chủ dự án cung cấp. Lần mở chat đầu trên Android chuẩn bị model từ APK; cần thêm khoảng 1,2 GB trống. Khuyến nghị ARM64, 6 GB RAM.
 - **J** mở mô hình nông trại local, **H** ẩn/hiện hướng dẫn. Camera tùy chọn.
 - [AI offline](Docs/LOCAL_CHAT.md), [hướng dẫn cho nhóm](HUONG_DAN_NHOM.md), [cách chơi](CHOI_GAME.md), [nhà hàng](HUONG_DAN_NHA_HANG.md).
 - Source Git giữ Assets/.meta, Packages, ProjectSettings, Backend, Tools, Docs và Evidence. Gói chơi/model ở Release; `DongGoi/RELEASE-MANIFEST.json` và `SHA256SUMS.txt` ghi commit và checksum.
 - Build Windows/Android thành công; việc duyệt gộp của chủ dự án không thay thế kiểm tra runtime. Chưa đo CPU/RAM hay chạy chatbot trên điện thoại thật.
+
+Bản đóng gói ngày 08/10/2026 được build từ commit `d82e56a`, gồm cập nhật nhà/nông trại, sân và lối đi nhà hàng mới nhất. Các file lớn được tải tại Release liên kết ở trên; tải đủ ZIP Windows để có EXE và dữ liệu đi kèm.
 
 ## Chức năng
 

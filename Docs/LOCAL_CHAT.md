@@ -1,7 +1,7 @@
 # Chat AI offline — bản được chủ dự án cho phép phát hành
 
-© HThinh.yy. Chủ dự án đã yêu cầu đẩy và gộp `codex/bundled-chat-model` vào main ngày 06/10/2026.
-[Tải Windows, APK và source Unity kèm model](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/localai-20261006).
+© HThinh.yy. Chủ dự án đã yêu cầu đẩy và gộp bản hiện tại vào main ngày 08/10/2026.
+[Tải Windows, APK và source Unity kèm model](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/localai-20261008).
 
 ## Chơi
 
@@ -16,9 +16,9 @@ Model chủ dự án cung cấp: `Backend/models/Qwen3-1.7B-Q4_K_M.gguf`, 1.107.
 Model khiến gói Windows/APK lớn hơn khoảng 1,11 GB. Android cần thêm khoảng 1,2 GB trống cho bản model trong vùng ứng dụng, ngoài dung lượng cài APK. Khuyến nghị điện thoại ARM64 có ít nhất 6 GB RAM; không bảo đảm mọi điện thoại đủ bộ nhớ hoặc tốc độ. Không tải model khi chạy; chuẩn bị một lần hoàn toàn từ gói cài. Chưa nghiệm thu tốc độ/bộ nhớ/đa chạm trên điện thoại thật.
 Máy PC 8 GB RAM nên đóng Unity Editor khi chơi EXE để dành bộ nhớ cho game và AI.
 
-## Bản build local 06/10/2026
+## Bản build local 08/10/2026
 
-Windows và Android đã build thành công với 0 lỗi build, sau thay đổi chỉ nạp khi mở chat và giải phóng khi đóng. Windows runtime: 1.265.433.848 byte; APK: 1.161.665.701 byte. Chưa mở EXE để hỏi model, chưa cài/thử APK trên thiết bị thật và chưa đo CPU/RAM sau đóng chat. Không bật âm thanh trong quá trình sửa/build. Chủ dự án đã cho phép phát hành/gộp main. Gói bàn giao có commit nguồn và SHA256 trong MANIFEST.json/SHA256SUMS.txt; kiểm tra runtime vẫn chưa được xác nhận.
+Windows và Android đã build thành công với 0 lỗi build, sau thay đổi chỉ nạp khi mở chat và giải phóng khi đóng. Windows runtime: 1.265.463.792 byte; APK: 1.161.707.185 byte. Chưa mở EXE để hỏi model, chưa cài/thử APK trên thiết bị thật và chưa đo CPU/RAM sau đóng chat. Không bật âm thanh trong quá trình sửa/build. Chủ dự án đã cho phép phát hành/gộp main. Gói bàn giao có commit nguồn và SHA256 trong MANIFEST.json/SHA256SUMS.txt; kiểm tra runtime vẫn chưa được xác nhận.
 
 ## Build / phát triển
 

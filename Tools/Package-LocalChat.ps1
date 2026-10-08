@@ -1,5 +1,5 @@
 # Copyright HThinh.yy. Package the current offline release after owner authorization.
-param([Parameter(Mandatory=$true)][string]$BuildSourceCommit,[string]$Label=(Get-Date -Format 'yyyyMMdd-HHmm'),[string]$ReleaseTag='localai-20261006')
+param([Parameter(Mandatory=$true)][string]$BuildSourceCommit,[string]$Label=(Get-Date -Format 'yyyyMMdd-HHmm'),[string]$ReleaseTag=('localai-'+(Get-Date -Format 'yyyyMMdd')))
 $ErrorActionPreference='Stop'
 $project=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 Set-Location -LiteralPath $project
@@ -40,7 +40,7 @@ WriteZip $sourceZip $entries
 $apkCopy=Join-Path $output "NongTrai-Android-LocalAI-$Label.apk"
 Copy-Item -LiteralPath $apk -Destination $apkCopy
 $packages=@($winZip,$apkCopy,$sourceZip)|ForEach-Object{[ordered]@{file=[IO.Path]::GetFileName($_);bytes=(Get-Item -LiteralPath $_).Length;sha256=(Get-FileHash -LiteralPath $_).Hash.ToLowerInvariant()}}
-$manifest=[ordered]@{branch=(& git branch --show-current).Trim();build_source_commit=$BuildSourceCommit;source_git_commit=(& git rev-parse HEAD).Trim();model=$spec;packages=$packages;release=$ReleaseTag;release_url=('https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/'+$ReleaseTag);user_merge_approval='approved by owner on 2026-10-06';publication='owner authorized GitHub publication';physical_android='not verified';runtime_acceptance='owner test pending'}
+$manifest=[ordered]@{branch=(& git branch --show-current).Trim();build_source_commit=$BuildSourceCommit;source_git_commit=(& git rev-parse HEAD).Trim();model=$spec;packages=$packages;release=$ReleaseTag;release_url=('https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/'+$ReleaseTag);user_merge_approval=('owner authorization required for publication; packaged '+(Get-Date -Format 'yyyy-MM-dd'));publication='owner authorized GitHub publication';physical_android='not verified';runtime_acceptance='owner test pending'}
 $manifest|ConvertTo-Json -Depth 6|Set-Content -LiteralPath (Join-Path $output 'RELEASE-MANIFEST.json') -Encoding utf8
 $packages|ForEach-Object{$_.sha256+'  '+$_.file}|Set-Content -LiteralPath (Join-Path $output 'SHA256SUMS.txt') -Encoding ascii
 Write-Output ($manifest|ConvertTo-Json -Depth 6)
