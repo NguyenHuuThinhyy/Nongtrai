@@ -1,7 +1,11 @@
 {
-  "branch": "codex/bundled-chat-model",
-  "build_source_commit": "6e0f6ae4a44835a8f524db65fbeebbf893693e68",
-  "source_git_commit": "c0f786aeb533c2b12081c0d75155d02180ba4bbe",
+  "branch": "main",
+  "build_source_commit": "d82e56a8ce1c439e0a0a7b1737abcb49208f9b70",
+  "source_git_commit": "e0237e9c90eb709adb31eb8fe12875ed53e99bbf",
+  "date": "2026-10-08",
+  "unity": "6000.3.22f1",
+  "windows_build": "Succeeded; 0 errors",
+  "android_build": "Succeeded; 0 errors",
   "model": {
     "name": "Qwen3-1.7B-Q4_K_M",
     "file": "Qwen3-1.7B-Q4_K_M.gguf",
@@ -18,25 +22,25 @@
   },
   "packages": [
     {
-      "file": "NongTrai-Windows-LocalAI-20261006-main.zip",
-      "bytes": 1171904092,
-      "sha256": "7dbf584994583b4bdc366bac4009ba60584e7d2ecbfeb5189bc9ef028d0a0eee"
+      "file": "NongTrai-Windows-20261008-d82e56a.zip",
+      "bytes": 1171913103,
+      "sha256": "c7184569a950f1747a9262e398883ca3f7ffdb70e77d570b0b84e67f6036b13c"
     },
     {
-      "file": "NongTrai-Android-LocalAI-20261006-main.apk",
-      "bytes": 1161665701,
-      "sha256": "3cc89348d0bb9bd34678d5fed3322da79327923d0f7dfbecf0a0a16276a521f5"
+      "file": "NongTrai-Android-20261008-d82e56a.apk",
+      "bytes": 1161707185,
+      "sha256": "302942518c9ee8e5c46976363bcbb1a5a0bf2943968436ec6e3cf609b1e396fc"
     },
     {
-      "file": "NongTrai-Unity-LocalAI-20261006-main.zip",
-      "bytes": 1187218239,
-      "sha256": "ac11cabb40862b6f04297db796a1b251f93db95679f797a8cd697ec45d6a247a"
+      "file": "NongTrai-Unity-20261008-d82e56a.zip",
+      "bytes": 1187504444,
+      "sha256": "2c1ed6e5fd3db56d65b805a5ba0974436e81c713029f216fcc7c5b612ba3e514"
     }
   ],
-  "release": "localai-20261006",
-  "release_url": "https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/localai-20261006",
-  "user_merge_approval": "approved by owner on 2026-10-06",
-  "publication": "owner authorized GitHub publication",
+  "release": "localai-20261008",
+  "release_url": "https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/localai-20261008",
+  "publication": "owner authorized main and build publication on 2026-10-08",
+  "runtime_acceptance": "not tested",
   "physical_android": "not verified",
-  "runtime_acceptance": "owner test pending"
+  "copyright": "HThinh.yy"
 }
