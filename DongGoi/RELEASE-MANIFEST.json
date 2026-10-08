@@ -1,7 +1,7 @@
 {
   "branch": "main",
-  "build_source_commit": "d82e56a8ce1c439e0a0a7b1737abcb49208f9b70",
-  "source_git_commit": "e0237e9c90eb709adb31eb8fe12875ed53e99bbf",
+  "build_source_commit": "a13f41f6e22c1c05c9178744748b361b735704a6",
+  "source_git_commit": "5aa33e5230c18827f0ae0e1ac1ae802d325bcd86",
   "date": "2026-10-08",
   "unity": "6000.3.22f1",
   "windows_build": "Succeeded; 0 errors",
@@ -22,24 +22,24 @@
   },
   "packages": [
     {
-      "file": "NongTrai-Windows-20261008-d82e56a.zip",
-      "bytes": 1171913103,
-      "sha256": "c7184569a950f1747a9262e398883ca3f7ffdb70e77d570b0b84e67f6036b13c"
+      "file": "NongTrai-Windows-20261008-a13f41f.zip",
+      "bytes": 1171930579,
+      "sha256": "73480ff7ede3acbce02ea09a75062625ff85f314c48a6a2af94e6ee43414090d"
     },
     {
-      "file": "NongTrai-Android-20261008-d82e56a.apk",
-      "bytes": 1161707185,
-      "sha256": "302942518c9ee8e5c46976363bcbb1a5a0bf2943968436ec6e3cf609b1e396fc"
+      "file": "NongTrai-Android-20261008-a13f41f.apk",
+      "bytes": 1161734829,
+      "sha256": "4e41a0dc1a273fb4395ddd3f4e61123fe6fad8f346f8916d19b03edf0263875f"
     },
     {
-      "file": "NongTrai-Unity-20261008-d82e56a.zip",
-      "bytes": 1187504444,
-      "sha256": "2c1ed6e5fd3db56d65b805a5ba0974436e81c713029f216fcc7c5b612ba3e514"
+      "file": "NongTrai-Unity-20261008-a13f41f.zip",
+      "bytes": 1187514495,
+      "sha256": "796dd183ac9c13a311fe9d88d7b8b1d54c6c342a160e5ecfccf709ec1838e459"
     }
   ],
-  "release": "localai-20261008",
-  "release_url": "https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/localai-20261008",
-  "publication": "owner authorized main and build publication on 2026-10-08",
+  "release": "localai-20261008-a13f41f",
+  "release_url": "https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/localai-20261008-a13f41f",
+  "publication": "owner requested rebuilding and publishing Windows and APK before trailer capture",
   "runtime_acceptance": "not tested",
   "physical_android": "not verified",
   "copyright": "HThinh.yy"
