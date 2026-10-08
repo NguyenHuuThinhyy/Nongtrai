@@ -78,6 +78,8 @@ namespace NongTrai
                     if(farmAnimal!=null&&bag!=null&&bag.Item==34)
                     {farmAnimal.FeedPremium(inventory,out string feedback);Say(feedback);return;}
                     var plot=useHit.collider.GetComponentInParent<FarmPlot>();
+                    if(plot!=null&&plot.State==PlotState.Tilled&&bag!=null&&FarmCropBalance.FieldPlantIndex(bag.Item)>=0)
+                    {Say(FarmExpansion.Instance.Work(plot));return;}
                     if(plot!=null&&bag!=null&&bag.Item==35)
                     {bool wasMutated=plot.Mutated;
                      if(FarmExpansion.Instance.IsUnlocked(plot)&&plot.State==PlotState.Growing&&inventory.Remove(35,1)&&plot.ApplyFertilizer())
@@ -88,7 +90,7 @@ namespace NongTrai
                     {fruitTree.Fertilize(inventory,out string feedback);Say(feedback);return;}
                     if(bag!=null&&bag.Item==27&&ExplorationWorld.Instance.IsExploring)
                     {bool planted=ExplorationWorld.Instance.Plant(ExplorationWorld.Instance.CellAt(useHit.point-useHit.normal*.02f));Say(planted?"Đã gieo cây gỗ. Cây lớn theo từng giai đoạn ban ngày.":"Cần mặt đất trống để trồng cây.");return;}
-                    if(bag!=null&&(bag.Item==27||bag.Item>=49&&bag.Item<=51)&&!ExplorationWorld.Instance.IsExploring)
+                    if(bag!=null&&FarmCropBalance.TreePlantKind(bag.Item)>=0&&!ExplorationWorld.Instance.IsExploring)
                     {FruitTree.TryPlantAt(useHit.point,shop,inventory,out string feedback,bag.Item);Say(feedback);return;}
                 }
 
@@ -213,9 +215,16 @@ namespace NongTrai
                 worldLabel.gameObject.SetActive(visible);
                 if(visible && selectedCollider!=null)
                 {
-                    worldLabel.text=selected.InteractionHint.Replace("[E]","[Chuột trái]");
+                    bool cropInfo=selected is FarmPlot crop&&crop.Crop!=null||selected is FruitTree;
+                    worldLabel.transform.localScale=Vector3.one*(cropInfo?1:.018f);
+                    worldLabel.fontSize=cropInfo?2.2f:2.5f;
+                    worldLabel.fontStyle=cropInfo?FontStyles.Bold:FontStyles.Normal;
+                    worldLabel.rectTransform.pivot=new Vector2(.5f,cropInfo?0:.5f);
+                    worldLabel.alignment=cropInfo?TextAlignmentOptions.Bottom:TextAlignmentOptions.Center;
+                    worldLabel.rectTransform.sizeDelta=cropInfo?new Vector2(7,1.3f):new Vector2(24,3);
+                    worldLabel.text=selected is FarmPlot plant&&plant.Crop!=null?plant.GrowthHint:selected is FruitTree tree?tree.GrowthHint:selected.InteractionHint.Replace("[E]","[Chuột trái]");
                     var bounds=selectedCollider.bounds;
-                    worldLabel.transform.position=bounds.center+Vector3.up*(bounds.extents.y+.28f);
+                    worldLabel.transform.position=selected is FarmPlot growing&&growing.Crop!=null?growing.GrowthHintPosition:bounds.center+Vector3.up*(bounds.extents.y+.35f);
                     worldLabel.transform.rotation=viewCamera.transform.rotation;
                 }
             }

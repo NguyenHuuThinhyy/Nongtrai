@@ -21,7 +21,7 @@ namespace NongTrai
         public int Item=>Slots[Selected].count>0?Slots[Selected].item:-1;
         public int LegacySlot=>Item>=100&&Item<=108?Item-100:-1;
         public bool HoldingBlock=>FarmBuildingSystem.TypeForItem(Item)>=0;
-        Image[] pictures=new Image[36],backgrounds=new Image[36];TMP_Text[] labels=new TMP_Text[36];TMP_Text status,dragLabel;Image dragGhost;
+        Image[] pictures=new Image[36],backgrounds=new Image[36];TMP_Text[] labels=new TMP_Text[36],slotCounts=new TMP_Text[36];TMP_Text status,dragLabel;Image dragGhost;
         public int dragSource=-1;[SerializeField] BagSlot held;int inspected;int sellQuantity=1;int lastItem=int.MinValue;TMP_Text sellLabel;
         readonly string[] tools={"Hạt lúa mì","Hạt cà chua","Hạt đậu nành","Thức ăn thú","Xẻng","Xô nước","Kiếm","Rìu","Giỏ hái","Xẻng cũ","Xẻng cũ","Cung gỗ"};
         void Awake(){Instance=this;Defaults();}
@@ -39,35 +39,40 @@ namespace NongTrai
             inventory=source;
             foreach(Transform child in inventory.Panel.transform)child.gameObject.SetActive(false);
             var parent=inventory.Panel.transform;
-            FarmUi.TmpLabel(parent,"TÚI ĐỒ • 27 Ô + HOTBAR 9 Ô",new Vector2(30,-20),new Vector2(1300,52),30);
-            FarmUi.TmpLabel(parent,"Kéo-thả để đổi ô • Shift + click: đưa xuống hotbar • Chuột phải bắt đầu kéo: tách nửa",new Vector2(30,-80),new Vector2(1310,50),21);
-            FarmUi.TmpLabel(parent,"THANH NHANH 1–9: kéo vật phẩm vào hàng ô viền vàng bên dưới để dùng ngoài màn hình",new Vector2(30,-120),new Vector2(1310,38),20);
+            FarmUi.TmpLabel(parent,"TÚI ĐỒ",new Vector2(30,-20),new Vector2(1050,48),32);
+            FarmUi.TmpLabel(parent,"Kéo-thả: đổi ô • Shift + click: chuyển nhanh • Kéo bằng chuột phải: tách nửa",new Vector2(30,-78),new Vector2(1320,30),20);
+            FarmUi.TmpLabel(parent,"KHO ĐỒ • 27 Ô",new Vector2(30,-118),new Vector2(1320,28),21);
+            FarmUi.TmpLabel(parent,"THANH NHANH • 9 Ô — Kéo đồ vào đây, nhấn phím 1–9 để dùng",new Vector2(30,-548),new Vector2(1320,30),21);
             for(int i=0;i<36;i++)
             {
-                int slot=i;int row=i<9?3:((i-9)/9),col=i%9;
-                var cell=FarmUi.Panel(parent,"Ô "+(i+1),new Vector2(139,139));var r=cell.GetComponent<RectTransform>();
-                r.anchorMin=r.anchorMax=r.pivot=new Vector2(0,1);r.anchoredPosition=new Vector2(30+col*146,-160-row*155);
+                int slot=i;int row=i<9?0:((i-9)/9),col=i%9;
+                var cell=FarmUi.Panel(parent,"Ô "+(i+1),new Vector2(139,120));var r=cell.GetComponent<RectTransform>();
+                r.anchorMin=r.anchorMax=r.pivot=new Vector2(0,1);r.anchoredPosition=new Vector2(30+col*146,i<9?-588:-154-row*130);
                 backgrounds[i]=cell.GetComponent<Image>();
-                var pic=new GameObject("Icon",typeof(RectTransform),typeof(Image));var pr=pic.GetComponent<RectTransform>();pr.SetParent(cell.transform,false);pr.anchorMin=pr.anchorMax=pr.pivot=new Vector2(.5f,1);pr.anchoredPosition=new Vector2(0,-8);pr.sizeDelta=new Vector2(48,48);
+                var pic=new GameObject("Icon",typeof(RectTransform),typeof(Image));var pr=pic.GetComponent<RectTransform>();pr.SetParent(cell.transform,false);pr.anchorMin=pr.anchorMax=pr.pivot=new Vector2(.5f,1);pr.anchoredPosition=new Vector2(0,-8);pr.sizeDelta=new Vector2(44,44);
                 pictures[i]=pic.GetComponent<Image>();pictures[i].preserveAspect=true;pictures[i].raycastTarget=false;
-                labels[i]=FarmUi.TmpLabel(cell.transform,"",new Vector2(5,-61),new Vector2(129,75),16);labels[i].alignment=TextAlignmentOptions.Center;
+                if(i<9)FarmUi.TmpLabel(cell.transform,(i+1).ToString(),new Vector2(7,-4),new Vector2(26,24),18);
+                labels[i]=FarmUi.TmpLabel(cell.transform,"",new Vector2(5,-56),new Vector2(129,40),17);labels[i].alignment=TextAlignmentOptions.Center;
+                labels[i].enableAutoSizing=true;labels[i].fontSizeMin=15;labels[i].fontSizeMax=17;
+                slotCounts[i]=FarmUi.TmpLabel(cell.transform,"",new Vector2(5,-98),new Vector2(129,20),16);slotCounts[i].alignment=TextAlignmentOptions.Center;
                 var link=cell.AddComponent<BagSlotDrag>();link.owner=this;link.index=slot;
             }
-            status=FarmUi.TmpLabel(parent,"",new Vector2(30,-790),new Vector2(780,48),21);
-            FarmUi.Button(parent,"−",new Vector2(835,-787),new Vector2(65,47),()=>ChangeSellQuantity(-1));
-            sellLabel=FarmUi.TmpLabel(parent,"Bán: 1",new Vector2(910,-790),new Vector2(205,45),20);
-            FarmUi.Button(parent,"+",new Vector2(1115,-787),new Vector2(65,47),()=>ChangeSellQuantity(1));
-            FarmUi.Button(parent,"Hết",new Vector2(1185,-787),new Vector2(95,47),()=>ChangeSellQuantity(int.MaxValue));
-            FarmUi.Button(parent,"Tiếp tục",new Vector2(30,-870),new Vector2(225,54),inventory.hud.Resume);
-            FarmUi.Button(parent,"Cửa hàng",new Vector2(265,-870),new Vector2(225,54),inventory.shop.Open);
-            FarmUi.Button(parent,"Bán số lượng",new Vector2(500,-870),new Vector2(225,54),()=>SellInspected());
-            FarmUi.Button(parent,"Sửa dụng cụ: 20 xu",new Vector2(735,-870),new Vector2(310,54),Repair);
-            FarmUi.Button(parent,"Xây dựng",new Vector2(1055,-870),new Vector2(225,54),()=>{inventory.hud.Resume();FarmBuildingSystem.Instance.Toggle();});
-            FarmUi.Button(parent,"BÁN TẤT CẢ ĐỒ TRONG TÚI",new Vector2(760,-730),new Vector2(520,45),()=>SellEverything());
-            FarmUi.Button(parent,"Bỏ vật phẩm đã chọn",new Vector2(30,-730),new Vector2(350,45),()=>DiscardInspected());
-            FarmUi.Button(parent,"Chuyển nhanh",new Vector2(30,-680),new Vector2(200,45),()=>QuickMove(inspected));
-            FarmUi.Button(parent,"Tách nửa",new Vector2(245,-680),new Vector2(180,45),()=>BeginDrag(inspected,true));
-            dragLabel=FarmUi.TmpLabel(parent,"",new Vector2(395,-730),new Vector2(350,45),22);
+            // Keep information and actions entirely below the last inventory row.
+            status=FarmUi.TmpLabel(parent,"Chọn một ô để xem thông tin vật phẩm.",new Vector2(30,-724),new Vector2(780,48),20);
+            dragLabel=FarmUi.TmpLabel(parent,"",new Vector2(830,-724),new Vector2(520,48),20);
+            FarmUi.Button(parent,"Chuyển nhanh",new Vector2(30,-788),new Vector2(180,48),()=>QuickMove(inspected));
+            FarmUi.Button(parent,"Tách nửa",new Vector2(220,-788),new Vector2(150,48),()=>BeginDrag(inspected,true));
+            FarmUi.Button(parent,"Bỏ vật phẩm đã chọn",new Vector2(380,-788),new Vector2(250,48),()=>DiscardInspected());
+            FarmUi.Button(parent,"Sửa dụng cụ: 20 xu",new Vector2(640,-788),new Vector2(275,48),Repair);
+            FarmUi.Button(parent,"BÁN TẤT CẢ ĐỒ TRONG TÚI",new Vector2(925,-788),new Vector2(425,48),()=>SellEverything());
+            FarmUi.Button(parent,"Tiếp tục",new Vector2(30,-868),new Vector2(180,54),inventory.hud.Resume);
+            FarmUi.Button(parent,"Cửa hàng",new Vector2(220,-868),new Vector2(180,54),inventory.shop.Open);
+            FarmUi.Button(parent,"Xây dựng",new Vector2(410,-868),new Vector2(180,54),()=>{inventory.hud.Resume();FarmBuildingSystem.Instance.Toggle();});
+            FarmUi.Button(parent,"−",new Vector2(640,-868),new Vector2(55,54),()=>ChangeSellQuantity(-1));
+            sellLabel=FarmUi.TmpLabel(parent,"Bán: 1",new Vector2(705,-868),new Vector2(155,54),20);sellLabel.alignment=TextAlignmentOptions.Midline;
+            FarmUi.Button(parent,"+",new Vector2(870,-868),new Vector2(55,54),()=>ChangeSellQuantity(1));
+            FarmUi.Button(parent,"Hết",new Vector2(935,-868),new Vector2(85,54),()=>ChangeSellQuantity(int.MaxValue));
+            FarmUi.Button(parent,"Bán số lượng đã chọn",new Vector2(1030,-868),new Vector2(320,54),()=>SellInspected());
             var ghost=new GameObject("Vật phẩm đang kéo",typeof(RectTransform),typeof(Image));ghost.transform.SetParent(parent,false);dragGhost=ghost.GetComponent<Image>();dragGhost.raycastTarget=false;dragGhost.rectTransform.sizeDelta=new Vector2(64,64);dragGhost.gameObject.SetActive(false);
             Sync();RefreshView();
         }
@@ -211,7 +216,7 @@ namespace NongTrai
         {
             if(pictures[0]==null)return;
             {
-                for(int i=0;i<36;i++){var s=Slots[i];pictures[i].enabled=s.count>0;if(s.count>0)pictures[i].sprite=FarmItemIconLibrary.Get(Icon(s.item));labels[i].text=(i<9?"["+(i+1)+"] ":"")+Name(s.item)+(s.count>0?"\n"+CountText(i):"");backgrounds[i].color=i==Selected?new Color(.67f,.47f,.14f):i<9?new Color(.34f,.42f,.20f):new Color(.14f,.26f,.21f);}
+                for(int i=0;i<36;i++){var s=Slots[i];pictures[i].enabled=s.count>0;if(s.count>0)pictures[i].sprite=FarmItemIconLibrary.Get(Icon(s.item));labels[i].text=Name(s.item);slotCounts[i].text=s.count>0?CountText(i):"";backgrounds[i].color=i==Selected?new Color(.67f,.47f,.14f):i<9?new Color(.34f,.42f,.20f):new Color(.14f,.26f,.21f);}
                 dragLabel.text=held==null?"Độ no: "+Mathf.RoundToInt(Satiety)+"%":"Đang kéo: "+Name(held.item)+" ×"+held.count;
                 if(sellLabel!=null)sellLabel.text="Bán: "+Mathf.Min(sellQuantity,Mathf.Max(1,Slots[inspected].count));
             }

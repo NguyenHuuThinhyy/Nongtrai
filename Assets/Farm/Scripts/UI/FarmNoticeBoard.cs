@@ -109,7 +109,7 @@ namespace NongTrai
         static void DrawFarmGeometry(Transform parent,RectTransform map)
         {
             MapShape(parent,map,"Nhà hàng 3 tầng",RestaurantWorld.Center,48,40,new Color(.76f,.48f,.25f,.95f));
-            MapShape(parent,map,"Khu vườn LV3",new Vector3(68,0,0),29,75,new Color(.52f,.68f,.35f,.8f));
+            MapShape(parent,map,"Khu vườn LV1",new Vector3(68,0,0),29,75,new Color(.52f,.68f,.35f,.8f));
             MapShape(parent,map,"Hồ sâu 1 khối",new Vector3(32,0,-15),13,20,new Color(.23f,.65f,.79f,.9f));
             MapShape(parent,map,"Nhà ở",new Vector3(0,0,28),12,11,new Color(.57f,.29f,.21f,.95f));
             MapShape(parent,map,"Sân trước",new Vector3(0,0,17),17,12,new Color(.80f,.69f,.45f,.8f));
@@ -149,7 +149,7 @@ namespace NongTrai
                 Landmark(taskPins,bigMap,"BÀN",new Vector3(-4,0,28),new Color(.6f,.39f,.21f),false,center);
                 var pond=FindFirstObjectByType<WaterSource>();if(pond!=null)Landmark(taskPins,bigMap,"HỒ",pond.transform.position,new Color(.2f,.7f,1),false,center);
                 var store=FindFirstObjectByType<FarmStorage>();if(store!=null)Landmark(taskPins,bigMap,"KHO",store.WarehousePosition,new Color(.83f,.65f,.4f),false,center);
-                Landmark(taskPins,bigMap,"VƯỜN LV3",new Vector3(67,0,0),new Color(.55f,.9f,.35f),false,center);
+                Landmark(taskPins,bigMap,"VƯỜN LV1",new Vector3(67,0,0),new Color(.55f,.9f,.35f),false,center);
                 CollectFarmTasks();
             }
             else

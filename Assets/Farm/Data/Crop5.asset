@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Crop5
   m_EditorClassIdentifier: Assembly-CSharp::NongTrai.CropDefinition
   displayName: "H\u01B0\u1EDBng d\u01B0\u01A1ng"
-  growthSeconds: 720
+  growthSeconds: 360
   yield: 1
   fruitColor: {r: 1, g: 0.8, b: 0.13, a: 1}
   stageVisuals: []

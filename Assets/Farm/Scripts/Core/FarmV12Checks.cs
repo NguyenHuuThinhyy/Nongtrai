@@ -39,10 +39,11 @@ namespace NongTrai
                 if(!storage.Transfer(38,2,false)||inventory.MutatedCrops[1]<2)
                     throw new Exception("Mutated crop warehouse withdrawal lost its source crop");
                 inventory.hud.Resume();int money=save.shop.Money;
-                if(inventory.Sell(38,2)!=108||save.shop.Money!=money+108)
-                    throw new Exception("Mutated tomato did not sell for three times 18 xu");
+                int mutantValue=2*inventory.Price(1)*3;
+                if(inventory.Sell(38,2)!=mutantValue||save.shop.Money!=money+mutantValue)
+                    throw new Exception("Mutated tomato did not sell for three times its base price");
 
-                save.expansion.Restore(3,0,clock.Day,.25f,save.expansion.ToolTiers,
+                save.expansion.Restore(FarmCropBalance.ForField(3).level,0,clock.Day,.25f,save.expansion.ToolTiers,
                     new[]{true,true,true,false},99);
                 clock.Restore(clock.Day,.25f,FarmWeather.Rain,120);
                 var extraPlot=Array.Find(UnityEngine.Object.FindObjectsByType<FarmPlot>(FindObjectsSortMode.None),x=>x.id==1);
@@ -53,8 +54,8 @@ namespace NongTrai
                     throw new Exception("Extra LV crop did not consume its hotbar seed");
                 inventory.Add(27,1);
                 if(!FruitTree.TryPlantAt(new Vector3(78,0,30),save.shop,inventory,out var reason))
-                    throw new Exception("LV3 orchard seed should not need land region 4: "+reason);
-                save.expansion.Restore(4,0,clock.Day,.25f,save.expansion.ToolTiers,
+                    throw new Exception("Unlocked orchard seed should not need land region 4: "+reason);
+                save.expansion.Restore(FarmCropBalance.ForTree(1).level,0,clock.Day,.25f,save.expansion.ToolTiers,
                     new[]{true,true,true,false},99);
                 inventory.Add(49,1);
                 if(!FruitTree.TryPlantAt(new Vector3(68,0,20),save.shop,inventory,out reason,49))
@@ -164,7 +165,7 @@ namespace NongTrai
                 var fox=DayPredator.Create(player.transform.position+Vector3.forward*3,wolves,false);
                 if(!fox.HasHealthBar||fox.Health<50)throw new Exception("Daytime fox health bar missing");
                 UnityEngine.Object.Destroy(fox.gameObject);
-                Debug.Log("FARM_V15_OK: timed pump stock, three carried cans, LV3 orchard, sprinkler, quest, feed, migration and respawn.");
+                Debug.Log("FARM_V15_OK: timed pump stock, three carried cans, LV1 orchard, sprinkler, quest, feed, migration and respawn.");
             }
             finally
             {

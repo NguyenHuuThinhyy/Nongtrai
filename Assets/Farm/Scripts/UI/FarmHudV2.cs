@@ -149,6 +149,8 @@ namespace NongTrai
             string action;
             if(bag.Item==105)action="Chuột trái: múc khi xô rỗng / đặt nước khi xô đầy";
             else if(bag.Item==111)action="Giữ chuột trái để kéo cung; thả để bắn";
+            else if(farm&&FarmCropBalance.ForProduct(bag.Item)!=null)
+                action=FarmCropBalance.TreePlantKind(bag.Item)>=0?"Chuột phải đất vườn: trồng lại • tốn 1 quả":"Chuột phải ô đã xới: trồng lại • tốn 1 nông sản";
             else if(FarmControls.Mobile&&AdventureBag.IsEdible(bag.Item))action="Giữ Dùng / Ăn 3 giây";
             else if(bag.HoldingBlock)action="Chuột trái: đặt khối cạnh mặt đang ngắm";
             else if(farm&&bag.Item>=40&&bag.Item<=42)action="Chuột trái: gieo trên ô đã xới";

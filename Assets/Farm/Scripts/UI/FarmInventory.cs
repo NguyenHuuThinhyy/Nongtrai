@@ -14,11 +14,11 @@ namespace NongTrai
         public const int ItemCount=FarmItemCatalog.Capacity;
         public int[] AnimalProducts { get; private set; } = new int[ItemCount-4];
         public int[] MutatedCrops { get; private set; } = new int[7];
-        static readonly int[] mutantBasePrices={8,18,32,15,55,90,130};
+        static readonly int[] mutantBaseItems={0,1,2,3,43,44,45};
         public GameObject Panel { get; private set; }
         readonly string[] itemNames = { "Lúa mì", "Cà chua", "Đậu nành", "Táo", "Trứng", "Sữa", "Lông cừu", "Thịt heo sống", "Bột mì", "Bánh mì", "Phô mai", "Nước táo", "Gỗ cũ", "Quặng", "Ván", "Kim loại", "Bó nông sản", "Gói đậu", "Giỏ táo", "Đèn thủ công", "Khối gỗ", "Khối đá", "Khối gạch", "Khối kính", "Khối kim loại", "Khối cỏ", "Bàn chế tạo", "Hạt cây táo", "Bậc gỗ", "Đuốc", "Hàng rào", "Ván cầu", "Bánh táo", "Mứt cà chua", "Cám dinh dưỡng", "Phân bón", "Rương đồ", "Đống lửa", "Nông sản đột biến", "Thịt heo nướng", "Hạt bí ngô", "Hạt dâu ruộng", "Hạt hướng dương", "Bí ngô", "Dâu ruộng", "Hướng dương", "Lê", "Đào", "Việt quất", "Hạt lê", "Hạt đào", "Hạt bụi việt quất", "Thức ăn gà", "Thức ăn bò", "Thức ăn cừu", "Thức ăn heo", "Vòi phun di động", "Thịt bò sống", "Thịt cừu sống", "Thịt gà sống", "Thịt bò nướng", "Thịt cừu nướng", "Thịt gà nướng", "Mũi tên", "Bình nước dự trữ", "Bàn rèn", "Than", "Bình máu", "Đá nâng cấp", "TNT", "Cổng hồi sinh", "Xô cũ (tự chuyển đổi)", "Bọt biển khô", "Bọt biển đầy", "Hạt bí pha lê", "Hạt dâu hoàng kim", "Bí pha lê", "Dâu hoàng kim" };
         readonly int[] unitPrices = { 8,18,32,15,8,20,25,30,22,65,65,35,12,18,34,50,45,55,95,165,18,14,24,35,55,16,90,12,35,55,26,45,65,48,40,25,95,85,24,65,20,30,45,55,90,130,50,75,45,45,65,40,28,38,42,48,350,45,38,25,95,85,60,3,28,220,20,80,120,150,450,12,35,8,150,220,240,360 };
-        public int Price(int item) => item>=0 && item<unitPrices.Length?unitPrices[item]:FarmItemCatalog.Price(item);
+        public int Price(int item) => FarmCropBalance.ForProduct(item)?.price??(item>=0 && item<unitPrices.Length?unitPrices[item]:FarmItemCatalog.Price(item));
         public string Name(int item) => item>=0 && item<itemNames.Length?itemNames[item]:FarmItemCatalog.Name(item);
         TMP_Text[] amounts;
         TMP_Text status;
@@ -129,7 +129,7 @@ namespace NongTrai
             {
                 int left=sold;
                 for(int crop=0;crop<7&&left>0;crop++)
-                {int n=Mathf.Min(left,MutatedCrops[crop]);MutatedCrops[crop]-=n;left-=n;earned+=n*mutantBasePrices[crop]*3;}
+                {int n=Mathf.Min(left,MutatedCrops[crop]);MutatedCrops[crop]-=n;left-=n;earned+=n*Price(mutantBaseItems[crop])*3;}
                 earned+=left*unitPrices[38];
             }
             if(item<3) field.Harvested[item]-=sold;
@@ -157,7 +157,7 @@ namespace NongTrai
         void Refresh()
         {
             if(amounts==null) return;
-            for(int i=0;i<amounts.Length;i++) if(amounts[i]!=null) amounts[i].text="Có "+Count(i)+" • "+(i==38?"giá gốc ×3":unitPrices[i]+" xu");
+            for(int i=0;i<amounts.Length;i++) if(amounts[i]!=null) amounts[i].text="Có "+Count(i)+" • "+(i==38?"giá gốc ×3":Price(i)+" xu");
         }
         public void Tooltip(int item)
         { if(status!=null) status.text=item<0?"Di chuột lên vật phẩm để xem mô tả; bán từng loại ở dưới.":

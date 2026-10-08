@@ -15,7 +15,7 @@ namespace NongTrai
         readonly string[] steps={
             "WASD đi, chuột nhìn quanh, Space nhảy. Giữ Alt để bấm nút trên màn hình; thả Alt để nhìn quanh. E mở bản đồ việc; Esc mở menu.",
             "B mở túi. Kéo vật phẩm vào 9 ô dưới cùng; bấm 1–9 hoặc lăn chuột để đổi nhanh. Tên món đang cầm hiện ở đáy màn hình.",
-            "Chọn ô 5 Xẻng rồi ngắm ô đất, bấm chuột trái. Chọn hạt trong hotbar để gieo; cây chín chỉ cần click trái để hái. Hạt cây ăn quả trồng ở vườn từ LV3 bằng chuột phải.",
+            "Chọn ô 5 Xẻng rồi ngắm ô đất, bấm chuột trái. Chọn hạt trong hotbar để gieo; cây chín chỉ cần click trái để hái. Hạt cây hoặc quả trồng ở vườn từ LV1 bằng chuột phải.",
             "Chọn ô 6 Xô nước: chuột trái vào mặt hồ khi rỗng để múc, chuột trái vào đất khi đầy để đặt nước. Thuê vòi tự tưới tại máy bơm: 3/ngày, LV3/5/7 mở thêm. Bọt biển ở shop hút nước quanh 1 ô rồi đầy.",
             "Ngắm bàn gỗ trước nhà và bấm trái để chế tạo. Ngắm hộp thư đỏ để xem 5 đơn; giao đủ hàng sẽ nhận xu và XP.",
             "Tab mở bản đồ, chọn Khám phá. Giữ trái để đào; chọn khối trong hotbar rồi trái để đặt. Mở túi B và chọn Xây dựng để xem các khối.",
@@ -23,7 +23,7 @@ namespace NongTrai
         readonly string[] touchSteps={
             "Kéo joystick bên trái để đi, vuốt vùng bên phải để nhìn. Giữ Chạy hoặc Nhảy. Dấu + là điểm ngắm; Menu mở các thao tác khác.",
             "Chạm Túi, kéo đồ vào 9 ô dưới cùng rồi chạm ô để chọn. Tách nửa và Chuyển nhanh có nút riêng trong túi.",
-            "Chọn Cuốc, ngắm đất và chạm Dùng để cày. Chọn hạt rồi Dùng để gieo; cây chín dùng tay hái. Tương tác vào đất vườn để trồng cây ăn quả từ LV3.",
+            "Chọn Cuốc, ngắm đất và chạm Dùng để cày. Chọn hạt rồi Dùng để gieo; cây chín dùng tay hái. Tương tác vào đất vườn để trồng cây ăn quả từ LV1.",
             "Chọn Xô: Múc/Đặt lấy nước khi rỗng, đặt nước khi đầy. Thuê vòi ở máy bơm; LV3/5/7 mở thêm lượt. Bọt biển trong shop hút nước quanh một ô.",
             "Ngắm bàn chế tạo hoặc hộp thư và chạm Dùng/Tương tác. Menu có Chế biến; giao đủ đơn nhận xu và XP.",
             "Chạm Bản đồ → Khám phá. Giữ Dùng để đào, chọn khối rồi Dùng để đặt; Xoay đổi hướng. Nhìn xuống, nhảy để đặt khối dưới chân.",
