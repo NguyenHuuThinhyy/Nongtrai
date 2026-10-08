@@ -34,6 +34,7 @@ namespace NongTrai
             foreach(var mailbox in UnityEngine.Object.FindObjectsByType<DeliveryMailbox>(FindObjectsSortMode.None))
                 if(mailbox.GetComponent<FarmRedesignMarker>()==null||mailbox.GetComponentInChildren<FarmRedesignModel>()==null)throw new Exception("Delivery mailbox visual missing");
             var savedPosition=player.transform.position;
+            CheckHomeAccess(GameObject.Find("Nhà ở - vào cửa trước để ngủ").transform,player.GetComponent<CharacterController>());
             player.Teleport(new Vector3(-4,.4f,24));Physics.SyncTransforms();
             if(!hud.interaction.TryLeftInteractRay(new Ray(new Vector3(-4,1.6f,24),new Vector3(0,-.6f,4).normalized))||!FarmCraftOrders.Instance.CraftPanel.activeSelf)
                 throw new Exception("Redesigned crafting table no longer opens its menu");
@@ -90,6 +91,35 @@ namespace NongTrai
             Capture(camera,folder,"10-pond-edge",new Vector3(23.5f,2.1f,-26),new Vector3(31,.1f,-17));
             UnityEngine.Object.Destroy(cameraObject);
             Debug.Log("FARM_REDESIGN_CHECKS_OK models="+prefabs.Length+" colliders="+after+" screenshots="+folder);
+        }
+        public static void CheckHomeAccess(Transform home,CharacterController body)
+        {
+            var original=body.transform.position;bool enabled=body.enabled;float stepOffset=body.stepOffset;
+            try
+            {
+                body.enabled=false;body.transform.position=home.TransformPoint(new Vector3(0,.3f,-6.8f));body.enabled=true;Physics.SyncTransforms();
+                void Walk(Vector3 local)
+                {
+                    var target=home.TransformPoint(local);int steps=0;
+                    while(Vector2.Distance(new Vector2(body.transform.position.x,body.transform.position.z),new Vector2(target.x,target.z))>.12f&&steps++<200)
+                    {
+                        // Match FarmPlayer's grounded stepping while its Update is paused for the check.
+                        body.stepOffset=body.isGrounded?.3f:0;
+                        var delta=target-body.transform.position;delta.y=0;body.Move(Vector3.ClampMagnitude(delta,.065f)+Vector3.down*.025f);
+                    }
+                    if(steps>=200)throw new Exception("Home route blocked near "+body.transform.position+" towards "+target);
+                }
+                Walk(new Vector3(0,0,-2));Walk(new Vector3(-2.8f,0,-.5f));
+                var bed=home.GetComponentInChildren<FarmBed>();var eye=body.transform.position+Vector3.up*1.4f;
+                var target=bed.GetComponent<Collider>().bounds.center;
+                if(!Physics.Raycast(eye,(target-eye).normalized,out var hit,4,~0,QueryTriggerInteraction.Ignore)||hit.collider.GetComponentInParent<FarmBed>()!=bed)
+                    throw new Exception("Bed cannot be selected from inside the house");
+                Walk(new Vector3(0,0,-2));Walk(new Vector3(0,0,-6.8f));
+                if(!Physics.Linecast(home.TransformPoint(new Vector3(4.6f,1,0)),home.TransformPoint(new Vector3(6.1f,1,0))))
+                    throw new Exception("House side wall has no collision");
+                Debug.Log("FARM_HOME_ACCESS_OK: entered house, reached/selectable bed, exited, solid side walls.");
+            }
+            finally{body.enabled=false;body.transform.position=original;body.stepOffset=stepOffset;body.enabled=enabled;Physics.SyncTransforms();}
         }
         static void Capture(Camera camera,string folder,string name,Vector3 position,Vector3 target)
         {
