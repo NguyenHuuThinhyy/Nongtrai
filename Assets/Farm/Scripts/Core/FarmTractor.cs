@@ -126,7 +126,15 @@ namespace NongTrai
             sign.alignment=TextAlignmentOptions.Center;sign.rectTransform.sizeDelta=new Vector2(18,4);sign.transform.localScale=Vector3.one*.28f;
             engine=gameObject.AddComponent<AudioSource>();engine.playOnAwake=false;engine.loop=true;engine.spatialBlend=.25f;
             const int rate=22050;var samples=new float[rate];
-            for(int i=0;i<rate;i++){float t=i/(float)rate;samples[i]=(.5f*Mathf.Sin(t*48*Mathf.PI*2)+.24f*Mathf.Sin(t*96*Mathf.PI*2)+.12f*Mathf.Sin(t*144*Mathf.PI*2))*(.8f+.2f*Mathf.Sin(t*12*Mathf.PI*2));}
+            for(int i=0;i<rate;i++)
+            {
+                float t=i/(float)rate;
+                float rev=.82f+.18f*Mathf.Sin(t*10*Mathf.PI*2);
+                float rumble=.42f*Mathf.Sin(t*42*Mathf.PI*2)+.25f*Mathf.Sin(t*84*Mathf.PI*2)
+                    +.16f*Mathf.Sin(t*126*Mathf.PI*2)+.09f*Mathf.Sin(t*168*Mathf.PI*2);
+                float rattle=.035f*Mathf.Sin(t*333*Mathf.PI*2)+.025f*Mathf.Sin(t*517*Mathf.PI*2);
+                samples[i]=(rumble*rev+rattle)*.82f;
+            }
             engineClip=AudioClip.Create("Động cơ máy cày",rate,1,rate,false);engineClip.SetData(samples,0);engine.clip=engineClip;
         }
         Material Mat(Color color){var m=new Material(Shader.Find("Universal Render Pipeline/Lit"));m.color=color;materials.Add(m);return m;}
@@ -178,7 +186,7 @@ namespace NongTrai
             while(remaining>0)
             {
                 float dt=Mathf.Min(remaining,.025f);remaining-=dt;
-                speed=Mathf.MoveTowards(speed,driver.Input.JumpHeld?0:axes.y*(axes.y<0?2.8f:5.5f),(driver.Input.JumpHeld?16:5)*dt);
+                speed=Mathf.MoveTowards(speed,driver.Input.JumpHeld?0:axes.y*(axes.y<0?6.4f:12.4f),(driver.Input.JumpHeld?16:11f)*dt);
                 var rotation=transform.rotation*Quaternion.Euler(0,axes.x*65*dt*Mathf.Clamp(speed/2,-1,1),0);
                 if(!Blocked(transform.position,rotation))transform.rotation=rotation;
                 var delta=transform.forward*speed*dt;
@@ -188,7 +196,9 @@ namespace NongTrai
                 {
                     foreach(var wheel in wheels)wheel.Rotate(Vector3.up,speed*dt*90,Space.Self);
                     foreach(var plot in plots){if(plot==null)continue;var local=transform.InverseTransformPoint(plot.transform.position);
-                        if(Mathf.Abs(local.x)<1.2f&&local.z<.9f&&local.z>-2.7f&&Mathf.Abs(local.y)<.65f)plot.TillWithTractor();}
+                        // Farm cells are spaced 2.8 units apart. Offset the 11.2-unit plow strip
+                        // by half a cell so it covers exactly four columns from the parking lane.
+                        if(Mathf.Abs(local.x-4.2f)<5.6f&&local.z<.9f&&local.z>-2.7f&&Mathf.Abs(local.y)<.65f)plot.TillWithTractor();}
                 }
             }
             SyncDriver();
@@ -221,7 +231,7 @@ namespace NongTrai
         void LateUpdate()
         {
             if(engine!=null)
-            {bool running=IsDriving&&!driver.Paused;engine.volume=running?.22f*(FarmAudio.Instance==null?.65f:FarmAudio.Instance.EffectsVolume):0;
+            {bool running=IsDriving&&!driver.Paused;engine.volume=running?.5f*(FarmAudio.Instance==null?.65f:FarmAudio.Instance.EffectsVolume):0;
                 engine.pitch=.8f+Mathf.Abs(speed)*.075f;if(running&&!engine.isPlaying)engine.Play();else if(!running&&engine.isPlaying)engine.Stop();}
             if(sign==null||hud==null)return;
             bool visible=!IsDriving&&!hud.player.Paused&&Vector3.Distance(hud.player.transform.position,transform.position)<9;

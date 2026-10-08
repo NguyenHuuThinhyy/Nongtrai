@@ -4,7 +4,7 @@ namespace NongTrai
 {
     public sealed class FarmAudio : MonoBehaviour
     {
-        public enum Cue { Hoe, Water, Harvest, Buy, Sell, Level, GolemImpact, FishBite }
+        public enum Cue { Hoe, Water, Harvest, Buy, Sell, Level, GolemImpact, FishBite, RunnerCoin }
         public static FarmAudio Instance { get; private set; }
         public float MusicVolume { get; private set; } = .28f;
         public float EffectsVolume { get; private set; } = .65f;
@@ -15,10 +15,11 @@ namespace NongTrai
             Instance=this;
             music=gameObject.AddComponent<AudioSource>();music.loop=true;music.playOnAwake=false;
             effects=gameObject.AddComponent<AudioSource>();effects.playOnAwake=false;
-            clips=new AudioClip[8];
+            clips=new AudioClip[9];
             for(int i=0;i<clips.Length;i++) clips[i]=Tone("Farm "+(Cue)i,220+i*90,.14f+i*.025f,i==1);
             clips[(int)Cue.GolemImpact]=GolemImpact();
             clips[(int)Cue.FishBite]=FishBiteSound();
+            clips[(int)Cue.RunnerCoin]=RunnerCoinSound();
             music.clip=Background();music.volume=MusicVolume;music.Play();
             effects.volume=EffectsVolume;
         }
@@ -94,6 +95,22 @@ namespace NongTrai
                 samples[i]=Mathf.Clamp(sound*.8f,-1,1);
             }
             var clip=AudioClip.Create("Cá cắn câu • tõm",length,1,rate,false);clip.SetData(samples,0);return clip;
+        }
+        static AudioClip RunnerCoinSound()
+        {
+            const int rate=22050;const float seconds=.24f;int length=Mathf.CeilToInt(rate*seconds);
+            var samples=new float[length];
+            for(int i=0;i<length;i++)
+            {
+                float t=i/(float)rate;
+                float envelope=Mathf.Exp(-t*17f)*(1-Mathf.Exp(-t*420f));
+                float fundamental=2*Mathf.PI*(1320*t-360*t*t);
+                float shimmer=2*Mathf.PI*(1980*t-520*t*t);
+                float ping=Mathf.Sin(fundamental)+.42f*Mathf.Sin(shimmer)+.16f*Mathf.Sin(2*Mathf.PI*2640*t);
+                float click=Mathf.Exp(-t*95f)*Mathf.Sin(2*Mathf.PI*3600*t);
+                samples[i]=Mathf.Clamp((ping*envelope+click*.2f)*.34f,-1,1);
+            }
+            var clip=AudioClip.Create("Farm Runner • xu leng keng",length,1,rate,false);clip.SetData(samples,0);return clip;
         }
     }
 }

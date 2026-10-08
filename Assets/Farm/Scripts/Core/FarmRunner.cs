@@ -37,7 +37,7 @@ namespace NongTrai
         string lastResult="Mốc 1 km: đá nâng cấp • 2 km: TNT • mỗi km thêm xu và quà.";
         sealed class Segment {public Transform root;public int index;public List<Obstacle> obstacles=new List<Obstacle>();public List<Coin> coins=new List<Coin>();}
         sealed class Obstacle {public Transform root;public GameObject[] forms;public int lane,kind;public float z;public bool passed,moving;}
-        sealed class Coin {public Transform root;public int lane;public float z,height;public bool taken,rare;}
+        sealed class Coin {public Transform root;public SpriteRenderer icon;public int lane;public float z,height;public bool taken,rare;}
         void Awake()=>Instance=this;
         void Start()
         {
@@ -89,6 +89,58 @@ namespace NongTrai
         GameObject Part(Transform parent,string name,Vector3 at,Vector3 size,Color color,PrimitiveType shape=PrimitiveType.Cube)
         {var go=GameObject.CreatePrimitive(shape);go.name=name;go.transform.SetParent(parent,false);go.transform.localPosition=at;go.transform.localScale=size;
          var collider=go.GetComponent<Collider>();collider.enabled=false;Destroy(collider);go.GetComponent<Renderer>().sharedMaterial=Mat(color);return go;}
+        GameObject RunnerAnimalPart(Transform parent,string name,Vector3 at,Vector3 size,Color color,PrimitiveType shape=PrimitiveType.Sphere,Vector3 rotation=default)
+        {var part=Part(parent,name,at,size,color,shape);part.transform.localEulerAngles=rotation;return part;}
+        void BuildRunnerAnimal(Transform root,int species)
+        {
+            bool boar=species==5,tiger=species==3;
+            var body=boar?new Color(.31f,.19f,.12f):tiger?new Color(.91f,.48f,.13f):new Color(.77f,.57f,.27f);
+            var dark=boar?new Color(.18f,.12f,.09f):new Color(.12f,.10f,.08f);
+            var cream=boar?new Color(.94f,.83f,.58f):new Color(.91f,.84f,.68f);
+            var leg=boar?new Color(.24f,.15f,.10f):body*.72f;
+            RunnerAnimalPart(root,"Thân thú",new Vector3(0,.79f,.08f),new Vector3(1.38f,.84f,1.92f),body);
+            RunnerAnimalPart(root,"Bụng sáng",new Vector3(0,.53f,-.05f),new Vector3(1.08f,.52f,1.5f),boar?body*1.18f:cream);
+            RunnerAnimalPart(root,"Ngực",new Vector3(0,.85f,-.62f),new Vector3(1.12f,.86f,.76f),body);
+            RunnerAnimalPart(root,"Đầu",new Vector3(0,1.12f,-.91f),boar?new Vector3(.88f,.78f,.88f):new Vector3(.78f,.72f,.78f),body);
+            if(boar)
+            {
+                RunnerAnimalPart(root,"Mõm heo rừng",new Vector3(0,.91f,-1.46f),new Vector3(.68f,.52f,.47f),new Color(.39f,.25f,.17f));
+                RunnerAnimalPart(root,"Mũi",new Vector3(0,.94f,-1.68f),new Vector3(.42f,.30f,.14f),new Color(.20f,.15f,.12f));
+                for(int side=-1;side<=1;side+=2)
+                {
+                    RunnerAnimalPart(root,"Ngà cong",new Vector3(side*.34f,.84f,-1.36f),new Vector3(.16f,.36f,.16f),cream,PrimitiveType.Capsule,new Vector3(0,0,-side*24));
+                    RunnerAnimalPart(root,"Tai",new Vector3(side*.43f,1.54f,-.76f),new Vector3(.27f,.42f,.17f),dark,PrimitiveType.Capsule,new Vector3(0,0,-side*32));
+                }
+                for(int i=0;i<5;i++)RunnerAnimalPart(root,"Bờm lông",new Vector3(0,1.28f,.45f-i*.25f),new Vector3(.18f,.32f,.20f),dark,PrimitiveType.Capsule,new Vector3(-12,0,0));
+            }
+            else
+            {
+                RunnerAnimalPart(root,"Mõm sáng",new Vector3(0,.91f,-1.42f),new Vector3(.58f,.36f,.43f),cream);
+                RunnerAnimalPart(root,"Mũi",new Vector3(0,1.02f,-1.64f),new Vector3(.24f,.16f,.11f),dark);
+                for(int side=-1;side<=1;side+=2)
+                    RunnerAnimalPart(root,"Tai tròn",new Vector3(side*.32f,1.59f,-.89f),new Vector3(.28f,.31f,.20f),body,PrimitiveType.Sphere,new Vector3(0,0,-side*18));
+            }
+            RunnerAnimalPart(root,"Đuôi",new Vector3(0,1.03f,.99f),new Vector3(.14f,.48f,.14f),body,PrimitiveType.Capsule,new Vector3(62,0,0));
+            for(int side=-1;side<=1;side+=2)
+            {
+                RunnerAnimalPart(root,"Mắt",new Vector3(side*.29f,1.27f,-1.39f),new Vector3(.105f,.12f,.075f),new Color(.98f,.84f,.48f));
+                RunnerAnimalPart(root,"Đồng tử",new Vector3(side*.29f,1.27f,-1.455f),new Vector3(.052f,.072f,.035f),dark);
+                for(int z=-1;z<=1;z+=2)
+                    RunnerAnimalPart(root,boar?"Chân guốc":"Chân thú",new Vector3(side*.43f,.39f,z*.56f),new Vector3(.28f,.64f,.32f),leg,PrimitiveType.Capsule,new Vector3(0,0,side*5));
+                if(tiger)
+                {
+                    for(int z=-1;z<=1;z++)
+                        RunnerAnimalPart(root,"Sọc hổ",new Vector3(side*.64f,.82f,z*.36f),new Vector3(.055f,.54f,.13f),dark,PrimitiveType.Cube,new Vector3(0,0,side*18));
+                }
+                else if(!boar)
+                    for(int z=-1;z<=1;z++)for(int row=0;row<2;row++)
+                    {
+                        float zz=z*.38f+(row==0?.15f:0);
+                        RunnerAnimalPart(root,"Đốm báo",new Vector3(side*.64f,.66f+row*.27f,zz),new Vector3(.075f,.10f,.12f),dark);
+                    }
+            }
+            if(tiger)for(int i=0;i<3;i++)RunnerAnimalPart(root,"Vằn đuôi",new Vector3(0,1.12f,1.12f+i*.14f),new Vector3(.16f,.075f,.07f),dark);
+        }
         void BuildWorld()
         {
             if(world!=null)return;runScene=SceneManager.CreateScene("Farm Runner Map");world=new GameObject("Farm Runner • map độc lập");world.SetActive(false);SceneManager.MoveGameObjectToScene(world,runScene);
@@ -128,17 +180,24 @@ namespace NongTrai
              Part(s.root,"Mái",new Vector3(side*17,3.3f,19),new Vector3(6.8f,.6f,6.8f),new Color(.60f,.28f,.20f));
              Part(s.root,"Cửa",new Vector3(side*17,1,15.95f),new Vector3(1.4f,2,.08f),new Color(.34f,.25f,.17f));}
             for(int i=0;i<6;i++)
-            {var o=new Obstacle{root=new GameObject("Chướng ngại").transform,forms=new GameObject[3]};o.root.SetParent(s.root,false);
+            {var o=new Obstacle{root=new GameObject("Chướng ngại").transform,forms=new GameObject[6]};o.root.SetParent(s.root,false);
              o.forms[0]=Part(o.root,"Kiện rơm • NHẢY",new Vector3(0,.45f,0),new Vector3(1.75f,.9f,1.2f),new Color(.91f,.70f,.27f));
              o.forms[1]=new GameObject("Cổng • TRƯỢT");o.forms[1].transform.SetParent(o.root,false);
              Part(o.forms[1].transform,"Xà ngang",new Vector3(0,1.65f,0),new Vector3(2.25f,1,1),new Color(.60f,.35f,.18f));
              for(int side=-1;side<=1;side+=2)Part(o.forms[1].transform,"Trụ cổng",new Vector3(side*1.08f,1.1f,0),new Vector3(.12f,2.2f,.3f),new Color(.60f,.35f,.18f));
-             o.forms[2]=Part(o.root,"Xe rơm • ĐỔI LÀN",new Vector3(0,1.5f,0),new Vector3(2,3,1.7f),new Color(.78f,.39f,.22f));s.obstacles.Add(o);}
+             o.forms[2]=Part(o.root,"Xe rơm • ĐỔI LÀN",new Vector3(0,1.5f,0),new Vector3(2,3,1.7f),new Color(.78f,.39f,.22f));
+             for(int animal=0;animal<3;animal++){o.forms[3+animal]=new GameObject(animal==0?"Hổ • ĐỔI LÀN":animal==1?"Báo • ĐỔI LÀN":"Heo rừng • ĐỔI LÀN");o.forms[3+animal].transform.SetParent(o.root,false);}
+             s.obstacles.Add(o);}
             foreach(var o in s.obstacles)
             {var hay=FarmRedesign.Add(o.forms[0].transform,"survival-kit/resource-wood",Vector3.down*.5f,1,.95f,.9f);if(hay!=null)o.forms[0].GetComponent<Renderer>().enabled=false;
              var cart=FarmRedesign.Add(o.forms[2].transform,"car-kit/tractor",Vector3.down*.5f,1.1f,1.7f,1.7f);if(cart!=null)o.forms[2].GetComponent<Renderer>().enabled=false;}
             for(int i=0;i<18;i++)
-            {var c=new Coin{root=Part(s.root,"Xu trên đường",Vector3.zero,new Vector3(.3f,.3f,.12f),new Color(1,.80f,.12f),PrimitiveType.Sphere).transform};s.coins.Add(c);}
+            {
+                var root=new GameObject("Xu vàng trên đường").transform;root.SetParent(s.root,false);
+                var visual=new GameObject("Biểu tượng xu",typeof(SpriteRenderer));visual.transform.SetParent(root,false);
+                var icon=visual.GetComponent<SpriteRenderer>();icon.sprite=FarmItemIconLibrary.Get(120);icon.color=Color.white;
+                s.coins.Add(new Coin{root=root,icon=icon});
+            }
             return s;
         }
         void Configure(Segment s,int index)
@@ -149,14 +208,15 @@ namespace NongTrai
             int safe=random.Next(3),firstSafe=safe;
             for(int i=0;i<s.obstacles.Count;i++)
             {if(i>0&&i%2==0)safe=(safe+1+random.Next(2))%3;
-             var o=s.obstacles[i];o.root.gameObject.SetActive(i<count);o.passed=false;o.kind=index*40<200?(random.Next(2)==0?0:2):random.Next(3);o.lane=i%2==0?(safe+1)%3:(safe+2)%3;
+             var o=s.obstacles[i];o.root.gameObject.SetActive(i<count);o.passed=false;o.kind=index*40<200?(random.Next(2)==0?0:2):random.Next(6);o.lane=i%2==0?(safe+1)%3:(safe+2)%3;
              o.moving=index*40>=500&&o.kind==2&&index%3==1;
              float localZ=index==0?30:count<=2?18:count<=4?10+(i/2)*20:9+(i/2)*12;o.z=index*40+localZ;o.root.localPosition=new Vector3((o.lane-1)*LaneWidth,0,localZ);
-             for(int j=0;j<3;j++)o.forms[j].SetActive(j==o.kind);}
+             if(o.kind>=3&&o.forms[o.kind].transform.childCount==0)BuildRunnerAnimal(o.forms[o.kind].transform,o.kind);
+             for(int j=0;j<o.forms.Length;j++)o.forms[j].SetActive(j==o.kind);}
             for(int i=0;i<s.coins.Count;i++)
             {var c=s.coins[i];c.taken=false;c.rare=index>0&&index%7==0&&i==9;c.lane=i<9?firstSafe:(firstSafe+1)%3;c.z=index*40+3+i*1.9f;
              c.height=i>=9?1+Mathf.Sin((i-9)/8f*Mathf.PI)*1.5f:1;c.root.localPosition=new Vector3((c.lane-1)*LaneWidth,c.height,c.z-index*40);
-             c.root.localScale=Vector3.one*(c.rare?.55f:.3f);c.root.GetComponent<Renderer>().sharedMaterial=Mat(c.rare?new Color(1,.39f,.09f):new Color(1,.80f,.12f));c.root.gameObject.SetActive(true);}
+             c.root.localScale=Vector3.one*(c.rare?.62f:.48f);c.icon.color=Color.white;c.root.gameObject.SetActive(true);}
         }
         public void ChangeLane(int direction){Lane=Mathf.Clamp(Lane+direction,0,2);}
         public void Jump(){jumpBuffer=.15f;}
@@ -194,10 +254,10 @@ namespace NongTrai
                 {var p=o.root.localPosition;float side=o.lane==0?-1:1;p.x=Mathf.Lerp(side*6,(o.lane-1)*LaneWidth,Mathf.Clamp01((Distance-(o.z-48))/22));o.root.localPosition=p;}
                 foreach(var o in s.obstacles)if(o.root.gameObject.activeSelf&&!o.passed&&Distance>=o.z-.7f&&previous<=o.z+.7f)
                 {bool sameLane=Mathf.Abs(x-(o.lane-1)*LaneWidth)<1.05f;
-                 if(sameLane&&(o.kind==2||o.kind==0&&y<1.0f||o.kind==1&&!Sliding)){Finish();return;}
+                 if(sameLane&&(o.kind>=3||o.kind==2||(o.kind==0&&y<1.0f)||(o.kind==1&&!Sliding))){Finish();return;}
                  if(Distance>o.z+.7f)o.passed=true;}
                 foreach(var c in s.coins)if(!c.taken&&Mathf.Abs(Distance-c.z)<1&&Mathf.Abs(x-(c.lane-1)*LaneWidth)<.8f&&Mathf.Abs(y+1-c.height)<1.2f)
-                {c.taken=true;c.root.gameObject.SetActive(false);if(c.rare)rare++;else coins++;}
+                {c.taken=true;c.root.gameObject.SetActive(false);if(c.rare)rare++;else coins++;FarmAudio.Instance?.Play(FarmAudio.Cue.RunnerCoin);}
                 if(s.index*40+40<Distance-20)Configure(s,nextSegment++);
             }
             int km=Mathf.FloorToInt(Distance/1000);if(km>milestones)milestones=km;

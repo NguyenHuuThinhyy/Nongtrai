@@ -78,10 +78,20 @@ namespace NongTrai
             var hungerBack=CreatePanel(survival.transform,"Nền độ no",new Vector2(190,-45),new Vector2(169,26),new Vector2(0,1));
             hungerFill=CreatePanel(hungerBack.transform,"Thanh no",Vector2.zero,new Vector2(165,22),new Vector2(0,1)).GetComponent<Image>();
             hungerFill.color=new Color(.96f,.71f,.28f);
-            tooltip=FarmUi.TmpLabel(root.transform,"",new Vector2(0,125),new Vector2(810,54),23);
+            tooltip=FarmUi.TmpLabel(root.transform,"",new Vector2(0,135),new Vector2(1500,48),23);
             var tipRect=tooltip.rectTransform;tipRect.anchorMin=tipRect.anchorMax=new Vector2(.5f,0);
-            tipRect.pivot=new Vector2(.5f,0);tipRect.anchoredPosition=new Vector2(0,130);
+            tipRect.pivot=new Vector2(.5f,0);tipRect.anchoredPosition=new Vector2(0,135);tipRect.sizeDelta=new Vector2(1500,48);
             tooltip.alignment=TextAlignmentOptions.Center;
+            tooltip.enableWordWrapping=false;tooltip.overflowMode=TextOverflowModes.Ellipsis;
+            tooltip.enableAutoSizing=true;tooltip.fontSizeMin=16;tooltip.fontSizeMax=23;
+            if(hud.prompt!=null)
+            {
+                var promptRect=hud.prompt.rectTransform;
+                promptRect.anchorMin=promptRect.anchorMax=new Vector2(.5f,0);promptRect.pivot=new Vector2(.5f,.5f);
+                promptRect.anchoredPosition=new Vector2(0,215);promptRect.sizeDelta=new Vector2(1500,42);
+                hud.prompt.alignment=TextAnchor.MiddleCenter;hud.prompt.resizeTextForBestFit=true;
+                hud.prompt.resizeTextMinSize=16;hud.prompt.resizeTextMaxSize=22;
+            }
             creativeControls=FarmUi.TmpLabel(root.transform,"",new Vector2(24,-328),new Vector2(420,110),20);
             var cc=creativeControls.rectTransform;cc.anchorMin=cc.anchorMax=new Vector2(0,1);cc.pivot=new Vector2(0,1);cc.anchoredPosition=new Vector2(24,-328);
             creativeControls.alignment=TextAlignmentOptions.TopLeft;
