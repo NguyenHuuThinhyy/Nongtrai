@@ -6,3 +6,5 @@
 /DongGoi/*.apk binary
 /DongGoi/*.unitypackage binary
 /Builds/README.md text diff merge
+/Builds/Windows-LocalAI/** filter=lfs diff=lfs merge=lfs -text
+/Builds/Android-LocalAI/NongTrai.apk filter=lfs diff=lfs merge=lfs -text
