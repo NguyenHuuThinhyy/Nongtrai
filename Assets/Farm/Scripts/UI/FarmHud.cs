@@ -55,7 +55,13 @@ namespace NongTrai
             if(Array.IndexOf(Environment.GetCommandLineArgs(),"-farmSmokeCheck")<0)
             {
                 if(CreativeModeManager.ConsumeEnterFarmAfterNextLoad())
-                { EnterFarmAfterReload();yield break; }
+                {
+                    player.SetPaused(true);mainMenu.SetActive(false);settingsPanel.SetActive(false);
+                    pausePanel.SetActive(false);gameplayChrome.SetActive(false);
+                    yield return new WaitUntil(()=>save!=null&&save.StartupComplete&&FarmRedesign.InitialPassComplete&&
+                        FarmServices.Instance!=null&&FarmServices.Instance.IsReady);
+                    EnterFarmAfterReload();yield break;
+                }
                 player.SetPaused(true);pausePanel.SetActive(false);mainMenu.SetActive(true);
             }
         }

@@ -179,9 +179,11 @@ namespace NongTrai
         static IEnumerator Fishing(FarmHud hud,FarmPlayer player)
         {
             var fishing=FarmFishing.Instance;player.SetPaused(false);Check(fishing.Open(),"fishing open");int id=fishing.TargetFish;int before=hud.interaction.inventory.Count(id);int money=hud.interaction.shop.Money;
-            float speed=id==116?.8f:.6f;fishing.Advance(.5f/speed);Check(fishing.Strike(),"fish first hit");fishing.Advance(1/speed);Check(fishing.Strike(),"fish second hit");fishing.Advance(1/speed);Check(fishing.Strike(),"fish third hit");
-            Check(hud.interaction.inventory.Count(id)==before+1,"fish reward");fishing.Strike();Check(hud.interaction.inventory.Count(id)==before+1&&hud.interaction.shop.Money==money,"fish duplicate or auto sale");fishing.Close();
-            yield return new WaitForSecondsRealtime(3.2f);player.SetPaused(false);Check(fishing.Open(),"fishing retry");id=fishing.TargetFish;before=hud.interaction.inventory.Count(id);fishing.Advance(25);Check(hud.interaction.inventory.Count(id)==before,"timeout reward");fishing.Close();
+            Check(!fishing.Strike()&&hud.interaction.inventory.Count(id)==before,"early hook awarded a fish");
+            fishing.Advance(fishing.TimeToBite+.01f);Check(fishing.IsBiting,"fish did not bite after approaching the float");
+            Check(fishing.Strike(),"hooking after the bite failed");
+            Check(hud.interaction.inventory.Count(id)==before+1,"fish reward");Check(!fishing.Strike()&&hud.interaction.inventory.Count(id)==before+1&&hud.interaction.shop.Money==money,"fish duplicate or auto sale");fishing.Close();
+            yield return new WaitForSecondsRealtime(3.2f);player.SetPaused(false);Check(fishing.Open(),"fishing retry");id=fishing.TargetFish;before=hud.interaction.inventory.Count(id);fishing.Advance(fishing.TimeToBite+FarmFishing.BiteWindowSeconds+1);Check(fishing.IsFinished&&hud.interaction.inventory.Count(id)==before,"missed bite was not escaped cleanly");fishing.Close();
         }
         static void Capture(Camera camera,string folder,string name,Vector3 position,Vector3 target,int width=1280,int height=720){camera.transform.position=position;camera.transform.LookAt(target);SaveImage(camera,Path.Combine(folder,name+".png"),width,height);}
         static void CaptureUI(Camera camera,FarmHud hud,string folder,string name,int width,int height)
