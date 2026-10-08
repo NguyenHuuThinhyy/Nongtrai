@@ -1,6 +1,6 @@
 # Kết quả kiểm tra nhánh rubric
 
-© HThinh.yy. Cập nhật 06/10/2026. Đây là kết quả kỹ thuật; chủ dự án chưa nghiệm thu.
+© TriForge. Cập nhật 06/10/2026. Đây là kết quả kỹ thuật; chủ dự án chưa nghiệm thu.
 Nhánh `codex/rubric-mobile-ar-ai-cloud`; không gộp main trước xác nhận của chủ dự án.
 
 ## Đợt local ngày06/10/2026

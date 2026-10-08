@@ -1,4 +1,4 @@
-// Copyright HThinh.yy. Local GGUF inference; no socket, service or subprocess.
+// Copyright TriForge. Local GGUF inference; no socket, service or subprocess.
 #include "llama.h"
 #include <atomic>
 #include <algorithm>

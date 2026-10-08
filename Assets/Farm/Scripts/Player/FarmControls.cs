@@ -5,7 +5,7 @@ using UnityEngine.InputSystem.Controls;
 
 namespace NongTrai
 {
-    // © HThinh.yy. Desktop and touch share the same gameplay input edges.
+    // © TriForge. Desktop and touch share the same gameplay input edges.
     public static class FarmControls
     {
         public sealed class ButtonState

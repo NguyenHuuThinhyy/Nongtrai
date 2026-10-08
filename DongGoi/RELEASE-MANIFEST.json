@@ -1,7 +1,7 @@
 {
   "branch": "main",
-  "build_source_commit": "a13f41f6e22c1c05c9178744748b361b735704a6",
-  "source_git_commit": "5aa33e5230c18827f0ae0e1ac1ae802d325bcd86",
+  "build_source_commit": "1adedb73172f9e5c9eda0799a9e6d95f415e5eff",
+  "source_git_commit": "6d1ce43899646e04efa9b70bf039e8ea54056232",
   "date": "2026-10-08",
   "unity": "6000.3.22f1",
   "windows_build": "Succeeded; 0 errors",
@@ -22,25 +22,35 @@
   },
   "packages": [
     {
-      "file": "NongTrai-Windows-20261008-a13f41f.zip",
-      "bytes": 1171930579,
-      "sha256": "73480ff7ede3acbce02ea09a75062625ff85f314c48a6a2af94e6ee43414090d"
+      "file": "NongTrai-Windows-20261008-TriForge-1adedb7.zip",
+      "bytes": 1171982477,
+      "sha256": "464ffc63c237286354f039d31ccf96b51fcdbbaeb8ab70e277676211ff5c4e01"
     },
     {
-      "file": "NongTrai-Android-20261008-a13f41f.apk",
-      "bytes": 1161734829,
-      "sha256": "4e41a0dc1a273fb4395ddd3f4e61123fe6fad8f346f8916d19b03edf0263875f"
+      "file": "NongTrai-Android-20261008-TriForge-1adedb7.apk",
+      "bytes": 1161801689,
+      "sha256": "49176a6a794a50367e073394454eef375d944e54ad61f72b39a71c28a025489d"
     },
     {
-      "file": "NongTrai-Unity-20261008-a13f41f.zip",
-      "bytes": 1187514495,
-      "sha256": "796dd183ac9c13a311fe9d88d7b8b1d54c6c342a160e5ecfccf709ec1838e459"
+      "file": "NongTrai-Unity-20261008-TriForge-1adedb7.zip",
+      "bytes": 1191546588,
+      "sha256": "2a882764773cd563bcb1ded21dc8a051123790a486e5f492ba10e9d14b960086"
+    },
+    {
+      "file": "NongTrai_FirstHarvest_Trailer_30s_1080p.mp4",
+      "bytes": 38188311,
+      "sha256": "68b5cfc1fc8722d42a4777c5bc6168dbeff7d3eb8caae62aa657a716b1beb092"
+    },
+    {
+      "file": "NongTrai_Trailer_Poster.jpg",
+      "bytes": 194962,
+      "sha256": "1888911de74f9020a4f20dcf6a4162632f614435fe1fb4cc0ecb9febd0492a8e"
     }
   ],
-  "release": "localai-20261008-a13f41f",
-  "release_url": "https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/localai-20261008-a13f41f",
-  "publication": "owner requested rebuilding and publishing Windows and APK before trailer capture",
+  "release": "triforge-20261008-1adedb7",
+  "release_url": "https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/triforge-20261008-1adedb7",
+  "publication": "owner requested all game copyright renamed to TriForge, obsolete files cleaned and merged into main",
   "runtime_acceptance": "not tested",
   "physical_android": "not verified",
-  "copyright": "HThinh.yy"
+  "copyright": "TriForge"
 }

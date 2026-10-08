@@ -17,13 +17,13 @@ git lfs pull
 ## Gói tải độc lập
 
 
-© HThinh.yy. Source game ở nhánh `main`. Các gói đầy đủ được phát hành trên GitHub Release:
+© TriForge. Source game ở nhánh `main`. Các gói đầy đủ được phát hành trên GitHub Release:
 
 | Gói | Tải trực tiếp | Dung lượng |
 |---|---|---|
-| Windows có EXE và toàn bộ dữ liệu/model | [Windows ZIP](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/download/localai-20261008-a13f41f/NongTrai-Windows-20261008-a13f41f.zip) | 1,17 GB |
-| Android ARM64, model offline trong APK | [Android APK](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/download/localai-20261008-a13f41f/NongTrai-Android-20261008-a13f41f.apk) | 1,16 GB |
-| Unity đầy đủ kèm model và giấy phép để build tiếp | [Unity source ZIP](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/download/localai-20261008-a13f41f/NongTrai-Unity-20261008-a13f41f.zip) | 1,19 GB |
+| Windows có EXE và toàn bộ dữ liệu/model | [Windows ZIP](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/download/triforge-20261008-1adedb7/NongTrai-Windows-20261008-TriForge-1adedb7.zip) | 1,17 GB |
+| Android ARM64, model offline trong APK | [Android APK](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/download/triforge-20261008-1adedb7/NongTrai-Android-20261008-TriForge-1adedb7.apk) | 1,16 GB |
+| Unity đầy đủ kèm model và giấy phép để build tiếp | [Unity source ZIP](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/download/triforge-20261008-1adedb7/NongTrai-Unity-20261008-TriForge-1adedb7.zip) | 1,19 GB |
 
 Windows: giải nén toàn bộ ZIP, mở `NongTrai.exe` hoặc `CHAY_GAME.bat`. Giữ thư mục dữ liệu, DLL và model cạnh EXE.
 
@@ -33,6 +33,6 @@ Unity: giải nén source ZIP, mở bằng Unity **6000.3.22f1**. Scene chính: 
 
 Nhấn **C** mở chat, **J** mở nông trại thu nhỏ local, **H** ẩn/hiện hướng dẫn.
 
-[Release và checksum](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/localai-20261008-a13f41f). Build từ commit `a13f41f`: Windows/Android đều thành công, 0 lỗi. Đã đối chiếu kích thước và SHA-256 trên GitHub. Chưa nghiệm thu EXE/chat hoặc APK trên thiết bị thật.
+[Release và checksum](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/triforge-20261008-1adedb7). Build từ commit `1adedb7`: Windows/Android đều thành công, 0 lỗi. Đã đối chiếu kích thước và SHA-256 trên GitHub. Chưa nghiệm thu EXE/chat hoặc APK trên thiết bị thật.
 
 Bản Windows/APK có trong main qua Git LFS; Release giữ ZIP tải độc lập và source kèm model. Cache Unity, log tạm và khóa bí mật không thuộc source bàn giao.

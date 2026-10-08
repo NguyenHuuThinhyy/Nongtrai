@@ -15,7 +15,7 @@ using UnityEngine.XR.Management;
 
 namespace NongTrai.Editor
 {
-    // © HThinh.yy. Builds the saved Farm scene; never calls a scene/prefab generator.
+    // © TriForge. Builds the saved Farm scene; never calls a scene/prefab generator.
     public static class FarmTechnologyBuild
     {
         [MenuItem("Nong Trai/Technology/Configure Android and AR")]

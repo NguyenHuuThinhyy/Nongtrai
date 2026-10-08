@@ -1,4 +1,4 @@
-# Copyright (c) HThinh.yy. Build the saved Farm scene without regenerating it.
+# Copyright (c) TriForge. Build the saved Farm scene without regenerating it.
 [CmdletBinding()]
 param(
     [string]$UnityEditor,

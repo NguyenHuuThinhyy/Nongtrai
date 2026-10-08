@@ -1,15 +1,31 @@
 {
-  "source_commit": "a13f41f6e22c1c05c9178744748b361b735704a6",
+  "source_commit": "1adedb73172f9e5c9eda0799a9e6d95f415e5eff",
   "date": "2026-10-08",
   "unity": "6000.3.22f1",
   "scene_sha256": "5665c8e132a60757de69258e23db7b108e5a1ce1b968a46ca0b9e5eab7e94231",
+  "copyright": "TriForge",
   "windows_result": "Succeeded; 0 errors",
   "android_result": "Succeeded; 0 errors",
   "windows": {
-    "source_commit": "a13f41f6e22c1c05c9178744748b361b735704a6",
-    "bytes": 1265493488.0,
+    "source_commit": "1adedb73172f9e5c9eda0799a9e6d95f415e5eff",
+    "bytes": 1265801324.0,
     "file_count": 188,
     "files": [
+      {
+        "path": "NongTrai.exe",
+        "bytes": 667136,
+        "sha256": "8da50e79b68e979c53cafb639961ca6c34d39bfed8e87b91cf9caf5c12c081fe"
+      },
+      {
+        "path": "UnityCrashHandler64.exe",
+        "bytes": 1669544,
+        "sha256": "e427db9fa17c96a9b0084efbfc62164d8560b207856e006445f3649f6bc39d9a"
+      },
+      {
+        "path": "UnityPlayer.dll",
+        "bytes": 36736424,
+        "sha256": "ccb4ff1c1bff882e6acc84d98ef992ff94dfa7685173e5c7669619127ee20335"
+      },
       {
         "path": "D3D12/D3D12Core.dll",
         "bytes": 4725304,
@@ -26,9 +42,14 @@
         "sha256": "87cc0657a97abab1215749ea500d2e079acecdbfdd1b83ad7313cb15f7a223c3"
       },
       {
-        "path": "MonoBleedingEdge/etc/mono/2.0/Browsers/Compat.browser",
-        "bytes": 1605,
-        "sha256": "8a1082057ac5681dcd4e9c227ed7fb8eb42ac1618963b5de3b65739dd77e2741"
+        "path": "MonoBleedingEdge/etc/mono/browscap.ini",
+        "bytes": 311984,
+        "sha256": "4ddd50f31fb968f30bedefc253a46dc3f2890192d05cdaa9e0a64a056eee807e"
+      },
+      {
+        "path": "MonoBleedingEdge/etc/mono/config",
+        "bytes": 3815,
+        "sha256": "5776169973a26a387b8b3e5c0f2301a7ab9a6dd7c7d3efa22a96abc47fbf8662"
       },
       {
         "path": "MonoBleedingEdge/etc/mono/2.0/DefaultWsdlHelpGenerator.aspx",
@@ -51,7 +72,7 @@
         "sha256": "cf2b54339e069b9e42f7d6795eecbf562c50c1011f4ca8f65f578fe52d97ff92"
       },
       {
-        "path": "MonoBleedingEdge/etc/mono/4.0/Browsers/Compat.browser",
+        "path": "MonoBleedingEdge/etc/mono/2.0/Browsers/Compat.browser",
         "bytes": 1605,
         "sha256": "8a1082057ac5681dcd4e9c227ed7fb8eb42ac1618963b5de3b65739dd77e2741"
       },
@@ -76,7 +97,7 @@
         "sha256": "e38bb8cc68fe5b4edecdfd288d094b9e8ced7629039b2a347682aba0d8bd7492"
       },
       {
-        "path": "MonoBleedingEdge/etc/mono/4.5/Browsers/Compat.browser",
+        "path": "MonoBleedingEdge/etc/mono/4.0/Browsers/Compat.browser",
         "bytes": 1605,
         "sha256": "8a1082057ac5681dcd4e9c227ed7fb8eb42ac1618963b5de3b65739dd77e2741"
       },
@@ -101,14 +122,9 @@
         "sha256": "c4cbddd4fd9347b58cc5a72b36dc4ba1ad2bb699e65869d05cd3fb9865f0d824"
       },
       {
-        "path": "MonoBleedingEdge/etc/mono/browscap.ini",
-        "bytes": 311984,
-        "sha256": "4ddd50f31fb968f30bedefc253a46dc3f2890192d05cdaa9e0a64a056eee807e"
-      },
-      {
-        "path": "MonoBleedingEdge/etc/mono/config",
-        "bytes": 3815,
-        "sha256": "5776169973a26a387b8b3e5c0f2301a7ab9a6dd7c7d3efa22a96abc47fbf8662"
+        "path": "MonoBleedingEdge/etc/mono/4.5/Browsers/Compat.browser",
+        "bytes": 1605,
+        "sha256": "8a1082057ac5681dcd4e9c227ed7fb8eb42ac1618963b5de3b65739dd77e2741"
       },
       {
         "path": "MonoBleedingEdge/etc/mono/mconfig/config.xml",
@@ -123,12 +139,12 @@
       {
         "path": "NongTrai_Data/boot.config",
         "bytes": 156,
-        "sha256": "1a66fe8c5cd16c3c9416cff9df91b599c80ce3caffc8e02b67aa6a17ab00d629"
+        "sha256": "fcda45c474d12286ab462e7bf131db1373b35c4ed8b32fe33a2aeebb0ed373dc"
       },
       {
         "path": "NongTrai_Data/globalgamemanagers",
         "bytes": 710324,
-        "sha256": "e788be912e2990363cd545ee3ec93e63f761657bed057457f41e91b10d320a9f"
+        "sha256": "5d3a7c07590dfe8d171bae667592770b5d976450dccaf99735573223377df460"
       },
       {
         "path": "NongTrai_Data/globalgamemanagers.assets",
@@ -146,9 +162,39 @@
         "sha256": "1216cd76ffb5cd98715256f25838fe0113a3a21e40d52fb6eabe4476c4d6b3cf"
       },
       {
+        "path": "NongTrai_Data/resources.assets",
+        "bytes": 34394204,
+        "sha256": "931c58c2cdd9d95853e23edca4656f573ecc987a68652b9d77eb85fa2b30670c"
+      },
+      {
+        "path": "NongTrai_Data/resources.assets.resS",
+        "bytes": 16129440,
+        "sha256": "0bc74ba39c5bbeb270512df180e5d83bd59dad942cc79fee2bd51dc0127ee396"
+      },
+      {
+        "path": "NongTrai_Data/RuntimeInitializeOnLoads.json",
+        "bytes": 8185,
+        "sha256": "f9627f6511afdc862bf43f9d70e24094ccea7946d01d18de7b851316a13f87f4"
+      },
+      {
+        "path": "NongTrai_Data/ScriptingAssemblies.json",
+        "bytes": 4412,
+        "sha256": "b6fc10742d2e1af38ea56b5ed3ba4c208a31812afbfa41af8adb9bde7b596dc2"
+      },
+      {
+        "path": "NongTrai_Data/sharedassets0.assets",
+        "bytes": 1902484,
+        "sha256": "0b1b49a1cbe31dd684027678d6fbb42574134526e86900392b75a9f5160b2085"
+      },
+      {
+        "path": "NongTrai_Data/sharedassets0.assets.resS",
+        "bytes": 1244416,
+        "sha256": "fc4e994686235b41f756eef6a453dace251953084895221a57d3e39de8891d1d"
+      },
+      {
         "path": "NongTrai_Data/Managed/Assembly-CSharp.dll",
-        "bytes": 828928,
-        "sha256": "a0e2f99bbd8ef661fb9a15c41be674d24afb71ae6d49ac499a3d36c584b1fbad"
+        "bytes": 841216,
+        "sha256": "814a345eaf83200550f16bd27db3273fd899f5095a8f48e4259bd1a7432f304a"
       },
       {
         "path": "NongTrai_Data/Managed/Midterm2D.dll",
@@ -856,16 +902,6 @@
         "sha256": "e4b5988ecdc33acf48b6054911dacd1b992a5bfb0d80854c20786aa215082a23"
       },
       {
-        "path": "NongTrai_Data/resources.assets",
-        "bytes": 34393596,
-        "sha256": "dd907d26e3e1daf16d64682d9e2a5b972bde8520b2f42ab919f4c078b2ea8cd2"
-      },
-      {
-        "path": "NongTrai_Data/resources.assets.resS",
-        "bytes": 15834528,
-        "sha256": "879d3b2d1a86cb84e1e525d4ed93f57692a80bd348aca6b86d61973b8c335598"
-      },
-      {
         "path": "NongTrai_Data/Resources/unity default resources",
         "bytes": 5883716,
         "sha256": "32b58bdb9cf090212b46a8ca7436dcdae89e4ef43e9d55a835233c21d1347734"
@@ -876,29 +912,19 @@
         "sha256": "d192e4afa33f67ed2aed8597d42082acdd62e68061030749efbf31a37aebff55"
       },
       {
-        "path": "NongTrai_Data/RuntimeInitializeOnLoads.json",
-        "bytes": 8157,
-        "sha256": "f791ef4ccc823236c092c3e4573d9fbf5083bb2510f4c87bfb23dcd6172c4406"
-      },
-      {
-        "path": "NongTrai_Data/ScriptingAssemblies.json",
-        "bytes": 4412,
-        "sha256": "b6fc10742d2e1af38ea56b5ed3ba4c208a31812afbfa41af8adb9bde7b596dc2"
-      },
-      {
-        "path": "NongTrai_Data/sharedassets0.assets",
-        "bytes": 1902484,
-        "sha256": "0b1b49a1cbe31dd684027678d6fbb42574134526e86900392b75a9f5160b2085"
-      },
-      {
-        "path": "NongTrai_Data/sharedassets0.assets.resS",
-        "bytes": 1244416,
-        "sha256": "fc4e994686235b41f756eef6a453dace251953084895221a57d3e39de8891d1d"
-      },
-      {
         "path": "NongTrai_Data/StreamingAssets/crafting.json",
         "bytes": 6281,
         "sha256": "48a8967b8015e5d3c860d217c1ef13b2b70185352d25ba86b2ee53a271256c34"
+      },
+      {
+        "path": "NongTrai_Data/StreamingAssets/recipes.json",
+        "bytes": 1800,
+        "sha256": "8e7d79a5763a5acc5ecf6578409b38e8fe88f60ff01748413cc5e5ecda7a8041"
+      },
+      {
+        "path": "NongTrai_Data/StreamingAssets/restaurant-recipes.json",
+        "bytes": 10128,
+        "sha256": "242595e8cf3e8b5e9e8054d5304fd5864ab7f8a0a2a5b2b541d2c096ed64fb63"
       },
       {
         "path": "NongTrai_Data/StreamingAssets/FarmAI/llama.cpp-MIT.txt",
@@ -924,40 +950,14 @@
         "path": "NongTrai_Data/StreamingAssets/FarmAI/Qwen3-LICENSE.txt",
         "bytes": 11343,
         "sha256": "832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e"
-      },
-      {
-        "path": "NongTrai_Data/StreamingAssets/recipes.json",
-        "bytes": 1800,
-        "sha256": "8e7d79a5763a5acc5ecf6578409b38e8fe88f60ff01748413cc5e5ecda7a8041"
-      },
-      {
-        "path": "NongTrai_Data/StreamingAssets/restaurant-recipes.json",
-        "bytes": 10128,
-        "sha256": "242595e8cf3e8b5e9e8054d5304fd5864ab7f8a0a2a5b2b541d2c096ed64fb63"
-      },
-      {
-        "path": "NongTrai.exe",
-        "bytes": 667136,
-        "sha256": "8da50e79b68e979c53cafb639961ca6c34d39bfed8e87b91cf9caf5c12c081fe"
-      },
-      {
-        "path": "UnityCrashHandler64.exe",
-        "bytes": 1669544,
-        "sha256": "e427db9fa17c96a9b0084efbfc62164d8560b207856e006445f3649f6bc39d9a"
-      },
-      {
-        "path": "UnityPlayer.dll",
-        "bytes": 36736424,
-        "sha256": "ccb4ff1c1bff882e6acc84d98ef992ff94dfa7685173e5c7669619127ee20335"
       }
     ]
   },
   "android": {
     "path": "Android-LocalAI/NongTrai.apk",
-    "bytes": 1161734829,
-    "sha256": "4e41a0dc1a273fb4395ddd3f4e61123fe6fad8f346f8916d19b03edf0263875f"
+    "bytes": 1161801689,
+    "sha256": "49176a6a794a50367e073394454eef375d944e54ad61f72b39a71c28a025489d"
   },
-  "runtime_acceptance": "not tested",
-  "physical_android": "not verified",
-  "copyright": "HThinh.yy"
+  "runtime_acceptance": "not tested in this branding change",
+  "physical_android": "not verified"
 }

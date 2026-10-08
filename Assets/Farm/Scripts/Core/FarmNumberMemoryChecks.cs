@@ -1,4 +1,4 @@
-// Copyright (c) HThinh.yy. Runs only with -farmSmokeCheck.
+// Copyright (c) TriForge. Runs only with -farmSmokeCheck.
 using System;
 using System.Collections;
 using System.IO;

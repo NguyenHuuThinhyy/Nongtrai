@@ -1,6 +1,6 @@
 # Tiêu chí → chức năng → kiểm thử → minh chứng
 
-© HThinh.yy. Chủ dự án phải tự kiểm tra và xác nhận trước khi gộp main.
+© TriForge. Chủ dự án phải tự kiểm tra và xác nhận trước khi gộp main.
 Không tự quy đổi các mục dưới đây thành 100/100; giảng viên chấm theo rubric chi tiết.
 
 | Thành phần rubric | Chức năng/code | Kiểm tra phải đạt | Minh chứng cần nộp |

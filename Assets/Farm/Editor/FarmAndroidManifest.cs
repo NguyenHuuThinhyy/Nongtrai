@@ -4,7 +4,7 @@ using UnityEditor.Android;
 
 namespace NongTrai.Editor
 {
-    // © HThinh.yy. The classroom backend is reached by HTTP on a private Wi-Fi LAN.
+    // © TriForge. The classroom backend is reached by HTTP on a private Wi-Fi LAN.
     // Patch Unity's generated manifest, keeping its activity/ARCore declarations.
     public sealed class FarmAndroidManifest : IPostGenerateGradleAndroidProject
     {

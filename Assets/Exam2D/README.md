@@ -1,4 +1,4 @@
-# Tìm số 2D — HThinh.yy
+# Tìm số 2D — TriForge
 
 Minigame do người dùng cung cấp qua Cau1_2D.unitypackage. Giữ lưới 7 × 7, 49 số không trùng (0–99), 5 câu, 5 giây/câu và bốn màu của bản gốc.
 
@@ -18,4 +18,4 @@ Tools → Midterm → Build Question 1 chỉ dựng lại scene/prefab 2D sinh t
 
 Tools → Midterm → Export Question 1 package xuất DongGoi/Cau1_2D.unitypackage, hoặc đường dẫn NUMBER_MEMORY_PACKAGE_OUTPUT. Gói chỉ chứa Assets/Exam2D và scene 2D; không chứa bản sao Packages, cache hoặc tài liệu nộp bài ở đường dẫn máy khác.
 
-Copyright (c) HThinh.yy. Giấy phép của package Unity phụ thuộc giữ nguyên trong Packages dự án; gói 2D không phân phối lại source các package đó.
+Copyright (c) TriForge. Giấy phép của package Unity phụ thuộc giữ nguyên trong Packages dự án; gói 2D không phân phối lại source các package đó.

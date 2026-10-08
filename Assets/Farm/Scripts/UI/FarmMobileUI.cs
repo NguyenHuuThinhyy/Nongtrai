@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace NongTrai
 {
-    // © HThinh.yy. Touch controls are also available on Windows with -farmTouch.
+    // © TriForge. Touch controls are also available on Windows with -farmTouch.
     [DefaultExecutionOrder(-150)]
     public sealed class FarmMobileUI : MonoBehaviour
     {

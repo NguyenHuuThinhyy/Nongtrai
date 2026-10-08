@@ -3,7 +3,7 @@
 **Bản LocalAI mới:** mở EXE/APK hoặc CHAY_GAME.bat; AI chỉ nạp khi mở C / Chat và giải phóng khi đóng, không cần backend. [Hướng dẫn offline](LOCAL_CHAT.md).
 Phần dưới chỉ áp dụng khi bạn chọn **AI qua PC** trong AI / Cloud.
 
-© HThinh.yy. Cập nhật 06/10/2026.
+© TriForge. Cập nhật 06/10/2026.
 
 ## Trên PC
 

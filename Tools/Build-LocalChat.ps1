@@ -1,4 +1,4 @@
-# Copyright HThinh.yy. Rebuild the single portable CPU plugin for both targets.
+# Copyright TriForge. Rebuild the single portable CPU plugin for both targets.
 param([string]$Cache=(Join-Path $env:LOCALAPPDATA 'NongTraiNativeChat'),[string]$AndroidPlayer='D:\Unity\Editors\6000.3.22f1\Editor\Data\PlaybackEngines\AndroidPlayer',[ValidateSet('Both','Windows','Android')][string]$Target='Both')
 $ErrorActionPreference='Stop'
 $project=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))

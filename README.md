@@ -1,12 +1,14 @@
 # Nông Trại — First Harvest
 
-© HThinh.yy. Unity **6000.3.22f1**, URP, save **22**.
+© TriForge. Unity **6000.3.22f1**, URP, save **22**.
+<img width="1448" height="1086" alt="image" src="https://github.com/user-attachments/assets/ae7b9f27-26fd-458c-9210-f87eacb7dbd3" />
 
-## Bản mới: AI offline trên Windows / Android
+## Bản mới: TriForge — AI offline trên Windows / Android
 
 Chủ dự án đã cho phép đẩy và gộp bản hiện tại vào **main** ngày 08/10/2026.
 
-- [Tải Windows ZIP có EXE, APK Android và source Unity kèm model](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/localai-20261008-a13f41f).
+- [Tải Windows ZIP có EXE, APK Android và source Unity kèm model](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/triforge-20261008-1adedb7).
+- [Trailer 30 giây — TriForge](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/download/triforge-20261008-1adedb7/NongTrai_FirstHarvest_Trailer_30s_1080p.mp4).
 - Mở `CHAY_GAME.bat` hoặc EXE; nhấn **C** / Chat mới nạp AI. Đóng/ẩn chat hoặc chuyển ứng dụng sẽ hủy xử lý và giải phóng model. Không cần backend, PC khác hay Internet để chat.
 - APK khoảng **1,16 GB**, gồm Qwen3 1.7B do chủ dự án cung cấp. Lần mở chat đầu trên Android chuẩn bị model từ APK; cần thêm khoảng 1,2 GB trống. Khuyến nghị ARM64, 6 GB RAM.
 - **J** mở mô hình nông trại local, **H** ẩn/hiện hướng dẫn. Camera tùy chọn.
@@ -14,7 +16,7 @@ Chủ dự án đã cho phép đẩy và gộp bản hiện tại vào **main** 
 - Source Git giữ Assets/.meta, Packages, ProjectSettings, Backend, Tools, Docs và Evidence. Bản Windows và APK có sẵn trong Builds qua Git LFS; gói ZIP/model để build tiếp ở Release; `DongGoi/RELEASE-MANIFEST.json` và `SHA256SUMS.txt` ghi commit và checksum.
 - Build Windows/Android thành công; việc duyệt gộp của chủ dự án không thay thế kiểm tra runtime. Chưa đo CPU/RAM hay chạy chatbot trên điện thoại thật.
 
-Bản đóng gói ngày 08/10/2026 được build từ commit `a13f41f`, gồm cập nhật icon túi đồ, trồng lại, tiến độ và hình ảnh cây trồng, cùng nhà/nông trại và nhà hàng. Các file lớn được tải tại Release liên kết ở trên; tải đủ ZIP Windows để có EXE và dữ liệu đi kèm.
+Bản đóng gói ngày 08/10/2026 được build từ commit `1adedb7`, gồm cập nhật icon túi đồ, trồng lại, tiến độ và hình ảnh cây trồng, cùng nhà/nông trại và nhà hàng. Đã gộp cập nhật nông trại, âm thanh và boss của thành viên tại commit 9eae2bc và câu cá/khởi động lại tại 502b990 trước khi build lại. Các file lớn được tải tại Release liên kết ở trên; tải đủ ZIP Windows để có EXE và dữ liệu đi kèm.
 
 [Tải trực tiếp EXE/Windows ZIP, APK và source Unity đầy đủ](Builds/README.md).
 
@@ -44,7 +46,7 @@ git lfs install
 git clone --branch main https://github.com/NguyenHuuThinhyy/Nongtrai.git
 ```
 
-GGUF không nằm trong Git. Tải source Unity ZIP ở Release để có model và license; nếu dùng checkout Git, lấy thư mục `Backend/models` từ ZIP vào checkout.
+Model trong bản chơi dùng Git LFS. Tải source Unity ZIP ở Release để có Backend/models và license; nếu dùng checkout Git, lấy thư mục `Backend/models` từ ZIP vào checkout.
 
 Unity Hub → Add project from disk → thư mục checkout. Mở
 `Assets/Farm/Scenes/Farm.unity`. Android cần module Android Build Support/SDK/NDK/OpenJDK.

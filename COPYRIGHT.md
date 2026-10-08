@@ -1,6 +1,6 @@
 # Quyền sở hữu
 
-© 2026 HThinh.yy. Quyền sở hữu mã nguồn, thiết kế và nội dung gốc của game Nông Trại thuộc HThinh.yy.
+© 2026 TriForge. Quyền sở hữu mã nguồn, thiết kế và nội dung gốc của game Nông Trại thuộc TriForge.
 
 Các thành viên được chủ dự án cho phép có thể tải mã để phối hợp phát triển. Không chuyển quyền sở hữu dự án khi tải hoặc đóng góp mã.
 

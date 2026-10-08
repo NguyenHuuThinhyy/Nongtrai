@@ -12,7 +12,7 @@ using UnityEngine.XR.Management;
 
 namespace NongTrai
 {
-    // © HThinh.yy. AR is a view of the live farm, never a second gameplay world.
+    // © TriForge. AR is a view of the live farm, never a second gameplay world.
     public sealed class FarmAR:MonoBehaviour
     {
         public static FarmAR Instance {get;private set;}
