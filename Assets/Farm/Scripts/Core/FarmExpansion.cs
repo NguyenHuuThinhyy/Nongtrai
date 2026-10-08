@@ -62,7 +62,8 @@ namespace NongTrai
             while(Level<LevelCap && Experience>=ExperienceNeeded)
             {
                 Experience-=ExperienceNeeded; Level++;
-                hud.Notify("Lên cấp "+Level+"! Mở bảng N để xem vùng đất mới.");
+                AdventureWolves.Instance?.GainHealthForLevel();
+                hud.Notify("Lên cấp "+Level+"! +20 máu tối đa. Mở bảng N để xem vùng đất mới.");
                 FarmAudio.Instance?.Play(FarmAudio.Cue.Level);
             }
             if(Level>=LevelCap) Experience=Mathf.Min(Experience,ExperienceNeeded-1);

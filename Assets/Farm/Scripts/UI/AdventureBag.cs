@@ -227,7 +227,7 @@ namespace NongTrai
         {
             int id=Item;if(!IsEdible(id))return false;
             if(id==67)
-            {if(AdventureWolves.Instance==null||AdventureWolves.Instance.Health>=100||!inventory.Remove(id,1))return false;
+            {if(AdventureWolves.Instance==null||AdventureWolves.Instance.Health>=AdventureWolves.Instance.MaxHealth||!inventory.Remove(id,1))return false;
              AdventureWolves.Instance.Heal(50);inventory.hud.Notify("Đã uống bình máu • hồi 50 máu.");return true;}
             if(Satiety>=99||!inventory.Remove(id,1))return false;
             bool raw=id==7||id>=57&&id<=59;

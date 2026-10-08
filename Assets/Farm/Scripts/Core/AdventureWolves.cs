@@ -11,6 +11,7 @@ namespace NongTrai
         public static AdventureWolves Instance { get; private set; }
         public int ActiveCount => wolves.Count;
         public float Health { get; private set; } = 100;
+        public float MaxHealth => 100 + Mathf.Max(0,(FarmExpansion.Instance==null?1:FarmExpansion.Instance.Level)-1)*20;
         public bool IsAwaitingRespawn=>deathPanel!=null&&deathPanel.activeSelf;
         readonly List<NightWolf> wolves = new List<NightWolf>();
         readonly List<DayPredator> daytime = new List<DayPredator>();
@@ -41,8 +42,9 @@ namespace NongTrai
             deathPanel.SetActive(false);
         }
         void OnDestroy() { if (Instance == this) Instance = null; }
-        public void Heal(float amount){if(!IsAwaitingRespawn)Health=Mathf.Min(100,Health+Mathf.Max(0,amount));}
-        public void RestoreHealth(float value) { Health = Mathf.Clamp(value <= 0 ? 100 : value, 1, 100);if(deathPanel!=null)deathPanel.SetActive(false); }
+        public void Heal(float amount){if(!IsAwaitingRespawn)Health=Mathf.Min(MaxHealth,Health+Mathf.Max(0,amount));}
+        public void RestoreHealth(float value) { Health = Mathf.Clamp(value <= 0 ? MaxHealth : value, 1, MaxHealth);if(deathPanel!=null)deathPanel.SetActive(false); }
+        public void GainHealthForLevel(){Health=Mathf.Min(MaxHealth,Health+20);}
         public bool IsNight => TimeManager.Instance != null && (TimeManager.Instance.Hour >= 18 || TimeManager.Instance.Hour < 6);
         public bool IsSafe(Vector3 point)
         {
@@ -128,9 +130,9 @@ namespace NongTrai
              while(starvationTimer>=5){starvationTimer-=5;Damage(2,"Đói cạn: -2 máu. Hãy ăn thức ăn chín.");}}
             else
             {starvationTimer=0;
-             if(satiety>70&&Health<100)
+             if(satiety>70&&Health<MaxHealth)
              {healingTimer+=seconds;
-              while(healingTimer>=5&&Health<100){healingTimer-=5;Health=Mathf.Min(100,Health+2);}}
+              while(healingTimer>=5&&Health<MaxHealth){healingTimer-=5;Health=Mathf.Min(MaxHealth,Health+2);}}
              else healingTimer=0;}
         }
         public void Respawn(bool pay)
@@ -155,7 +157,7 @@ namespace NongTrai
                     bag.Sync();
                 }
             }
-            Health=100;starvationTimer=0;deathPanel.SetActive(false);
+            Health=MaxHealth;starvationTimer=0;deathPanel.SetActive(false);
             // TriForge: trả xu giữ đúng điểm ngã; Teleport xóa vận tốc rơi/đẩy còn lại.
             hud.player.Teleport(pay?deathPosition:deathPosition.y>500?FarmTravelPortal.Arrival:IslandManager.FarmArrival);
             hud.Resume();hud.Notify(pay?"Đã hồi sinh TẠI CHỖ và giữ đồ (-100 xu).":"Đã về cổng. Tối đa 3 món rơi tại vị trí ngã xuống.");

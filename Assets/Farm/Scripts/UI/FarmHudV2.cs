@@ -206,10 +206,11 @@ namespace NongTrai
             var clock=TimeManager.Instance;
             if(clock!=null) environmentText.text=clock.ClockText;
             if(CreativeModeManager.IsCreative) environmentText.text+=" • SÁNG TẠO"+(CreativeModeManager.IsFlying?" • ĐANG BAY":"");
+            float maxHealth=AdventureWolves.Instance==null?100:AdventureWolves.Instance.MaxHealth;
             float health=AdventureWolves.Instance==null?100:AdventureWolves.Instance.Health;
             float hunger=AdventureBag.Instance==null?100:AdventureBag.Instance.Satiety;
-            if(survivalText!=null)survivalText.text="MÁU "+Mathf.CeilToInt(health)+"/100    NO "+Mathf.CeilToInt(hunger)+"%";
-            if(healthFill!=null)healthFill.rectTransform.sizeDelta=new Vector2(165*Mathf.Clamp01(health/100),22);
+            if(survivalText!=null)survivalText.text="MÁU "+Mathf.CeilToInt(health)+"/"+Mathf.CeilToInt(maxHealth)+"    NO "+Mathf.CeilToInt(hunger)+"%";
+            if(healthFill!=null)healthFill.rectTransform.sizeDelta=new Vector2(165*Mathf.Clamp01(health/maxHealth),22);
             if(hungerFill!=null)hungerFill.rectTransform.sizeDelta=new Vector2(165*Mathf.Clamp01(hunger/100),22);
             creativeControls.text=FarmControls.Mobile?(CreativeModeManager.IsCreative?"SÁNG TẠO • Menu: bật/tắt bay\nNhảy: lên • Hạ / Bay: xuống":""):CreativeModeManager.IsCreative?
                 (CreativeModeManager.IsFlying?"ĐANG BAY • Space lên, X xuống\nShift nhanh • F8 tắt bay":"SÁNG TẠO • F8 bật bay\nB: túi đồ và xây dựng"):
