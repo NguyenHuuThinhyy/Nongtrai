@@ -10,6 +10,7 @@ namespace NongTrai
     {
         public const string Root = "FarmRedesign/Models/";
         static readonly Dictionary<string, GameObject> cache = new Dictionary<string, GameObject>();
+        static readonly Dictionary<string, Material> golemMaterials = new Dictionary<string, Material>();
         static Sprite panel, button;
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void ResetCache() { cache.Clear(); panel = button = null; }
@@ -108,11 +109,148 @@ namespace NongTrai
         public static void RockGolem(Transform root)
         {
             if(root.GetComponent<FarmRedesignMarker>()!=null)return;
+            if(root.GetComponent<CaveBoss>()!=null) { IceGolem(root); root.gameObject.AddComponent<FarmRedesignMarker>(); return; }
             foreach(Transform child in root) {
                 if(child.GetComponent<MeshFilter>()==null||child.name.Contains("Mắt")||child.name.Contains("Quặng"))continue;
                 FitSurface(child,child.name.Contains("Đầu")?"nature-kit/statue_head":"nature-kit/rock_largeA");
             }
             root.gameObject.AddComponent<FarmRedesignMarker>();
+        }
+        static void IceGolem(Transform root)
+        {
+            // Replace only the boss's old blocky renderers; keep its labels, collider, and combat scripts.
+            foreach(var renderer in root.GetComponentsInChildren<Renderer>(true))
+                if(renderer.GetComponent<TMPro.TMP_Text>()==null) renderer.enabled=false;
+
+            var visual=new GameObject("Golem băng • giáp đá khổng lồ").transform;
+            visual.SetParent(root,false);
+            Color deep=new Color(.075f,.17f,.31f),blue=new Color(.14f,.32f,.52f),mid=new Color(.22f,.43f,.63f);
+            Color pale=new Color(.42f,.68f,.82f),ice=new Color(.70f,.91f,1f),glow=new Color(.12f,.82f,1f);
+
+            // Heavy boots, armored legs, waist, and overlapping chest plates.
+            GolemPiece(visual,"Bàn chân trái",PrimitiveType.Cube,new Vector3(-.43f,.22f,.12f),new Vector3(.78f,.42f,1.02f),deep,Quaternion.Euler(0,-8,0));
+            GolemPiece(visual,"Bàn chân phải",PrimitiveType.Cube,new Vector3(.43f,.22f,.12f),new Vector3(.78f,.42f,1.02f),deep,Quaternion.Euler(0,8,0));
+            GolemPiece(visual,"Ốp ống chân trái",PrimitiveType.Sphere,new Vector3(-.43f,.77f,0),new Vector3(.67f,1.02f,.72f),blue,Quaternion.identity);
+            GolemPiece(visual,"Ốp ống chân phải",PrimitiveType.Sphere,new Vector3(.43f,.77f,0),new Vector3(.67f,1.02f,.72f),blue,Quaternion.identity);
+            GolemPiece(visual,"Giáp đùi trái",PrimitiveType.Sphere,new Vector3(-.43f,1.48f,0),new Vector3(.79f,.98f,.81f),mid,Quaternion.Euler(0,0,-7));
+            GolemPiece(visual,"Giáp đùi phải",PrimitiveType.Sphere,new Vector3(.43f,1.48f,0),new Vector3(.79f,.98f,.81f),mid,Quaternion.Euler(0,0,7));
+            GolemPiece(visual,"Đai đá",PrimitiveType.Cube,new Vector3(0,2.12f,0),new Vector3(1.53f,.5f,.95f),deep,Quaternion.identity);
+            GolemPiece(visual,"Thân băng",PrimitiveType.Sphere,new Vector3(0,2.94f,0),new Vector3(1.85f,1.67f,1.08f),blue,Quaternion.identity);
+            GolemPiece(visual,"Giáp ngực trái",PrimitiveType.Sphere,new Vector3(-.47f,3.17f,.40f),new Vector3(.91f,.91f,.39f),pale,Quaternion.Euler(8,0,-12));
+            GolemPiece(visual,"Giáp ngực phải",PrimitiveType.Sphere,new Vector3(.47f,3.17f,.40f),new Vector3(.91f,.91f,.39f),mid,Quaternion.Euler(-8,0,12));
+            GolemPiece(visual,"Phiến giáp bụng trái",PrimitiveType.Sphere,new Vector3(-.36f,2.54f,.44f),new Vector3(.55f,.62f,.28f),mid,Quaternion.Euler(0,0,-9));
+            GolemPiece(visual,"Phiến giáp bụng phải",PrimitiveType.Sphere,new Vector3(.36f,2.54f,.44f),new Vector3(.55f,.62f,.28f),pale,Quaternion.Euler(0,0,9));
+            GolemPiece(visual,"Pha lê trung tâm",PrimitiveType.Cube,new Vector3(0,2.91f,.65f),new Vector3(.55f,.76f,.25f),glow,Quaternion.Euler(0,0,45),true);
+            GolemPiece(visual,"Dải khố giáp",PrimitiveType.Cube,new Vector3(0,1.66f,.52f),new Vector3(.58f,1.03f,.22f),deep,Quaternion.Euler(0,0,-2));
+            GolemPiece(visual,"Viền dải khố trái",PrimitiveType.Cube,new Vector3(-.32f,1.67f,.53f),new Vector3(.10f,.92f,.24f),ice,Quaternion.Euler(0,0,-2));
+            GolemPiece(visual,"Viền dải khố phải",PrimitiveType.Cube,new Vector3(.32f,1.67f,.53f),new Vector3(.10f,.92f,.24f),pale,Quaternion.Euler(0,0,-2));
+            GolemPiece(visual,"Khóa đai kim cương",PrimitiveType.Cube,new Vector3(0,2.12f,.57f),new Vector3(.52f,.52f,.24f),ice,Quaternion.Euler(0,0,45));
+
+            // Broad spiked shoulders and long plated arms frame the silhouette.
+            Transform strikingArm=null;
+            for(int side=-1;side<=1;side+=2)
+            {
+                GolemPiece(visual,"Vai băng",PrimitiveType.Sphere,new Vector3(side*1.10f,3.68f,0),new Vector3(1.02f,.91f,.96f),mid,Quaternion.identity);
+                var arm=new GameObject(side>0?"Tay đập • khớp vai":"Tay trái • khớp vai").transform;
+                arm.SetParent(visual,false);arm.localPosition=new Vector3(side*1.10f,3.68f,0);
+                if(side>0)strikingArm=arm;
+                GolemPiece(arm,"Cánh tay trên",PrimitiveType.Sphere,new Vector3(side*.19f,-.76f,.02f),new Vector3(.68f,1.05f,.72f),blue,Quaternion.Euler(0,0,side*8));
+                GolemPiece(arm,"Cẳng tay giáp",PrimitiveType.Sphere,new Vector3(side*.32f,-1.55f,.11f),new Vector3(.78f,.94f,.79f),pale,Quaternion.Euler(0,0,side*10));
+                GolemPiece(arm,"Nắm đá",PrimitiveType.Sphere,new Vector3(side*.38f,-2.13f,.16f),new Vector3(.66f,.67f,.65f),deep,Quaternion.identity);
+                for(int claw=0;claw<3;claw++)
+                {
+                    float spread=(claw-1)*.24f;
+                    GolemPiece(arm,"Móng băng",PrimitiveType.Cube,new Vector3(side*.38f+spread,-2.41f,.42f),new Vector3(.17f,.48f,.20f),ice,Quaternion.Euler(18,0,side*(spread*35)));
+                }
+                // Shoulder and forearm shards, pointing out from the body.
+                GolemSpike(visual,"Gai vai lớn",new Vector3(side*1.22f,4.17f,.03f),new Vector3(.32f,.83f,.34f),ice,Quaternion.Euler(0,0,-side*28));
+                GolemSpike(visual,"Gai vai nhỏ",new Vector3(side*1.62f,3.98f,-.03f),new Vector3(.25f,.64f,.28f),pale,Quaternion.Euler(0,0,-side*47));
+                GolemSpike(arm,"Gai cẳng tay",new Vector3(side*.65f,-1.23f,-.03f),new Vector3(.23f,.55f,.25f),ice,Quaternion.Euler(0,0,-side*50));
+                GolemPiece(visual,"Phiến ống chân",PrimitiveType.Cube,new Vector3(side*.43f,.79f,.36f),new Vector3(.43f,.76f,.19f),pale,Quaternion.Euler(8,0,side*5));
+            }
+
+            // A crested ice helm, angular face, glowing eyes, and a crown of jagged crystals.
+            GolemPiece(visual,"Đầu golem",PrimitiveType.Sphere,new Vector3(0,4.20f,.02f),new Vector3(1.02f,.99f,.86f),mid,Quaternion.identity);
+            GolemPiece(visual,"Mặt nạ đá",PrimitiveType.Cube,new Vector3(0,4.08f,.40f),new Vector3(.72f,.55f,.43f),deep,Quaternion.identity);
+            GolemPiece(visual,"Trán băng",PrimitiveType.Cube,new Vector3(0,4.57f,.34f),new Vector3(.91f,.25f,.42f),pale,Quaternion.Euler(0,0,4));
+            for(int side=-1;side<=1;side+=2)
+            {
+                GolemPiece(visual,"Mắt phát sáng",PrimitiveType.Cube,new Vector3(side*.24f,4.18f,.64f),new Vector3(.22f,.09f,.08f),glow,Quaternion.identity,true);
+                GolemSpike(visual,"Gai thái dương",new Vector3(side*.52f,4.49f,-.01f),new Vector3(.24f,.67f,.25f),ice,Quaternion.Euler(0,0,-side*42));
+            }
+            GolemSpike(visual,"Sừng băng giữa",new Vector3(0,4.92f,-.02f),new Vector3(.31f,.91f,.31f),ice,Quaternion.identity);
+            GolemSpike(visual,"Gai đỉnh trái",new Vector3(-.27f,4.78f,-.03f),new Vector3(.21f,.62f,.22f),pale,Quaternion.Euler(0,0,20));
+            GolemSpike(visual,"Gai đỉnh phải",new Vector3(.27f,4.78f,-.03f),new Vector3(.21f,.62f,.22f),pale,Quaternion.Euler(0,0,-20));
+            for(int side=-1;side<=1;side+=2)
+            {
+                for(int shard=0;shard<3;shard++)
+                {
+                    float y=3.78f-shard*.25f;
+                    GolemSpike(visual,"Mảnh giáp vai",new Vector3(side*(.83f+shard*.16f),y,-.24f),new Vector3(.18f,.45f,.2f),shard==1?mid:ice,Quaternion.Euler(side*24,0,-side*34));
+                    GolemSpike(visual,"Mảnh giáp ống chân",new Vector3(side*(.55f+shard*.05f),.65f+shard*.18f,-.16f),new Vector3(.16f,.39f,.17f),shard==1?mid:pale,Quaternion.Euler(0,0,-side*25));
+                }
+            }
+            if(strikingArm!=null)strikingArm.gameObject.AddComponent<IceGolemAttackMotion>();
+        }
+        static void GolemSpike(Transform parent,string name,Vector3 position,Vector3 scale,Color color,Quaternion rotation)
+        {
+            var part=new GameObject(name,typeof(MeshFilter),typeof(MeshRenderer));part.transform.SetParent(parent,false);
+            part.transform.localPosition=position;part.transform.localScale=scale;part.transform.localRotation=rotation;
+            const int sides=8;var vertices=new Vector3[sides+1];var triangles=new int[sides*3+sides*3];
+            for(int i=0;i<sides;i++)
+            {
+                float angle=i*Mathf.PI*2/sides;vertices[i]=new Vector3(Mathf.Cos(angle)*.5f,-.5f,Mathf.Sin(angle)*.5f);
+                int next=(i+1)%sides;triangles[i*3]=i;triangles[i*3+1]=sides;triangles[i*3+2]=next;
+                int b=sides*3+i*3;triangles[b]=0;triangles[b+1]=next;triangles[b+2]=i;
+            }
+            vertices[sides]=new Vector3(0,.5f,0);var mesh=new Mesh{name="Gai đá băng"};mesh.vertices=vertices;mesh.triangles=triangles;mesh.RecalculateNormals();
+            part.GetComponent<MeshFilter>().sharedMesh=mesh;part.GetComponent<Renderer>().sharedMaterial=GolemMaterial(color,false);
+        }
+        static void GolemPiece(Transform parent,string name,PrimitiveType shape,Vector3 position,Vector3 scale,Color color,Quaternion rotation,bool emissive=false)
+        {
+            var part=GameObject.CreatePrimitive(shape);part.name=name;part.transform.SetParent(parent,false);
+            part.transform.localPosition=position;part.transform.localScale=scale;part.transform.localRotation=rotation;
+            Destroy(part.GetComponent<Collider>());
+            if(shape==PrimitiveType.Sphere)part.GetComponent<MeshFilter>().sharedMesh=FacetedIceRockMesh();
+            part.GetComponent<Renderer>().sharedMaterial=GolemMaterial(color,emissive);
+        }
+        static Mesh facetedIceRockMesh;
+        static Mesh FacetedIceRockMesh()
+        {
+            if(facetedIceRockMesh!=null)return facetedIceRockMesh;
+            float t=(1+Mathf.Sqrt(5))* .5f;
+            var points=new List<Vector3>{new Vector3(-1,t,0),new Vector3(1,t,0),new Vector3(-1,-t,0),new Vector3(1,-t,0),new Vector3(0,-1,t),new Vector3(0,1,t),new Vector3(0,-1,-t),new Vector3(0,1,-t),new Vector3(t,0,-1),new Vector3(t,0,1),new Vector3(-t,0,-1),new Vector3(-t,0,1)};
+            for(int i=0;i<points.Count;i++)points[i]=points[i].normalized;
+            var faces=new List<int>{0,11,5,0,5,1,0,1,7,0,7,10,0,10,11,1,5,9,5,11,4,11,10,2,10,7,6,7,1,8,3,9,4,3,4,2,3,2,6,3,6,8,3,8,9,4,9,5,2,4,11,6,2,10,8,6,7,9,8,1};
+            var midpoints=new Dictionary<long,int>();
+            int Midpoint(int a,int b)
+            {
+                int min=Mathf.Min(a,b),max=Mathf.Max(a,b);long key=((long)min<<32)+(uint)max;
+                if(midpoints.TryGetValue(key,out int index))return index;
+                index=points.Count;points.Add((points[a]+points[b]).normalized);midpoints[key]=index;return index;
+            }
+            var refined=new List<int>();
+            for(int i=0;i<faces.Count;i+=3)
+            {
+                int a=faces[i],b=faces[i+1],c=faces[i+2],ab=Midpoint(a,b),bc=Midpoint(b,c),ca=Midpoint(c,a);
+                refined.AddRange(new[]{a,ab,ca,b,bc,ab,c,ca,bc,ab,bc,ca});
+            }
+            var vertices=new List<Vector3>(refined.Count);var indices=new int[refined.Count];
+            for(int i=0;i<refined.Count;i++)
+            {
+                Vector3 p=points[refined[i]];float roughness=.91f+.13f*Mathf.Abs(Mathf.Sin(p.x*37.2f+p.y*19.8f+p.z*51.4f));
+                vertices.Add(p*(.5f*roughness));indices[i]=i;
+            }
+            facetedIceRockMesh=new Mesh{name="Low-poly ice boulder armor"};facetedIceRockMesh.SetVertices(vertices);facetedIceRockMesh.SetTriangles(indices,0);facetedIceRockMesh.RecalculateNormals();facetedIceRockMesh.RecalculateBounds();
+            return facetedIceRockMesh;
+        }
+        static Material GolemMaterial(Color color,bool emissive)
+        {
+            string key=ColorUtility.ToHtmlStringRGB(color)+(emissive?"_glow":"");
+            if(golemMaterials.TryGetValue(key,out var material))return material;
+            material=new Material(Shader.Find("Universal Render Pipeline/Lit"));material.color=color;
+            if(emissive){material.EnableKeyword("_EMISSION");material.SetColor("_EmissionColor",color*1.35f);}
+            material.enableInstancing=true;golemMaterials[key]=material;return material;
         }
         static void Animal(FarmAnimal animal)
         {
@@ -306,5 +444,29 @@ namespace NongTrai
         static Material cropPodMaterial;
         static Material CropPodMaterial
         {get{if(cropPodMaterial==null){cropPodMaterial=new Material(Shader.Find("Universal Render Pipeline/Lit"));cropPodMaterial.color=new Color(.56f,.72f,.24f);cropPodMaterial.enableInstancing=true;}return cropPodMaterial;}}
+    }
+}
+
+public sealed class IceGolemAttackMotion:MonoBehaviour
+{
+    NongTrai.CaveBoss boss;Quaternion restPose;
+    void Awake(){boss=GetComponentInParent<NongTrai.CaveBoss>();restPose=transform.localRotation;}
+    void LateUpdate()
+    {
+        if(boss==null)return;
+        float angle=0;
+        if(boss.AttackWindup>0)
+        {
+            float p=1-Mathf.Clamp01(boss.AttackWindup/Mathf.Max(.01f,boss.AttackWindupDuration));
+            float raise=Mathf.SmoothStep(0,1,Mathf.Clamp01(p/.48f));
+            float slam=Mathf.SmoothStep(0,1,Mathf.Clamp01((p-.48f)/.52f));
+            angle=Mathf.Lerp(0,120,raise)+Mathf.Lerp(0,-135,slam);
+        }
+        else if(boss.AttackRecovery>0)
+        {
+            float p=1-Mathf.Clamp01(boss.AttackRecovery/Mathf.Max(.01f,boss.AttackRecoveryDuration));
+            angle=Mathf.Lerp(-15,0,Mathf.SmoothStep(0,1,p));
+        }
+        transform.localRotation=restPose*Quaternion.Euler(0,0,angle);
     }
 }
