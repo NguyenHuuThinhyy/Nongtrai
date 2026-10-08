@@ -143,7 +143,7 @@ namespace NongTrai
             }
             catch(Exception error) { Debug.LogError("Lưu nông trại thất bại: "+error); return false; }
         }
-        // Copyright (c) HThinh.yy. Retire duplicate bottle items without losing their sale value.
+        // Copyright (c) TriForge. Retire duplicate bottle items without losing their sale value.
         static void MigrateBuckets(SaveData data)
         {
             int refund=0;bool filled=false,hadBottle=false;

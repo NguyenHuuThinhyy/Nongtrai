@@ -1,4 +1,4 @@
-// Copyright (c) HThinh.yy.
+// Copyright (c) TriForge.
 using System;
 using System.Collections;
 using System.IO;
@@ -42,7 +42,7 @@ namespace NongTrai
             sponge.Interact(hud.interaction);Check(inventory.Count(73)==1,"Wet sponge cannot be collected");building.EquipBlock(-1);
             Debug.Log("FARM_SYSTEMS_SPONGE_OK: shop/place/radius-one absorption/full state/collect/save-load.");
 
-            // HThinh.yy: paid revival keeps the death location and inventory, on both maps.
+            // TriForge: paid revival keeps the death location and inventory, on both maps.
             var wolves=AdventureWolves.Instance;
             foreach(var location in new[]{new Vector3(26,.1f,-30.5f),ExplorationWorld.Origin+new Vector3(12.5f,world.SurfaceHeight(12,14)+.1f,14.5f)})
             {

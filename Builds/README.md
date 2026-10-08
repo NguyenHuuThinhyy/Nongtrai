@@ -17,7 +17,7 @@ git lfs pull
 ## Gói tải độc lập
 
 
-© HThinh.yy. Source game ở nhánh `main`. Các gói đầy đủ được phát hành trên GitHub Release:
+© TriForge. Source game ở nhánh `main`. Các gói đầy đủ được phát hành trên GitHub Release:
 
 | Gói | Tải trực tiếp | Dung lượng |
 |---|---|---|

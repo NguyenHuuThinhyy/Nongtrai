@@ -1,4 +1,4 @@
-# Copyright HThinh.yy. Desktop launcher, no administrator rights required.
+# Copyright TriForge. Desktop launcher, no administrator rights required.
 [CmdletBinding()]
 param([switch]$NoGame,[switch]$Lan,[switch]$Mute,[switch]$PrepareOnly,[switch]$VerifyModel)
 $ErrorActionPreference='Stop'

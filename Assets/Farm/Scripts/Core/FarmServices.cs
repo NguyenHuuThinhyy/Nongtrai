@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 namespace NongTrai
 {
-    // © HThinh.yy. Connection preferences and chat are independent of gameplay save22.
+    // © TriForge. Connection preferences and chat are independent of gameplay save22.
     public sealed class FarmServices : MonoBehaviour
     {
         [Serializable] public sealed class Connection { public string url="http://127.0.0.1:8000",key="";public bool remoteChat; }
@@ -46,7 +46,7 @@ namespace NongTrai
         string PreferencesPath=>Path.Combine(Application.persistentDataPath,"farm-connection.json");
         string HistoryPath=>Path.Combine(Application.persistentDataPath,"farm-chat-history.json");
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static void Install(){if(FindFirstObjectByType<FarmPlayer>()!=null&&FindFirstObjectByType<FarmServices>()==null)new GameObject("Farm Android AR AI Cloud • HThinh.yy").AddComponent<FarmServices>();}
+        static void Install(){if(FindFirstObjectByType<FarmPlayer>()!=null&&FindFirstObjectByType<FarmServices>()==null)new GameObject("Farm Android AR AI Cloud • TriForge").AddComponent<FarmServices>();}
         void Awake(){Instance=this;}
         IEnumerator Start()
         {

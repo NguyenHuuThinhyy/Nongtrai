@@ -156,7 +156,7 @@ namespace NongTrai
                 }
             }
             Health=100;starvationTimer=0;deathPanel.SetActive(false);
-            // HThinh.yy: trả xu giữ đúng điểm ngã; Teleport xóa vận tốc rơi/đẩy còn lại.
+            // TriForge: trả xu giữ đúng điểm ngã; Teleport xóa vận tốc rơi/đẩy còn lại.
             hud.player.Teleport(pay?deathPosition:deathPosition.y>500?FarmTravelPortal.Arrival:IslandManager.FarmArrival);
             hud.Resume();hud.Notify(pay?"Đã hồi sinh TẠI CHỖ và giữ đồ (-100 xu).":"Đã về cổng. Tối đa 3 món rơi tại vị trí ngã xuống.");
         }

@@ -1,6 +1,6 @@
 """Start the desktop assistant, pair the game, and own only our child processes.
 
-Copyright HThinh.yy. Invoked by the user's CHAY_GAME_CO_TRO_LY.bat.
+Copyright TriForge. Invoked by the user's CHAY_GAME_CO_TRO_LY.bat.
 """
 import argparse
 import json

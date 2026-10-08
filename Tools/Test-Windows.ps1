@@ -1,4 +1,4 @@
-# © HThinh.yy. Tests are opt-in and run the built player.
+# © TriForge. Tests are opt-in and run the built player.
 param([ValidateSet('Full','Restaurant','Technology','ServicesLive')][string]$Suite='Full',[switch]$Touch)
 $ErrorActionPreference='Stop'
 $project=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))

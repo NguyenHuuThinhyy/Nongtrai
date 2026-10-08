@@ -1,4 +1,4 @@
-// Copyright (c) HThinh.yy.
+// Copyright (c) TriForge.
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -102,7 +102,7 @@ namespace NongTrai
                 counts[i].alignment=TextAlignmentOptions.Right;
                 tile.AddComponent<FarmTooltipTrigger>().Initialize(this,names[i]);
             }
-            var copyright=FarmUi.TmpLabel(hud.transform,"© HThinh.yy",Vector2.zero,new Vector2(230,30),16);
+            var copyright=FarmUi.TmpLabel(hud.transform,"© TriForge",Vector2.zero,new Vector2(230,30),16);
             copyright.rectTransform.anchorMin=copyright.rectTransform.anchorMax=copyright.rectTransform.pivot=new Vector2(1,0);
             copyright.rectTransform.anchoredPosition=new Vector2(-16,8);copyright.alignment=TextAlignmentOptions.Right;copyright.raycastTarget=false;
             displayedMoney=shop.Money;Select(0);

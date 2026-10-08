@@ -1,4 +1,4 @@
-// Copyright (c) HThinh.yy. Farm-to-table simulation; all transfers are explicit transactions.
+// Copyright (c) TriForge. Farm-to-table simulation; all transfers are explicit transactions.
 using System;
 using System.Collections.Generic;
 using System.Linq;

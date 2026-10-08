@@ -1,6 +1,6 @@
 # Tải bản mới và phát triển tiếp
 
-© HThinh.yy. Chủ dự án cho phép phát hành và gộp main ngày 08/10/2026.
+© TriForge. Chủ dự án cho phép phát hành và gộp main ngày 08/10/2026.
 
 1. [GitHub Release LocalAI](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/localai-20261008-a13f41f) có Windows ZIP, APK và source Unity ZIP kèm model/license.
 2. Windows: giải nén toàn bộ ZIP, giữ EXE/Data/DLL; mở CHAY_GAME.bat hoặc NongTrai.exe. C mở chat; J mở mô hình local; H ẩn hướng dẫn. AI chỉ nạp khi chat mở, đóng chat sẽ hủy xử lý và giải phóng model.

@@ -1,4 +1,4 @@
-// Copyright (c) HThinh.yy. Original game code; third-party assets retain their own licenses.
+// Copyright (c) TriForge. Original game code; third-party assets retain their own licenses.
 using System;
 using UnityEngine;
 namespace NongTrai

@@ -103,7 +103,7 @@ namespace NongTrai
             if(chest!=null){chest.unlocked=true;RememberChest(chest);}
             dragIndex=-1;current=chest;chestSession=chest!=null;hud.ShowOverlay(Panel);Refresh();
         }
-        // HThinh.yy: rương mở trực tiếp; đồ chưa lấy còn nguyên cả khi rời vùng rồi quay lại.
+        // TriForge: rương mở trực tiếp; đồ chưa lấy còn nguyên cả khi rời vùng rồi quay lại.
         void RememberChest(FarmChest chest)
         {
             if(chest==null||!chest.isExploration||broken.Contains(chest.key))return;

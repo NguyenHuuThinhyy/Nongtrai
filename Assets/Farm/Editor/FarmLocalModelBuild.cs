@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace NongTrai.Editor
 {
-    // Copyright HThinh.yy. The supplied GGUF is part of both playable packages.
+    // Copyright TriForge. The supplied GGUF is part of both playable packages.
     public sealed class FarmLocalModelBuild : IPreprocessBuildWithReport, IPostGenerateGradleAndroidProject
     {
         public int callbackOrder => 20;

@@ -1,4 +1,4 @@
-"""Nông Trại API. © HThinh.yy. API keys stay on the PC."""
+"""Nông Trại API. © TriForge. API keys stay on the PC."""
 import asyncio
 import hmac
 import json

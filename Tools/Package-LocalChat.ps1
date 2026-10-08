@@ -1,4 +1,4 @@
-# Copyright HThinh.yy. Package the current offline release after owner authorization.
+# Copyright TriForge. Package the current offline release after owner authorization.
 param([Parameter(Mandatory=$true)][string]$BuildSourceCommit,[string]$Label=(Get-Date -Format 'yyyyMMdd-HHmm'),[string]$ReleaseTag=('localai-'+(Get-Date -Format 'yyyyMMdd')))
 $ErrorActionPreference='Stop'
 $project=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))

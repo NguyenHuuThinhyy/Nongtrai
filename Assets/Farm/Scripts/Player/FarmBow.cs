@@ -1,4 +1,4 @@
-// Copyright (c) HThinh.yy.
+// Copyright (c) TriForge.
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;

@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace NongTrai
 {
-    // © HThinh.yy. Automated PC demonstration only; never runs in ordinary play.
+    // © TriForge. Automated PC demonstration only; never runs in ordinary play.
     public sealed class FarmDemoRecorder:MonoBehaviour
     {
         Camera cameraOverride;bool recording;int frame;string folder;

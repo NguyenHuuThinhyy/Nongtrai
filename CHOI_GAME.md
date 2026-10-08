@@ -2,7 +2,7 @@
 
 **Bản LocalAI đã được chủ dự án cho phép phát hành/gộp main:** mở EXE/APK → C / Chat mới nạp model. Đóng chat hủy xử lý và nhả RAM, khi chơi bình thường AI không chạy. Không cần backend/Wi-Fi; Android lấy model từ APK trong lần mở chat đầu tiên. Xem [AI offline](Docs/LOCAL_CHAT.md). Các hướng dẫn backend dưới đây dành cho lựa chọn **AI qua PC**.
 
-© HThinh.yy. Bản local được chủ dự án duyệt gộp main ngày 06/10/2026.
+© TriForge. Bản local được chủ dự án duyệt gộp main ngày 06/10/2026.
 
 - **AI qua PC (tùy chọn): chạy CHAY_GAME_TRO_LY_PC.bat** để mở backend nhẹ và ghi kết nối. Chờ “BACKEND SAN SANG”, vào game rồi nhấn C; AI chỉ nạp khi gửi câu hỏi, nhả RAM sau60giây không dùng. [Cách khởi động và xử lý lỗi](Docs/ASSISTANT_START.md).
 - **BAT_BACKEND_PC.bat** giữ riêng backend chạy; **CHAY_GAME_KHONG_TRO_LY.bat** chơi offline. AR và Hỏi trợ lý trong bản LocalAI không cần backend; chế độ AI qua PC cần backend.

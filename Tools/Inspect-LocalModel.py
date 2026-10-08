@@ -1,4 +1,4 @@
-"""Read GGUF metadata without importing or running a model. Copyright HThinh.yy."""
+"""Read GGUF metadata without importing or running a model. Copyright TriForge."""
 import json
 import struct
 import sys

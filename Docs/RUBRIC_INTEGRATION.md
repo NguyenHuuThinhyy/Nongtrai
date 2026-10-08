@@ -1,6 +1,6 @@
 # Local: nông trại thu nhỏ, trợ lý và Android
 
-© HThinh.yy. Cập nhật phạm vi ngày06/10/2026. Nhánh codex/rubric-mobile-ar-ai-cloud.
+© TriForge. Cập nhật phạm vi ngày06/10/2026. Nhánh codex/rubric-mobile-ar-ai-cloud.
 Chủ dự án đã xác nhận gộp bản local vào main ngày 06/10/2026.
 
 ## Kiến trúc

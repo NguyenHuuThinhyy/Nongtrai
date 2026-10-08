@@ -1,6 +1,6 @@
 # Handoff — LocalAI, 08/10/2026
 
-© HThinh.yy. Chủ dự án yêu cầu dọn bản cũ, đẩy Git và gộp vào main trong lượt hiện tại.
+© TriForge. Chủ dự án yêu cầu dọn bản cũ, đẩy Git và gộp vào main trong lượt hiện tại.
 
 - Code game/build đã tạo từ a13f41f; Windows runtime 1.265.493.488 byte, APK 1.161.734.829 byte, 0 lỗi build. Chưa chạy inference trong EXE, chưa thử APK/đo CPU/RAM thật. Không bật âm thanh khi sửa.
 - FarmLocalChat gọi farm_chat.dll/libfarm_chat.so trong game. Model Qwen3-1.7B-Q4_K_M.gguf do chủ dự án đặt tại Backend/models; SHA256 b139949c5bd74937ad8ed8c8cf3d9ffb1e99c866c823204dc42c0d91fa181897, 1.107.409.472 byte. Apache 2.0; llama.cpp b7199 MIT; giấy phép đi kèm gói.

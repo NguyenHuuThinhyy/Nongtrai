@@ -1,6 +1,6 @@
 # Kịch bản trình diễn và ghi hình
 
-© HThinh.yy. Video PC đã có; kịch bản Android/AR/cloud bên dưới chờ thiết bị và tài khoản.
+© TriForge. Video PC đã có; kịch bản Android/AR/cloud bên dưới chờ thiết bị và tài khoản.
 
 ## Minh chứng đã ghi
 

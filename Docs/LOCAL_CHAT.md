@@ -1,6 +1,6 @@
 # Chat AI offline — bản được chủ dự án cho phép phát hành
 
-© HThinh.yy. Chủ dự án đã yêu cầu đẩy và gộp bản hiện tại vào main ngày 08/10/2026.
+© TriForge. Chủ dự án đã yêu cầu đẩy và gộp bản hiện tại vào main ngày 08/10/2026.
 [Tải Windows, APK và source Unity kèm model](https://github.com/NguyenHuuThinhyy/Nongtrai/releases/tag/localai-20261008-a13f41f).
 
 ## Chơi

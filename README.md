@@ -1,6 +1,6 @@
 # Nông Trại — First Harvest
 
-© HThinh.yy. Unity **6000.3.22f1**, URP, save **22**.
+© TriForge. Unity **6000.3.22f1**, URP, save **22**.
 
 ## Bản mới: AI offline trên Windows / Android
 
