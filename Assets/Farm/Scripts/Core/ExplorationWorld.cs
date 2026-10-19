@@ -317,8 +317,11 @@ namespace NongTrai
                 if(swordSwing)FarmSwordAim.Strike(swordTarget,hud.player.transform.position);
                 return false;
             }
+            // Imported CC0 tree meshes can have a collider in front of the voxel trunk.
+            // Resolve through that presentation collider so the real trunk/leaves remain mineable.
+            bool hitWorld=TryRaycastWorld(ray,out var hit);
             // The third-person ray must pass through the player's own layer and reach past the camera offset.
-            if(Physics.Raycast(ray,out var hit,24,~(1<<8),QueryTriggerInteraction.Ignore))
+            if(hitWorld)
             {
                 var guard=hit.collider.GetComponentInParent<FarmChestGuard>();
                 if(guard!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
@@ -381,6 +384,29 @@ namespace NongTrai
                     if(bag!=null&&(bag.Item==104||bag.Item==107))bag.DamageTool();return MineCell(c,true,true);}
             }
             else{hasTarget=false;hold=0;}
+            return false;
+        }
+        bool TryRaycastWorld(Ray ray,out RaycastHit hit)
+        {
+            const float distance=24;
+            int mask=~(1<<8);
+            if(!Physics.Raycast(ray,out hit,distance,mask,QueryTriggerInteraction.Ignore))return false;
+            if(!IsExploring||IsTerrain(hit.collider)||!IsExplorationDecoration(hit.collider))return true;
+            var hits=Physics.RaycastAll(ray,distance,mask,QueryTriggerInteraction.Ignore);
+            Array.Sort(hits,(left,right)=>left.distance.CompareTo(right.distance));
+            foreach(var candidate in hits)
+                if(IsTerrain(candidate.collider)){hit=candidate;return true;}
+            return true;
+        }
+        bool IsExplorationDecoration(Collider collider)
+        {
+            if(collider==null)return false;
+            var current=collider.transform;
+            while(current!=null)
+            {
+                if(current.name=="CC0 trees and meadow details")return true;
+                current=current.parent;
+            }
             return false;
         }
         public bool IsTerrain(Collider collider){foreach(var c in chunks.Values)if(c.collider==collider)return true;return false;}

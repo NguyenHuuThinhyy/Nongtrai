@@ -62,6 +62,7 @@
 
 - **WASD:** đi 6 m/s. **Shift:** chạy 9 m/s, hao độ no gấp 4 khi thực sự chạy nhanh.
 - **Ngắm dưới chân:** kéo chuột xuống hết; giữ trái để đào thẳng xuống. Cầm khối, nhảy rồi bấm trái để đặt ngay dưới chân. Không được đặt chồng vào người.
+- **Chặt cây ở Khám phá:** chọn **rìu**, ngắm thân hoặc tán cây và giữ chuột trái. Cây CC0 hiển thị phía ngoài không còn chặn tia ngắm; khối thân/lá phía trong nhận đúng thao tác chặt và rơi gỗ.
 - **Ra khỏi nước:** giữ Space và hướng về bờ. Có thể đào một bậc nếu bờ cao hơn tầm nhảy.
 - **Một xô nước duy nhất:** chọn **ô 6 — Xô nước**. **Rỗng:** ngắm hồ/sông trong 6 m, bấm **trái** để đầy. **Đầy:** bấm **trái** lên đất/khối xây để đặt nguồn nước, xô về rỗng. Không dùng chuột phải, không cần chế tạo bình khác. Cây được tưới bằng vòi hoặc nước đặt cạnh ruộng. Nếu xô đã bán/bỏ, mua lại ở trang 4 của shop (50 xu).
 - **Bọt biển:** shop trang 4, 80 xu/khối. Chọn trên hotbar, trái để đặt cạnh nước. Hút nước trong khối 3×3×3 (1 ô mỗi hướng) rồi chuyển **đầy**, không hút lần nữa. Đổi sang dụng cụ khác rồi **phải vào bọt biển** để thu vào túi; có thể bán khô/đầy. Nguồn bị hút mất thì phần dòng chảy từ nguồn đó cũng rút. Đặt nước mới gần vùng đã hút sẽ cho nước lan trở lại.
