@@ -1,4 +1,6 @@
-# Tải game — bản 08/10/2026
+# Tải game — Git main cập nhật Windows 19/10/2026
+
+Bản Windows trong `Windows-LocalAI` được build lại từ commit `81d80f4` để sửa thao tác chặt cây tại map Khám phá. APK Android giữ nguyên từ bản phát hành 08/10/2026, không được rebuild trong lần cập nhật này.
 
 ## Chạy trực tiếp từ checkout main
 
