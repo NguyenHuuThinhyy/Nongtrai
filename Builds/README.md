@@ -1,6 +1,6 @@
 # Tải game — Git main cập nhật Windows 22/10/2026
 
-Bản Windows trong `Windows-LocalAI` được build lại từ commit `1292106` để sửa thao tác ngắm/chặt cây tại map Khám phá. APK Android giữ nguyên từ bản phát hành 08/10/2026, không được rebuild trong lần cập nhật này.
+Bản Windows trong `Windows-LocalAI` được build lại từ commit `b814b10` để cho phép đốn cả cây ở Làng ven hồ trong map Khám phá. APK Android giữ nguyên từ bản phát hành 08/10/2026, không được rebuild trong lần cập nhật này.
 
 ## Chạy trực tiếp từ checkout main
 
