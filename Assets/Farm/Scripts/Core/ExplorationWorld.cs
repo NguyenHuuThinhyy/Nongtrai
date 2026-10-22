@@ -30,7 +30,7 @@ namespace NongTrai
         Component swordTarget;
         [SerializeField] UnityEngine.UI.Image breakFill;
         [SerializeField] UnityEngine.GameObject breakBack;string miningHint="";
-        readonly List<SaplingRecord> saplings=new List<SaplingRecord>();readonly Dictionary<Vector3Int,int> additions=new Dictionary<Vector3Int,int>();readonly Dictionary<SaplingRecord,GameObject> sprouts=new Dictionary<SaplingRecord,GameObject>();readonly HashSet<Vector3Int> leavesToCheck=new HashSet<Vector3Int>();float leafClock;
+        readonly List<SaplingRecord> saplings=new List<SaplingRecord>();readonly Dictionary<Vector3Int,int> additions=new Dictionary<Vector3Int,int>();readonly Dictionary<SaplingRecord,GameObject> sprouts=new Dictionary<SaplingRecord,GameObject>();readonly HashSet<Vector3Int> leavesToCheck=new HashSet<Vector3Int>();readonly Dictionary<int,Vector3Int> treeTargets=new Dictionary<int,Vector3Int>();float leafClock;
         Material[] materials;float hold;float breakDuration=1;int entityTarget;Vector3Int target;bool hasTarget;
         public int MinedCount {get;private set;}
         public int Seed {get;private set;}
@@ -319,7 +319,7 @@ namespace NongTrai
             }
             // Imported CC0 tree meshes can have a collider in front of the voxel trunk.
             // Resolve through that presentation collider so the real trunk/leaves remain mineable.
-            bool hitWorld=TryRaycastWorld(ray,out var hit);
+            bool hitWorld=TryRaycastWorld(ray,out var hit,out var treeCell);
             // The third-person ray must pass through the player's own layer and reach past the camera offset.
             if(hitWorld)
             {
@@ -368,9 +368,9 @@ namespace NongTrai
                     if(hold>=breakDuration){hold=0;if(bag.Item==104||bag.Item==107)bag.DamageTool();return FarmBuildingSystem.Instance.BreakPlaced(placed,true);}return false;
                 }
             }
-            if(IsExploring&&hit.collider!=null&&IsTerrain(hit.collider))
+            if(IsExploring&&(treeCell.HasValue||hit.collider!=null&&IsTerrain(hit.collider)))
             {
-                var c=CellAt(hit.point-hit.normal*.02f);
+                var c=treeCell??CellAt(hit.point-hit.normal*.02f);
                 if(Vector3.Distance(hit.point,hud.player.transform.position+Vector3.up)>6)
                 {miningHint="Tiến gần khối hơn (tầm đào 6 m tính từ nhân vật)";hold=0;hasTarget=false;return false;}
                 if(!hasTarget||target!=c||entityTarget!=0){target=c;hold=0;hasTarget=true;entityTarget=0;}
@@ -386,17 +386,20 @@ namespace NongTrai
             else{hasTarget=false;hold=0;}
             return false;
         }
-        bool TryRaycastWorld(Ray ray,out RaycastHit hit)
+        bool TryRaycastWorld(Ray ray,out RaycastHit hit,out Vector3Int? treeCell)
         {
             const float distance=24;
             int mask=~(1<<8);
-            if(!Physics.Raycast(ray,out hit,distance,mask,QueryTriggerInteraction.Ignore))return false;
-            if(!IsExploring||IsTerrain(hit.collider)||!IsExplorationDecoration(hit.collider))return true;
-            var hits=Physics.RaycastAll(ray,distance,mask,QueryTriggerInteraction.Ignore);
+            bool hitWorld=Physics.Raycast(ray,out hit,distance,mask,QueryTriggerInteraction.Ignore);
+            treeCell=null;
+            if(!IsExploring)return hitWorld;
+            float firstDistance=hitWorld?hit.distance:float.PositiveInfinity;
+            var hits=Physics.RaycastAll(ray,distance,mask,QueryTriggerInteraction.Collide);
             Array.Sort(hits,(left,right)=>left.distance.CompareTo(right.distance));
             foreach(var candidate in hits)
-                if(IsTerrain(candidate.collider)){hit=candidate;return true;}
-            return true;
+                if(candidate.distance<firstDistance&&treeTargets.TryGetValue(candidate.collider.GetInstanceID(),out var cell)&&BlockAt(cell)==7)
+                {hit=candidate;treeCell=cell;return true;}
+            return hitWorld;
         }
         bool IsExplorationDecoration(Collider collider)
         {
@@ -462,7 +465,7 @@ namespace NongTrai
         }
         void DecorateChunk(Vector2Int key,Chunk chunk)
         {
-            if(chunk.decoration!=null){chunk.decoration.SetActive(false);Destroy(chunk.decoration);}
+            if(chunk.decoration!=null){RemoveTreeTargets(chunk.decoration);chunk.decoration.SetActive(false);Destroy(chunk.decoration);}
             chunk.decoration=new GameObject("CC0 trees and meadow details");chunk.decoration.transform.SetParent(chunk.go.transform,false);
             int grassCount=0;
             for(int x=0;x<ChunkSize;x++)for(int z=0;z<ChunkSize;z++)
@@ -471,7 +474,7 @@ namespace NongTrai
                 if(BlockAt(new Vector3Int(gx,top,gz))==7&&BlockAt(new Vector3Int(gx,top-1,gz))!=7)
                 {string tree=Hash(gx,17,gz)%3==0?"nature-kit/tree_pineRoundA":Hash(gx,19,gz)%2==0?"nature-kit/tree_oak":"nature-kit/tree_detailed";
                  var model=FarmRedesign.Add(chunk.decoration.transform,tree,new Vector3(x+.5f,top,z+.5f),5.2f+Hash(gx,23,gz)%20*.08f);
-                 if(model!=null)model.localRotation=Quaternion.Euler(0,Hash(gx,29,gz)%360,0);continue;}
+                 if(model!=null){model.localRotation=Quaternion.Euler(0,Hash(gx,29,gz)%360,0);AddTreeTarget(model,new Vector3Int(gx,top,gz));}continue;}
                 uint hash=Hash(gx,31,gz);int ground=BlockAt(new Vector3Int(gx,top-1,gz));
                 if(ground==1&&hash%31==0&&grassCount++<12)
                 {var grass=FarmRedesign.Add(chunk.decoration.transform,"nature-kit/grass_leafs",new Vector3(x+.5f,top+.01f,z+.5f),.24f+hash%5*.025f);
@@ -479,6 +482,14 @@ namespace NongTrai
                  if(hash%93==0)FarmRedesign.Add(chunk.decoration.transform,hash%2==0?"nature-kit/flower_redA":"nature-kit/flower_yellowC",new Vector3(x+.72f,top+.01f,z+.4f),.20f);}
             }
         }
+        void AddTreeTarget(Transform model,Vector3Int cell)
+        {
+            var info=model.GetComponent<FarmRedesignModel>();var size=info==null?new Vector3(.6f,1,.6f):info.size;
+            var target=model.gameObject.AddComponent<BoxCollider>();target.isTrigger=true;target.center=Vector3.up*(size.y*.5f);target.size=size;
+            treeTargets[target.GetInstanceID()]=cell;
+        }
+        void RemoveTreeTargets(GameObject root)
+        {foreach(var target in root.GetComponentsInChildren<BoxCollider>(true))treeTargets.Remove(target.GetInstanceID());}
         void Dispose(Chunk chunk){if(chunk.go!=null){chunk.go.SetActive(false);Destroy(chunk.go);}if(chunk.mesh!=null)Destroy(chunk.mesh);if(chunk.collisionMesh!=null)Destroy(chunk.collisionMesh);}
         void ClearChunks(){foreach(var chunk in chunks.Values)Dispose(chunk);chunks.Clear();}
         void OnDestroy(){if(Instance==this)Instance=null;ClearChunks();if(materials!=null)foreach(var material in materials)Destroy(material);}
