@@ -1,14 +1,14 @@
 {
-  "source_commit": "81d80f475f340af3440ff4f6c4ea683ce53c10b5",
-  "date": "2026-10-19",
+  "source_commit": "1292106c07840e8006962004f2c51625fd4b0133",
+  "date": "2026-10-22",
   "unity": "6000.3.22f1",
   "scene_sha256": "5665c8e132a60757de69258e23db7b108e5a1ce1b968a46ca0b9e5eab7e94231",
   "copyright": "TriForge",
-  "windows_result": "Succeeded; 0 errors; Windows-only rebuild for exploration tree chopping",
+  "windows_result": "Succeeded; 0 errors; Windows-only rebuild for exploration tree targeting",
   "android_result": "Not rebuilt for this Windows-only fix; existing APK retained",
   "windows": {
-    "source_commit": "81d80f475f340af3440ff4f6c4ea683ce53c10b5",
-    "bytes": 1266022796,
+    "source_commit": "1292106c07840e8006962004f2c51625fd4b0133",
+    "bytes": 1266023308,
     "file_count": 189,
     "files": [
       {
@@ -134,12 +134,12 @@
       {
         "path": "NongTrai_Data/boot.config",
         "bytes": 156,
-        "sha256": "12199c11e0147dcafb57aec78b8a61656cd9b7ebe29f8d231cc0aba6b306524d"
+        "sha256": "3d59b424bfd378ff264dcb7e8f26c0927a4fd519345d309493bf390d3f7a8ace"
       },
       {
         "path": "NongTrai_Data/globalgamemanagers",
         "bytes": 710324,
-        "sha256": "491b9c462a3ce7f4c11df61f9d16ccdd00f882b090fb6ce01ebfafe1241f245d"
+        "sha256": "817377c8d0fc1574967473e0e96f13f8af80dbfa2259a233e44647c4d589ffd9"
       },
       {
         "path": "NongTrai_Data/globalgamemanagers.assets",
@@ -158,8 +158,8 @@
       },
       {
         "path": "NongTrai_Data/Managed/Assembly-CSharp.dll",
-        "bytes": 867840,
-        "sha256": "76d2f8f2e08099a5e1123d0d681440cfac60fb804f09162e3e7df9eabee6277f"
+        "bytes": 868352,
+        "sha256": "d00993f70d36fd2f154e6e86004190776a1f09472b2fea6b54873add6d2ce6b9"
       },
       {
         "path": "NongTrai_Data/Managed/Midterm2D.dll",
@@ -869,7 +869,7 @@
       {
         "path": "NongTrai_Data/resources.assets",
         "bytes": 34394428,
-        "sha256": "6363045ddf1b92fbbb86d9ac8bd0862f23b5301d236788391a136d63bcc0bd32"
+        "sha256": "29114daf180a4cdd84fafa9dccd4d7e00490deb62fc899149af29d335b04141b"
       },
       {
         "path": "NongTrai_Data/resources.assets.resS",
