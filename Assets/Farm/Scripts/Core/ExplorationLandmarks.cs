@@ -38,7 +38,7 @@ namespace NongTrai
             for(int i=0;i<12;i++)
             {float a=i*Mathf.PI*2/12;Vector3 p=new Vector3(Mathf.Cos(a)*12,0,Mathf.Sin(a)*13);
              var tree=FarmRedesign.Add(village,i%3==0?"nature-kit/tree_pineRoundA":"nature-kit/tree_detailed",p,4.6f+i%3*.45f);
-             if(tree!=null)tree.localRotation=Quaternion.Euler(0,i*61,0);
+             if(tree!=null){tree.localRotation=Quaternion.Euler(0,i*61,0);MakeChoppableTree(tree,-9000-i);}
              FarmRedesign.Add(village,"nature-kit/grass_leafs",p+new Vector3(.7f,0,.35f),.32f);}
             // Decorate the generated exploration lake without changing voxel water or swimming rules.
             for(int i=0;i<20;i++)
@@ -47,6 +47,13 @@ namespace NongTrai
              FarmRedesign.Add(landmarks.transform,i%2==0?"nature-kit/rock_largeA":"nature-kit/grass_leafs",p,i%2==0?.42f:.32f);}
             Sign(village,new Vector3(0,3.6f,-10),"LÀNG VEN HỒ • LỐI ĐI GIỮA HAI DÃY NHÀ");
             Sign(landmarks.transform,new Vector3(32,12,12),"HỒ → (56,18) • TẾ ĐÀN → (88,24)\nLÀNG → (24,76) • HỐ SÂU ← (-18,35)\nSÔNG ← (-36,0) • BIỂN ↓ (0,-75)",.22f);
+        }
+        void MakeChoppableTree(Transform tree,int id)
+        {
+            var decor=tree.gameObject.AddComponent<FarmDecorTree>();decor.id=id;
+            var info=tree.GetComponent<FarmRedesignModel>();var size=info==null?new Vector3(.6f,1,.6f):info.size;
+            var collider=tree.gameObject.AddComponent<CapsuleCollider>();collider.center=Vector3.up*(size.y*.5f);
+            collider.radius=Mathf.Max(size.x,size.z)*.3f;collider.height=size.y;
         }
         void Update()
         {

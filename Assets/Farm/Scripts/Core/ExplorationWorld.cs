@@ -323,6 +323,10 @@ namespace NongTrai
             // The third-person ray must pass through the player's own layer and reach past the camera offset.
             if(hitWorld)
             {
+                var landmarkTree=hit.collider.GetComponentInParent<FarmDecorTree>();
+                if(landmarkTree!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
+                {miningHint="Cây làng • giữ trái để đốn";hasTarget=true;hold=0;
+                 if(pressed&&hud.player.TryAttack()){hud.player.TriggerAnimation("Work");landmarkTree.Interact(hud.interaction);}return false;}
                 var guard=hit.collider.GetComponentInParent<FarmChestGuard>();
                 if(guard!=null&&Vector3.Distance(hit.point,hud.player.transform.position)<6)
                 {miningHint=guard.Title+" • né khi hiện NÉ!";hasTarget=true;hold=0;
